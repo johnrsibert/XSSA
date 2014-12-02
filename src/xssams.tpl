@@ -2,8 +2,8 @@ GLOBALS_SECTION;
   #include <math.h>
   #include <adstring.hpp>
   #include "trace.h"
-  //#include <df1b2fun.h>
 
+  //#include <df1b2fun.h>
   //#include "nLogNormal.h"
  
   #undef PINOUT
@@ -143,8 +143,8 @@ PARAMETER_SECTION;
   init_number logT21(-1);
   number T12;
   number T21;
-  init_bounded_number r(0.0,0.25,1);
-  init_bounded_number K(1.0e-8,1e8,-1);
+  init_bounded_number r(0.0,0.5,2);
+  init_bounded_number K(1.0e-8,1e8,1);
 
   init_bounded_vector logsdlogF(1,ngear,-5,5,2);
   //init_vector logsdlogF(1,ngear,1);
@@ -336,6 +336,7 @@ SEPARABLE_FUNCTION void step(const int t, const dvar_vector& f1, const dvar_vect
   dvar_vector ft2(1,ngear);
   for (int g = 1; g <= ngear; g++)
   {
+     TTRACE(t,f1(f1.indexmin()+g-1))
      ft1(g) = f1(f1.indexmin()+g-1);
      ft2(g) = f2(f2.indexmin()+g-1);
   }
@@ -346,6 +347,15 @@ SEPARABLE_FUNCTION void step(const int t, const dvar_vector& f1, const dvar_vect
      {
         dvariable varlogF = square(exp(logsdF(g)));
         nll += 0.5*(log(TWO_M_PI*varlogF) + square(ft1(g)-logF0)/varlogF);
+        if (isnan(value(nll)))
+        {
+           TRACE(nll)
+           TTRACE(t,g)
+           TTRACE(ft1(g),logF0)
+           TTRACE(t,g)
+           write_status(clogf);
+           ad_exit(1);
+        }
      }
   }
 
@@ -356,6 +366,14 @@ SEPARABLE_FUNCTION void step(const int t, const dvar_vector& f1, const dvar_vect
      dvariable varlogF = square(exp(logsdF(g)));
      // fishing mortality prior
      nll += 0.5*(log(TWO_M_PI*varlogF) + square(ft1(g)-ft2(g))/varlogF);
+     if (isnan(value(nll)))
+     {
+        TRACE(nll)
+        TTRACE(t,g)
+        write_status(clogf);
+        ad_exit(1);
+     }
+
   } 
 
   dvar_vector varPop = square(exp(logsdPop));
@@ -370,7 +388,20 @@ SEPARABLE_FUNCTION void step(const int t, const dvar_vector& f1, const dvar_vect
      //TTRACE(nextLogN1,nextLogN2)
      //TTRACE(exp(nextLogN1),exp(nextLogN2))
      nll += 0.5*(log(TWO_M_PI*varPop(1)) + square(nextLogN1-p11)/varPop(1));
+     if (isnan(value(nll)))
+     {
+        TRACE(nll)
+        write_status(clogf);
+        ad_exit(1);
+     }
+
      nll += 0.5*(log(TWO_M_PI*varPop(2)) + square(nextLogN2-p21)/varPop(2));
+     if (isnan(value(nll)))
+     {
+        TRACE(nll)
+        write_status(clogf);
+        ad_exit(1);
+     }
   }
   
   nextLogN1 = p11;
@@ -392,13 +423,32 @@ SEPARABLE_FUNCTION void step(const int t, const dvar_vector& f1, const dvar_vect
   }
   // process error
   nll += 0.5*(log(TWO_M_PI*varPop(1)) + square(nextLogN1-p12)/varPop(1));
+  if (isnan(value(nll)))
+  {
+     TRACE(nll)
+     write_status(clogf);
+     ad_exit(1);
+  }
+
   nll += 0.5*(log(TWO_M_PI*varPop(2)) + square(nextLogN2-p22)/varPop(2));
+  if (isnan(value(nll)))
+  {
+     TRACE(nll)
+     write_status(clogf);
+     ad_exit(1);
+  }
 
   // proportion local
   // Proportion_local = exp(nextLogN1)/(exp(nextLogN1)+exp(nextLogN2));
   dvariable LpropL = nextLogN1 - nextLogN2;
   dvariable varLPropL = square(exp(logsdLPropL));
   nll += 0.5*(log(TWO_M_PI*varLPropL) + square(LpropL - LmeanPropL)/varLPropL);
+  if (isnan(value(nll)))
+  {
+     TRACE(nll)
+     write_status(clogf);
+     ad_exit(1);
+  }
 
   
 
@@ -424,6 +474,13 @@ SEPARABLE_FUNCTION void obs(const int t, const dvar_vector& f, const dvariable& 
      dvariable varYield = square(exp(logsdYield(g)));
      // observation error
      Ynll += 0.5*(log(TWO_M_PI*varYield) + square(obs_catch(g,t)-pred_yield(g))/varYield);
+     if (isnan(value(Ynll)))
+     {
+        TRACE(Ynll)
+        TTRACE(t,g)
+        write_status(clogf);
+        ad_exit(1);
+     }
      }
   }
   nll += Ynll;
