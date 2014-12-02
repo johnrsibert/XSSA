@@ -1,0 +1,14 @@
+# Catch data file path
+#five_gears.dat
+one_gear.dat
+# MFCL forcing data matrix path
+total_biomass.dat
+#
+# Number of time periods
+244
+# Number of fishing gears
+1
+# Time step (quarters)
+1.0
+# MFCL forcing region number
+2

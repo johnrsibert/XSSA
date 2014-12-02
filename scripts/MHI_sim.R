@@ -241,6 +241,8 @@ plot.region.biomass<-function(yr1=1952,yr2=2012,bfile="total_biomass.dat")
 
    save.png.plot("MFCL_region_biomass",width=width,height=height)
    par(old.par)
+#  return(region.biomass)
+   print(summary(t(region.biomass[c(2,4),])))
 }
 
 # compute initial estimates of sdlogF and sdlogYield as

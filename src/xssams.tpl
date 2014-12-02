@@ -1,8 +1,10 @@
 GLOBALS_SECTION;
+  #include <math.h>
+  #include <adstring.hpp>
   #include "trace.h"
-  #include <df1b2fun.h>
+  //#include <df1b2fun.h>
 
-  #include "nLogNormal.h"
+  //#include "nLogNormal.h"
  
   #undef PINOUT
   #define PINOUT(object) pin << "# " << #object ":\n" << setprecision(5) << object << endl;
@@ -12,11 +14,11 @@ GLOBALS_SECTION;
   ofstream clogf;
   const double TWO_M_PI = 2.0*M_PI;
 
-  // ./xssams -noinit -est -l2 10000000  -l3 10000000
+  // ./xssams -noinit -nr 2 -est -l2 10000000  -l3 10000000
   int fexists(const adstring& filename)
   {
-    ifstream ifile(filename);
-    if ( !ifile)
+    std::ifstream ifile(filename);
+    if (!ifile)
        return 0;
     else
        return 1;

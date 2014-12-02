@@ -57,40 +57,44 @@ LL=$(CC)
 
 OBJECTS=ADMB_XMLDoc.o model_xml.o
 
-default: yft0
-all:\
-read_plot_rep \
-yft0
+default: xssams
+#all:\
+#read_plot_rep \
+#yft0
 
-libxfer.a : $(OBJECTS)
-	@echo ------- Create $@; 
-	@echo         from $(OBJECTS)
-	ar -vrc $@ $^
 
-read_plot_rep: read_plot_rep.o libxfer.a
-	@echo ------- Link $@; 
-	$(LD) -o $@ $^ $(LFLAGS) -L. -lxfer
+:%.o
+	@echo ------- Link $^; 
+	$(LD) -o ../run/$@ $^ $(LFLAGS)
 
-%.cpp : %.tpl 
-	@echo ------- Translate $<; 
-	$(ADMB_HOME)/bin/tpl2cpp $(basename $<)
-
-%.o : %.cpp
+%.o:%.cpp
 	@echo ------- Compile $<; 
 	$(CXX) -c $(CFLAGS) -o $@ $<
+
+%.cpp:%.tpl 
+	@echo ------- Translate $<; 
+	$(ADMB_HOME)/bin/tpl2rem $(basename $<)
 
 xssams: xssams.o
 	@echo ------- Link $^; 
 	$(LD) -o ../run/$@ $^ $(LFLAGS)
 
-xssams.cpp: xssams.tpl
-	@echo ------- Translate $<; 
-	$(ADMB_HOME)/bin/tpl2rem $(basename $<)
-
-
-yft0: yft0.o libxfer.a
-	@echo ------- Link $^; 
-	$(LD) -o $@ $^ $(LFLAGS) -L. -lxfer
+#xssams.cpp: xssams.tpl
+#	@echo ------- Translate $<; 
+#	$(ADMB_HOME)/bin/tpl2rem $(basename $<)
+#
+#libxfer.a : $(OBJECTS)
+#	@echo ------- Create $@; 
+#	@echo         from $(OBJECTS)
+#	ar -vrc $@ $^
+#
+#read_plot_rep: read_plot_rep.o libxfer.a
+#	@echo ------- Link $@; 
+#	$(LD) -o $@ $^ $(LFLAGS) -L. -lxfer
+#
+#yft0: yft0.o libxfer.a
+#	@echo ------- Link $^; 
+#	$(LD) -o $@ $^ $(LFLAGS) -L. -lxfer
 
 #####################################################################
 
