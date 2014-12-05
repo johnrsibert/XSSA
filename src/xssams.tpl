@@ -69,18 +69,20 @@ DATA_SECTION;
 
   init_vector init_logsdlogF(1,ngear);
   init_int phase_logsdlogF;
+  !! TTRACE(init_logsdlogF,phase_logsdlogF)
 
-  init_int phase_logsdlogPop;
   init_vector init_logsdlogPop(1,2);
+  init_int phase_logsdlogPop;
 
-  init_int phase_logsdlogYield;
   init_vector init_logsdlogYield(1,ngear);
+  init_int phase_logsdlogYield;
 
   init_number init_LmeanProportion_local;
   init_int phase_LmeanProportion_local;
 
   init_number init_logsdLProportion_local;
   init_int phase_logsdLProportion_local;
+  !! TTRACE(init_logsdLProportion_local,phase_logsdLProportion_local)
 
 
   number ss;      // 1/dt number of interations in the integration
@@ -174,28 +176,28 @@ DATA_SECTION;
     //if (1) ad_exit(1);
 
 PARAMETER_SECTION
-  init_number logT12(phase_logT12);
-  init_number logT21(phase_logT21);
+  init_bounded_number logT12(-5.0,5.0,phase_logT12);
+  init_bounded_number logT21(-5.0,5.0,phase_logT21);
   number T12;
   number T21;
-  init_number logr(phase_logr);
+  init_bounded_number logr(-5.0,5.0,phase_logr);
   number r;
-  init_number logK(phase_logK);
+  init_bounded_number logK(-5.0,5.0,phase_logK);
   number K;
 
 
-  init_vector logsdlogF(1,ngear,phase_logsdlogF);
+  init_bounded_vector logsdlogF(1,ngear,-5.0,5.0,phase_logsdlogF);
   vector varlogF(1,ngear)
 
-  init_vector logsdlogPop(1,2,phase_logsdlogPop);
+  init_bounded_vector logsdlogPop(1,2,-5.0,5.0,phase_logsdlogPop);
   vector varlogPop(1,2);
 
-  init_vector logsdlogYield(1,ngear,phase_logsdlogYield);
+  init_bounded_vector logsdlogYield(1,ngear,-5.0,5.0,phase_logsdlogYield);
   vector varlogYield(1,ngear)
 
   // logit transformed porportion local
-  init_number LmeanProportion_local(phase_LmeanProportion_local);
-  init_number logsdLProportion_local(phase_logsdLProportion_local);
+  init_bounded_number LmeanProportion_local(-5.0,5.0,phase_LmeanProportion_local);
+  init_bounded_number logsdLProportion_local(-5.0,5.0,phase_logsdLProportion_local);
 
   random_effects_vector U(1,lengthU);
 
@@ -230,11 +232,14 @@ PRELIMINARY_CALCS_SECTION
        //logsdLProportion_local = 1.5;
        LmeanProportion_local = init_LmeanProportion_local;
        logsdLProportion_local = init_logsdLProportion_local;
-       double prop = exp(value(LmeanProportion_local));
+       TTRACE(LmeanProportion_local,logsdLProportion_local)
+       double prop = 1.0/(1.0+exp(-value(LmeanProportion_local)));
+       TTRACE(LmeanProportion_local,prop)
 
        double Pop1 = value(prop*K);
-       double Pop2 = value(K-Pop1);
+       double Pop2 = value(K)-Pop1;
        TTRACE(Pop1,Pop2)
+       TTRACE(log(Pop1),log(Pop2))
        dmatrix Ferr(1,ntime,1,ngear); Ferr.fill_randn(77);
        dmatrix logPop1Err(1,ntime,1,2); logPop1Err.fill_randn(79);
        dmatrix logPop2Err(1,ntime,1,2); logPop2Err.fill_randn(75);
@@ -333,6 +338,8 @@ PROCEDURE_SECTION
     TRACE(logsdlogF)
     TRACE(logsdlogPop)
     TRACE(logsdlogYield)
+    TRACE(LmeanProportion_local)
+    TRACE(logsdLProportion_local)
     TRACE(U)
     TTRACE(U(utPop1+1),U(utPop2+1))
     TRACE(obs_catch)
@@ -345,11 +352,19 @@ PROCEDURE_SECTION
   nll = 0.0;
   T12 = exp(logT12);
   T21 = exp(logT21);
+  TTRACE(T12,T21)
   r = exp(logr);
   K = exp(logK);
+  TTRACE(r,K)
+  TRACE(logsdlogF)
   varlogF = square(exp(logsdlogF));
+  TRACE(varlogF)
   varlogPop = square(exp(logsdlogPop));
+  TRACE(varlogPop)
   varlogYield = square(exp(logsdlogYield));
+  TRACE(varlogYield)
+  TRACE(LmeanProportion_local)
+  TRACE(logsdLProportion_local)
 
   TTRACE(U(utPop1+1),U(utPop2+1))
   TRACE(varlogPop)
