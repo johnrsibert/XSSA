@@ -176,13 +176,13 @@ DATA_SECTION;
     //if (1) ad_exit(1);
 
 PARAMETER_SECTION
-  init_bounded_number logT12(-5.0,5.0,phase_logT12);
-  init_bounded_number logT21(-5.0,5.0,phase_logT21);
+  init_bounded_number logT12(-15.0,5.0,phase_logT12);
+  init_bounded_number logT21(-15.0,5.0,phase_logT21);
   number T12;
   number T21;
   init_bounded_number logr(-5.0,5.0,phase_logr);
   number r;
-  init_bounded_number logK(-5.0,5.0,phase_logK);
+  init_bounded_number logK(-1.0,15.0,phase_logK);
   number K;
 
 

@@ -18,9 +18,14 @@ double.lines<-function(x,y,bcol="black",fcol,lwd,lty="solid",pretty=TRUE)
 
 nice.ts.plot<-function(x,y,label=NULL,legend=NULL,bcol="blue",fcol="lightblue",lwd=5)
 {
-#  y <- tplb*tt
-   
-   yrange <- c(0,1.2*max(y,na.rm=TRUE))
+   nlines <- 1
+   if (!is.null(ncol(y)))
+     nlines = ncol(y)
+
+   print(paste("nlines",nlines))
+
+#  yrange <- c(0,1.2*max(y,na.rm=TRUE))
+   yrange <- c(min(y,na.rm=TRUE),1.2*max(y,na.rm=TRUE))
    print(yrange)
    ytic <- pretty(yrange[1]:yrange[2]) #seq(yrange[1],yrange[2],yrange[2]/5)
    xrange <- c(min(x,na.rm=TRUE),max(x,na.rm=TRUE))
@@ -40,7 +45,17 @@ nice.ts.plot<-function(x,y,label=NULL,legend=NULL,bcol="blue",fcol="lightblue",l
       short.abline(c(par("usr")[1],range(x)[2]),c(ytic[i],ytic[i]),col="lightgray",lwd=2)
    #  abline(h=ytic[i],col="lightgray",lwd=2)
    } 
-   double.lines(x,y,bcol=bcol,fcol=fcol,lwd=lwd)
+   if (nlines > 1)
+   {
+      for (n in 1:nlines)
+      {
+        double.lines(x,y[,n],bcol=bcol,fcol=fcol,lwd=lwd)
+      }
+   } 
+   else
+   {
+      double.lines(x,y,bcol=bcol,fcol=fcol,lwd=lwd)
+   }
    if (!is.null(legend))
       text(x[length(x)],y[length(y)],legend,col=bcol,pos=4,offset=0.25,cex=1.0)
    if (!is.null(label))
