@@ -199,6 +199,7 @@ PARAMETER_SECTION
   init_bounded_number LmeanProportion_local(-5.0,5.0,phase_LmeanProportion_local);
   init_bounded_number logsdLProportion_local(-5.0,5.0,phase_logsdLProportion_local);
 
+  !!  TRACE(lengthU)
   random_effects_vector U(1,lengthU);
 
   objective_function_value nll;
@@ -303,25 +304,35 @@ PRELIMINARY_CALCS_SECTION
        }
        else
        {
-          cout << "Successfully created xssams.p00" << endl;
           clogf << "Successfully created xssams.p00" << endl;
+          cout << "Successfully created xssams.p00" << endl;
        }
     }
     trace_init_pars = 1;
 
     clogf << "\nAt end of PRELIMINARY_CALCS_SECTION:"<<endl;
+    TRACE(userfun_entries)
+    TTRACE(utPop1,utPop2)
+    TRACE(Fndxl)
+    TRACE(Fndxu)
+    TRACE(lengthU)
     TRACE(logT12)
     TRACE(logT21)
-    TRACE(r)
-    TRACE(K)
+    TRACE(logr)
+    TRACE(logK)
     TRACE(logsdlogF)
     TRACE(logsdlogPop)
     TRACE(logsdlogYield)
+    TRACE(LmeanProportion_local)
+    TRACE(logsdLProportion_local)
     TRACE(U)
     TTRACE(U(utPop1+1),U(utPop2+1))
     TRACE(obs_catch)
+    TRACE (trace_init_pars)
+
     clogf << endl;
     //if (1) ad_exit(1);
+  
 
 RUNTIME_SECTION
   convergence_criteria .1, 1e-5
@@ -331,6 +342,11 @@ PROCEDURE_SECTION
   if (trace_init_pars)
   {
     clogf << "\nInitial step in to PROCEDURE_SECTION:" << endl;
+    TRACE(userfun_entries)
+    TTRACE(utPop1,utPop2)
+    TRACE(Fndxl)
+    TRACE(Fndxu)
+    TRACE(lengthU)
     TRACE(logT12)
     TRACE(logT21)
     TRACE(logr)
@@ -352,27 +368,17 @@ PROCEDURE_SECTION
   nll = 0.0;
   T12 = exp(logT12);
   T21 = exp(logT21);
-  TTRACE(T12,T21)
   r = exp(logr);
   K = exp(logK);
-  TTRACE(r,K)
-  TRACE(logsdlogF)
   varlogF = square(exp(logsdlogF));
-  TRACE(varlogF)
   varlogPop = square(exp(logsdlogPop));
-  TRACE(varlogPop)
   varlogYield = square(exp(logsdlogYield));
-  TRACE(varlogYield)
-  TRACE(LmeanProportion_local)
-  TRACE(logsdLProportion_local)
 
-  TTRACE(U(utPop1+1),U(utPop2+1))
-  TRACE(varlogPop)
   step_zero(U(Fndxl(1),Fndxu(1)),varlogF,U(utPop1+1),U(utPop2+1),varlogPop,r,K,T12,T21,LmeanProportion_local,logsdLProportion_local,varlogYield);
 
   for (int t = 2; t <= maxtime; t++)
   {
-     step(t,U(Fndxl(t-1),Fndxu(t-1)),U(Fndxl(t),Fndxu(t)),logsdlogF,U(utPop1+t-1),U(utPop1+t),U(utPop2+t-1),U(utPop2+t),varlogPop,r,K,T12,T21,LmeanProportion_local,logsdLProportion_local);
+     step(t, U(Fndxl(t-1),Fndxu(t-1)), U(Fndxl(t),Fndxu(t)), varlogF,U(utPop1+t-1),U(utPop1+t),U(utPop2+t-1),U(utPop2+t),varlogPop,r,K,T12,T21,LmeanProportion_local,logsdLProportion_local);
   }
 
   for (int t = 2; t <= maxtime; t++)
@@ -387,15 +393,13 @@ PROCEDURE_SECTION
      write_status(clogf);
   }
 
-SEPARABLE_FUNCTION void step_zero(const dvar_vector& f, const dvar_vector& varlogF, const dvariable& p1, const dvariable& p2, const dvar_vector& vlp, const dvariable& r, const dvariable& K, const dvariable& T12, const dvariable& T21, const dvariable& LmeanPropL, const dvariable& logsdLPropL,const dvar_vector& varlogYield)
-   TTRACE(p1,p2)
-   TRACE(vlp)
+SEPARABLE_FUNCTION void step_zero(const dvar_vector& f, const dvar_vector& vlF, const dvariable& p1, const dvariable& p2, const dvar_vector& vlp, const dvariable& r, const dvariable& K, const dvariable& T12, const dvariable& T21, const dvariable& LmeanPropL, const dvariable& logsdLPropL,const dvar_vector& varlogYield)
    dvariable logF0 = log(1.0e-8);
    dvar_vector ft(1,ngear);
    for (int g = 1; g <= ngear; g++)
    {
       ft(g) = f(f.indexmin()+g-1);
-      nll += 0.5*(log(TWO_M_PI*varlogF(g)) + square(ft(g)-logF0)/varlogF(g));
+      nll += 0.5*(log(TWO_M_PI*vlF(g)) + square(ft(g)-logF0)/vlF(g));
       if (isnan(value(nll)))
       {
          TTRACE(nll,varlogF(g))
@@ -407,23 +411,30 @@ SEPARABLE_FUNCTION void step_zero(const dvar_vector& f, const dvar_vector& varlo
 
     dvariable tprop = 1.0/(1.0+exp(-LmeanPropL));
     dvariable nextLogN1 = log(tprop*K);
+    dvariable nextLogN2 = log(K - tprop*K);
     nll += 0.5*(log(TWO_M_PI*vlp(1)) + square(nextLogN1-p1)/vlp(1));
     if (isnan(value(nll)))
     {
        TRACE(nll)
+       TTRACE(p1,p2)
+       TTRACE(logK,K)
+       TTRACE(tprop,LmeanPropL)
+       TTRACE(nextLogN1,nextLogN2)
        write_status(clogf);
        ad_exit(1);
     }
 
-    dvariable nextLogN2 = log(K - tprop*K);
     nll += 0.5*(log(TWO_M_PI*vlp(2)) + square(nextLogN2-p2)/vlp(2));
     if (isnan(value(nll)))
     {
        TRACE(nll)
+       TTRACE(p1,p2)
+       TTRACE(logK,K)
+       TTRACE(tprop,LmeanPropL)
+       TTRACE(nextLogN1,nextLogN2)
        write_status(clogf);
        ad_exit(1);
     }
-    TTRACE(nextLogN1,nextLogN2)
   
     // observation error
     dvar_vector log_pred_yield(1,ngear);
@@ -434,13 +445,13 @@ SEPARABLE_FUNCTION void step_zero(const dvar_vector& f, const dvar_vector& varlo
 
        nll += 0.5*(log(TWO_M_PI*varlogYield(g)) + square(obs_catch(g,1)-log_pred_yield(g))/varlogYield(g));
        if (isnan(value(nll)))
-        {
-           TRACE(nll)
-           TRACE(g)
-           write_status(clogf);
-           ad_exit(1);
-        }
-     }
+       {
+          TRACE(nll)
+          TRACE(g)
+          write_status(clogf);
+          ad_exit(1);
+       }
+    }
 
     residuals(1,1) = value(p1);
     residuals(1,2) = value(p2);
@@ -529,7 +540,7 @@ SEPARABLE_FUNCTION void step(const int t, const dvar_vector& f1, const dvar_vect
 
   
 
-SEPARABLE_FUNCTION void obs(const int t, const dvar_vector& f,const dvariable& pop11, const dvariable& pop21,  const dvariable& pop12, const dvariable& pop22, const dvar_vector varlogYield)
+SEPARABLE_FUNCTION void obs(const int t, const dvar_vector& f,const dvariable& pop11, const dvariable& pop21,  const dvariable& pop12, const dvariable& pop22, const dvar_vector vlY)
   dvar_vector ft(1,ngear);
   for (int g = 1; g <= ngear; g++)
   {
@@ -550,7 +561,7 @@ SEPARABLE_FUNCTION void obs(const int t, const dvar_vector& f,const dvariable& p
      if (obs_catch(g,t) > -18.0)
      {
         // observation error
-        Ynll += 0.5*(log(TWO_M_PI*varlogYield(g)) + square(obs_catch(g,t)-log_pred_yield(g))/varlogYield(g));
+        Ynll += 0.5*(log(TWO_M_PI*vlY(g)) + square(obs_catch(g,t)-log_pred_yield(g))/vlY(g));
         if (isnan(value(Ynll)))
         {
            TRACE(Ynll)
