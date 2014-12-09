@@ -2,6 +2,8 @@ GLOBALS_SECTION;
   #include <math.h>
   #include <adstring.hpp>
   #include "trace.h"
+  #include <fvar.hpp>
+  #include <admodel.h>
 
   //#include <df1b2fun.h>
   //#include "nLogNormal.h"
@@ -23,6 +25,24 @@ GLOBALS_SECTION;
     else
        return 1;
   }
+
+  template <typename SCALAR> SCALAR logit(const SCALAR& p)
+  {
+     SCALAR a = log(p/(1.0-p));
+     return a;
+  }
+  template double logit<double>(const double& p);
+  template dvariable logit<dvariable>(const dvariable& p);
+  //template df1b2variable logit(const df1b2variable& p); 
+
+  template <typename SCALAR> SCALAR alogit(const SCALAR& a)
+  {
+     SCALAR p = 1.0/(1.0+exp(-a));
+     return p;
+  }
+  template double alogit<double>(const double& a);
+  template dvariable alogit<dvariable>(const dvariable& a);
+  //template df1b2variable alogit(const df1b2variable& a); 
 
 TOP_OF_MAIN_SECTION
   arrmblsize = 50000000;
@@ -86,15 +106,15 @@ DATA_SECTION;
 
 
   number ss;      // 1/dt number of interations in the integration
-  //init_adstring catch_dat_file(pxml);
   matrix obs_catch;
-  //matrix log_obs_catch;
   matrix forcing_matrix;
   vector immigrant_biomass;
   int pininit;
   number Fmsy;
   number Bmsy;
   number MSY;
+  number ZeroCatch;
+  number logZeroCatch;
   int lengthU;
   int utPop1;
   int utPop2;
@@ -133,10 +153,12 @@ DATA_SECTION;
        cerr  << "error reading " << catch_dat_file << endl;
        ad_exit(1);
     }
+    ZeroCatch = 1.0e-8;
+    logZeroCatch = log(ZeroCatch);
     for (int g = 1; g <= ngear; g++)
       for (int t = 1; t <= ntime; t++)
          if (obs_catch(g,t) <= 0.0)
-            obs_catch(g,t) = 1.0e-8;
+            obs_catch(g,t) = ZeroCatch;
     obs_catch = log(obs_catch);
 
     TRACE(forcing_dat_file)
@@ -228,13 +250,11 @@ PRELIMINARY_CALCS_SECTION
        logsdlogPop(1) = init_logsdlogPop(1);
        logsdlogPop(2) = init_logsdlogPop(2);;
 
-       //double prop = 0.9;
-       //LmeanProportion_local = log(prop/(1.0-prop));
-       //logsdLProportion_local = 1.5;
        LmeanProportion_local = init_LmeanProportion_local;
        logsdLProportion_local = init_logsdLProportion_local;
        TTRACE(LmeanProportion_local,logsdLProportion_local)
-       double prop = 1.0/(1.0+exp(-value(LmeanProportion_local)));
+       //double prop = 1.0/(1.0+exp(-value(LmeanProportion_local)));
+       double prop = alogit(value(LmeanProportion_local));
        TTRACE(LmeanProportion_local,prop)
 
        double Pop1 = value(prop*K);
@@ -374,7 +394,7 @@ PROCEDURE_SECTION
   varlogPop = square(exp(logsdlogPop));
   varlogYield = square(exp(logsdlogYield));
 
-  step_zero(U(Fndxl(1),Fndxu(1)),varlogF,U(utPop1+1),U(utPop2+1),varlogPop,r,K,T12,T21,LmeanProportion_local,logsdLProportion_local,varlogYield);
+  step_zero(U(Fndxl(1),Fndxu(1)),varlogF,U(utPop1+1),U(utPop2+1),varlogPop,K,LmeanProportion_local,logsdLProportion_local,varlogYield);
 
   for (int t = 2; t <= maxtime; t++)
   {
@@ -393,11 +413,13 @@ PROCEDURE_SECTION
      write_status(clogf);
   }
 
-SEPARABLE_FUNCTION void step_zero(const dvar_vector& f, const dvar_vector& vlF, const dvariable& p1, const dvariable& p2, const dvar_vector& vlp, const dvariable& r, const dvariable& K, const dvariable& T12, const dvariable& T21, const dvariable& LmeanPropL, const dvariable& logsdLPropL,const dvar_vector& varlogYield)
-   dvariable logF0 = log(1.0e-8);
+SEPARABLE_FUNCTION void step_zero(const dvar_vector& f, const dvar_vector& vlF, const dvariable& p1, const dvariable& p2, const dvar_vector& vlp, const dvariable& tK, const dvariable& LmeanPropL, const dvariable& logsdLPropL,const dvar_vector& varlogYield)
+   dvariable logF0 = logZeroCatch;
    dvar_vector ft(1,ngear);
    for (int g = 1; g <= ngear; g++)
    {
+      //if (obs_catch(g,1) > logZeroCatch)
+      {
       ft(g) = f(f.indexmin()+g-1);
       nll += 0.5*(log(TWO_M_PI*vlF(g)) + square(ft(g)-logF0)/vlF(g));
       if (isnan(value(nll)))
@@ -407,11 +429,17 @@ SEPARABLE_FUNCTION void step_zero(const dvar_vector& f, const dvar_vector& vlF, 
          write_status(clogf);
          ad_exit(1);
       }
+      }
     }
 
     dvariable tprop = 1.0/(1.0+exp(-LmeanPropL));
-    dvariable nextLogN1 = log(tprop*K);
-    dvariable nextLogN2 = log(K - tprop*K);
+    //dvariable tprop = alogit(LmeanPropL);
+    //df1b2variable tprop = alogit(LmeanPropL);
+    dvariable nextLogN1 = log(tprop*tK);
+    dvariable nextLogN2 = log(tK - tprop*tK);
+    //TTRACE(nextLogN1,nextLogN2)
+    //TTRACE(exp(nextLogN1),exp(nextLogN2))
+    //TTRACE(tK,(exp(nextLogN1)+exp(nextLogN2)))
     nll += 0.5*(log(TWO_M_PI*vlp(1)) + square(nextLogN1-p1)/vlp(1));
     if (isnan(value(nll)))
     {
@@ -441,6 +469,8 @@ SEPARABLE_FUNCTION void step_zero(const dvar_vector& f, const dvar_vector& vlF, 
     dvariable log_total_mean_pop = p1 + p2;
     for (int g = 1; g <= ngear; g++)
     {
+       //if (obs_catch(g,1) > logZeroCatch)
+       {
        log_pred_yield(g) =  logF0 + log_total_mean_pop;
 
        nll += 0.5*(log(TWO_M_PI*varlogYield(g)) + square(obs_catch(g,1)-log_pred_yield(g))/varlogYield(g));
@@ -450,6 +480,7 @@ SEPARABLE_FUNCTION void step_zero(const dvar_vector& f, const dvar_vector& vlF, 
           TRACE(g)
           write_status(clogf);
           ad_exit(1);
+       }
        }
     }
 
@@ -462,7 +493,7 @@ SEPARABLE_FUNCTION void step_zero(const dvar_vector& f, const dvar_vector& vlF, 
       residuals(1, ++rc) = value(log_pred_yield(g));
 
 
-SEPARABLE_FUNCTION void step(const int t, const dvar_vector& f1, const dvar_vector& f2, const dvar_vector& vlF, const dvariable& p11, const dvariable p12, const dvariable& p21, const dvariable p22, const dvar_vector& varPop, const dvariable& r, const dvariable& K, const dvariable& T12, const dvariable& T21, const dvariable& LmeanPropL, const dvariable& logsdLPropL)
+SEPARABLE_FUNCTION void step(const int t, const dvar_vector& f1, const dvar_vector& f2, const dvar_vector& vlF, const dvariable& p11, const dvariable p12, const dvariable& p21, const dvariable p22, const dvar_vector& varPop, const dvariable& tr, const dvariable& tK, const dvariable& tT12, const dvariable& tT21, const dvariable& LmeanPropL, const dvariable& logsdLPropL)
 
   dvar_vector ft1(1,ngear);
   dvar_vector ft2(1,ngear);
@@ -475,7 +506,8 @@ SEPARABLE_FUNCTION void step(const int t, const dvar_vector& f1, const dvar_vect
 
   for (int g = 1; g <= ngear; g++)
   {
-     // fishing mortality prior
+     if (obs_catch(g,t) > logZeroCatch)
+     {
      nll += 0.5*(log(TWO_M_PI*vlF(g)) + square(ft1(g)-ft2(g))/vlF(g));
      if (isnan(value(nll)))
      {
@@ -484,6 +516,7 @@ SEPARABLE_FUNCTION void step(const int t, const dvar_vector& f1, const dvar_vect
         TTRACE(t,g)
         write_status(clogf);
         ad_exit(1);
+     }
      }
 
   } 
@@ -504,10 +537,18 @@ SEPARABLE_FUNCTION void step(const int t, const dvar_vector& f1, const dvar_vect
      prevN1 = exp(prevLogN1);
      prevN2 = exp(prevLogN2);
 
-     nextLogN1 += dt*(r*(1.0 - prevN1/K) - sumFg - T12 - r*prevN2/K);
-     nextLogN2 += dt*(r*(1.0 - prevN2/K) - sumFg - T12 - r*prevN1/K + T21*immigrant_biomass(t)/prevN2);
+     nextLogN1 += dt*(tr*(1.0 - prevN1/tK) - sumFg - tT12 - tr*prevN2/tK);
+     nextLogN2 += dt*(tr*(1.0 - prevN2/tK) - sumFg - tT12 - tr*prevN1/tK + tT21*immigrant_biomass(t)/prevN2);
   }
 
+  if ( (isnan(value(nextLogN1))) || (isnan(value(nextLogN2))) )
+  {
+     TRACE(t)
+     TTRACE(nextLogN1,nextLogN2)
+     TTRACE(prevLogN1,prevLogN2)
+     TTRACE(prevN1,prevN2)
+     TTRACE(tr,tK)
+  }
   // process error N1
   nll += 0.5*(log(TWO_M_PI*varPop(1)) + square(nextLogN1-p12)/varPop(1));
   if (isnan(value(nll)))
@@ -534,6 +575,9 @@ SEPARABLE_FUNCTION void step(const int t, const dvar_vector& f1, const dvar_vect
   if (isnan(value(nll)))
   {
      TRACE(nll)
+     TTRACE(nextLogN1,nextLogN2)
+     TTRACE(LpropL,varLPropL)
+
      write_status(clogf);
      ad_exit(1);
   }
@@ -558,7 +602,7 @@ SEPARABLE_FUNCTION void obs(const int t, const dvar_vector& f,const dvariable& p
   dvariable Ynll = 0.0;
   for (int g = 1; g <= ngear; g++)
   {
-     if (obs_catch(g,t) > -18.0)
+     if (obs_catch(g,t) > logZeroCatch)
      {
         // observation error
         Ynll += 0.5*(log(TWO_M_PI*vlY(g)) + square(obs_catch(g,t)-log_pred_yield(g))/vlY(g));
@@ -582,7 +626,8 @@ SEPARABLE_FUNCTION void obs(const int t, const dvar_vector& f,const dvariable& p
     residuals(t, ++rc) = value(log_pred_yield(g));
 
 FUNCTION void write_status(ofstream& s)
-    double prop = 1.0/(1.0+exp(value(-LmeanProportion_local)));
+    //double prop = 1.0/(1.0+exp(value(-LmeanProportion_local)));
+    double prop = alogit(value(LmeanProportion_local));
     s << "\n# Status after "<< userfun_entries << " PROCEDURE_SECTION entries;" << endl;
     s << "# nll = " << value(nll) << endl;
     s << "# nvar = " << initial_params::nvarcalc() << endl;
@@ -629,7 +674,8 @@ FUNCTION void write_status(ofstream& s)
 
 
 REPORT_SECTION
-    double prop = 1.0/(1.0+exp(value(-LmeanProportion_local)));
+    //double prop = 1.0/(1.0+exp(value(-LmeanProportion_local)));
+    double prop = alogit(value(-LmeanProportion_local));
     REPORT(T21)
     REPORT(T12)
     REPORT(r)
