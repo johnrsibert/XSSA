@@ -25,9 +25,12 @@ nice.ts.plot<-function(x,y,label=NULL,legend=NULL,bcol="blue",fcol="lightblue",l
    print(paste("nlines",nlines))
 
 #  yrange <- c(0,1.2*max(y,na.rm=TRUE))
-   yrange <- c(min(y,na.rm=TRUE),1.2*max(y,na.rm=TRUE))
+#  yrange <- c(min(y,na.rm=TRUE),1.2*max(y,na.rm=TRUE))
+   yrange <- quantile(y,probs=c(0.01,0.99),na.rm=TRUE)
    print(yrange)
-   ytic <- pretty(yrange[1]:yrange[2]) #seq(yrange[1],yrange[2],yrange[2]/5)
+#  ytic <- pretty(yrange[1]:yrange[2])
+   ytic <- seq(yrange[1],yrange[2],yrange[2]/5)
+   print(ytic)
    xrange <- c(min(x,na.rm=TRUE),max(x,na.rm=TRUE))
    print(xrange)
    if (!is.null(legend))
@@ -37,8 +40,8 @@ nice.ts.plot<-function(x,y,label=NULL,legend=NULL,bcol="blue",fcol="lightblue",l
      print(xrange)
    }
 
-#  old.par <- par(no.readonly = TRUE) 
-#  par(mar=c(3,4,1,1)+0.1)
+   old.par <- par(no.readonly = TRUE) 
+   par(mar=c(3,4,1,1)+0.1)
    plot(xrange,yrange,type='n',axes=FALSE,ann=FALSE,yaxs='i')
    for (i in 2:length(ytic))
    {

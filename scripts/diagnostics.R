@@ -38,6 +38,6 @@ plot.diagnostics=function(file="diagnostics.dat")
 
    nice.ts.plot(dat$t,cbind(dat$predC1,dat$obsC1),bcol="orange4",fcol="orange",lwd=lwd)
 
-
    return(dat)
+#  return(cbind(dat$pop1,dat$pop2))
 }
