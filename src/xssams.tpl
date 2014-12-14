@@ -139,7 +139,7 @@ DATA_SECTION;
     ss = 1.0/dt;
     TTRACE(dt,ss);
     obs_catch.allocate(1,ngear,1,ntime);
-    residuals.allocate(1,ntime,1,2*ngear+2);
+    residuals.allocate(1,ntime,1,2*ngear+3);
     residuals.initialize();
     TRACE(catch_dat_file);
     cifstream cc(catch_dat_file);
@@ -404,7 +404,7 @@ PROCEDURE_SECTION
   }
 
   //clogf << "\nStarting obs loop:" << endl;
-  for (int t = 2; t <= maxtime; t++)
+  for (int t = 1; t <= maxtime; t++)
   {
      //TRACE(t)
      //TTRACE(UU(utPop1+t-1),UU(utPop1+t))
@@ -471,15 +471,16 @@ SEPARABLE_FUNCTION void step(const int t, const dvar_vector& f1, const dvar_vect
   }
   dvariable sumFg = 0.0; //sum(ft1); // total fishing mortality
 
+  dvariable Fnll = 0.0;
   for (int g = 1; g <= ngear; g++)
   {
      //if (obs_catch(g,t) > logZeroCatch)
      //{
         sumFg += exp(ft1(g));
-        nll += 0.5*(log(TWO_M_PI*varlogF(g)) + square(ft1(g)-ft2(g))/varlogF(g));
-        if (isnan(value(nll)))
+        Fnll += 0.5*(log(TWO_M_PI*varlogF(g)) + square(ft1(g)-ft2(g))/varlogF(g));
+        if (isnan(value(Fnll)))
         {
-           TTRACE(nll,varlogF(g))
+           TTRACE(Fnll,varlogF(g))
            TTRACE(ft1(g),ft2(g))
            TTRACE(t,g)
            write_status(clogf);
@@ -521,31 +522,33 @@ SEPARABLE_FUNCTION void step(const int t, const dvar_vector& f1, const dvar_vect
      ad_exit(1);
   }
 
+  dvariable Pnll = 0.0;
   // process error N1
-  nll += 0.5*(log(TWO_M_PI*varlogPop(1)) + square(p12-nextLogN1)/varlogPop(1));
-  if (isnan(value(nll)))
+  Pnll += 0.5*(log(TWO_M_PI*varlogPop(1)) + square(p12-nextLogN1)/varlogPop(1));
+  if (isnan(value(Pnll)))
   {
-     TRACE(nll)
+     TRACE(Pnll)
      write_status(clogf);
      ad_exit(1);
   }
 
   // process error N2
-  nll += 0.5*(log(TWO_M_PI*varlogPop(2)) + square(p22-nextLogN2)/varlogPop(2));
-  if (isnan(value(nll)))
+  Pnll += 0.5*(log(TWO_M_PI*varlogPop(2)) + square(p22-nextLogN2)/varlogPop(2));
+  if (isnan(value(Pnll)))
   {
-     TRACE(nll)
+     TRACE(Pnll)
      write_status(clogf);
      ad_exit(1);
   }
 
   // proportion local
   // Proportion_local = exp(nextLogN1)/(exp(nextLogN1)+exp(nextLogN2));
+  dvariable PLnll = 0.0;
   dvariable LpropL = nextLogN1 - nextLogN2;
-  nll += 0.5*(log(TWO_M_PI*varLPropL) + square(LpropL - LmeanPropL)/varLPropL);
-  if (isnan(value(nll)))
+  PLnll += 0.5*(log(TWO_M_PI*varLPropL) + square(LpropL - LmeanPropL)/varLPropL);
+  if (isnan(value(PLnll)))
   {
-     TRACE(nll)
+     TRACE(PLnll)
      TTRACE(nextLogN1,nextLogN2)
      TTRACE(prevLogN1,prevLogN2)
      TTRACE(prevN1,prevN2)
@@ -555,6 +558,9 @@ SEPARABLE_FUNCTION void step(const int t, const dvar_vector& f1, const dvar_vect
      write_status(clogf);
      ad_exit(1);
   }
+
+  clogf << t << " " << Fnll << " " <<Pnll << " " <<PLnll << " " << nll << endl;
+  nll += (Fnll+Pnll+PLnll);
 
   
 
@@ -591,11 +597,14 @@ SEPARABLE_FUNCTION void obs(const int t, const dvar_vector& f,const dvariable& p
         }
      //}
   }
+  clogf << t << " " << Ynll << " " << nll << endl;
   nll += Ynll;
 
   residuals(t,1) = value(pop21);
   residuals(t,2) = value(pop22);
-  int rc = 2 ;
+  residuals(t,3) = exp(value(pop12))/(exp(value(pop12)) + exp(value(pop22)));
+
+  int rc = 3 ;
   for (int g = 1; g <= ngear; g++)
     residuals(t, ++rc) = value(ft(g));
   for (int g = 1; g <= ngear; g++)
@@ -630,7 +639,7 @@ FUNCTION void write_status(ofstream& s)
     s << "# logsdLProportion_local = " << logsdLProportion_local<< " (" 
                                 << active(logsdLProportion_local) <<")" << endl;
     s << "# Residuals:" << endl;
-    s << "  t    pop1   pop2";
+    s << "  t    pop1   pop2  propL";
     for (int g = 1; g <= ngear; g++)
        s << "     F" << g;
 
@@ -641,8 +650,9 @@ FUNCTION void write_status(ofstream& s)
     s << endl;
     for (int t = 1; t <= ntime; t++)
     {
-       s << t << " " << residuals(t,1) << " " << residuals(t,2);
-       int rc = 2;
+       s << t << " " << residuals(t,1) << " " << residuals(t,2) 
+              << " " << residuals(t,3);
+       int rc = 3;
        for (int g = 1; g <= 2*ngear; g++)
           s << " " << residuals(t,++rc);
        for (int g = 1; g <= ngear; g++)
