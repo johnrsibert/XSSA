@@ -5,8 +5,6 @@ GLOBALS_SECTION;
   #include <fvar.hpp>
   #include <admodel.h>
 
-  //#include <df1b2fun.h>
-  //#include "nLogNormal.h"
  
   #undef PINOUT
   #define PINOUT(object) pin << "# " << #object ":\n" << setprecision(5) << object << endl;
@@ -92,12 +90,15 @@ DATA_SECTION;
 
   init_vector init_logsdlogPop(1,2);
   init_int phase_logsdlogPop;
+  !! TTRACE(init_logsdlogPop,phase_logsdlogPop)
 
   init_vector init_logsdlogYield(1,ngear);
   init_int phase_logsdlogYield;
+  !! TTRACE(init_logsdlogYield,phase_logsdlogYield)
 
   init_number init_LmeanProportion_local;
   init_int phase_LmeanProportion_local;
+  !! TTRACE(init_LmeanProportion_local,phase_LmeanProportion_local)
 
   init_number init_logsdLProportion_local;
   init_int phase_logsdLProportion_local;
@@ -211,7 +212,6 @@ PARAMETER_SECTION
   init_bounded_number logT21(-15.0,5.0,phase_logT21);
   init_bounded_number logr(-5.0,5.0,phase_logr);
   //init_number logr(phase_logr);
-  !! TTRACE(logr,phase_logr)
   init_bounded_number logK(-1.0,15.0,phase_logK);
 
 
@@ -393,59 +393,23 @@ PROCEDURE_SECTION
 
   nll = 0.0;
 
-  //TRACE(UU(Fndxl(1),Fndxu(1)))
-  //TTRACE(UU(utPop1),UU(utPop2))
-  //step_zero(U(Fndxl(1),Fndxu(1)),logsdlogF,U(utPop1),U(utPop2),logsdlogPop,logK,LmeanProportion_local,logsdLProportion_local);
- 
-
   for (int t = 2; t <= maxtime; t++)
   {
      step(t, U(Fndxl(t-1),Fndxu(t-1)), U(Fndxl(t),Fndxu(t)), logsdlogF,U(utPop1+t-1), U(utPop1+t),U(utPop2+t-1),U(utPop2+t),logsdlogPop,logr,logK,logT12,logT21,LmeanProportion_local,logsdLProportion_local);
   }
 
-  //clogf << "\nStarting obs loop:" << endl;
   for (int t = 1; t <= maxtime; t++)
   {
-     //TRACE(t)
-     //TTRACE(UU(utPop1+t-1),UU(utPop1+t))
-     //TTRACE(UU(utPop2+t-1),UU(utPop2+t))
      obs(t,U(Fndxl(t),Fndxu(t)),U(utPop1+t-1),U(utPop1+t),U(utPop2+t-1),U(utPop2+t),logsdlogYield);
   }
 
   //TRACE(++userfun_entries)
   ++userfun_entries;
-  if ((userfun_entries % ntime) == 0)
+  if ((lengthU % ntime) == 0)
   {
      write_status(clogf);
   }
   //if (1) ad_exit(1);
-
-SEPARABLE_FUNCTION void step_zero(const dvar_vector& f, const dvar_vector& lsdlogF, const dvariable& p11, const dvariable p21, const dvar_vector& lsdlogPop, const dvariable& lK, const dvariable& LmPropL, const dvariable& lsdLProportion_local)
-
-  dvar_vector varlogF = square(exp(lsdlogF));
-  dvar_vector ft(1,ngear);
-  for (int g = 1; g <= ngear; g++)
-  {
-     //if (obs_catch(g,t) > logZeroCatch)
-        ft(g) = f(f.indexmin()+g-1);
-     //else
-     //   ft(g) = logZeroF;
-     nll += 0.5*(log(TWO_M_PI*varlogF(g)) + square(logZeroF-ft(g))/varlogF(g));
-  }
-
-  dvar_vector varlogPop = square(exp(lsdlogPop));
-  dvariable K = exp(lK);
-  dvariable LmeanPropL = LmPropL;
-  dvariable prop = alogit(LmeanPropL);
-  dvariable nextLogN1 = log(prop*K);
-  dvariable nextLogN2 = log(K - prop*K);
-  TTRACE(p11,p21)
-  TTRACE(nextLogN1,nextLogN2)
-  TTRACE(exp(nextLogN1),exp(nextLogN2))
-  TTRACE(K,(exp(nextLogN1)+exp(nextLogN2)))
-  nll += 0.5*(log(TWO_M_PI*varlogPop(1)) + square(p11 - nextLogN1)/varlogPop(1));
-  nll += 0.5*(log(TWO_M_PI*varlogPop(2)) + square(p21 - nextLogN2)/varlogPop(2));
-
 
 SEPARABLE_FUNCTION void step(const int t, const dvar_vector& f1, const dvar_vector& f2, const dvar_vector& lsdlogF, const dvariable& p11, const dvariable p12, const dvariable& p21, const dvariable p22, const dvar_vector& lsdlogPop, const dvariable& lr, const dvariable& lK, const dvariable& lT12, const dvariable& lT21, const dvariable& LmPropL, const dvariable& lsdLProportion_local)
 
@@ -542,8 +506,9 @@ SEPARABLE_FUNCTION void step(const int t, const dvar_vector& f1, const dvar_vect
   }
 
   // proportion local
-  // Proportion_local = exp(nextLogN1)/(exp(nextLogN1)+exp(nextLogN2));
   dvariable PLnll = 0.0;
+  // Proportion_local = exp(nextLogN1)/(exp(nextLogN1)+exp(nextLogN2));
+  // logit(p) = log(N1)-log(N2)
   dvariable LpropL = nextLogN1 - nextLogN2;
   PLnll += 0.5*(log(TWO_M_PI*varLPropL) + square(LpropL - LmeanPropL)/varLPropL);
   if (isnan(value(PLnll)))
@@ -559,7 +524,7 @@ SEPARABLE_FUNCTION void step(const int t, const dvar_vector& f1, const dvar_vect
      ad_exit(1);
   }
 
-  clogf << t << " " << Fnll << " " <<Pnll << " " <<PLnll << " " << nll << endl;
+  //clogf << t << " " << Fnll << " " <<Pnll << " " <<PLnll << " " << nll << endl;
   nll += (Fnll+Pnll+PLnll);
 
   
@@ -597,7 +562,7 @@ SEPARABLE_FUNCTION void obs(const int t, const dvar_vector& f,const dvariable& p
         }
      //}
   }
-  clogf << t << " " << Ynll << " " << nll << endl;
+  //clogf << t << " " << Ynll << " " << nll << endl;
   nll += Ynll;
 
   residuals(t,1) = value(pop21);
