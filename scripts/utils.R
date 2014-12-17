@@ -16,29 +16,27 @@ double.lines<-function(x,y,bcol="black",fcol,lwd,lty="solid",pretty=TRUE)
     lines(x,y,col=fcol,lwd=2)
 }
 
-nice.ts.plot<-function(x,y,label=NULL,legend=NULL,bcol="blue",fcol="lightblue",lwd=5)
+nice.ts.plot<-function(x,y,label=NULL,legend=NULL,bcol="blue",fcol="lightblue",lwd=5,ylab=NULL)
 {
    nlines <- 1
    if (!is.null(ncol(y)))
      nlines = ncol(y)
 
-   print(paste("nlines",nlines))
-
-#  yrange <- c(0,1.2*max(y,na.rm=TRUE))
+   yrange <- c(0,1.2*max(y,na.rm=TRUE))
 #  yrange <- c(min(y,na.rm=TRUE),1.2*max(y,na.rm=TRUE))
    q <- quantile(y,probs=c(0.01,0.99),na.rm=TRUE)
-   yrange <- c(q[1],(1.6*q[2]))
-   print(yrange)
-#  ytic <- pretty(yrange[1]:yrange[2])
-   ytic <- seq(yrange[1],yrange[2],((yrange[2]-yrange[1])/5))
-   print(ytic)
+#  yrange <- c(q[1],(1.6*q[2]))
+#  print(yrange)
+   ytic <- pretty(yrange[1]:yrange[2])
+#  ytic <- seq(yrange[1],yrange[2],((yrange[2]-yrange[1])/5))
+#  print(ytic)
    xrange <- c(min(x,na.rm=TRUE),max(x,na.rm=TRUE))
-   print(xrange)
+#  print(xrange)
    if (!is.null(legend))
    {
-     print(paste(legend,nchar(legend)))
+   # print(paste(legend,nchar(legend)))
      xrange[2] = xrange[2]+nchar(legend)*1.5
-     print(xrange)
+   # print(xrange)
    }
 
    old.par <- par(no.readonly = TRUE) 
@@ -70,7 +68,7 @@ nice.ts.plot<-function(x,y,label=NULL,legend=NULL,bcol="blue",fcol="lightblue",l
 
    axis(2,lwd=0,las=1,at=ytic[2:length(ytic)])
    abline(v=par("usr")[1],lwd=3)
-#  mtext("Catch (mt)",side=2,line=3)
+   mtext(ylab,side=2,line=3)
 #  par(old.par)
 }
 

@@ -57,7 +57,7 @@ Honolulu, HI  96822 U.S.A.\\[0.125in]
 
 \doublespacing
 
-\section*{Introducetion}
+\section*{Introduction}
 The Yellowfin Tuna (YFT) population in main Hawaiian Islands (MHI) is
 embedded in a larger pan-Pacific stock. Nevertheless, local fishermen
 believe that the MHI supports a ``resident'' yellowfin population.
@@ -76,29 +76,55 @@ fisheries is an important an important  local issue deserving of scientific supp
 This paper explores some potential models that might be used to
 analyze options for the management of fisheries for YFT in the MHI.
 
+The principle assumptions for modeling the MHI YFT population are:
+\begin{enumerate}
+\item The Pacific Ocean near Hawaii is divided into two locations:
+MHI (region 1) and elsewhere (region 2).
+\item Fish emigrate from region 1 to region 2, but emigrant fish have
+no effect on region 2 population dynamics.
+\item Fish immigrate from region 2 to region 1, and mix thoroughly.
+\item Immigrant fish are indistinguishable from ``resident'' fish
+(i.e. both groups of fish have the same population dynamics) and
+interact with the fishing gear identically.
+\item Immigration into the MHI is dependent on the
+biomass of the yellowfin population outside of the MHI as estimated by
+some other model, e.g., \MFCL\ or \SD.
+\item The fishery consists of several gear types, each with characteristic
+fishing mortality.
+\item The evolution of fishing mortality over time is a random walk
+where the current fishing mortality is equal to the fishing mortality
+in the previous quarter plus a random deviation.
+\end{enumerate}
+
 \section*{Data}
-Two sources of data used are used in this analysis:
+Several sources of data used are used in this analysis:
 \begin{enumerate}
 \item  Yellowfin catch weights reported to the Hawaii Department of Aquatic
 Resources (HDAR) from 1949 to 2014 from the  Offshore Handline, Toll,
 Inshore Handline, Longline, and Aku Boat fleets.
 \item Longline yellowfin catch weights reported to the National Oceanic and
-Atmospheric Administration, National Marine Fisheries Service (NMFS)
-unfer the federally mandated log book program from
-\help{1992 to 2014. 
-\item Estimates of yellowfin catch weight of fish sampled at the
-Honolulu auction by NMFS staff.
-} 
-\item Model estimates of yellowfin biomass for MFCL regions 1 and 2
+Atmospheric Administration, National Marine Fisheries Service (NOAA)
+under the federally mandated log book program from 1995 through 2013.
+\item Measurements of yellowfin weights fish sampled at the
+Honolulu auction by NMFS staff from 2000 through 2013.
+\item Model estimates of yellowfin biomass for MFCL regions 2 and 4
 provided by the Oceanic Fisheries Programme at the Secretariat of the
-Pacific Community (SPC) in Noumea, New Caledonia. These :w
-estimates span
+Pacific Community (SPC) in Noumea, New Caledonia. These estimates span
 the period 1952 through 2012.
 \end{enumerate}
 All data are reported by quarter of the year.
 
+The Hawaii longline fishery has a long history and changed radically
+in the 1990s when new vessels entered the fleet and fishing gear was
+modernized.
+The HDAR longline data covers the period 1949 through 2001 and does
+not differentiate between ``deep'' and ``shallow'' sets.
+The NOAA longline data covers the period 1995 through 2013 and reports deep
+and shallow set set separately.
+Thus the period of most ratical change is include in time series.
+
 The catch time series for all gear are shown in
-Figure~\ref{fig:catchTS}. The most obvious feature of these time
+Figure~\ref{fig:hdarTS}. The most obvious feature of these time
 series is the marked quarterly cycles suggesting a strong seasonal
 signal in the catches by all fleets.
 The time series also show both increasing and decreasing trends. These
@@ -118,7 +144,7 @@ around this time, the mandate to collect data from the longline fleet
 shifted from HDAR to NMFS.
 \help{What happened to the Inshore HL fleet?}
 
-Figure~\ref{fig:catchTS} also displays the first order differences
+Figure~\ref{fig:hdarTS} also displays the first order differences
 between successive quarters. This statistic emphasizes the seasonal
 periodicity of all fishing fleets and help to identify anomalies in
 the data such as changes in reporting protocol. Some possible
@@ -149,7 +175,7 @@ biomass of the yellowfin population outside of the MHI as estimated by
 \MFCL\ or \SD.
 \item The fishery consists of several gear types spanning different periods
 of time: Offshore Handline, Toll, Inshore Handline, Longline, and Aku
-Boat (Figure~\ref{fig:catchTS}). Some of gear types have size
+Boat (Figure~\ref{fig:hdarTS}). Some of gear types have size
 (weight or length) data associated with the reported catch for more recent
 part of the time series. It is assumed that these
 gear types have characteristic size (or age) dependent selectivity
@@ -158,12 +184,17 @@ functions.
 
 \begin{figure}
 \begin{center}
-\includegraphics[height=0.9\textheight]{./graphics/catch_history.png}
-\caption{\label{fig:catchTS}
+\includegraphics[height=0.9\textheight]{./graphics/hdar_catch_history.png}
+\caption{\label{fig:hdarTS}
 Yellowfin catch in metric tonnes by principle fisheries operating in
-the Main Hawaiian Islands. The missing data in the bottom panel is
-longline data reported on federal logbooks since 1992 which will be
-appended to the earlier longline time series.}
+the Main Hawaiian Islands from the HDAR data.
+The ``InshoreHL'' category is the same as the original HDAR category
+``Bottom/inshore HL''.
+The ``Misc.'' time series is the sum of catches reported to HDAR as
+``Other'', ``Hybrid'',``Casting'', and ``Shortline''.
+The dotted red line superimposed on each time series is the difference in
+catch between successive quarters.
+}
 \end{center}
 \end{figure}
 
@@ -433,7 +464,25 @@ C_{g,a,t} =
 \end{equation}
 using the standard Baranov approximation.
 
-\singlespacing
+\par
+\noindent {\bf Acknowledgements.}
+This work was funded by the Western Pacficic Regional Fisheries
+Managment Council. I thank the Council for its generous support and
+Council Staff Paul Dalzell and Eric Kingma for encouraging me to
+actually take on this challenging project and for their on-going
+collaboration.
+Thanks to Mr. Reginald Kokubun of the Hawaii Division of Aquatic
+Resources for supplying catch report data from the HDAR commercial
+fisheries data base.
+Thanks to Mr. Keith Bigelow and Ms. Karen Sender of NOAA Pacific
+Island Fisheries Science Center for supplying logbook reporting data and
+weight-frequency data from the PIFSC data base.
+Thanks also to Dr. John Hampton of the Secretariat of the Pacific
+Community, Oceanic Fisheries Programme, for making available
+MULTICAN-CL output files from the latest Western and Central Pacific
+Fisheries Commission yellowfin tuna stock assessment, and to Mr. Nick
+Davies for sharing R scripts and advice to decode the MFCL output files.
+
 \section*{References}
 {\parindent=0cm \small
 \everypar={\hangindent=2em \hangafter=1}\par

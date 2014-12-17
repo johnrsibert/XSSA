@@ -163,7 +163,7 @@ plot.all.pacf<-function(dat)
 
 }
 
-plot.all.gears<-function(dat)
+plot.all.hdar.gears<-function(dat)
 {
    width <- 6.5
    height <- 9.0
@@ -171,23 +171,26 @@ plot.all.gears<-function(dat)
    old.par <- par(no.readonly = TRUE) 
    par(mar=c(2,2.75,0,0)+0.1)
 #  par(mar=c(5,4,4,2)+0.1)
-   np = ncol(dat) - 2
+   np = ncol(dat) - 3
    lm <- layout(matrix(c(1:np),ncol=1,byrow=TRUE))
    layout.show(lm)
 
    for (j in 4:ncol(dat))
    {
-      nice.ts.plot(dat[,3],dat[,j],lwd=3,label=colnames(dat)[j])
+      nice.ts.plot(dat[,3],dat[,j],lwd=3,label=colnames(dat)[j],
+                   ylab="Catch (mt)")
+      wna = which(is.na(dat[,j]))
+      zz = vector(length=length(wna))
+      points(dat[wna,3],zz,pch='|',col="red")
       dy = diff(dat[,j])
-   #  maxdy=max(abs(dy))
-      maxdy=max(dat[,j])
+      maxdy=max(abs(dat[,j]))
       yrange=c(-maxdy,maxdy)
       par("new"=TRUE)
-      plot(dat[-1,3],dy,type='l',axes=FALSE,lty="dotted")
+      plot(dat[-1,3],dy,type='l',axes=FALSE,ann=FALSE,
+           lty="dotted",lwd=2,col="red")
    }
-   nice.ts.plot(dat[,3],dat[,3],lwd=3,label="Comming soon: More Longline Data")
 
-   save.png.plot("catch_history",width=width,height=height)
+   save.png.plot("hdar_catch_history",width=width,height=height)
    par(old.par)
 }
 
