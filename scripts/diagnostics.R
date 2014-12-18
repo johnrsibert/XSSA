@@ -15,17 +15,18 @@ plot.diagnostics=function(dat=NULL,file="diagnostics.dat",ngear,devices)
 
    lwd = 3
 
-   print("on entry to plot.diagnostice, devices =")
-   print(devices)
    width = 9.0
    height = 11.0
    d = 1
    if (devices[d] > 0)
-      dev.set(devices[d])
-   x11(width=width,height=height)
-   devices[d] = dev.cur()
-   print(paste("Current device",dev.cur()))
-   print(paste("pop device",devices[d]))
+   {
+      s = dev.set(devices[d])
+   }
+   else
+   {
+      x11(width=width,height=height)
+      devices[d] = dev.cur()
+   }
 
    old.par = par(no.readonly = TRUE) 
    par(mar=c(3,4.5,0,0)+0.1)
@@ -42,17 +43,19 @@ plot.diagnostics=function(dat=NULL,file="diagnostics.dat",ngear,devices)
    plot(dat$t,dat$propL,type='l',ann=FALSE,axes=FALSE,
         col="red",lwd=2,lty="dotted")
    title(main="Total Population")
-   #save.png.plot("est_pop",width=width,height=height)
 
    width = 9.0
    height =11.0
    d = 2
    if (devices[d] > 0)
-      dev.set(devices[d])
-   x11(width=width,height=height)
-   devices[d] = dev.cur()
-   print(paste("Current device",dev.cur()))
-   print(paste("catch device",devices[d]))
+   {
+      s = dev.set(devices[d])
+   }
+   else
+   {
+     x11(width=width,height=height)
+     devices[d] = dev.cur()
+   }
 
    par(mar=c(3,4.5,0,0)+0.1)
    np = ngear
@@ -64,17 +67,19 @@ plot.diagnostics=function(dat=NULL,file="diagnostics.dat",ngear,devices)
       points(dat$t,dat[,(g+14)],col= "darkgreen",pch=16)
       title(main=paste("Catch, gear",g))
    }
-   #save.png.plot("est_catch",width=width,height=height)
 
    width = 9.0
    height =11.0
    d = 3
    if (devices[d] > 0)
-      dev.set(devices[d])
-   x11(width=width,height=height)
-   devices[d] = dev.cur()
-   print(paste("Current device",dev.cur()))
-   print(paste("F device",devices[d]))
+   {
+      s = dev.set(devices[d])
+   }
+   else
+   {
+      x11(width=width,height=height)
+      devices[d] = dev.cur()
+   }
    par(mar=c(3,4.5,0,0)+0.1)
    np = ngear
    lm = layout(matrix(c(1:np),ncol=1,byrow=TRUE))
@@ -84,7 +89,6 @@ plot.diagnostics=function(dat=NULL,file="diagnostics.dat",ngear,devices)
       nice.ts.plot(dat$t,dat[,(g+4)],bcol="orange4",fcol="orange",lwd=lwd)
       title(main=paste("F mort, gear",g))
    }
-   #save.png.plot("est_F",width=width,height=height)
 
    new.devices = devices
    return(new.devices)
@@ -109,10 +113,9 @@ log.diagnostics=function(file="xssams_program.log",ntime=244,ngear=5)
 
    c = 'n'
    dev.list = vector(mode="numeric",length=3)
+   dev.file.names=c("est_pop","est_catch","est_F")
    while (c != 'q')
    {
-      print(paste("pop.dev =",dev.list[1],", catch.dev =", dev.list[2], 
-                  ", F.dev =",dev.list[3]))
       fc = res[counter]
       for (c in 1:ncol)
       {
@@ -135,20 +138,26 @@ log.diagnostics=function(file="xssams_program.log",ntime=244,ngear=5)
 #     print(tail(diag))
 
       new.devices = plot.diagnostics(as.data.frame(diag),ngear=ngear,devices=dev.list)
-      print("on return from plot.diagnostics, new.devices =")
-      print(new.devices)
       dev.list=new.devices
      
 
 #     title(main=paste(log[afters[counter]+1],"entries"))
 
-      c = readline("next, back or quit? (enter n,b, or q):")
+      c = readline("next, back, save or quit? (enter n,b,s,or q):")
       print(paste(c," entered"))
       if (c == 'n')
          counter = counter + 1
       else if (c == 'b')
          counter = counter - 1
-   
+      else if (c == 's')
+      {
+         for (d in 1:length(dev.list))
+         {
+            dev.set(dev.list[d])
+            din = par("din")
+            save.png.plot(dev.file.names[d],width=din[1],height=din[2])
+          }
+      }
       if (counter < 1)
          counter = max.counter
       else if (counter > max.counter)
