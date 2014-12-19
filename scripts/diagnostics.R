@@ -8,10 +8,15 @@ plot.diagnostics=function(dat=NULL,file="diagnostics.dat",ngear,devices)
    if (dat$t[1] == 1)
    {
       dat$t = (1951.875 + dat$t*0.25)
-   #  print(names(dat))
+      print(names(dat))
    }
 #  dat$pop1 = exp(dat$pop1)
 #  dat$pop2 = exp(dat$pop2)
+   ncol = ncol(dat)
+   dd = c(2:3,5:ncol)
+   print(dd)
+   print(names(dat)[dd])
+   dat[,dd] = exp(dat[,dd])
 
    lwd = 3
 
@@ -102,8 +107,8 @@ log.diagnostics=function(file="xssams_program.log",ntime=244,ngear=5)
    res = grep("Residuals:",log)
    afters = grep("after",log)
 
-   counter = 1
    max.counter = length(res)
+   counter = max.counter
    print(paste(max.counter, "blocks found:"))
    print(res)
 

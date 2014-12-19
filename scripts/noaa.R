@@ -173,3 +173,37 @@ LL.join=function(hdar=NULL,noaa=NULL,yr1=1952,yr2=2012)
    par(old.par)
    return(dat)
 }
+
+make.catch.diffs=function(file="five_gears.dat")
+{
+   dat = t(read.table(file))
+   colnames(dat) = c("OffshoreHL","Troll","Longline","InshoreHL","AkuBoat")
+   print(head(dat))
+
+   ZeroCatch = 1.0 #1.0e-8
+   logZeroCatch = log(ZeroCatch)
+   ngear = ncol(dat)
+
+   width = 6.5
+   height = 9.0
+   x11(width=width,height=height)
+   old.par <- par(no.readonly = TRUE) 
+   par(mar=c(2,4,1,0)+0.1)
+#  par(mar=c(5,4,4,2)+0.1)
+   np = ngear
+   lm = layout(matrix(c(1:np),ncol=1,byrow=TRUE))
+   layout.show(lm)
+   breaks = seq(-4,4,0.5)
+
+   for (g in 1:ngear)
+   {
+      ts = dat[,g]
+   #  w = which (ts <= 0.0)
+   #  ts[w] = ZeroCatch
+      ts = log(ts+ZeroCatch)
+      dts = diff(ts)
+      hist(dts,breaks=breaks,main=colnames(dat)[g],freq=FALSE,las=1)
+
+
+   }
+}

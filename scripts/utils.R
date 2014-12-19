@@ -22,8 +22,8 @@ nice.ts.plot<-function(x,y,label=NULL,legend=NULL,bcol="blue",fcol="lightblue",l
    if (!is.null(ncol(y)))
      nlines = ncol(y)
 
-#  yrange <- c(0,1.2*max(y,na.rm=TRUE))
-   yrange <- c(min(y,na.rm=TRUE),1.2*max(y,na.rm=TRUE))
+   yrange <- c(0,1.2*max(y,na.rm=TRUE))
+#  yrange <- c(min(y,na.rm=TRUE),1.2*max(y,na.rm=TRUE))
    q <- quantile(y,probs=c(0.01,0.99),na.rm=TRUE)
 #  yrange <- c(q[1],(1.6*q[2]))
 #  print(yrange)
