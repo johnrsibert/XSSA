@@ -27,7 +27,7 @@ nice.ts.plot<-function(x,y,label=NULL,legend=NULL,bcol="blue",fcol="lightblue",l
    q <- quantile(y,probs=c(0.01,0.99),na.rm=TRUE)
 #  yrange <- c(q[1],(1.6*q[2]))
 #  print(yrange)
-   ytic <- pretty(yrange[1]:yrange[2])
+   ytic <- pretty(c(yrange[1],yrange[2]),5)
 #  ytic <- seq(yrange[1],yrange[2],((yrange[2]-yrange[1])/5))
 #  print(ytic)
    xrange <- c(min(x,na.rm=TRUE),max(x,na.rm=TRUE))

@@ -10,9 +10,10 @@ make.hdar.dat<-function(file="hdar_calendar.csv",yr1=1952,yr2=2012)
 #  print(tail(dat1))
    print(dim(dat1))
 
-   #g1 <- unique(dat1$method)
+   g1 <- unique(dat1$Method)
+   print(g1)
    g2 <- as.vector(c("Tuna HL","Troll","Longline","Bottom/inshore HL","Aku boat","Misc"),mode="character")
-#  print(g2)
+   print(g2)
    # tuna handline, troll, longline, bottom fish/inshore handline and aku boat
 
    qname <- as.vector(c("JAN_MAR","APR_JUN","JUL_SEP","OCT_DEC"))
@@ -20,7 +21,7 @@ make.hdar.dat<-function(file="hdar_calendar.csv",yr1=1952,yr2=2012)
 
    nrd2 = (yr2-yr2+1)*4
    dat2 <- as.data.frame(matrix(nrow=nrd2,ncol=9))
-   colnames(dat2)<-c("year","quarter","time","OffshoreHL","Troll","Longline","InshoreHL","AkuBoat","Misc")
+   colnames(dat2)<-c("year","quarter","time","TunaHL","Troll","Longline","InshoreHL","AkuBoat","Misc")
    print(dim(dat2))
 
    m <- nrow(dat1)
@@ -145,7 +146,7 @@ plot.all.pacf<-function(dat)
    old.par <- par(no.readonly = TRUE) 
    par(mar=c(2,4,0,0)+0.1)
 #  par(mar=c(5,4,4,2)+0.1)
-   np = ncol(dat) - 2
+   np = ncol(dat) - 3
    lm <- layout(matrix(c(1:np),ncol=1,byrow=TRUE))
    layout.show(lm)
 
@@ -156,8 +157,8 @@ plot.all.pacf<-function(dat)
       tmp[w] = 0.0
       pacf(tmp,main="",ylab=colnames(dat)[j],lwd=3)
    }
-   plot(c(1,23),c(-0.5,0.5),type='n',ylab="HI LL")
-   mtext("Comming soon: More Longline Data",side=3,line=-3)
+#  plot(c(1,23),c(-0.5,0.5),type='n',ylab="HI LL")
+#  mtext("Comming soon: More Longline Data",side=3,line=-3)
    save.png.plot("partial_acf",width=width,height=height)
    par(old.par)
 

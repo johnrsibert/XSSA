@@ -214,27 +214,33 @@ DATA_SECTION;
     //if (1) ad_exit(1);
 
 PARAMETER_SECTION
-  init_bounded_number logT12(-15.0,5.0,phase_logT12);
-  init_bounded_number logT21(-15.0,5.0,phase_logT21);
-  init_bounded_number logr(-5.0,5.0,phase_logr);
-  //init_number logr(phase_logr);
-  init_bounded_number logK(-1.0,15.0,phase_logK);
+  //init_bounded_number logT12(-15.0,5.0,phase_logT12);
+  init_number logT12(phase_logT12);
+  //init_bounded_number logT21(-15.0,5.0,phase_logT21);
+  init_number logT21(phase_logT21);
+  //init_bounded_number logr(-5.0,5.0,phase_logr);
+  init_number logr(phase_logr);
+  //init_bounded_number logK(-1.0,15.0,phase_logK);
+  init_number logK(phase_logK);
 
-
-  init_bounded_vector logsdlogF(1,ngear,-5.0,5.0,phase_logsdlogF);
-
+  //init_bounded_vector logsdlogF(1,ngear,-5.0,5.0,phase_logsdlogF);
+  init_vector logsdlogF(1,ngear,phase_logsdlogF);
   //init_bounded_vector logsdlogPop(1,2,-5.0,5.0,phase_logsdlogPop);
   init_vector logsdlogPop(1,2,phase_logsdlogPop);
-
-  init_bounded_vector logsdlogYield(1,ngear,-5.0,5.0,phase_logsdlogYield);
+  //init_bounded_vector logsdlogYield(1,ngear,-5.0,5.0,phase_logsdlogYield);
+  init_vector logsdlogYield(1,ngear,phase_logsdlogYield);
 
   // logit transformed porportion local
-  init_bounded_number LmeanProportion_local(-5.0,5.0,phase_LmeanProportion_local);
-  init_bounded_number logsdLProportion_local(-5.0,5.0,phase_logsdLProportion_local);
+  //init_bounded_number LmeanProportion_local(-5.0,5.0,phase_LmeanProportion_local);
+  init_number LmeanProportion_local(phase_LmeanProportion_local);
+  //init_bounded_number logsdLProportion_local(-7.0,5.0,phase_logsdLProportion_local);
+  init_number logsdLProportion_local(phase_logsdLProportion_local);
+
+  // robust F likelihood
   //!!  #ifdef USE_PFAT
   //init_bounded_vector pfat(1,ngear,0.001,0.999,phase_pfat);
   //!!  #endif
-  !!  TRACE(lengthU)
+
   random_effects_vector U(1,lengthU);
 
   objective_function_value nll;
