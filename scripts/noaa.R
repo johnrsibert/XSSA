@@ -193,7 +193,7 @@ make.catch.diffs=function(file="five_gears.dat")
    np = ngear
    lm = layout(matrix(c(1:np),ncol=1,byrow=TRUE))
    layout.show(lm)
-   breaks = seq(-4,4,0.5)
+   breaks = seq(-4.25,4.25,0.5)
 
    for (g in 1:ngear)
    {
@@ -202,8 +202,13 @@ make.catch.diffs=function(file="five_gears.dat")
    #  ts[w] = ZeroCatch
       ts = log(ts+ZeroCatch)
       dts = diff(ts)
+      sd = sd(dts)
+      mean = mean(dts)
       hist(dts,breaks=breaks,main=colnames(dat)[g],freq=FALSE,las=1)
-
-
+      x = seq(-3*sd,3*sd,0.1)
+      lines(x,dnorm(x,mean=mean,sd=sd),col="blue")
    }
+   save.png.plot("first_difference_histograms",width=width,height=height)
 }
+#dnorm(x, mean = 0, sd = 1, log = FALSE)
+

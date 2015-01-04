@@ -472,7 +472,7 @@ SEPARABLE_FUNCTION void step(const int t, const dvar_vector& f1, const dvar_vect
      //pfat(g) = pf(g);
      //#endif
   }
-  dvariable sumFg = 0.0; //sum(ft1); // total fishing mortality
+  dvariable sumFg = 0.0; // total fishing mortality
 
   //#ifdef USE_PFAT
   //const double ww = 3.0*sqrt(M_PI);
@@ -498,8 +498,8 @@ SEPARABLE_FUNCTION void step(const int t, const dvar_vector& f1, const dvar_vect
      //TTRACE(norm_part,fat_part)
      //TRACE(exp(norm_part + fat_part))
      //Fnll += exp(norm_part + fat_part);
-
      //#else
+
      Fnll += 0.5*(log(TWO_M_PI*varlogF(g)) + square(ft1(g)-ft2(g))/varlogF(g));
      //#endif
      //TRACE(Fnll)
