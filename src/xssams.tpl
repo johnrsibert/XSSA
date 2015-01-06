@@ -36,7 +36,7 @@ GLOBALS_SECTION;
 
   template <typename SCALAR> SCALAR alogit(const SCALAR& a)
   {
-     SCALAR p = 1.0/(1.0+exp(-a));
+     SCALAR p = 1.0/(1.0+mfexp(-a));
      return p;
   }
   template double alogit<double>(const double& a);
@@ -89,7 +89,7 @@ DATA_SECTION;
   init_int phase_logsdlogF;
   !! TTRACE(init_logsdlogF,phase_logsdlogF)
 
-  init_vector init_logsdlogPop(1,2);
+  init_number init_logsdlogPop;
   init_int phase_logsdlogPop;
   !! TTRACE(init_logsdlogPop,phase_logsdlogPop)
 
@@ -226,7 +226,8 @@ PARAMETER_SECTION
   //init_bounded_vector logsdlogF(1,ngear,-5.0,5.0,phase_logsdlogF);
   init_vector logsdlogF(1,ngear,phase_logsdlogF);
   //init_bounded_vector logsdlogPop(1,2,-5.0,5.0,phase_logsdlogPop);
-  init_vector logsdlogPop(1,2,phase_logsdlogPop);
+  //init_vector logsdlogPop(1,2,phase_logsdlogPop);
+  init_number logsdlogPop(phase_logsdlogPop);
   //init_bounded_vector logsdlogYield(1,ngear,-5.0,5.0,phase_logsdlogYield);
   init_vector logsdlogYield(1,ngear,phase_logsdlogYield);
 
@@ -255,9 +256,9 @@ PRELIMINARY_CALCS_SECTION
        logT21 = init_logT21;
        TTRACE(logT12,logT21)
        logr = init_logr;
-       TTRACE(logr,exp(logr))
+       TTRACE(logr,mfexp(logr))
        logK = init_logK;
-       TTRACE(logK,exp(logK))
+       TTRACE(logK,mfexp(logK))
 
        for (int g = 1; g <= ngear; g++)
        {
@@ -267,18 +268,17 @@ PRELIMINARY_CALCS_SECTION
           //pfat(g) = init_pfat(g);
           //#endif
        }
-       logsdlogPop(1) = init_logsdlogPop(1);
-       logsdlogPop(2) = init_logsdlogPop(2);;
+       logsdlogPop = init_logsdlogPop;
 
 
        LmeanProportion_local = init_LmeanProportion_local;
        logsdLProportion_local = init_logsdLProportion_local;
        TTRACE(LmeanProportion_local,logsdLProportion_local)
-       //double prop = 1.0/(1.0+exp(-value(LmeanProportion_local)));
+       //double prop = 1.0/(1.0+mfexp(-value(LmeanProportion_local)));
        double prop = alogit(value(LmeanProportion_local));
        TTRACE(LmeanProportion_local,prop)
 
-       double K = exp(value(logK));
+       double K = mfexp(value(logK));
        double Pop1 = prop*K;
        double Pop2 = K-Pop1;
        TTRACE(Pop1,Pop2)
@@ -295,7 +295,7 @@ PRELIMINARY_CALCS_SECTION
           {
           // U(++ut) = log(Fmsy)+0.1*Ferr(t,g); // Fmsy
           // U(++ut) = log(1.0e-8+1.0e-7*Ferr(t,g));
-             U(++ut) = -18*exp(0.001*Ferr(t,g));
+             U(++ut) = -18*mfexp(0.001*Ferr(t,g));
              if ((t<=2) && (g==1))
                TTRACE(Ferr(t,g),U(ut))
           }
@@ -446,17 +446,21 @@ PROCEDURE_SECTION
   //#ifdef USE_PFAT
   //SEPARABLE_FUNCTION void step(const int t, const dvar_vector& f1, const dvar_vector& f2, const dvar_vector& lsdlogF, const dvariable& p11, const dvariable p12, const dvariable& p21, const dvariable p22, const dvar_vector& lsdlogPop, const dvariable& lr, const dvariable& lK, const dvariable& lT12, const dvariable& lT21, const dvariable& LmPropL, const dvariable& lsdLProportion_local,const dvar_vector& pf)
   //#else
-SEPARABLE_FUNCTION void step(const int t, const dvar_vector& f1, const dvar_vector& f2, const dvar_vector& lsdlogF, const dvariable& p11, const dvariable p12, const dvariable& p21, const dvariable p22, const dvar_vector& lsdlogPop, const dvariable& lr, const dvariable& lK, const dvariable& lT12, const dvariable& lT21, const dvariable& LmPropL, const dvariable& lsdLProportion_local)
+SEPARABLE_FUNCTION void step(const int t, const dvar_vector& f1, const dvar_vector& f2, const dvar_vector& lsdlogF, const dvariable& p11, const dvariable p12, const dvariable& p21, const dvariable p22, const dvariable& lsdlogPop, const dvariable& lr, const dvariable& lK, const dvariable& lT12, const dvariable& lT21, const dvariable& LmPropL, const dvariable& lsdLProportion_local)
   //#endif
+  // p11 U(utPop1+t-1) log N1 at start of time step
+  // p12 U(utPop1+t)   log N1 at end   of time step
+  // p21 U(utPop2+t-1) log N2 at start of time step
+  // p22 U(utPop2+t)   log N2 at end   of time step
 
-  dvar_vector varlogF = square(exp(lsdlogF));
-  dvar_vector varlogPop = square(exp(lsdlogPop));
-  dvariable r = exp(lr);
-  dvariable K = exp(lK);
-  dvariable T12 =exp(lT12);
-  dvariable T21 =exp(lT21);
+  dvar_vector varlogF = square(mfexp(lsdlogF));
+  dvariable varlogPop = square(mfexp(lsdlogPop));
+  dvariable r = mfexp(lr);
+  dvariable K = mfexp(lK);
+  dvariable T12 =mfexp(lT12);
+  dvariable T21 =mfexp(lT21);
   dvariable LmeanPropL = LmPropL;
-  dvariable varLPropL = square(exp(lsdLProportion_local));
+  dvariable varLPropL = square(mfexp(lsdLProportion_local));
   dvariable nextLogN1;
   dvariable nextLogN2;
   dvar_vector ft1(1,ngear);
@@ -483,21 +487,21 @@ SEPARABLE_FUNCTION void step(const int t, const dvar_vector& f1, const dvar_vect
   dvariable Fnll = 0.0;
   for (int g = 1; g <= ngear; g++)
   {
-     sumFg += exp(ft1(g));
+     sumFg += mfexp(ft1(g));
      //#ifdef USE_PFAT
      //dvariable dF2 = square(ft1(g)-ft2(g));
      //dvariable asig2 = a2*varlogF(g)+1e-80; 
-     //dvariable norm_part = log(1.0-pfat(g))*exp(-dF2/(2.0*asig2));
+     //dvariable norm_part = log(1.0-pfat(g))*mfexp(-dF2/(2.0*asig2));
 
      //dvariable dF4 = square(dF2);
      //dvariable fat_part = (2.0*pfat(g)/(ww)/(1.0+square(dF2/(ww2*asig2))));
 
      // from newreg2.cpp
-     //dvariable log_likelihood = -sum(log((1.-pcon)*exp(-diff2/(2.*a2*v_hat))
+     //dvariable log_likelihood = -sum(log((1.-pcon)*mfexp(-diff2/(2.*a2*v_hat))
      // + b/(1.+pow(diff2/(width2*a2*v_hat),2))));
      //TTRACE(norm_part,fat_part)
-     //TRACE(exp(norm_part + fat_part))
-     //Fnll += exp(norm_part + fat_part);
+     //TRACE(mfexp(norm_part + fat_part))
+     //Fnll += mfexp(norm_part + fat_part);
      //#else
 
      Fnll += 0.5*(log(TWO_M_PI*varlogF(g)) + square(ft1(g)-ft2(g))/varlogF(g));
@@ -526,8 +530,8 @@ SEPARABLE_FUNCTION void step(const int t, const dvar_vector& f1, const dvar_vect
      prevLogN1 = nextLogN1;
      prevLogN2 = nextLogN2;
      //TTRACE(prevLogN1,prevLogN2)
-     prevN1 = exp(prevLogN1);
-     prevN2 = exp(prevLogN2);
+     prevN1 = mfexp(prevLogN1);
+     prevN2 = mfexp(prevLogN2);
      //TTRACE(prevN1,prevN2)
 
      nextLogN1 += dt*(r*(1.0 - prevN1/K) - sumFg - T12 - r*prevN2/K);
@@ -548,8 +552,9 @@ SEPARABLE_FUNCTION void step(const int t, const dvar_vector& f1, const dvar_vect
   }
 
   dvariable Pnll = 0.0;
-  // process error N1
-  Pnll += 0.5*(log(TWO_M_PI*varlogPop(1)) + square(p12-nextLogN1)/varlogPop(1));
+  dvariable diff = log(mfexp(p12)+mfexp(p22))-log(mfexp(nextLogN1)+mfexp(nextLogN2));
+  // process error N.
+  Pnll += 0.5*(log(TWO_M_PI*varlogPop) + square(diff)/varlogPop);
   if (isnan(value(Pnll)))
   {
      TRACE(Pnll)
@@ -557,18 +562,27 @@ SEPARABLE_FUNCTION void step(const int t, const dvar_vector& f1, const dvar_vect
      ad_exit(1);
   }
 
-  // process error N2
-  Pnll += 0.5*(log(TWO_M_PI*varlogPop(2)) + square(p22-nextLogN2)/varlogPop(2));
-  if (isnan(value(Pnll)))
-  {
-     TRACE(Pnll)
-     write_status(clogf);
-     ad_exit(1);
-  }
+  //// process error N1
+  //Pnll += 0.5*(log(TWO_M_PI*varlogPop(1)) + square(p12-nextLogN1)/varlogPop(1));
+  //if (isnan(value(Pnll)))
+  //{
+  //   TRACE(Pnll)
+  //   write_status(clogf);
+  //   ad_exit(1);
+  //}
+
+  //// process error N2
+  //Pnll += 0.5*(log(TWO_M_PI*varlogPop(2)) + square(p22-nextLogN2)/varlogPop(2));
+  //if (isnan(value(Pnll)))
+  //{
+  //   TRACE(Pnll)
+  //   write_status(clogf);
+  //   ad_exit(1);
+  //}
 
   // proportion local
   dvariable PLnll = 0.0;
-  // Proportion_local = exp(nextLogN1)/(exp(nextLogN1)+exp(nextLogN2));
+  // Proportion_local = mfexp(nextLogN1)/(mfexp(nextLogN1)+mfexp(nextLogN2));
   // logit(p) = log(N1)-log(N2)
   dvariable LpropL = nextLogN1 - nextLogN2;
   //TTRACE(alogit(LmeanPropL),alogit(LpropL))
@@ -592,7 +606,12 @@ SEPARABLE_FUNCTION void step(const int t, const dvar_vector& f1, const dvar_vect
   
 
 SEPARABLE_FUNCTION void obs(const int t, const dvar_vector& f,const dvariable& pop11, const dvariable& pop21,  const dvariable& pop12, const dvariable& pop22, const dvar_vector& logsdlogYield)
-  dvar_vector ft(1,ngear);
+  // pop11 U(utPop1+t-1)
+  // pop21 U(utPop1+t)
+  // pop12 U(utPop2+t-1)
+  // pop22 U(utPop2+t)
+
+  dvar_vector ft(1,ngear); ///< log fishing mortality by gear
   for (int g = 1; g <= ngear; g++)
   {
      //TTRACE(g,UU(f.indexmin()+g-1))
@@ -600,14 +619,14 @@ SEPARABLE_FUNCTION void obs(const int t, const dvar_vector& f,const dvariable& p
   }
 
   dvar_vector log_pred_yield(1,ngear);
-  dvariable log_total_mean_pop = log( 0.5*(exp(pop11) + exp(pop21) + 
-                                           exp(pop21) + exp(pop22)) );
+  dvariable log_total_mean_pop = log( 0.5*(mfexp(pop11) + mfexp(pop21) + 
+                                           mfexp(pop21) + mfexp(pop22)) );
   for (int g = 1; g <= ngear; g++)
   {
      log_pred_yield(g) =  ft(g) + log_total_mean_pop;
   }
 
-  dvar_vector varlogYield = square(exp(logsdlogYield));
+  dvar_vector varlogYield = square(mfexp(logsdlogYield));
   dvariable Ynll = 0.0;
   for (int g = 1; g <= ngear; g++)
   {
@@ -629,8 +648,8 @@ SEPARABLE_FUNCTION void obs(const int t, const dvar_vector& f,const dvariable& p
 
   residuals(t,1) = value(pop21);
   residuals(t,2) = value(pop22);
-  double propLa = value(pop12) - value(pop22);
-  //double propLb = exp(value(pop12))/(exp(value(pop12)) + exp(value(pop22)));
+  double propLa = value(pop21) - value(pop22);
+  //double propLb = mfexp(value(pop21))/(mfexp(value(pop21)) + mfexp(value(pop22)));
   //TTRACE(alogit(propLa),propLb)
   residuals(t,3) = alogit(propLa);
 
@@ -641,29 +660,29 @@ SEPARABLE_FUNCTION void obs(const int t, const dvar_vector& f,const dvariable& p
     residuals(t, ++rc) = value(log_pred_yield(g));
 
 FUNCTION void write_status(ofstream& s)
-    //double prop = 1.0/(1.0+exp(value(-LmeanProportion_local)));
+    //double prop = 1.0/(1.0+mfexp(value(-LmeanProportion_local)));
     double prop = alogit(value(LmeanProportion_local));
     s << "\n# Status after "<< userfun_entries << " PROCEDURE_SECTION entries;" << endl;
     s << "# nll = " << value(nll) << endl;
     s << "# nvar = " << initial_params::nvarcalc() << endl;
     s << "# current phase = " << current_phase() << endl;
     s << "#  logT12 = " << logT12 << " (" << active(logT12) <<")" << endl;
-    s << "#  T12 = " << exp(logT12) << endl;
+    s << "#  T12 = " << mfexp(logT12) << endl;
     s << "#  logT21 = " << logT21 << " (" << active(logT21) <<")" << endl;
-    s << "#  T21 = " << exp(logT21) << endl;
+    s << "#  T21 = " << mfexp(logT21) << endl;
     s << "# logr = " << logr << " (" << active(logr) <<")" << endl;
-    s << "#    r = " << exp(logr) << endl;
+    s << "#    r = " << mfexp(logr) << endl;
     s << "# logK = " << logK << " (" << active(logK) <<")" << endl;
-    s << "#    K = " << exp(logK) << endl;
+    s << "#    K = " << mfexp(logK) << endl;
     s << "#     logsdlogF: " << logsdlogF 
              <<  " (" << active(logsdlogF) <<")" << endl;
-    s << "#        sdlogF: " << exp(logsdlogF) << endl;
+    s << "#        sdlogF: " << mfexp(logsdlogF) << endl;
     s << "#   logsdlogPop: " << logsdlogPop
              <<  " (" << active(logsdlogPop) <<")" << endl;
-    s << "#      sdlogPop: " << exp(logsdlogPop) << endl;
+    s << "#      sdlogPop: " << mfexp(logsdlogPop) << endl;
     s << "# logsdlogYield: " << logsdlogYield
              <<  " (" << active(logsdlogYield) <<")" << endl;
-    s << "#    sdlogYield: " << exp(logsdlogYield) << endl;
+    s << "#    sdlogYield: " << mfexp(logsdlogYield) << endl;
     s << "# LmeanProportion_local = " << LmeanProportion_local << " (" 
                                << active(LmeanProportion_local) <<")" << endl;
     s << "#                  prop = " << prop << endl;
@@ -697,7 +716,7 @@ FUNCTION void write_status(ofstream& s)
 
 
 REPORT_SECTION
-    //double prop = 1.0/(1.0+exp(value(-LmeanProportion_local)));
+    //double prop = 1.0/(1.0+mfexp(value(-LmeanProportion_local)));
     double prop = alogit(value(-LmeanProportion_local));
     REPORT(logT21)
     REPORT(logT12)
