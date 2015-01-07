@@ -115,6 +115,7 @@ DATA_SECTION;
   matrix obs_catch;
   matrix forcing_matrix;
   vector immigrant_biomass;
+  number mean_immigrant_biomass;
   int pininit;
   number Fmsy;
   number Bmsy;
@@ -195,8 +196,11 @@ DATA_SECTION;
        ad_exit(1);
     }
     TRACE(fr);
-    immigrant_biomass = forcing_matrix(fr);
-    TRACE(immigrant_biomass)
+    mean_immigrant_biomass = mean(forcing_matrix(fr));
+    immigrant_biomass.allocate(1,ntime);
+    //immigrant_biomass = forcing_matrix(fr);
+    immigrant_biomass = mean_immigrant_biomass;
+    TTRACE(mean_immigrant_biomass,immigrant_biomass)
 
     // set up U indexing
     Fndxl.allocate(1,ntime);

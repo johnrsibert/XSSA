@@ -204,11 +204,23 @@ make.catch.diffs=function(file="five_gears.dat")
       dts = diff(ts)
       sd = sd(dts)
       mean = mean(dts)
+      print(paste(g,mean,sd))
       hist(dts,breaks=breaks,main=colnames(dat)[g],freq=FALSE,las=1)
-      x = seq(-3*sd,3*sd,0.1)
+      x = seq(-4*sd,4*sd,0.1)
       lines(x,dnorm(x,mean=mean,sd=sd),col="blue")
+      lines(x,dtdist(x,mean=mean,sd=1),col="red")
+   #  lines(x,dcauchy(x,location=mean,scale=1),col="green" ,lty="dashed")
    }
    save.png.plot("first_difference_histograms",width=width,height=height)
 }
 #dnorm(x, mean = 0, sd = 1, log = FALSE)
+dtdist=function(x, mean = 0, sd = 1)
+{
+  xx = (x-mean)/sd
+# print(paste(xx,xx*xx,(1.0+xx*xx)))
+  dt = 1.0/(pi*(1.0+xx*xx))
+  return(dt)
+}
+
+
 

@@ -1,7 +1,7 @@
 
 MHI.sim<-function(r = NULL, T12 = 0.01, T21 = 0.001,dt=1.0,fr=2,seta=c(0,0),
-                  F.fcng=FALSE,T.fcng=FALSE, USE.LOGS = FALSE,
-                  yr1=1952,yr2=2012,cfile="hdar_1952_2012.dat") 
+                  F.fcng=FALSE,T.fcng=TRUE, USE.LOGS = FALSE,
+                  yr1=1952,yr2=2012,cfile="five_gears.dat") 
 {
    ntime = (yr2 - yr1 + 1)*4
    F = compute.F(yr1=yr1,yr2=yr2,cfile=cfile)
@@ -65,29 +65,35 @@ MHI.sim<-function(r = NULL, T12 = 0.01, T21 = 0.001,dt=1.0,fr=2,seta=c(0,0),
       nextx2 = x2[i-1]
       for (k in 1:ss)
       {
-         prevx1 = nextx1
-         prevx2 = nextx2
-         dx1 =  dt*(r*(1.0 - exp(prevx1)/K) - sumF[i] -T12
-                           - r*exp(prevx2)/K) 
-                           + eta[1,i]
-         dx2 = dt*(r*(1.0 - exp(prevx2)/K) - sumF[i] -T12
-                         - r*exp(prevx1)/K 
-                         + T21*immigrant.biomass[i]/exp(prevx2))
-                         + eta[2,i]
+         prevx1 = nextx1 #prevLogN1 = nextLogN1;
+         prevx2 = nextx2 #prevLogN2 = nextLogN2;
+         prevN1 = exp(prevx1) #prevN1 = exp(prevLogN1);
+         prevN2 = exp(prevx2) #prevN2 = exp(prevLogN2);
+      #  nextLogN1      += dt*(r*(1.0 - prevN1/K) - sumFg   - T12 - r*prevN2/K);
+         nextx1 = nextx1 + dt*(r*(1.0 - prevN1/K) - sumF[i] - T12 - r*prevN2/K)
 
-         dtN = dt*(exp(prevx1)+exp(prevx2))
-         for (g in 1:ngear)
-            yield[g,i] = yield[g,i] + F[g,i]*dtN
+      #  nextLogN2      += dt*(r*(1.0 - prevN2/K) - sumFg  - T12 - r*prevN1/K + T21*immigrant_biomass(t)/prevN2);
+         nextx2 = nextx2 + dt*(r*(1.0 - prevN2/K) - sumF[i] -T12 - r*prevN1/K + T21*immigrant.biomass[i]/prevN2)
 
-         nextx1 = prevx1 + dx1
-         nextx2 = prevx2 + dx2
       }
       x1[i] = nextx1
       x2[i] = nextx2
-   }
 
-   N1 = exp(x1)
-   N2 = exp(x2)
+     # log_total_mean_pop = log( 0.5*(exp(pop11) + exp(pop21) + exp(pop21) + exp(pop22)) );
+
+      total.mean.pop = 0.5*(exp(x1[i-1])+exp(x2[i-1])+exp(x1[i])+exp(x2[i]))
+      for (g in 1:ngear)
+      {
+      #  log_pred_yield(g) =  ft(g) + log_total_mean_pop;
+         yield[g,i] = F[g,i] * total.mean.pop
+      }
+
+   } # for (i in 2:ntime)
+
+
+   N1 = exp(x1+eta[1,i])
+
+   N2 = exp(x2+eta[2,i])
    }
 
    else
@@ -134,35 +140,41 @@ MHI.sim<-function(r = NULL, T12 = 0.01, T21 = 0.001,dt=1.0,fr=2,seta=c(0,0),
    print(sub)
 
    old.par <- par(no.readonly = TRUE) 
-   par(mar=c(5,4,4,5)+0.1)
+#  par(mar=c(5,4,4,7)+0.1)
 #  par(mar=c(5,4,4,2)+0.1)
 
 
    lwd=5
    nice.ts.plot(tt,N1,bcol="blue",fcol="lightblue",lwd=lwd+2)
-   double.lines(tt,N2,bcol="blue",fcol="lightblue",lwd=lwd-2,lty="dotted")
+   double.lines(tt,N2,bcol="blue",fcol="lightblue",lwd=lwd+2,lty="dotted")
    double.lines(tt,sumY,bcol="darkred",fcol="red",lwd=lwd-2)
    title(main=main,sub=sub,ylab="Biomass (mt)",xlab="Year")
 #  abline(h=B.msy,lwd=lwd,col="red")
-   lines(range(tt),c(B.msy,B.msy),lwd=lwd,col="red")
+   lines(range(tt),c(B.msy,B.msy),lwd=lwd,col="blue")
 #  rug(tt)
 
    par("new"=TRUE)
    ytics = c(0.2,0.4,0.6,0.8,1.0)
    plot(range(tt),c(0,1),type='n',axes=FALSE,ann="FALSE")
-#  abline(h=0.9,lwd=1,col="lightgreen")
    short.abline(c(range(tt)[1],par("usr")[2]),c(0.9,0.9),lwd=1,col="lightgreen")
    double.lines(tt,prop,bcol="darkgreen",fcol="lightgreen",lwd=lwd)
-   axis(side=4,lwd=0,las=1,at=ytics)
-   mtext("P1",side=4,line=3)
+   axis(side=4,las=1,at=ytics,outer=FALSE,tcl=0.5,line=0,col.ticks="darkgreen")
+   mtext("P1",side=4,line=0,col="darkgreen")
    abline(v=par("usr")[2],lwd=3,col="darkgreen")
-   par(mar=c(2,5,0,0)+0.1)
+
+
+   X11()
+   lm = layout(matrix(c(1:ngear),ncol=1,byrow=TRUE))
+   layout.show(lm)
+   for (g in 1:ngear)
+     nice.ts.plot(tt,yield[g,])
 
    dat.file = paste("simulated_catch.dat",sep="")
    print(paste("writing",dat.file))
    write(yield,file=dat.file,ncolumns=ntime)
    print(paste("finished",dat.file))
 
+#  par(old.par)
 #  return(as.matrix(cbind(tt,N1,N2,sumF,immigrant.biomass)))
    return(as.matrix(cbind(tt,t(yield))))
 }
@@ -237,12 +249,45 @@ plot.region.biomass<-function(yr1=1952,yr2=2012,bfile="total_biomass.dat")
    layout.show(lm)
 
    nice.ts.plot(tt,region.biomass[2,],bcol="darkgreen",fcol="lightgreen",lwd=lwd,label="Region 2")
-   nice.ts.plot(tt,region.biomass[4,],bcol="darkgreen",fcol="lightgreen",lwd=lwd,label="Region 4")
+   dR2 = diff(region.biomass[2,])
+   par("new"=TRUE)
+   plot(tt[-1],dR2,type='l',lty="dotted",axes=FALSE,ann="FALSE")
 
+   nice.ts.plot(tt,region.biomass[4,],bcol="darkgreen",fcol="lightgreen",lwd=lwd,label="Region 4")
+   dR4 = diff(region.biomass[4,])
+   par("new"=TRUE)
+   plot(tt[-1],dR4,type='l',lty="dotted",axes=FALSE,ann="FALSE")
+
+   print(summary(t(region.biomass[c(2,4),])))
    save.png.plot("MFCL_region_biomass",width=width,height=height)
+
+   x11(width=width,height=height)
+   lm = layout(matrix(c(1:np),ncol=1,byrow=TRUE))
+   layout.show(lm)
+   print(summary(t(rbind(dR2,dR4))))
+
+   sd = sd(dR2)
+   mean = mean(dR2)
+   print(paste(mean,sd))
+   breaks = 7 #seq(mean-3.25*sd,mean+3.25*sd,0.5*sd)
+   print(breaks)
+   hist(dR2,breaks=breaks,main="delta R2",freq=FALSE,las=1)
+   x = seq(-3*sd,3*sd,0.1)
+   lines(x,dnorm(x,mean=mean,sd=sd),col="blue")
+
+   sd = sd(dR4)
+   mean = mean(dR4)
+   breaks = 7 #seq(-2.25*sd,2.25*sd,0.5*sd)
+   hist(dR4,breaks=breaks,main="delta R2",freq=FALSE,las=1)
+   x = seq(-3*sd,3*sd,0.1)
+   lines(x,dnorm(x,mean=mean,sd=sd),col="blue")
+
+   print(paste(sd(dR2),sd(dR4)))
+
+
+
    par(old.par)
 #  return(region.biomass)
-   print(summary(t(region.biomass[c(2,4),])))
 }
 
 # compute initial estimates of sdlogF and sdlogYield as
@@ -273,7 +318,7 @@ logit<-function(p)
    return(log(p/(1-p)))
 }
 
-inv.logit=function(alpha)
+alogit=function(alpha)
 {
    return(1/(1+exp(-alpha)))
 }
