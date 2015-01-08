@@ -14,8 +14,8 @@ plot.diagnostics=function(dat=NULL,file="diagnostics.dat",ngear,devices)
 #  dat$pop2 = exp(dat$pop2)
    ncol = ncol(dat)
    dd = c(2:3,5:ncol)
-   print(dd)
-   print(names(dat)[dd])
+#  print(dd)
+#  print(names(dat)[dd])
    dat[,dd] = exp(dat[,dd])
 
    lwd = 3
@@ -47,6 +47,7 @@ plot.diagnostics=function(dat=NULL,file="diagnostics.dat",ngear,devices)
    par("new"=TRUE)
    plot(dat$t,dat$propL,type='l',ann=FALSE,axes=FALSE,
         col="red",lwd=2,lty="dotted")
+   abline(h=0.9,col="gray4")
    title(main="Total Population")
 
    width = 9.0
@@ -68,8 +69,8 @@ plot.diagnostics=function(dat=NULL,file="diagnostics.dat",ngear,devices)
    layout.show(lm)
    for (g in 1:ngear)
    {
-      nice.ts.plot(dat$t,dat[,(g+9)],bcol="darkgreen",fcol="lightgreen",lwd=lwd)
-      points(dat$t,dat[,(g+14)],col= "darkgreen",pch=16)
+      nice.ts.plot(dat$t,dat[,(4+ngear+g)],bcol="darkgreen",fcol="lightgreen",lwd=lwd)
+      points(dat$t,dat[,(4+2*ngear+g)],col= "darkgreen",pch=16)
       title(main=paste("Catch, gear",g))
    }
 
@@ -142,6 +143,7 @@ log.diagnostics=function(file="xssams_program.log",ntime=244,ngear=5)
 #     print(head(diag))
 #     print(tail(diag))
 
+      print(paste("Displaying block ",counter,sep=""))
       new.devices = plot.diagnostics(as.data.frame(diag),ngear=ngear,devices=dev.list)
       dev.list=new.devices
      
