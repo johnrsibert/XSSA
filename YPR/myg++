@@ -1,0 +1,5 @@
+echo $ADMB_HOME
+g++ -m64 -Wall -ggdb -DTEST_CODE -DSAFE_ARRAYS -Isrc -I${ADMB_HOME}/include -I${ADMB_HOME}/contrib/include -I${JNIGRAPHICS_PATH} -I${JAVA_HOME}/include -I${JAVA_HOME}/include/${OS} -D__GNUDOS__ -Dlinux -DUSE_LAPLACE -UOLD_DO_KLUDGE -c $1.cpp -o $1.o
+
+g++ $1.o ${ADMB_HOME}/lib/libadmb.a ${ADMB_HOME}/lib/libadmb-contrib.a -o $1
+ 

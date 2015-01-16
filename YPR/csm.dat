@@ -1,0 +1,24 @@
+#max_days
+1400 
+#bin_days
+10
+#min_nos_in_cohort
+100 
+#no.of time steps to eliminate: -1 mean all time steps are included
+2 
+#T1shed, note T1 shed = 0.0
+0.85347     
+#nstep
+#4
+#ngroup_MF
+7   
+#MF_sze_grp_ranges
+20 40 50 60 70 80 90
+
+#M_curve_pen_weight
+10.0
+
+#start from cohort number
+1
+#end with cohort number    
+266       
