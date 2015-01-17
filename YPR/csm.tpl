@@ -1,10 +1,14 @@
+// Modification of csm.tpl originally written in 2001 by Shiham Adam.
+// It is a simple tag attrition model based on fadmodel9.tpl intended 
+// to estimate fishing and natural mortality for use in yield per recruit analysi
+
 GLOBALS_SECTION
   #include <sstream>
   #include <fvar.hpp>
   #include "trace.h"
  
   #undef REPORT
-  #define REPORT(object) report << "# " << #object ":\n" << setprecision(5) << object << endl;
+  #define REPORT(object) report << "#" << #object"\n" << setprecision(5) << object << endl;
 
   ofstream clogf;
   int ndx = 1;
@@ -79,7 +83,7 @@ DATA_SECTION
   init_imatrix obs_caps(1,ncohort,0,ntime);
   !! TRACE(obs_caps(ncohort))
   ivector fish_size(min_size,2*max_size);               //set up size vector  
-  //number dt;
+  number dt;
   //number tt;
   vector nobs(1,ngroup_MF);
 
@@ -91,6 +95,7 @@ PARAMETER_SECTION
   sdreport_vector qF(1,ngroup_MF);
   sdreport_vector qM(1,ngroup_MF);
 
+  number Z;
   number N1;
   number N2;
   number numrel;
@@ -119,7 +124,8 @@ PRELIMINARY_CALCS_SECTION
   //calculate dt
   //dt = double(bin_days)/double(nstep);
   //dt = double(1)/double(nstep);
-  //TRACE(dt);
+  dt = double(bin_days);
+  TRACE(dt);
 
   
 
@@ -166,40 +172,22 @@ PROCEDURE_SECTION
         ndx = fish_size(ipl);
         nobs(ndx) ++;
 
-        //only do this for cohorts from 13 to 47 cos these have about > 100 releases 
-        //if(  (c >= 13) && (c <= 47) && (t <= nexclude)  )  
-        if( t > ntime) // don't do this; produces nans
+        Z = F(ndx)+M(ndx);
+        N2 = N1 * mfexp( (-Z*dt)   );
+        if (isnan(value(N2)))
         {
-           //calculate the special F that forces the observed and predicted numbers to be equal
-           Fdum(t) = CalcF(obs_caps(c,t), value(N1), value(M(ndx) ) ); 
-           pred_caps(c,t) = N1 * Fdum(t) / (Fdum(t) + M(ndx)) * (1-mfexp(-Fdum(t) - M(ndx)   ) );
-           N2 = N1 * mfexp( - (Fdum(t)+ M(ndx))  );  
-           if (isnan(value(N2)))
-           {
-              TTRACE(N1,N2)
-              TTRACE(c,t)
-              ad_exit(1);
-           }
-           N1 = N2;  //swap
-        }  
-        else
-        {
-           pred_caps(c, t) = N1 * F(ndx)/(F(ndx)+M(ndx) ) *(1-mfexp( -F(ndx) -  M(ndx))  );
-           N2 = N1 * mfexp( (- F(ndx) - M(ndx))   );
-           if (isnan(value(N2)))
-           {
-              TTRACE(N1,N2)
-              TTRACE(c,t)
-              ad_exit(1);
-           }
-           N1 = N2;
+           TTRACE(N1,N2)
+           TTRACE(c,t)
+           ad_exit(1);
         }
+        pred_caps(c, t) = N1 * F(ndx)/Z *(1.0-mfexp(-Z*dt)  );
         if (isnan(value(pred_caps(c,t))))
         {
            TTRACE(N1,N2)
            TTRACE(c,t)
            ad_exit(1);
         }
+        N1 = N2;
 
 
      } //for int t
@@ -283,7 +271,9 @@ REPORT_SECTION
   REPORT(L)
   REPORT(M_curve_penalty)
   REPORT(F)
+  REPORT(qF)
   REPORT(M)
+  REPORT(qM)
   report << endl;
   report << "days" << "  " << "obs" << "   " << "pred" << endl; 
   for (int t = 0; t <= ntime; t++)
@@ -301,8 +291,14 @@ REPORT_SECTION
            <<  pre         << endl;
   }
   report << endl;
-  report << "n size nobs M F" << endl;
+  const double wa = 2.512e-05;
+  const double wb = 2.9396;
+  REPORT(ngroup_MF)
+  report << "n len wt nobs M F" << endl;
   for (int n = 1; n <= ngroup_MF; n++)
   {
-     report << n << " " << MF_sz_grp(n) << " " << nobs(n) << " " << M(n) << " " << F(n) << endl;
+     double len = (double)MF_sz_grp(n) + 5.0;
+     double wt = wa*pow(len,wb);
+     report << n << " " << len << " " << wt << " " << nobs(n) << " " 
+            << qM(n) << " " << qF(n) << endl;
   }

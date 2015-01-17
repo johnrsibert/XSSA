@@ -21,6 +21,8 @@ require("R4MFCL")
 # 0.15 0 0.3
 # Length-weight parameters
 # 2.512e-05 2.9396
+mfcl.wa = 2.512e-05
+mfcl.wb = 2.9396
 
 # from Dalzell
 # The current minimum size for YFT for commercial sale in Hawaii is 3 lb.
@@ -29,8 +31,11 @@ require("R4MFCL")
 # what would be the impact of 15 lb and 20 lb on the Y/R.
 
 kgperlb = 0.453592
+mfcl.rep.file = paste(path.expand("~"),
+                     "/Projects/xssa/mfcl/yft/2014/basecase/plot-12.Rdata",
+                     sep="")
 
-ypr<-function(epoch=NULL,region=2,astar=NULL)
+mfcl.ypr<-function(epoch=NULL,region=2,astar=NULL)
 {
 
    rep.file = paste(path.expand("~"),
@@ -136,7 +141,7 @@ ypr<-function(epoch=NULL,region=2,astar=NULL)
   return(as.data.frame(cbind(YPR,Fmult)))
 }
 
-plot.yield<-function(epoch=NULL,region=2)
+mfcl.plot.yield<-function(epoch=NULL,region=2)
 {
    rep.file = paste(path.expand("~"),
                      "/Projects/xssa/mfcl/yft/2014/basecase/plot-12.Rdata",
@@ -224,9 +229,142 @@ plot.yield<-function(epoch=NULL,region=2)
 #  return(rep)
 }
 
-ypr.step = function()
+csm.read.rep=function(path=".")
 {
-   N = prevN*exp(-Z)	
-   B = prevB + prevN*W + N*prevW + 2.0*prevN*prevW
+   get.field<-function(sca)
+   {
+     p = .csm.field.counter
+     field = sca[p]
+     p = p+1;
+     .csm.field.counter<<-p
+     return(field)
+   }
+   get.numeric.field<-function(sca,nfield)
+   {
+      ret<-as.numeric(get.field(sca))
+      return(ret)
+   }
+
+   #######################################
+
+   fp = paste(path,"csm.rep",sep='/')
+   print(paste("Scanning ",fp))
+   sca = scan(file=fp,what="raw")
+   print(paste("Scan read",length(sca),"fields"),quote=F)
+   .csm.field.counter <<- 1
+   ret = list()
+
+   f = which(sca == "#ngroup_MF")
+   .csm.field.counter <<- f+1
+   ng = get.numeric.field(sca)
+   ncol = 6
+   .csm.field.counter = f + 8
+   qM = vector(length=ng)
+   qF = vector(length=ng)
+   wt = vector(length=ng)
+   len = vector(length=ng)
+   for (g in 1:ng)
+   {
+      n = get.numeric.field(sca)
+      len[n] = get.numeric.field(sca)
+      wt[n] = get.numeric.field(sca)
+      nobs = get.numeric.field(sca)
+      qM[n] = get.numeric.field(sca)
+      qF[n] = get.numeric.field(sca)
+   }
+   print(nobs)
+   ret$mort.mat = as.data.frame(cbind(len,wt,qM,qF))
+
+
+   f = which(sca == "days")
+#  print(sca[(f+3):(f+5)])
+   .csm.field.counter = f+3
+   ntime = 101
+   days=vector(length=ntime)
+   obs=vector(length=ntime)
+   pred=vector(length=ntime)
+   for (t in 1:ntime)
+   {
+      days[t] = get.numeric.field(sca)
+      obs[t] = get.numeric.field(sca)
+      pred[t] = get.numeric.field(sca)
+   }
+   ret$attrition=as.data.frame(cbind(days,obs,pred))
+
+  return(ret)
 }
 
+
+plot.mortality=function(epoch=NULL,region=2)
+{
+   print(paste("Loading ",mfcl.rep.file))
+   load(mfcl.rep.file)
+
+
+   nTime = rep$nTime
+   nAges = rep$nAges
+   nReg = rep$nReg
+   yrs = rep$yrs
+   MatAge = rep$MatAge
+   MeanWatAge = rep$mean.WatAge
+   MeanLatAge = rep$mean.LatAge
+   FatAgeReg = rep$FatYrAgeReg
+
+   # compute recet average fishing mortality for region
+   if (is.null(epoch))
+      epoch = (nTime-19):nTime
+   den = 0
+   AveFatAge = vector(length=nAges)
+   for (j in epoch)
+   {
+      den = den + 1
+      for (k in 1:nAges)
+      {
+         AveFatAge[k] = AveFatAge[k] + FatAgeReg[j,k,region]
+      }
+   } 
+   for (k in 1:nAges)
+   {
+      AveFatAge[k] = AveFatAge[k]/den
+   }
+
+   csm.rep = csm.read.rep()
+#  print(csm.rep$mort.mat$wt)
+#  print(csm.rep$mort.mat$qF)
+   csm = read.fit("csm")
+   nmort = csm$npar/4
+   qq = nmort*2
+   qF = (qq+1):(qq+nmort)
+   print(csm$names[qF])
+   qM = (qq+nmort+1):(qq+2*nmort)
+   print(csm$names[qM])
+
+   maxF = max(AveFatAge,csm$est[qF])
+   print(maxF)
+   plot(MeanWatAge,AveFatAge,type='l',ylim=c(0,maxF))
+   points(csm.rep$mort.mat$wt,csm$est[qF],col="red")
+   sd.bars(csm.rep$mort.mat$wt,csm$est[qF],2.0*csm$std[qF])
+
+   maxM = max(MatAge,csm.rep$mort.mat$qM)
+   print(maxM)
+   x11()
+   plot(MeanWatAge,MatAge,type='l',ylim=c(0,maxM))
+   points(csm.rep$mort.mat$wt,csm$est[qM],pch=18,cex=2,col="orange")
+   sd.bars(csm.rep$mort.mat$wt,csm$est[qM],2.0*csm$std[qM],lwd=2,col="seagreen")
+
+   
+}
+
+sd.bars = function(x,y,s,col="red",lwd=1,lty="solid")
+{
+#  print("sd.bars:")
+#  print(x)
+#  print(y)
+#  print(s)
+   np = length(x)
+   for (p in 1:np)
+   {
+      lines(c(x[p],x[p]),c((y[p]-s[p]),(y[p]+s[p])),
+       col=col,lwd=lwd,lty=lty)
+   }
+}
