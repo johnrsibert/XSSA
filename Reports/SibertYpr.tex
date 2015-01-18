@@ -1,0 +1,227 @@
+\documentclass[12pt,letterpaper]{article}
+\usepackage{amsmath}
+\usepackage{amsfonts}
+%\usepackage{color}
+\usepackage[usenames,dvipsnames]{color}
+\usepackage{graphicx}
+\usepackage{longtable}
+\usepackage{rotating}
+\usepackage{verbatim}
+\usepackage[pdftex,bookmarksopen]{hyperref}
+\hypersetup{pdfauthor={John Sibert}}
+\hypersetup{pdfsubject={Compartment model of MHI YFT}}
+\hypersetup{pdftitle={Two-compartment models of Main Hawaiian Islands
+Yellowfin Tuna Population}}
+\hypersetup{pdfkeywords={yellowfin,state space,compartment model,Hawaii}}
+
+\newcommand\doublespacing{\baselineskip=1.6\normalbaselineskip}
+\newcommand\singlespacing{\baselineskip=1.0\normalbaselineskip}
+\renewcommand\deg[1]{$^\circ$#1}
+\newcommand\SD{SEAPODYM}
+\newcommand\MFCL{MULTIFAN-CL}
+\newcommand\ADMB{ADModel Builder}
+\newcommand\SPC{Secretariat of the Pacific Community}
+\newcommand\WCPO{Western Central Pacific Ocean}
+\newcommand\SSAP{Skipjack Survey and Assessment Programme}
+\newcommand\RTTP{Regional Tuna Tagging Programme}
+\newcommand\PTTP{Pacific Tuna Tagging Programme}
+\newcommand\HTTP{Hawaii Tuna Tagging Programme}
+\newcommand\WCPFC{Western and Central Pacific Fisheries Commission}
+\newcommand\FAD{fish aggregating device}
+\newcommand\ADRM{advection-diffusion-reaction model}
+\newcommand\help[1]{\color{Magenta}{\it #1 }\normalcolor}
+\newcommand\widebar[1]{\overline{#1}}
+\newcommand\EEZ{Exclusive Economic Zone}
+
+\title{Preliminary Yield per Recruit Analysis of the Hawaiian
+Yellowfin Tuna Fishery}
+
+\author{
+John Sibert\thanks{sibert@hawaii.edu}\\
+Joint Institute of Marine and Atmospheric Research\\
+University of Hawai'i at Manoa\\
+Honolulu, HI  96822 U.S.A.\\[0.125in]
+\date{\today}
+}
+
+\pagestyle{myheadings}
+\markright{Sibert\hfil YFT Yield Per Recruit\hfil{\bf DRAFT}\hfil\today}
+
+\begin{document}
+\maketitle
+
+\doublespacing
+
+\section*{Introduction}
+The yield per recruit (YPR) concept originates in work conducted in the 1950s
+as described by Beverton and Hold (1957). It is a relatively simple
+approach requiring estimates of fishing mortality (F), natural
+mortality (M), rate of growth in weight. YPR seems to have fallen into
+disuse because modern stock assessment methods provide more useful
+information for fisheries managers. Furthermore most presentations of
+YPR center around development of formulas for calculating YPR based on
+assumptions of constant F and M over the life of the exploited fish.
+Estimates of age-dependent F and M are often available from stock
+assessments or tagging experiments. These estimates can be easily
+applied to computing YPR with fewer assumptions. Sparre and Venema
+(1998) suggest on approach.
+
+Estimates of F and M at age for Hawaiian yellowfin tuna are avaialble
+from two sources: the \HTTP\ (HTTP) and the 2014 \WCPFC\ (WCPFC) stock
+assessment.
+
+\section*{WCPFC}
+The Main Hawaiian Islands (MHI) are split between two regions 2 and 4
+in the \MFCL\ (MFCL) analysis; Figure~\ref{fig:mfclreg}. The boundary between
+these two regions passes through the MHI. Region 4 extends from
+10\deg{S} latitude to 20\deg{N} latitude and comprises
+the large-scale equatorial purse seine and longline fisheries and a
+portion of the small boat fishery in the MHI. 
+Region 2 extends from 20\deg{N} latitude to 50\deg{N} latitude
+and comprises the Hawaii longline fishery 
+and most of the small boat fisheries in the MHI.
+These small boat fisheries catch in aggregate more yellowfin than the longline
+fishery (Figure~\ref{fig:fivegears}), but are not included in the data
+on which the MFCL assessment is based.
+
+The 2014 MFCL yellowfin assessment includes data from 1952 through
+2012. The stock is assumed to consist of 28 quarterly age classes. The
+model output routinely includes estimate of natural mortality by age
+class, mean weight at age, and fishing mortality by year, age and
+region. For the purpose of YPR analysis, I average the natural
+mortality at age for each region from 2009 through 2014 (the last 5
+years or 20 quarters). 
+
+The YPR analysis for regions 4 and 2 are
+presented in Figures~\ref{fig:r4ypr} and~\ref{fig:r2ypr} repectively.
+Each of this figures contains three panels. \label{pp:what}
+The top panel is the estimated fishing mortality at age plotted
+against mean weight at age. The red marks on the abscissa are placed at
+the current lower catch weight limit and at three other
+weight limits sometimes discussed; 
+that is at 3, 10, 15, and 20 pounds.
+
+The second panel show the change yield per recruit due to multiplying
+the fishing mortality at all ages by constant factor ranging from 0 to
+10, that is from essential closing all fisheries to expanding all
+fisheries by a factor of 10. 
+The dashed vertical red line is drawn at 1, the current fishing mortality.
+
+The bottom panel shows the change in yield per recruit of increasing
+the minimum size limit in the fishery from 0kg to 70kg. 
+The dashed vertical red line is drawn at the weight producing the
+highest yield per recruit.
+
+In region 4, the purse seine and longline fisheries impose distinct fishing
+mortality patterns on the yellowfin stock resulting in two peaks in
+mortality, one near 5kg and another near 30kg.
+It would appear that increasing or decreasing the overall fishing
+mortality would cause a decrease in yield per recruit for all
+fisheries.
+\help{Or this may be an artifact of the math.}
+Increasing the size at first capture to around 10 kg appear to by
+about 25\% to all fisheries.
+
+In region 2, the situation is quite different. Since the catches from
+the small-boat fishery were excluded from the assessment, the fishing
+mortality is imposed by the longline fishery alone. There are not
+distinct peak.
+Increasing or decreasing the total fishing morality simply increases
+or decreases the yield.
+Similarly, increasing the weight at first capture merely decreases the
+yield.
+
+\section*{HTTP}\help{Working on it.}
+
+\section*{Discussion and Conclusions}\help{Working on it.}
+
+\section*{Math Stuff}\help{Working on it.}
+
+\vspace{4ex}
+\noindent {\bf Acknowledgements.}
+This work was funded by the Western Pacficic Regional Fisheries
+Managment Council. I thank the Council for its generous support and
+Council Staff Paul Dalzell and Eric Kingma for encouraging me to
+actually take on this challenging project and for their on-going
+collaboration.
+Particular thanks to Dr. M. Shiham Adam from the Maldives Marine
+Research Centre for making available computer code for estimating
+mortality from tagging data.
+Thanks to Mr. Reginald Kokubun of the Hawaii Division of Aquatic
+Resources for supplying catch report data from the HDAR commercial
+fisheries data base.
+Thanks to Mr. Keith Bigelow and Ms. Karen Sender of NOAA Pacific
+Island Fisheries Science Center for supplying logbook reporting data and
+weight-frequency data from the PIFSC data base.
+Thanks also to Dr. John Hampton of the Secretariat of the Pacific
+Community, Oceanic Fisheries Programme, for making available
+MULTICAN-CL output files from the latest Western and Central Pacific
+Fisheries Commission yellowfin tuna stock assessment, and to Mr. Nick
+Davies for sharing R scripts and advice to decode the MFCL output files.
+
+\section*{References}
+{\parindent=0cm \small
+\everypar={\hangindent=2em \hangafter=1}\par
+\doublespacing
+Adam, M. S., J. Sibert, D. Itano and K. Holland. 2003. Dynamics of
+bigeye (Thunnus obesus) and yellowfin tuna (T. albacares) in Hawaii's
+pelagic fishery: analysis of tagging data with a bulk transfer model
+incorporating size specific attrition. Fishery Bulletin 101(2):
+215-228.
+
+Beverton, R. J. H. and S. J. Holt. 1957. On the Dynamics of Exploited
+Fish Populations. Fishery Investigations Series II Volume XIX,
+Ministry of Agriculture, Fisheries and Food. London: Her Majesty's
+Stationary Office.
+
+Davies, N., S. Harley, J. Hampton, S. McKechnie. 2014. Stock
+assessment of yellowfin tuna in the western and central pacific ocean.
+WCPFC-SC10-2014/SA-WP-04.
+
+Itano, D., K. Holland. 2000.  Movement and vulnerability of bigeye
+(Thunnus obesus) and yellowfin tuna (Thunnus albacares) in relation to
+FADs and natural aggregation points.Aquat. Living Resour. 13: 213-223.
+
+Kleiber, P., J. Hampton, N. Davies, S. Hoyle, D. Fournier. 2014.
+MULTIFAN-CL User’s Guide
+
+Quinn, T. and R. Deriso. 1999. Quantitative fish dynamics. Oxford
+University Press, New York.
+
+Sparre, P. and S. Venema.1998. Introduction to tropical fish stock
+assessment. Part 1: Manual. Food and Agricultural Organization of the
+United Nations. Fisheries Technical Paper 306/1.
+\par}
+
+%%%%%%%% figures begin here %%%%%%%%%%%%%%%%%%%%%%
+\begin{figure}
+\begin{center}
+\includegraphics[height=1.0\textwidth]{./graphics/MFCLregions.png}
+\caption{\label{fig:mfclreg}
+Regions used in the 2014 MFCL stock assessment; from Davies et al,
+2014.
+}
+\end{center}
+\end{figure}
+
+\begin{figure}
+\begin{center}
+\includegraphics[height=0.9\textheight]{./graphics/YPR_MFCL_R4.pdf}
+\caption{\label{fig:r4ypr}
+Fishing mortality and yield per recruit for MFCL region 4.
+See text page~\ref{pp:what} for explanation of panels.
+}
+\end{center}
+\end{figure}
+
+\begin{figure}
+\begin{center}
+\includegraphics[height=0.9\textheight]{./graphics/YPR_MFCL_R2.pdf}
+\caption{\label{fig:r2ypr}
+Fishing mortality and yield per recruit for MFCL region 2.
+See text page~\ref{pp:what} for explanation of panels.
+}
+\end{center}
+\end{figure}
+
+\end{document}

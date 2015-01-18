@@ -16,7 +16,7 @@ double.lines<-function(x,y,bcol="black",fcol,lwd,lty="solid",pretty=TRUE)
     lines(x,y,col=fcol,lwd=2)
 }
 
-nice.ts.plot<-function(x,y,label=NULL,legend=NULL,bcol="blue",fcol="lightblue",lwd=5,ylab=NULL)
+nice.ts.plot<-function(x,y,label=NULL,legend=NULL,bcol="blue",fcol="lightblue",lwd=5,ylab=NULL,xlab=NULL)
 {
    nlines <- 1
    if (!is.null(ncol(y)))
@@ -40,7 +40,7 @@ nice.ts.plot<-function(x,y,label=NULL,legend=NULL,bcol="blue",fcol="lightblue",l
    }
 
    old.par <- par(no.readonly = TRUE) 
-   par(mar=c(3,4,1,1)+0.1)
+ # par(mar=c(3,4,2,1)+0.1)
    plot(xrange,yrange,type='n',axes=FALSE,ann=FALSE,yaxs='i')
    for (i in 2:length(ytic))
    {
@@ -65,6 +65,7 @@ nice.ts.plot<-function(x,y,label=NULL,legend=NULL,bcol="blue",fcol="lightblue",l
 
    axis(1,lwd=0)
    abline(h=par("usr")[3],lwd=3)
+   mtext(xlab,side=1,line=2.5)
 
    axis(2,lwd=0,las=1,at=ytic[2:length(ytic)])
    abline(v=par("usr")[1],lwd=3)

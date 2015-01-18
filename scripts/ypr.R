@@ -86,9 +86,8 @@ mfcl.ypr<-function(epoch=NULL,region=2,astar=NULL)
 
    Y = vector(length=nAges)
    Fmult = seq(0.1,10,.1)
-#  print(Fmult)
    nf = length(Fmult)
-   YPR = vector(length=nf)
+   YPR.f = vector(length=nf)
 #  m = 10
    for (m in 1:nf)
    {
@@ -115,30 +114,79 @@ mfcl.ypr<-function(epoch=NULL,region=2,astar=NULL)
          prevYY = YY
          Y[a] = YY
       }
-      YPR[m] = sum(Y)
+      YPR.f[m] = sum(Y)
    }
+
+   YPR.a = vector(length=nAges)
+#  m = 10
+   maxa = 0
+   maxYPR = 0
+   for (m in 1:nAges)
+   {
+      Y = vector(length=nAges)
+      prevW = MeanWatAge[1]
+      prevFF = 0.0
+      prevN = 1.0
+      prevYY = prevFF*prevN*prevW
+      Y[1] = prevYY
+      for (a in 2:nAges)
+      {
+         W = MeanWatAge[a]
+         if (a <= m)
+            FF = 0.0
+         else
+            FF = AveFatAge[region,a]
+         Z = FF+MatAge[a]
+         N = prevN*exp(-Z)	
+         YY = FF*N*W
+   
+         prevW = W
+         prevFF = FF
+         prevN = N
+         prevYY = YY
+         Y[a] = YY
+      }
+      YPR.a[m] = sum(Y)
+      if (YPR.a[m] > maxYPR)
+      {
+         maxYPR = YPR.a[m]
+         maxa = m;
+      }
+   }
+   print(paste(maxa,MeanWatAge[maxa],MeanWatAge[maxa]/kgperlb))
 
 
    width = 6.5
    height = 9.0
    x11(width=width,height=height)
    old.par = par(no.readonly = TRUE) 
-   par(mar=c(5,4,0,0)+0.1)
+   par(mar=c(4,4,0,0)+0.1)
 #  par(mar=c(5,4,4,2)+0.1)
-   lm <- layout(matrix(c(1:2),nrow=2,byrow=TRUE))
+   lm <- layout(matrix(c(1:3),nrow=3,byrow=TRUE))
    layout.show(lm)
-   plot(MeanWatAge,AveFatAge[region,],las=1,type='b',ylim=c(0,max(AveFatAge[region,])),
+   nice.ts.plot(MeanWatAge,AveFatAge[region,],
          ylab="Fishing Mortality",xlab="Weight (kg)")
-   points(c(3*kgperlb,10*kgperlb,15*kgperlb,20*kgperlb),c(0,0,0,0),col="red",pch='|')#,cex=2)
+#  plot(MeanWatAge,AveFatAge[region,],las=1,type='b',ylim=c(0,max(AveFatAge[region,])),
+#        ylab="Fishing Mortality",xlab="Weight (kg)")
+   points(c(3*kgperlb,10*kgperlb,15*kgperlb,20*kgperlb),c(0,0,0,0),col="red",pch='|',cex=2)
    if(astar < nAges)
       abline(v=MeanWatAge[astar],col="green",lty="dotdash")
+   title(main=paste("MFCL Region",region),line=-2,cex.main=1.6)
 
-   plot(Fmult,YPR,las=1,type='b',ylim=c(0,max(YPR)),
+#  plot(Fmult,YPR.f,las=1,type='b',ylim=c(0,max(YPR.f)),
+   nice.ts.plot(Fmult,YPR.f,
          xlab="F multiplier",ylab="Yield per Recruit (kg)")
    abline(v=1.0,col="red",lty="dotdash")
 
+#  plot(MeanWatAge,YPR.a,las=1,type='b',ylim=c(0,max(YPR.a)),
+   nice.ts.plot(MeanWatAge,YPR.a,
+         xlab="Weight at First Capture",ylab="Yield per Recruit (kg)")
+   points(c(3*kgperlb,10*kgperlb,15*kgperlb,20*kgperlb),c(0,0,0,0),col="red",pch='|',cex=2)
+   abline(v=MeanWatAge[maxa],col="red",lty="dotdash")
+
+   save.png.plot(paste("YPR_MFCL_R",region,sep=""),width=width,height=height)
    par(old.par)
-  return(as.data.frame(cbind(YPR,Fmult)))
+   return(as.data.frame(cbind(YPR.f,Fmult)))
 }
 
 mfcl.plot.yield<-function(epoch=NULL,region=2)
