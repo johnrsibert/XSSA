@@ -162,27 +162,25 @@ mfcl.ypr<-function(epoch=NULL,region=2,astar=NULL)
    old.par = par(no.readonly = TRUE) 
    par(mar=c(4,4,0,0)+0.1)
 #  par(mar=c(5,4,4,2)+0.1)
-   lm <- layout(matrix(c(1:3),nrow=3,byrow=TRUE))
+   lm <- layout(matrix(c(1:2),nrow=2,byrow=TRUE))
    layout.show(lm)
-   nice.ts.plot(MeanWatAge,AveFatAge[region,],
-         ylab="Fishing Mortality",xlab="Weight (kg)")
-#  plot(MeanWatAge,AveFatAge[region,],las=1,type='b',ylim=c(0,max(AveFatAge[region,])),
+#  nice.ts.plot(MeanWatAge,AveFatAge[region,],
 #        ylab="Fishing Mortality",xlab="Weight (kg)")
-   points(c(3*kgperlb,10*kgperlb,15*kgperlb,20*kgperlb),c(0,0,0,0),col="red",pch='|',cex=2)
-   if(astar < nAges)
-      abline(v=MeanWatAge[astar],col="green",lty="dotdash")
-   title(main=paste("MFCL Region",region),line=-2,cex.main=1.6)
+#  points(c(3*kgperlb,10*kgperlb,15*kgperlb,20*kgperlb),c(0,0,0,0),col="red",pch='|',cex=2)
+#  if(astar < nAges)
+#     abline(v=MeanWatAge[astar],col="green",lty="dotdash")
 
-#  plot(Fmult,YPR.f,las=1,type='b',ylim=c(0,max(YPR.f)),
    nice.ts.plot(Fmult,YPR.f,
          xlab="F multiplier",ylab="Yield per Recruit (kg)")
    abline(v=1.0,col="red",lty="dotdash")
+   legend("topleft",bty='n',cex=1.6,legend="A")
+#  title(main=paste("MFCL Region",region),line=-2,cex.main=1.6)
 
-#  plot(MeanWatAge,YPR.a,las=1,type='b',ylim=c(0,max(YPR.a)),
    nice.ts.plot(MeanWatAge,YPR.a,
          xlab="Weight at First Capture",ylab="Yield per Recruit (kg)")
    points(c(3*kgperlb,10*kgperlb,15*kgperlb,20*kgperlb),c(0,0,0,0),col="red",pch='|',cex=2)
    abline(v=MeanWatAge[maxa],col="red",lty="dotdash")
+   legend("topleft",bty='n',cex=1.6,legend="B")
 
    save.png.plot(paste("YPR_MFCL_R",region,sep=""),width=width,height=height)
    par(old.par)
@@ -342,12 +340,10 @@ csm.read.rep=function(path=".")
   return(ret)
 }
 
-
-plot.mortality=function(epoch=NULL,region=2)
+plot.mfcl.mortality=function(epoch=NULL)
 {
    print(paste("Loading ",mfcl.rep.file))
    load(mfcl.rep.file)
-
 
    nTime = rep$nTime
    nAges = rep$nAges
@@ -361,20 +357,86 @@ plot.mortality=function(epoch=NULL,region=2)
    # compute recet average fishing mortality for region
    if (is.null(epoch))
       epoch = (nTime-19):nTime
-   den = 0
-   AveFatAge = vector(length=nAges)
-   for (j in epoch)
+   width = 6.5
+   height = 9.0
+   x11(width=width,height=height)
+   old.par = par(no.readonly = TRUE) 
+   par(mar=c(4,4,1,0)+0.1)
+#  par(mar=c(5,4,4,2)+0.1)
+   lm <- layout(matrix(c(1:3),nrow=3,byrow=TRUE))
+   layout.show(lm)
+
+   nice.ts.plot(MeanWatAge,MatAge,
+        ylab="Natural Mortality (q)",xlab="Weight (kg)")
+   legend("topleft",bty='n',cex=1.6,legend="M")
+
+   for (r in c(2,4))
    {
-      den = den + 1
+      den = 0
+      AveFatAge = vector(length=nAges)
+      for (j in epoch)
+      {
+         den = den + 1
+         for (k in 1:nAges)
+         {
+            AveFatAge[k] = AveFatAge[k] + FatAgeReg[j,k,r]
+         }
+      } 
       for (k in 1:nAges)
       {
-         AveFatAge[k] = AveFatAge[k] + FatAgeReg[j,k,region]
+         AveFatAge[k] = AveFatAge[k]/den
+      }
+      
+      nice.ts.plot(MeanWatAge,AveFatAge,
+           ylab="Fishing Mortality (q)",xlab="Weight (kg)")
+      points(c(3*kgperlb,10*kgperlb,15*kgperlb,20*kgperlb),c(0,0,0,0),col="red",pch='|',cex=2)
+      legend("topleft",bty='n',cex=1.6,legend=paste("F(",r,")",sep=""))
+   }
+
+   save.png.plot("MFCL_MF",width=width,height=height)
+   par(old.par)
+}
+
+
+plot.csm.mortality=function(epoch=NULL)
+{
+   print(paste("Loading ",mfcl.rep.file))
+   load(mfcl.rep.file)
+
+   nTime = rep$nTime
+   nAges = rep$nAges
+   nReg = rep$nReg
+   yrs = rep$yrs
+   MatAge = rep$MatAge
+   MeanWatAge = rep$mean.WatAge
+   MeanLatAge = rep$mean.LatAge
+   FatAgeReg = rep$FatYrAgeReg
+
+   # compute recet average fishing mortality for region
+   if (is.null(epoch))
+      epoch = (nTime-19):nTime
+
+   AveFatAge = matrix(0,ncol=2,nrow = nAges)
+   region.vec = as.vector(c(2,4))
+   for (r in 1:2)
+   {
+      den = 0
+      region = region.vec[r]
+      print(paste("region",region))
+      for (j in epoch)
+      {  
+         den = den + 1
+         for (k in 1:nAges)
+         {
+            AveFatAge[k,r] = AveFatAge[k,r] + FatAgeReg[j,k,region]
+         }
+      }
+      for (k in 1:nAges)
+      {
+         AveFatAge[k,r] = AveFatAge[k,r]/den
       }
    } 
-   for (k in 1:nAges)
-   {
-      AveFatAge[k] = AveFatAge[k]/den
-   }
+   print(head(AveFatAge))
 
    csm.rep = csm.read.rep()
 #  print(csm.rep$mort.mat$wt)
@@ -387,23 +449,39 @@ plot.mortality=function(epoch=NULL,region=2)
    qM = (qq+nmort+1):(qq+2*nmort)
    print(csm$names[qM])
 
-   maxF = max(AveFatAge,csm$est[qF])
-   print(maxF)
-   plot(MeanWatAge,AveFatAge,type='l',ylim=c(0,maxF))
-   points(csm.rep$mort.mat$wt,csm$est[qF],col="red")
-   sd.bars(csm.rep$mort.mat$wt,csm$est[qF],2.0*csm$std[qF])
+   width = 6.5
+   height = 9.0
+   x11(width=width,height=height)
+   old.par = par(no.readonly = TRUE) 
+   par(mar=c(4,4,0,0)+0.1)
+#  par(mar=c(5,4,4,2)+0.1)
+   lm <- layout(matrix(c(1:2),nrow=2,byrow=TRUE))
+   layout.show(lm)
 
-   maxM = max(MatAge,csm.rep$mort.mat$qM)
+   maxM = 1.2*max(MatAge,csm.rep$mort.mat$qM)
    print(maxM)
-   x11()
-   plot(MeanWatAge,MatAge,type='l',ylim=c(0,maxM))
-   points(csm.rep$mort.mat$wt,csm$est[qM],pch=18,cex=2,col="orange")
+   nice.ts.plot(MeanWatAge,MatAge,ylim=c(0,maxM),bcol="black",fcol="lightgray",
+                xlab="Weight (kg)", 
+                ylab=substitute(paste("Natural Mortality ",(q^{-1}))))
+   double.lines(csm.rep$mort.mat$wt,csm$est[qM],bcol="red",fcol="orange",lwd=7)
    sd.bars(csm.rep$mort.mat$wt,csm$est[qM],2.0*csm$std[qM],lwd=2,col="seagreen")
 
+   maxF = 1.2*max(AveFatAge,csm$est[qF])
+   print(maxF)
+   nice.ts.plot(MeanWatAge,AveFatAge,bcol="black",fcol="lightgray",
+                legend=c(" R2"," R4"), ylim = c(0,maxF),
+                xlab="Weight (kg)", 
+                ylab=substitute(paste("Fishing Mortality ",(q^{-1}))))
+   double.lines(csm.rep$mort.mat$wt,csm$est[qF],bcol="red",fcol="orange",lwd=7)
+   sd.bars(csm.rep$mort.mat$wt,csm$est[qF],2.0*csm$std[qF],col="seagreen")
+
+
+   save.png.plot("csm_MF",width=width,height=height)
+   par(old.par)
    
 }
 
-sd.bars = function(x,y,s,col="red",lwd=1,lty="solid")
+sd.bars = function(x,y,s,col="orange",lwd=3,lty="dashed")
 {
 #  print("sd.bars:")
 #  print(x)
@@ -415,4 +493,13 @@ sd.bars = function(x,y,s,col="red",lwd=1,lty="solid")
       lines(c(x[p],x[p]),c((y[p]-s[p]),(y[p]+s[p])),
        col=col,lwd=lwd,lty=lty)
    }
+}
+
+##########
+do.it.all=function()
+{
+   graphics.off()
+   mfcl.ypr(region=2)->tmp
+   mfcl.ypr(region=4)->tmp
+   plot.mfcl.mortality()->tmp
 }

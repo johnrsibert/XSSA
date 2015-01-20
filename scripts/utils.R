@@ -16,13 +16,17 @@ double.lines<-function(x,y,bcol="black",fcol,lwd,lty="solid",pretty=TRUE)
     lines(x,y,col=fcol,lwd=2)
 }
 
-nice.ts.plot<-function(x,y,label=NULL,legend=NULL,bcol="blue",fcol="lightblue",lwd=5,ylab=NULL,xlab=NULL)
+nice.ts.plot<-function(x,y,label=NULL,legend=NULL,bcol="blue",fcol="lightblue",lwd=5,
+              ylab=NULL,xlab=NULL,ylim=NULL)
 {
    nlines <- 1
    if (!is.null(ncol(y)))
      nlines = ncol(y)
 
-   yrange <- c(0,1.2*max(y,na.rm=TRUE))
+   if (is.null(ylim))
+      yrange <- c(0,1.2*max(y,na.rm=TRUE))
+   else
+      yrange=ylim
 #  yrange <- c(min(y,na.rm=TRUE),1.2*max(y,na.rm=TRUE))
    q <- quantile(y,probs=c(0.01,0.99),na.rm=TRUE)
 #  yrange <- c(q[1],(1.6*q[2]))
@@ -59,7 +63,17 @@ nice.ts.plot<-function(x,y,label=NULL,legend=NULL,bcol="blue",fcol="lightblue",l
       double.lines(x,y,bcol=bcol,fcol=fcol,lwd=lwd)
    }
    if (!is.null(legend))
-      text(x[length(x)],y[length(y)],legend,col=bcol,pos=4,offset=0.25,cex=1.0)
+   {
+      if (nlines > 1)
+      {
+         for (n in 1:nlines)
+         {
+            text(x[length(x)],y[nrow(y),n],legend[n],col=bcol,pos=4,offset=0.25,cex=1.0)
+         }
+      }
+      else
+        text(x[length(x)],y[length(y)],legend,col=bcol,pos=4,offset=0.25,cex=1.0)
+   }
    if (!is.null(label))
       title(main=label,line=-0.75) #outer=FALSE)
 
