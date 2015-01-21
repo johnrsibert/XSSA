@@ -38,9 +38,10 @@ mfcl.rep.file = paste(path.expand("~"),
 mfcl.ypr<-function(epoch=NULL,region=2,astar=NULL)
 {
 
-   rep.file = paste(path.expand("~"),
-                     "/Projects/xssa/mfcl/yft/2014/basecase/plot-12.Rdata",
-                     sep="")
+   rep.file = mfcl.rep.file
+   #           paste(path.expand("~"),
+   #                  "/Projects/xssa/mfcl/yft/2014/basecase/plot-12.Rdata",
+   #                 sep="")
    print(rep.file)
 
    load(rep.file)
@@ -173,25 +174,28 @@ mfcl.ypr<-function(epoch=NULL,region=2,astar=NULL)
    nice.ts.plot(Fmult,YPR.f,
          xlab="F multiplier",ylab="Yield per Recruit (kg)")
    abline(v=1.0,col="red",lty="dotdash")
-   legend("topleft",bty='n',cex=1.6,legend="A")
+#  legend("topleft",bty='n',cex=1.6,legend="A")
+   label.panel("A")
 #  title(main=paste("MFCL Region",region),line=-2,cex.main=1.6)
 
    nice.ts.plot(MeanWatAge,YPR.a,
          xlab="Weight at First Capture",ylab="Yield per Recruit (kg)")
    points(c(3*kgperlb,10*kgperlb,15*kgperlb,20*kgperlb),c(0,0,0,0),col="red",pch='|',cex=2)
    abline(v=MeanWatAge[maxa],col="red",lty="dotdash")
-   legend("topleft",bty='n',cex=1.6,legend="B")
+#  legend("topleft",bty='n',cex=1.6,legend="B")
+   label.panel("B")
 
    save.png.plot(paste("YPR_MFCL_R",region,sep=""),width=width,height=height)
    par(old.par)
    return(as.data.frame(cbind(YPR.f,Fmult)))
 }
 
-mfcl.plot.yield<-function(epoch=NULL,region=2)
+junk.mfcl.plot.yield<-function(epoch=NULL,region=2)
 {
-   rep.file = paste(path.expand("~"),
-                     "/Projects/xssa/mfcl/yft/2014/basecase/plot-12.Rdata",
-                     sep="")
+   rep.file = mfcl.rep.file
+   #           paste(path.expand("~"),
+   #                 "/Projects/xssa/mfcl/yft/2014/basecase/plot-12.Rdata",
+   #                 sep="")
    print(rep.file)
 
    load(rep.file)
@@ -275,6 +279,113 @@ mfcl.plot.yield<-function(epoch=NULL,region=2)
 #  return(rep)
 }
 
+csm.ypr=function()
+{
+   rep = csm.read.rep()
+   print(names(rep))
+   fit = read.fit("csm")
+
+   nmort = fit$npar/4
+   qq = nmort*2
+   qF = (qq+1):(qq+nmort)
+   qM = (qq+nmort+1):(qq+2*nmort)
+
+   nAges = nmort
+   astar = nAges
+
+   Fmult = seq(0.1,10,.1)
+   nf = length(Fmult)
+   YPR.f = vector(length=nf)
+#  m = 10
+   for (m in 1:nf)
+   {
+      Y = vector(length=nAges)
+      prevW = rep$mort.mat$wt[1]
+      prevFF = fit$est[qF[1]]*Fmult[m]
+      prevN = 1.0
+      prevYY = prevFF*prevN*prevW
+      Y[1] = prevYY
+      for (a in 2:nAges)
+      {
+         W = rep$mort.mat$wt[a]
+         if (a <= astar)
+            FF = fit$est[qF[a]]*Fmult[m]
+         else
+            FF = fit$est[qF[a]]
+         Z = FF+fit$est[qM[a]]
+         N = prevN*exp(-Z)	
+         YY = FF*N*W
+   
+         prevW = W
+         prevFF = FF
+         prevN = N
+         prevYY = YY
+         Y[a] = YY
+      }
+      YPR.f[m] = sum(Y)
+   }
+
+   YPR.a = vector(length=nAges)
+#  m = 10
+   maxa = 0
+   maxYPR = 0
+   for (m in 1:nAges)
+   {
+      Y = vector(length=nAges)
+      prevW = rep$mort.mat$wt[1]
+      prevFF = 0.0
+      prevN = 1.0
+      prevYY = prevFF*prevN*prevW
+      Y[1] = prevYY
+      for (a in 2:nAges)
+      {
+         W = rep$mort.mat$wt[a]
+         if (a <= m)
+            FF = 0.0
+         else
+            FF = fit$est[qF[a]]
+         Z = FF+fit$est[qM[a]]
+         N = prevN*exp(-Z)	
+         YY = FF*N*W
+   
+         prevW = W
+         prevFF = FF
+         prevN = N
+         prevYY = YY
+         Y[a] = YY
+      }
+      YPR.a[m] = sum(Y)
+      if (YPR.a[m] > maxYPR)
+      {
+         maxYPR = YPR.a[m]
+         maxa = m;
+      }
+   }
+   print(paste(maxa,rep$mort.mat$wt[maxa],rep$mort.mat$wt[maxa]/kgperlb))
+
+   width = 6.5
+   height = 9.0
+   x11(width=width,height=height)
+   old.par = par(no.readonly = TRUE) 
+   par(mar=c(4,4,0,0)+0.1)
+   lm <- layout(matrix(c(1:2),nrow=2,byrow=TRUE))
+   layout.show(lm)
+
+   nice.ts.plot(Fmult,YPR.f,
+         xlab="F multiplier",ylab="Yield per Recruit (kg)")
+   abline(v=1.0,col="red",lty="dotdash")
+   label.panel("A")
+
+   nice.ts.plot(rep$mort.mat$wt,YPR.a,
+         xlab="Weight at First Capture (kg)",ylab="Yield per Recruit (kg)")
+   points(c(3*kgperlb,10*kgperlb,15*kgperlb,20*kgperlb),c(0,0,0,0),col="red",pch='|',cex=2)
+   label.panel("B")
+   abline(v=rep$mort.mat$wt[maxa],col="red",lty="dotdash")
+
+   save.png.plot("YPR_csm",width=width,height=height)
+   par(old.par)
+
+}
 csm.read.rep=function(path=".")
 {
    get.field<-function(sca)
@@ -368,7 +479,8 @@ plot.mfcl.mortality=function(epoch=NULL)
 
    nice.ts.plot(MeanWatAge,MatAge,
         ylab="Natural Mortality (q)",xlab="Weight (kg)")
-   legend("topleft",bty='n',cex=1.6,legend="M")
+#  legend("topleft",bty='n',cex=1.6,legend="M")
+   label.panel("M")
 
    for (r in c(2,4))
    {
@@ -390,7 +502,8 @@ plot.mfcl.mortality=function(epoch=NULL)
       nice.ts.plot(MeanWatAge,AveFatAge,
            ylab="Fishing Mortality (q)",xlab="Weight (kg)")
       points(c(3*kgperlb,10*kgperlb,15*kgperlb,20*kgperlb),c(0,0,0,0),col="red",pch='|',cex=2)
-      legend("topleft",bty='n',cex=1.6,legend=paste("F(",r,")",sep=""))
+  #   legend("topleft",bty='n',cex=1.6,legend=paste("F(",r,")",sep=""))
+      label.panel(paste("F(",r,")",sep=""))
    }
 
    save.png.plot("MFCL_MF",width=width,height=height)
@@ -464,6 +577,7 @@ plot.csm.mortality=function(epoch=NULL)
                 xlab="Weight (kg)", 
                 ylab=substitute(paste("Natural Mortality ",(q^{-1}))))
    double.lines(csm.rep$mort.mat$wt,csm$est[qM],bcol="red",fcol="orange",lwd=7)
+   label.panel("A")
    sd.bars(csm.rep$mort.mat$wt,csm$est[qM],2.0*csm$std[qM],lwd=2,col="seagreen")
 
    maxF = 1.2*max(AveFatAge,csm$est[qF])
@@ -473,12 +587,18 @@ plot.csm.mortality=function(epoch=NULL)
                 xlab="Weight (kg)", 
                 ylab=substitute(paste("Fishing Mortality ",(q^{-1}))))
    double.lines(csm.rep$mort.mat$wt,csm$est[qF],bcol="red",fcol="orange",lwd=7)
+   label.panel("B")
    sd.bars(csm.rep$mort.mat$wt,csm$est[qF],2.0*csm$std[qF],col="seagreen")
 
 
    save.png.plot("csm_MF",width=width,height=height)
    par(old.par)
    
+}
+
+label.panel=function(label)
+{
+   legend("topleft",bty='n',legend=label,text.font=2)
 }
 
 sd.bars = function(x,y,s,col="orange",lwd=3,lty="dashed")
@@ -499,7 +619,9 @@ sd.bars = function(x,y,s,col="orange",lwd=3,lty="dashed")
 do.it.all=function()
 {
    graphics.off()
+   plot.mfcl.mortality()->tmp
    mfcl.ypr(region=2)->tmp
    mfcl.ypr(region=4)->tmp
-   plot.mfcl.mortality()->tmp
+   plot.csm.mortality()
+   csm.ypr()
 }
