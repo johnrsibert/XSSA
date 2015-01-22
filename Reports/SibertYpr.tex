@@ -9,10 +9,10 @@
 \usepackage{verbatim}
 \usepackage[pdftex,bookmarksopen]{hyperref}
 \hypersetup{pdfauthor={John Sibert}}
-\hypersetup{pdfsubject={Compartment model of MHI YFT}}
-\hypersetup{pdftitle={Two-compartment models of Main Hawaiian Islands
-Yellowfin Tuna Population}}
-\hypersetup{pdfkeywords={yellowfin,state space,compartment model,Hawaii}}
+\hypersetup{pdfsubject={MHI Yellowfin Yield Per Recruit}}
+\hypersetup{pdftitle={ Yield per Recruit Analysis of the Hawaiian
+Yellowfin Tuna Fishery}}
+\hypersetup{pdfkeywords={yellowfin,yield per recruit}}
 
 \newcommand\doublespacing{\baselineskip=1.6\normalbaselineskip}
 \newcommand\singlespacing{\baselineskip=1.0\normalbaselineskip}
@@ -33,7 +33,10 @@ Yellowfin Tuna Population}}
 \newcommand\widebar[1]{\overline{#1}}
 \newcommand\EEZ{Exclusive Economic Zone}
 
-\title{Preliminary Yield per Recruit Analysis of the Hawaiian
+\title{
+{\bf\color{red}DRAFT REPORT\normalcolor}\\
+~\\
+Yield per Recruit Analysis of the Hawaiian
 Yellowfin Tuna Fishery}
 
 \author{
@@ -45,7 +48,8 @@ Honolulu, HI  96822 U.S.A.\\[0.125in]
 }
 
 \pagestyle{myheadings}
-\markright{Sibert\hfil YFT Yield Per Recruit\hfil{\bf DRAFT}\hfil\today}
+\markright{\color{red}Sibert\hfil YFT Yield Per Recruit\hfil{\bf
+DRAFT}\hfil\today}
 
 \begin{document}
 \maketitle
@@ -67,19 +71,20 @@ Derivations of
 YPR often center around development of formulas for calculating YPR based on
 assumptions of constant F and M over the life of the exploited fish.
 Estimates of age-dependent F and M are often available from
-agre-structured stock
+age-structured stock
 assessments or tagging experiments. These estimates can be easily
 applied to computing YPR with fewer assumptions. Sparre and Venema
 (1998) suggest one approach.
 
-Estimates of F and M at age for Hawaiian yellowfin tuna are avaialble
+Estimates of F and M at age for Hawaiian yellowfin tuna are available
 from two sources: the 1995-2000 \HTTP\ (HTTP) (Adam et 2003) and the
 2014 \MFCL\ (MFCL) stock assessment (Davies et al 2014). Here I
 apply YPR analysis to evaluate potential effects of changing the
 minimum size limit in the Main Hawaiian Islands (MHI) yellowfin tuna
 fishery.
 
-\section*{MFCL}
+\section*{Estimates of Mortality and YPR}
+\subsubsection*{MFCL}
 The Hawaii Exclusive Economic Zone is split between two regions 2 and 4
 in the MFCL analysis (Figure~\ref{fig:mfclreg}). 
 Region 4 extends from
@@ -115,7 +120,6 @@ In region 2, F is an order of magnitude lower with no clear
 modes. The lack of a mode in the smaller sizes is due to the omission
 of data from non longline fleets.
 
-
 The YPR analysis for regions 4 and 2 are
 presented in Figures~\ref{fig:r4ypr} and~\ref{fig:r2ypr} respectively.
 In region 4, either increasing or decreasing the overall fishing
@@ -130,57 +134,146 @@ or decreases the yield.
 Similarly, increasing the weight at first capture merely decreases the
 the total yield.
 
-\section*{HTTP}
-Adam et al (2003) used a tag-attrition model to estimate
+\subsubsection*{HTTP}
+Adam et al (2003) used a size- and spatially-structured
+tag-attrition model to estimate
 size-dependent fishing mortality, natural
-mortality and migration rates between six recapture sites from the
+mortality and migration rates between release and recapture sites from
 HTTP yellowfin and bigeye tag recaptures. 
-I used a simplified version of the same
-model with only one recapture site to estimate size-dependent fishing
+I used a simplified, spatially aggregated, version of the same
+model to estimate size-dependent fishing
 mortality and natural mortality from the HTTP yellowfin recaptures.
 The number of age groups was increased in the simplified model
 from three to
 eight because there were fewer recapture strata.
-`
-The new HTTP mortality estimates are shown in Figure\ref{fig:csmmf}.
-These estimates differ from the MFCL estimates in several ways. There
-are fewer age classes represented because of the relatively low numbers
-of longline recaptures. The HTTP mortality estimates are generally
-much higher that the MFCL estimates.
-The corresponding YPR analyses are shown in Figure~\ref{fig:csmmf}.
+
+The new HTTP mortality estimates are shown in Figure~\ref{fig:csmmf}.
+These estimates differ from the MFCL estimates in several ways. The
+size range is more restricted because of the relatively few
+recaptures of large fish from the longline. HTTP mortality estimates
+are generally much higher than MFCL estimates.
+The corresponding YPR analyses are shown in Figure~\ref{fig:yprcsm}.
 The YPR in relation to current levels of fishing mortality suggests
 that increasing F would yield only modest gains in yield.
 The YPR in relation to the weight at first recapture suggests that
-increasing the minimum size limit would have a deleterious effect on
-YPR.
+increasing the minimum size limit would have a deleterious effect
+total yield to the fishery.
+
 
 \section*{Discussion}
-The MFCL stock assessment is not intended to inform management of fisheries in
-the North Pacific. Division of the Hawaii EEZ between two regions
-makes application to problems in Hawaii difficult. Furthermore
-exclusion of a significant tonnage catch of smaller fish exacerbates
-the problem. Nevertheless, the situation in region 4 is instructive.
+The MFCL stock assessment is intended to inform management of
+large-scale purse seine and longline fisheries in equatorial Pacific.
+Application of MFCL stock assessment results to a relatively insular
+small scale fishery in the North Pacific may be stretching the
+capabilities of MFCL. Division of the Hawaii EEZ between two regions
+makes application to problems in Hawaii difficult. Furthermore,
+exclusion of the substantial catch of smaller fish from the analysis exacerbates
+the problem of applying the regional stock assessment to
+resolve fishery management issues in Hawaii. The results in region 4
+is instructive nevertheless.
 Fishing mortality on yellowfin is higher for small-sized fish than for
 larger fish, as is the suspected case in the MHI. By analogy, it is
-possible that increasing the age at recapture in Hawaii could increase
+possible that increasing the age at first recapture in Hawaii could increase
 the total yield to the fishery. 
 
-
-The general level of F in Hawaii is
-considered to be much smaller than in region 4, so conclusions about
-MHI fisheries based on region MFCL 4 are purely speculative.
+The high mortality estimates from the HTTP tag recaptures are
+troubling. To some extend high mortality estimates reflect the
+lack of precision in the definition of M. ``Natural mortality'' is not
+a process that is ever observed in a way that can be easily tied to
+specific parameters in a statistical model. M is the aggregate loss of fish from
+the population  that cannot be attributed in some way to a
+fishery. For widely distributed, highly mobile fish such as tunas,
+emigration is an important component of M in addition to the
+biological processes usually associated with mortality, e.g. predation and
+senescence. Both the MFCL stock assessment and the previous HTTP
+analysis by Adam et al (2003) account movement, so the new
+spatially aggregated mortality estimates include emigration and could
+thus be higher.
+Although the new estimates are difficult to compare directly to the
+previous HTTP estimates because they use different size
+classes, the new estimates are generally slightly higher or similar to
+the previous estimates. \help{It should be possible to do a better
+comparison between old and new HTTP estimates.}
+The YPR analysis based on HTTP mortality estimates shows that
+increasing the lower size limit on yellowfin could have a deleterious
+effect on the fishery.
 
 Yield per recruit analysis only provides information about the effects
 of management actions on the yield to the fishery. YPR does not
 provide insight into stock conditions and does not offer any guidance
-in establishing biomass-based reference points.
+in establishing biomass-based reference points. Therefore stock conservation
+decisions should not be based solely on YPR analysis.
 
-\help{Still working on it.}
+\section*{Conclusions and Recommendations}
+\begin{enumerate}
+\item The YPR analysis for MFCL Region 4 shows clearly that reducing
+the size at recapture would increase the yield to the entire fishery.
+Whether change in minimum size at recatpure would benefit the MHI
+yellowfin fishery is not clear.
 
-\section*{Conclusions}\help{Working on it.}
+The US Delegation to the WCPFC should strongly advocate for minimum
+size restrictions in MFCL Region 4, and elsewhere in the equatorial
+fishery.
+
+\item The YPR analysis for MFCL Region 2 is ambiguous because only
+longline catches are included in the MFCL assessment and because the
+MFCL regions are ill-addapted to support management of fisheries in
+Hawaii.
+
+US scientists should participate actively in the WCPFC pre-assessment
+workshop to assist the assessment team to find ways to include more
+data from Hawaii fisheries in the assessment and to redefine the MFCL
+regions to be more informative about the Hawaiian yellowfin
+population.
+
+\item The YPR analysis using mortality estimates from tagging data are
+are inconclusive, but there is no clear benefit to the fishery of
+increasing the minimum size restrictions.
+
+The HTTP data should be completely reanalyzed, and if any yellowfin
+recaptures have been return since 2001, the new recaptures should be
+included in the data.
+\end{enumerate}
 
 
-\section*{Math Stuff}\help{Working on it.}
+\section*{Math Stuff}
+Yield per recruit is an estimate of the contribution to the fishery of
+a cohort during its entire life span.
+The biomass of fish of age $a$ is the product of the number of fish
+of age $a$ in the population $(N_a)$ times the weight of age $a$ fish
+$(W_a)$ that is $B_a=N_a\cdot W_a$, and the contribution of age $a$
+fish to the yield $Y_a=F_a\cdot B_a = F_a\cdot N_a\cdot W_a$, 
+where $F_a$ is the fishing mortality at age.  
+The yield per recruit is thus the $\sum_a Y_a/R$, where $R$ is the
+recruitment at age $a=0$.
+%The change in biomass with age is
+%thus,\[ \frac{dB}{da} = N\frac{dW}{da}+W\frac{dN}{da} \].
+%This expression can be approximated by finite differences as
+%\[
+%\frac{dB}{da} \approx
+%\frac{B_a-B_{a-\Delta a}}{\Delta a} = 
+%   N_{a-\Delta a}\frac{W_a-W_{a-\Delta a}}{\Delta a} + 
+%   W_{a-\Delta a}\frac{N_a-N_{a-\Delta a}}{\Delta a}
+%\].
+%
+Assuming that $R = 1 = N_0$, yield per recruit can be easily computed by these
+relatively simple relations
+\begin{eqnarray}
+Z_a &=& M_a +F_a \\
+N_a &=& N_{a-\Delta a}e^{-Z_a\Delta a}\\
+Y_a &=& F_aN_aW_a.\\
+\end{eqnarray}
+$F_a$ and $M_a$ are estimated by the MFCL assessment or the HTTP
+tag attrition models.
+$W_a$ can be computed from estimated or specified
+growth parameters and length-weight relationships. In the case of the
+MFCL assessment, $W_a$ is a routine model output. In the case of the
+HTTP analysis, $W_a$ is computed by von Bertalanffy growth parameters
+and the length-weight relationship from the MFCL assessment.
+
+All computer code, data files, and draft reports in support of this
+analysis can be found at Github
+\url{https://github.com/johnrsibert/XSSA.git}.
 
 \singlespacing
 \vspace{4ex}
@@ -211,7 +304,6 @@ output files.
 \section*{References}
 {\parindent=0cm \small
 \everypar={\hangindent=2em \hangafter=1}\par
-\doublespacing
 Adam, M. S., J. Sibert, D. Itano and K. Holland. 2003. Dynamics of
 bigeye (Thunnus obesus) and yellowfin tuna (T. albacares) in Hawaii's
 pelagic fishery: analysis of tagging data with a bulk transfer model
@@ -304,11 +396,10 @@ See caption in Figure~\ref{fig:r4ypr} for details.
 \begin{figure}
 \begin{center}
 \includegraphics[height=0.8\textheight]{./graphics/csm_MF.pdf}
-\caption{\label{fig:csmypr}
+\caption{\label{fig:csmmf}
 Natural mortality (A) and fishing mortality (B) estimates from the 
 HTTP tag recaptures.
-Mortality estimates (per quarter) are shown in orange.
-The green bars are the point estimates $\pm$ two standard deviations.
+The blue bars are the point estimates $\pm$ two standard deviations.
 The light gray lines are MFCL estimates shown for comparison.
 }
 \end{center}
@@ -317,7 +408,7 @@ The light gray lines are MFCL estimates shown for comparison.
 \begin{figure}
 \begin{center}
 \includegraphics[height=0.8\textheight]{./graphics/YPR_csm.pdf}
-\caption{\label{fig:csmmf}
+\caption{\label{fig:yprcsm}
 Yield per recruit in the Main Hawaiian Islands based on HTTP mortality
 estimates. 
 See caption in Figure~\ref{fig:r4ypr} for details.

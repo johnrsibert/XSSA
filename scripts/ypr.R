@@ -172,7 +172,7 @@ mfcl.ypr<-function(epoch=NULL,region=2,astar=NULL)
 #     abline(v=MeanWatAge[astar],col="green",lty="dotdash")
 
    nice.ts.plot(Fmult,YPR.f,
-         xlab="F multiplier",ylab="Yield per Recruit (kg)")
+         xlab="F multiplier",ylab="Yield per Recruit (kg)",lwd=7)
    abline(v=1.0,col="red",lty="dotdash")
 #  legend("topleft",bty='n',cex=1.6,legend="A")
    label.panel("A")
@@ -372,12 +372,12 @@ csm.ypr=function()
    layout.show(lm)
 
    nice.ts.plot(Fmult,YPR.f,
-         xlab="F multiplier",ylab="Yield per Recruit (kg)")
+         xlab="F multiplier",ylab="Yield per Recruit (kg)",lwd=7)
    abline(v=1.0,col="red",lty="dotdash")
    label.panel("A")
 
    nice.ts.plot(rep$mort.mat$wt,YPR.a,
-         xlab="Weight at First Capture (kg)",ylab="Yield per Recruit (kg)")
+         xlab="Weight at First Capture (kg)",ylab="Yield per Recruit (kg)",lwd=7)
    points(c(3*kgperlb,10*kgperlb,15*kgperlb,20*kgperlb),c(0,0,0,0),col="red",pch='|',cex=2)
    label.panel("B")
    abline(v=rep$mort.mat$wt[maxa],col="red",lty="dotdash")
@@ -472,13 +472,14 @@ plot.mfcl.mortality=function(epoch=NULL)
    height = 9.0
    x11(width=width,height=height)
    old.par = par(no.readonly = TRUE) 
-   par(mar=c(4,4,1,0)+0.1)
+   par(mar=c(4,4.5,1,0)+0.1)
 #  par(mar=c(5,4,4,2)+0.1)
    lm <- layout(matrix(c(1:3),nrow=3,byrow=TRUE))
    layout.show(lm)
 
    nice.ts.plot(MeanWatAge,MatAge,
-        ylab="Natural Mortality (q)",xlab="Weight (kg)")
+        xlab="Weight (kg)",lwd=7,
+        ylab=substitute(paste("Natural Mortality ",(q^{-1}))))
 #  legend("topleft",bty='n',cex=1.6,legend="M")
    label.panel("M")
 
@@ -500,7 +501,8 @@ plot.mfcl.mortality=function(epoch=NULL)
       }
       
       nice.ts.plot(MeanWatAge,AveFatAge,
-           ylab="Fishing Mortality (q)",xlab="Weight (kg)")
+           ylab=substitute(paste("Fishing Mortality ",(q^{-1}))),
+           xlab="Weight (kg)",lwd=7)
       points(c(3*kgperlb,10*kgperlb,15*kgperlb,20*kgperlb),c(0,0,0,0),col="red",pch='|',cex=2)
   #   legend("topleft",bty='n',cex=1.6,legend=paste("F(",r,")",sep=""))
       label.panel(paste("F(",r,")",sep=""))
@@ -576,9 +578,9 @@ plot.csm.mortality=function(epoch=NULL)
    nice.ts.plot(MeanWatAge,MatAge,ylim=c(0,maxM),bcol="black",fcol="lightgray",
                 xlab="Weight (kg)", 
                 ylab=substitute(paste("Natural Mortality ",(q^{-1}))))
-   double.lines(csm.rep$mort.mat$wt,csm$est[qM],bcol="red",fcol="orange",lwd=7)
+   double.lines(csm.rep$mort.mat$wt,csm$est[qM],bcol="blue",fcol="lightblue",lwd=7)
+   sd.bars(csm.rep$mort.mat$wt,csm$est[qM],2.0*csm$std[qM],lwd=5,col="blue")
    label.panel("A")
-   sd.bars(csm.rep$mort.mat$wt,csm$est[qM],2.0*csm$std[qM],lwd=2,col="seagreen")
 
    maxF = 1.2*max(AveFatAge,csm$est[qF])
    print(maxF)
@@ -586,9 +588,9 @@ plot.csm.mortality=function(epoch=NULL)
                 legend=c(" R2"," R4"), ylim = c(0,maxF),
                 xlab="Weight (kg)", 
                 ylab=substitute(paste("Fishing Mortality ",(q^{-1}))))
-   double.lines(csm.rep$mort.mat$wt,csm$est[qF],bcol="red",fcol="orange",lwd=7)
+   double.lines(csm.rep$mort.mat$wt,csm$est[qF],bcol="blue",fcol="lightblue",lwd=7)
+   sd.bars(csm.rep$mort.mat$wt,csm$est[qF],2.0*csm$std[qF],lwd=5,col="blue")
    label.panel("B")
-   sd.bars(csm.rep$mort.mat$wt,csm$est[qF],2.0*csm$std[qF],col="seagreen")
 
 
    save.png.plot("csm_MF",width=width,height=height)
@@ -598,7 +600,7 @@ plot.csm.mortality=function(epoch=NULL)
 
 label.panel=function(label)
 {
-   legend("topleft",bty='n',legend=label,text.font=2)
+   legend("topleft",bty='n',cex=1.6,legend=label,text.font=2)
 }
 
 sd.bars = function(x,y,s,col="orange",lwd=3,lty="dashed")
@@ -612,6 +614,8 @@ sd.bars = function(x,y,s,col="orange",lwd=3,lty="dashed")
    {
       lines(c(x[p],x[p]),c((y[p]-s[p]),(y[p]+s[p])),
        col=col,lwd=lwd,lty=lty)
+   #  double.lines(c(x[p],x[p]),c((y[p]-s[p]),(y[p]+s[p])),
+   #   bcol="blue",fcol="lightblue",lwd=lwd)
    }
 }
 

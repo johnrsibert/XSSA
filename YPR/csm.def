@@ -1,4 +1,0 @@
-LIBRARY csm
-
-EXPORTS
-	csm
