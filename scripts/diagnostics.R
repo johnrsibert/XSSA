@@ -8,7 +8,7 @@ plot.diagnostics=function(dat=NULL,file="diagnostics.dat",ngear,devices)
    if (dat$t[1] == 1)
    {
       dat$t = (1951.875 + dat$t*0.25)
-      print(names(dat))
+#     print(names(dat))
    }
 #  dat$pop1 = exp(dat$pop1)
 #  dat$pop2 = exp(dat$pop2)
@@ -18,6 +18,8 @@ plot.diagnostics=function(dat=NULL,file="diagnostics.dat",ngear,devices)
 #  print(names(dat)[dd])
    dat[,dd] = exp(dat[,dd])
 
+   gear.names = c("TunaHL","Troll","Longline","InshoreHL","AkuBoat")
+   title.line = -1
    lwd = 3
 
    width = 9.0
@@ -40,15 +42,16 @@ plot.diagnostics=function(dat=NULL,file="diagnostics.dat",ngear,devices)
    layout.show(lm)
 
    nice.ts.plot(dat$t,dat$pop1,lwd=lwd)
-   title(main="Population 1")
+   title(main="Population 1",line=title.line)
    nice.ts.plot(dat$t,dat$pop2,lwd=lwd)
-   title(main="Population 2")
+   title(main="Population 2",line=title.line)
    nice.ts.plot(dat$t,(dat$pop1+dat$pop2),lwd=lwd)
    par("new"=TRUE)
    plot(dat$t,dat$propL,type='l',ann=FALSE,axes=FALSE,
-        col="red",lwd=2,lty="dotted")
+        col="red",lwd=2,lty="dotted",ylim=c(0,1))
+   axis(4,line=0,outer=FALSE,tcl=0.5,labels=FALSE,col="red")
    abline(h=0.9,col="gray4")
-   title(main="Total Population")
+   title(main="Total Population",line=title.line)
 
    width = 9.0
    height =11.0
@@ -71,7 +74,8 @@ plot.diagnostics=function(dat=NULL,file="diagnostics.dat",ngear,devices)
    {
       nice.ts.plot(dat$t,dat[,(4+ngear+g)],bcol="darkgreen",fcol="lightgreen",lwd=lwd)
       points(dat$t,dat[,(4+2*ngear+g)],col= "darkgreen",pch=16)
-      title(main=paste("Catch, gear",g))
+   #  title(main=paste("Catch, gear",g))
+      title(main=paste("Catch,",gear.names[g]),line=title.line)
    }
 
    width = 9.0
@@ -93,7 +97,8 @@ plot.diagnostics=function(dat=NULL,file="diagnostics.dat",ngear,devices)
    for (g in 1:ngear)
    {
       nice.ts.plot(dat$t,dat[,(g+4)],bcol="orange4",fcol="orange",lwd=lwd)
-      title(main=paste("F mort, gear",g))
+   #  title(main=paste("F mort, gear",g))
+      title(main=paste("F mort,",gear.names[g]),,line=title.line)
    }
 
    new.devices = devices
