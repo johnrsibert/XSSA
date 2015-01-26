@@ -470,18 +470,12 @@ SEPARABLE_FUNCTION void step(const int t, const dvar_vector& f1, const dvar_vect
      ft2(g) = f2(f2.indexmin()+g-1);
   }
 
-  //#ifdef USE_PFAT
-  //const double ww = 3.0*sqrt(M_PI);
-  //const double ww2 = square(3.0*sqrt(M_PI));
-  //const double alpha = 0.7;
-  //const double a2 = square(alpha);
-  //#endif
   dvariable Fnll = 0.0;
   //if (use_robustF)
   //   dvar_vector pfat(1,ngear);
   for (int g = 1; g <= ngear; g++)
   {
-     if (use_robustF)
+     if (use_robustF == 1)
      {
         dvariable z = square(ft1(g)-ft2(g))/varlogF(g);
         dvariable norm_part = sqrt(varlogF(g)) + 0.5*LOG_TWO_M_PI + z;
@@ -491,28 +485,33 @@ SEPARABLE_FUNCTION void step(const int t, const dvar_vector& f1, const dvar_vect
         //TTRACE(norm_part,fat_part)
 	//TTRACE(pfat,Lpf(g))
      }
+     else if (use_robustF == 2) // from newreg2.cpp
+     {
+        double width=3.0;
+        double width2=width*width;
+        //const double ww = 3.0*sqrt(M_PI);
+        //const double ww2 = square(3.0*sqrt(M_PI));
+        const double alpha = 0.7;
+        const double a2 = square(alpha);
+        dvariable diff2 = square(ft1(g)-ft2(g));
+        dvariable v_hat = diff2+1.0e-80;
+
+        dvariable pcon = alogit(Lpf(g));
+        dvariable b=2.*pcon/(width*sqrt(PI));  // This is the weight for the "robustifying" term
+
+        dvariable norm_part = log(1.0-pcon)*mfexp(-diff2/(2.0*a2*v_hat));
+   
+        //dvariable dF4 = square(diff2);
+        dvariable fat_part =  b/(1.+pow(diff2/(width2*a2*v_hat),2));
+        //TTRACE(norm_part,fat_part)
+        //TRACE(mfexp(norm_part + fat_part))
+        Fnll += norm_part + fat_part;
+     }
+
      else
      {
         Fnll += 0.5*(log(TWO_M_PI*varlogF(g)) + square(ft1(g)-ft2(g))/varlogF(g));
      }
-     //#ifdef USE_PFAT
-     //dvariable asig2 = a2*varlogF(g)+1e-80; 
-     //dvariable norm_part = log(1.0-pfat(g))*mfexp(-dF2/(2.0*asig2));
-
-     //dvariable dF4 = square(dF2);
-     //dvariable fat_part = (2.0*pfat(g)/(ww)/(1.0+square(dF2/(ww2*asig2))));
-
-     // from newreg2.cpp
-     //dvariable log_likelihood = -sum(log((1.-pcon)*mfexp(-diff2/(2.*a2*v_hat))
-     // + b/(1.+pow(diff2/(width2*a2*v_hat),2))));
-     //TTRACE(norm_part,fat_part)
-     //TRACE(mfexp(norm_part + fat_part))
-     //Fnll += mfexp(norm_part + fat_part);
-     //#else
-
-     //Fnll += 0.5*(log(TWO_M_PI*varlogF(g)) + square(ft1(g)-ft2(g))/varlogF(g));
-     //Fnll += 0.5*(log(TWO_M_PI*varlogF(g)) + square(ft1(g)-ft2(g))/varlogF(g));
-     //#endif
      //TRACE(Fnll)
      if (isnan(value(Fnll)))
      {
