@@ -87,6 +87,29 @@ nice.ts.plot<-function(x,y,label=NULL,legend=NULL,bcol="blue",fcol="lightblue",l
 #  par(old.par)
 }
 
+
+label.panel=function(label)
+{
+   legend("topleft",bty='n',cex=1.6,legend=label,text.font=2)
+}
+
+sd.bars = function(x,y,s,col="orange",lwd=3,lty="dashed")
+{
+#  print("sd.bars:")
+#  print(x)
+#  print(y)
+#  print(s)
+   np = length(x)
+   for (p in 1:np)
+   {
+      lines(c(x[p],x[p]),c((y[p]-s[p]),(y[p]+s[p])),
+       col=col,lwd=lwd,lty=lty)
+   #  double.lines(c(x[p],x[p]),c((y[p]-s[p]),(y[p]+s[p])),
+   #   bcol="blue",fcol="lightblue",lwd=lwd)
+   }
+}
+
+
 save.png.plot<-function(root,width=6.5,height=4.5)
 {
   graphics.root <-paste("../Reports/graphics/",root,sep="")

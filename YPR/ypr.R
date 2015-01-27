@@ -1,4 +1,11 @@
+# the functions in this file use functions in utilities.R and ReadADMB.R
+# source("../scripts/utils.R")
+# source("../scripts/ReadADMB.R")
+
+#also:
 require("R4MFCL")
+
+
 #from plot-12.par.rep
 
 # Beverton-Holt stock-recruitment relationship report
@@ -539,27 +546,7 @@ bogus.ypr<-function(bogus.mode=4,epoch=NULL,region=2,astar=NULL)
    print(paste(sum(sfB),sum(sFR)))
  
    bogusF = sFR + sfB
-#  plot(MeanWatAge,bogusF,ylim=c(0,max(bogusF)),type='b')
-#  lines(MeanWatAge,sFR,col="blue")
-#  lines(MeanWatAge,sfB,col="red")
-#  abline(v=maxF4a,col="blue")
 
-
-   width = 6.5
-   height = 4.5
-   x11(width=width,height=height)
-   old.par = par(no.readonly = TRUE) 
-   par(mar=c(4,4.5,1,0)+0.1)
-#  par(mar=c(5,4,4,2)+0.1)
-
-   nice.ts.plot(MeanWatAge,bogusF,
-           ylab=substitute(paste("Fishing Mortality ",(q^{-1}))),
-           xlab="Weight (kg)",lwd=7)
-   lines(MeanWatAge,sFR,col="blue",lwd=3,lty="dotted")
-   lines(MeanWatAge,sfB,col="red",lwd=3,lty="dotted")
-   points(c(3*kgperlb,10*kgperlb,15*kgperlb,20*kgperlb),c(0,0,0,0),col="red",pch='|',cex=2)
-   abline(v=MeanWatAge[bogus.mode],col="red",lty="dotdash")
-   save.png.plot("BOGUS_F",width=width,height=height)
 
 # do YPR
    
@@ -599,21 +586,30 @@ bogus.ypr<-function(bogus.mode=4,epoch=NULL,region=2,astar=NULL)
    old.par = par(no.readonly = TRUE) 
    par(mar=c(4,4,0,0)+0.1)
 #  par(mar=c(5,4,4,2)+0.1)
-   lm <- layout(matrix(c(1:2),nrow=2,byrow=TRUE))
+   lm <- layout(matrix(c(1:3),nrow=3,byrow=TRUE))
    layout.show(lm)
+
+   nice.ts.plot(MeanWatAge,bogusF,
+           ylab=substitute(paste("Fishing Mortality ",(q^{-1}))),
+           xlab="Weight (kg)",lwd=7)
+   lines(MeanWatAge,sFR,col="blue",lwd=3,lty="dotted")
+   lines(MeanWatAge,sfB,col="red",lwd=3,lty="dotted")
+   points(c(3*kgperlb,10*kgperlb,15*kgperlb,20*kgperlb),c(0,0,0,0),col="red",pch='|',cex=2)
+   abline(v=MeanWatAge[bogus.mode],col="red",lty="dotdash")
+   label.panel("A")
 
    nice.ts.plot(Fmult,YPR.f,
          xlab="F multiplier",ylab="Yield per Recruit (kg)",lwd=7)
    abline(v=1.0,col="red",lty="dotdash")
-   label.panel("A")
+   label.panel("B")
 
    nice.ts.plot(MeanWatAge,YPR.a,
          xlab="Weight at First Capture (kg)",ylab="Yield per Recruit (kg)",lwd=7)
    points(c(3*kgperlb,10*kgperlb,15*kgperlb,20*kgperlb),c(0,0,0,0),col="red",pch='|',cex=2)
    abline(v=MeanWatAge[maxa],col="red",lty="dotdash")
-   label.panel("B")
+   label.panel("C")
 
-   save.png.plot(paste("YPR_BOGUS",region,sep=""),width=width,height=height)
+   save.png.plot(paste("YPR_BOGUS",bogus.mode,sep=""),width=width,height=height)
    par(old.par)
    return(as.data.frame(cbind(YPR.f,Fmult)))
 }
@@ -622,36 +618,12 @@ bogus.ypr<-function(bogus.mode=4,epoch=NULL,region=2,astar=NULL)
 do.it.all=function()
 {
    graphics.off()
-   plot.mfcl.mortality()->tmp
-   mfcl.ypr(region=2)->tmp
-   mfcl.ypr(region=4)->tmp
+   plot.mfcl.mortality()->junk
+   mfcl.ypr(region=2)->junk
+   mfcl.ypr(region=4)->junk
    plot.csm.mortality()
+   bogus.ypr()->junk
    csm.ypr()
    LL.nonLL.catch()
-}
-#plot(x,dlnorm(x,1,.5))
-
-##########
-# belong in utilities.R
-##########
-label.panel=function(label)
-{
-   legend("topleft",bty='n',cex=1.6,legend=label,text.font=2)
-}
-
-sd.bars = function(x,y,s,col="orange",lwd=3,lty="dashed")
-{
-#  print("sd.bars:")
-#  print(x)
-#  print(y)
-#  print(s)
-   np = length(x)
-   for (p in 1:np)
-   {
-      lines(c(x[p],x[p]),c((y[p]-s[p]),(y[p]+s[p])),
-       col=col,lwd=lwd,lty=lty)
-   #  double.lines(c(x[p],x[p]),c((y[p]-s[p]),(y[p]+s[p])),
-   #   bcol="blue",fcol="lightblue",lwd=lwd)
-   }
 }
 
