@@ -475,7 +475,7 @@ SEPARABLE_FUNCTION void step(const int t, const dvar_vector& f1, const dvar_vect
   //   dvar_vector pfat(1,ngear);
   for (int g = 1; g <= ngear; g++)
   {
-     if (use_robustF == 1)
+     if (use_robustF == 1)  // normal + t distribution
      {
         dvariable z = square(ft1(g)-ft2(g))/varlogF(g);
         dvariable norm_part = sqrt(varlogF(g)) + 0.5*LOG_TWO_M_PI + z;
@@ -489,8 +489,6 @@ SEPARABLE_FUNCTION void step(const int t, const dvar_vector& f1, const dvar_vect
      {
         double width=3.0;
         double width2=width*width;
-        //const double ww = 3.0*sqrt(M_PI);
-        //const double ww2 = square(3.0*sqrt(M_PI));
         const double alpha = 0.7;
         const double a2 = square(alpha);
         dvariable diff2 = square(ft1(g)-ft2(g));
@@ -501,7 +499,6 @@ SEPARABLE_FUNCTION void step(const int t, const dvar_vector& f1, const dvar_vect
 
         dvariable norm_part = log(1.0-pcon)*mfexp(-diff2/(2.0*a2*v_hat));
    
-        //dvariable dF4 = square(diff2);
         dvariable fat_part =  b/(1.+pow(diff2/(width2*a2*v_hat),2));
         //TTRACE(norm_part,fat_part)
         //TRACE(mfexp(norm_part + fat_part))

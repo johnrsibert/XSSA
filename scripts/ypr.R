@@ -35,17 +35,41 @@ mfcl.rep.file = paste(path.expand("~"),
                      "/Projects/xssa/mfcl/yft/2014/basecase/plot-12.Rdata",
                      sep="")
 
+
+ypr.comp=function(WatAge,MatAge,FatAge)
+{
+   nages = length(WatAge)
+   Y = vector(length=nages)
+   prevW = WatAge[1]
+   prevFF = FatAge[1]
+   prevN = 1.0
+   prevYY = prevFF*prevN*prevW
+   Y[1] = prevYY
+   for (a in 2:nages)
+   {
+      W = WatAge[a]
+      FF = FatAge[a]
+      Z = FF+MatAge[a]
+      N = prevN*exp(-Z)	
+      YY = FF*N*W
+
+      prevW = W
+      prevFF = FF
+      prevN = N
+      prevYY = YY
+      Y[a] = YY
+   }
+   YPR = sum(Y)
+   return(YPR)
+}
+
+
 mfcl.ypr<-function(epoch=NULL,region=2,astar=NULL)
 {
 
    rep.file = mfcl.rep.file
-   #           paste(path.expand("~"),
-   #                  "/Projects/xssa/mfcl/yft/2014/basecase/plot-12.Rdata",
-   #                 sep="")
    print(rep.file)
-
    load(rep.file)
-
 
    nTime = rep$nTime
    nAges = rep$nAges
@@ -92,30 +116,8 @@ mfcl.ypr<-function(epoch=NULL,region=2,astar=NULL)
 #  m = 10
    for (m in 1:nf)
    {
-      Y = vector(length=nAges)
-      prevW = MeanWatAge[1]
-      prevFF = AveFatAge[region,1]*Fmult[m]
-      prevN = 1.0
-      prevYY = prevFF*prevN*prevW
-      Y[1] = prevYY
-      for (a in 2:nAges)
-      {
-         W = MeanWatAge[a]
-         if (a <= astar)
-            FF = AveFatAge[region,a]*Fmult[m]
-         else
-            FF = AveFatAge[region,a]
-         Z = FF+MatAge[a]
-         N = prevN*exp(-Z)	
-         YY = FF*N*W
-   
-         prevW = W
-         prevFF = FF
-         prevN = N
-         prevYY = YY
-         Y[a] = YY
-      }
-      YPR.f[m] = sum(Y)
+      FF = AveFatAge[region,]*Fmult[m]
+      YPR.f[m] = ypr.comp(MeanWatAge,MatAge,FF)
    }
 
    YPR.a = vector(length=nAges)
@@ -124,30 +126,10 @@ mfcl.ypr<-function(epoch=NULL,region=2,astar=NULL)
    maxYPR = 0
    for (m in 1:nAges)
    {
-      Y = vector(length=nAges)
-      prevW = MeanWatAge[1]
-      prevFF = 0.0
-      prevN = 1.0
-      prevYY = prevFF*prevN*prevW
-      Y[1] = prevYY
-      for (a in 2:nAges)
-      {
-         W = MeanWatAge[a]
-         if (a <= m)
-            FF = 0.0
-         else
-            FF = AveFatAge[region,a]
-         Z = FF+MatAge[a]
-         N = prevN*exp(-Z)	
-         YY = FF*N*W
-   
-         prevW = W
-         prevFF = FF
-         prevN = N
-         prevYY = YY
-         Y[a] = YY
-      }
-      YPR.a[m] = sum(Y)
+      FF = AveFatAge[region,]
+      for (a in 1:m)
+         FF[a] = 0.0;
+      YPR.a[m] = ypr.comp(MeanWatAge,MatAge,FF)
       if (YPR.a[m] > maxYPR)
       {
          maxYPR = YPR.a[m]
@@ -165,24 +147,16 @@ mfcl.ypr<-function(epoch=NULL,region=2,astar=NULL)
 #  par(mar=c(5,4,4,2)+0.1)
    lm <- layout(matrix(c(1:2),nrow=2,byrow=TRUE))
    layout.show(lm)
-#  nice.ts.plot(MeanWatAge,AveFatAge[region,],
-#        ylab="Fishing Mortality",xlab="Weight (kg)")
-#  points(c(3*kgperlb,10*kgperlb,15*kgperlb,20*kgperlb),c(0,0,0,0),col="red",pch='|',cex=2)
-#  if(astar < nAges)
-#     abline(v=MeanWatAge[astar],col="green",lty="dotdash")
 
    nice.ts.plot(Fmult,YPR.f,
          xlab="F multiplier",ylab="Yield per Recruit (kg)",lwd=7)
    abline(v=1.0,col="red",lty="dotdash")
-#  legend("topleft",bty='n',cex=1.6,legend="A")
    label.panel("A")
-#  title(main=paste("MFCL Region",region),line=-2,cex.main=1.6)
 
    nice.ts.plot(MeanWatAge,YPR.a,
-         xlab="Weight at First Capture",ylab="Yield per Recruit (kg)")
+         xlab="Weight at First Capture (kg)",ylab="Yield per Recruit (kg)",lwd=7)
    points(c(3*kgperlb,10*kgperlb,15*kgperlb,20*kgperlb),c(0,0,0,0),col="red",pch='|',cex=2)
    abline(v=MeanWatAge[maxa],col="red",lty="dotdash")
-#  legend("topleft",bty='n',cex=1.6,legend="B")
    label.panel("B")
 
    save.png.plot(paste("YPR_MFCL_R",region,sep=""),width=width,height=height)
@@ -190,94 +164,6 @@ mfcl.ypr<-function(epoch=NULL,region=2,astar=NULL)
    return(as.data.frame(cbind(YPR.f,Fmult)))
 }
 
-junk.mfcl.plot.yield<-function(epoch=NULL,region=2)
-{
-   rep.file = mfcl.rep.file
-   #           paste(path.expand("~"),
-   #                 "/Projects/xssa/mfcl/yft/2014/basecase/plot-12.Rdata",
-   #                 sep="")
-   print(rep.file)
-
-   load(rep.file)
-#  print(names(rep))
-
-   nTime = rep$nTime
-   nAges = rep$nAges
-   nReg = rep$nReg
-   yrs = rep$yrs
-   MatAge = rep$MatAge
-   MeanWatAge = rep$mean.WatAge
-   MeanLatAge = rep$mean.LatAge
-   plot(1:nAges,MatAge,type='l')
-#  print(paste(nAges,length(MatAge)))
-   FatAgeReg = rep$FatYrAgeReg
-#  print(dim(FatAgeReg))
-   if (is.null(epoch))
-      epoch = (nTime-19):nTime
-
-   print(paste("Averaging over",length(epoch),"quarter epoch:"))
-   print(epoch)
-
-   AveFatAge = matrix(0,nrow=nReg,ncol=nAges)
-
-   for (i in 1:nReg)
-   {
-#     print(paste("Region",i))
-#     print(AveFatAge[i,])
-
-      den = 0
-   #  for (j in 1:20)
-   #  for (j in (nTime-19):nTime)
-      for (j in epoch)
-      {
-         den = den + 1
-         for (k in 1:nAges)
-         {
-            AveFatAge[i,k] = AveFatAge[i,k] + FatAgeReg[j,k,i]
-         }
-      } 
-      for (k in 1:nAges)
-      {
-         AveFatAge[i,k] = AveFatAge[i,k]/den
-      }
-#     print(paste("denominator =",den))
-#     print(AveFatAge[i,])
-   }
-
-   x11()
-   plot(1:nAges,AveFatAge[region,],type='l')
-#  lines(1:nAges,AveFatAge[2,],col="blue")
-
-
-   N = 1.0
-   Y = 0.0
-   nstep = 100
-   dt = 1.0/nstep
-   NatAge = vector(mode="numeric",length=nAges)
-   YatAge = vector(mode="numeric",length=nAges)
-   AveFatAge = AveFatAge
-   for (k in 1:nAges)
-   {
-      Z = AveFatAge[region,k]+MatAge[k]
-      Y = 0.0
-      for(it in 1:nstep)
-      {
-	 N = N*exp(-Z*dt)
-         Y = Y + AveFatAge[region,k]*N*MeanWatAge[k] * dt
-      }
-      NatAge[k] = N
-      YatAge[k] = Y
-   }
-   print(sum(YatAge))
-#  YatAge = YatAge/sum(YatAge)
- 
-   x11()
-   plot(1:nAges,YatAge,type='l')
-#  plot(1:nAges,YatAge,type='l',axes=FALSE)
-#  axis(side=1,at=c(1:nAges),labels=MeanLatAge,col="blue")
-
-#  return(rep)
-}
 
 csm.ypr=function()
 {
@@ -299,30 +185,8 @@ csm.ypr=function()
 #  m = 10
    for (m in 1:nf)
    {
-      Y = vector(length=nAges)
-      prevW = rep$mort.mat$wt[1]
-      prevFF = fit$est[qF[1]]*Fmult[m]
-      prevN = 1.0
-      prevYY = prevFF*prevN*prevW
-      Y[1] = prevYY
-      for (a in 2:nAges)
-      {
-         W = rep$mort.mat$wt[a]
-         if (a <= astar)
-            FF = fit$est[qF[a]]*Fmult[m]
-         else
-            FF = fit$est[qF[a]]
-         Z = FF+fit$est[qM[a]]
-         N = prevN*exp(-Z)	
-         YY = FF*N*W
-   
-         prevW = W
-         prevFF = FF
-         prevN = N
-         prevYY = YY
-         Y[a] = YY
-      }
-      YPR.f[m] = sum(Y)
+      FF = fit$est[qF]*Fmult[m]
+      YPR.f[m] = ypr.comp(rep$mort.mat$wt,fit$est[qM],FF)
    }
 
    YPR.a = vector(length=nAges)
@@ -331,30 +195,10 @@ csm.ypr=function()
    maxYPR = 0
    for (m in 1:nAges)
    {
-      Y = vector(length=nAges)
-      prevW = rep$mort.mat$wt[1]
-      prevFF = 0.0
-      prevN = 1.0
-      prevYY = prevFF*prevN*prevW
-      Y[1] = prevYY
-      for (a in 2:nAges)
-      {
-         W = rep$mort.mat$wt[a]
-         if (a <= m)
-            FF = 0.0
-         else
-            FF = fit$est[qF[a]]
-         Z = FF+fit$est[qM[a]]
-         N = prevN*exp(-Z)	
-         YY = FF*N*W
-   
-         prevW = W
-         prevFF = FF
-         prevN = N
-         prevYY = YY
-         Y[a] = YY
-      }
-      YPR.a[m] = sum(Y)
+      FF= fit$est[qF]
+      for (a in 1:m)
+         FF[a] = 0.0;
+      YPR.a[m] = ypr.comp(rep$mort.mat$wt,fit$est[qM],FF)
       if (YPR.a[m] > maxYPR)
       {
          maxYPR = YPR.a[m]
@@ -598,6 +442,198 @@ plot.csm.mortality=function(epoch=NULL)
    
 }
 
+LL.nonLL.catch=function()
+{
+   dat = read.table("../run/five_gears.dat")
+   nTime = ncol(dat)
+   ngear = nrow(dat)
+   epoch = (nTime-19):nTime
+#  print(t(dat[,epoch]))
+   sum = vector(length=2,mode="numeric")
+   den = vector(length=2,mode="numeric")
+   for (g in 1:ngear)
+   {
+      if (g != 3)
+         n = 1
+      else
+         n = 2
+      for (j in epoch)
+      {
+      #  print(paste(g,n,j,dat[g,j]))
+         sum[n] = sum[n] + dat[g,j]
+         den[n] = den[n] + 1
+      }
+   }
+   ave = sum/5
+#  print(sum)
+#  print(den)
+#  print(ave)
+   print(paste("Average annual non-lonline catch:",ave[1]))
+   print(paste("Average annual     lonline catch:",ave[2]))
+   return(ave)
+}
+
+bogus.ypr<-function(bogus.mode=4,epoch=NULL,region=2,astar=NULL)
+{
+
+   rep.file = mfcl.rep.file
+   print(rep.file)
+   load(rep.file)
+
+   nTime = rep$nTime
+   nAges = rep$nAges
+   nReg = rep$nReg
+   yrs = rep$yrs
+   MatAge = rep$MatAge
+   MeanWatAge = rep$mean.WatAge
+   MeanLatAge = rep$mean.LatAge
+   FatAgeReg = rep$FatYrAgeReg
+   if (is.null(astar))
+      astar=nAges
+   print(paste("astar =",astar))
+
+   if (is.null(epoch))
+      epoch = (nTime-19):nTime
+   print(paste("Averaging over",length(epoch),"quarter epoch:"))
+   print(epoch)
+
+   AveFatAge = matrix(0,nrow=nReg,ncol=nAges)
+
+   for (i in 1:nReg)
+   {
+      den = 0
+      for (j in epoch)
+      {
+         den = den + 1
+         for (k in 1:nAges)
+         {
+            AveFatAge[i,k] = AveFatAge[i,k] + FatAgeReg[j,k,i]
+         }
+      } 
+      for (k in 1:nAges)
+      {
+         AveFatAge[i,k] = AveFatAge[i,k]/den
+      }
+   }
+
+   FR = AveFatAge[region,]
+   maxFR = max(FR)
+   maxF4a = 0
+   maxF4 = 0
+   for (a in 1:nAges)
+   {
+      if (AveFatAge[4,a] > maxF4)
+      {
+         maxF4a = a
+         maxF4  = AveFatAge[4,a] 
+      }
+   }
+
+   average.catch = LL.nonLL.catch()
+   catch.ratio = average.catch[1]/average.catch[2]
+
+   fB = dlnorm(1:nAges,log(bogus.mode),log(2.0))
+   print(paste(sum(fB),sum(FR)))
+   sfB = fB/max(fB)*maxFR*catch.ratio
+   sFR = FR
+   print(paste(sum(sfB),sum(sFR)))
+ 
+   bogusF = sFR + sfB
+#  plot(MeanWatAge,bogusF,ylim=c(0,max(bogusF)),type='b')
+#  lines(MeanWatAge,sFR,col="blue")
+#  lines(MeanWatAge,sfB,col="red")
+#  abline(v=maxF4a,col="blue")
+
+
+   width = 6.5
+   height = 4.5
+   x11(width=width,height=height)
+   old.par = par(no.readonly = TRUE) 
+   par(mar=c(4,4.5,1,0)+0.1)
+#  par(mar=c(5,4,4,2)+0.1)
+
+   nice.ts.plot(MeanWatAge,bogusF,
+           ylab=substitute(paste("Fishing Mortality ",(q^{-1}))),
+           xlab="Weight (kg)",lwd=7)
+   lines(MeanWatAge,sFR,col="blue",lwd=3,lty="dotted")
+   lines(MeanWatAge,sfB,col="red",lwd=3,lty="dotted")
+   points(c(3*kgperlb,10*kgperlb,15*kgperlb,20*kgperlb),c(0,0,0,0),col="red",pch='|',cex=2)
+   abline(v=MeanWatAge[bogus.mode],col="red",lty="dotdash")
+   save.png.plot("BOGUS_F",width=width,height=height)
+
+# do YPR
+   
+   Y = vector(length=nAges)
+   Fmult = seq(0.1,10,.1)
+   nf = length(Fmult)
+   YPR.f = vector(length=nf)
+#  m = 10
+   for (m in 1:nf)
+   {
+      FF = bogusF*Fmult[m]
+      YPR.f[m] = ypr.comp(MeanWatAge,MatAge,FF)
+   }
+
+   YPR.a = vector(length=nAges)
+#  m = 10
+   maxa = 0
+   maxYPR = 0
+   for (m in 1:nAges)
+   {
+      FF = bogusF
+      for (a in 1:m)
+         FF[a] = 0.0;
+      YPR.a[m] = ypr.comp(MeanWatAge,MatAge,FF)
+      if (YPR.a[m] > maxYPR)
+      {
+         maxYPR = YPR.a[m]
+         maxa = m;
+      }
+   }
+   print(paste(maxa,MeanWatAge[maxa],MeanWatAge[maxa]/kgperlb))
+
+
+   width = 6.5
+   height = 9.0
+   x11(width=width,height=height)
+   old.par = par(no.readonly = TRUE) 
+   par(mar=c(4,4,0,0)+0.1)
+#  par(mar=c(5,4,4,2)+0.1)
+   lm <- layout(matrix(c(1:2),nrow=2,byrow=TRUE))
+   layout.show(lm)
+
+   nice.ts.plot(Fmult,YPR.f,
+         xlab="F multiplier",ylab="Yield per Recruit (kg)",lwd=7)
+   abline(v=1.0,col="red",lty="dotdash")
+   label.panel("A")
+
+   nice.ts.plot(MeanWatAge,YPR.a,
+         xlab="Weight at First Capture (kg)",ylab="Yield per Recruit (kg)",lwd=7)
+   points(c(3*kgperlb,10*kgperlb,15*kgperlb,20*kgperlb),c(0,0,0,0),col="red",pch='|',cex=2)
+   abline(v=MeanWatAge[maxa],col="red",lty="dotdash")
+   label.panel("B")
+
+   save.png.plot(paste("YPR_BOGUS",region,sep=""),width=width,height=height)
+   par(old.par)
+   return(as.data.frame(cbind(YPR.f,Fmult)))
+}
+
+   
+do.it.all=function()
+{
+   graphics.off()
+   plot.mfcl.mortality()->tmp
+   mfcl.ypr(region=2)->tmp
+   mfcl.ypr(region=4)->tmp
+   plot.csm.mortality()
+   csm.ypr()
+   LL.nonLL.catch()
+}
+#plot(x,dlnorm(x,1,.5))
+
+##########
+# belong in utilities.R
+##########
 label.panel=function(label)
 {
    legend("topleft",bty='n',cex=1.6,legend=label,text.font=2)
@@ -619,13 +655,3 @@ sd.bars = function(x,y,s,col="orange",lwd=3,lty="dashed")
    }
 }
 
-##########
-do.it.all=function()
-{
-   graphics.off()
-   plot.mfcl.mortality()->tmp
-   mfcl.ypr(region=2)->tmp
-   mfcl.ypr(region=4)->tmp
-   plot.csm.mortality()
-   csm.ypr()
-}
