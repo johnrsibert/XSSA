@@ -592,8 +592,8 @@ bogus.ypr<-function(bogus.mode=4,epoch=NULL,region=2,astar=NULL)
    nice.ts.plot(MeanWatAge,bogusF,
            ylab=substitute(paste("Fishing Mortality ",(q^{-1}))),
            xlab="Weight (kg)",lwd=7)
-   lines(MeanWatAge,sFR,col="blue",lwd=3,lty="dotted")
-   lines(MeanWatAge,sfB,col="red",lwd=3,lty="dotted")
+   lines(MeanWatAge,sFR,col="blue",lwd=3,lty="dashed")
+   lines(MeanWatAge,sfB,col="red",lwd=3,lty="dashed")
    points(c(3*kgperlb,10*kgperlb,15*kgperlb,20*kgperlb),c(0,0,0,0),col="red",pch='|',cex=2)
    abline(v=MeanWatAge[bogus.mode],col="red",lty="dotdash")
    label.panel("A")

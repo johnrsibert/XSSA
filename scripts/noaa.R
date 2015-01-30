@@ -149,6 +149,7 @@ LL.join=function(hdar=NULL,noaa=NULL,yr1=1952,yr2=2012)
 
    nqd = (yr2-yr1+1)*4
    dat = as.data.frame(matrix(nrow=nqd,ncol=5))
+   yy = vector(length=nqd)
    colnames(dat) = c("OffshoreHL","Troll","Longline","InshoreHL","AkuBoat")
    for (n in 1:ntime)
    {
@@ -157,21 +158,43 @@ LL.join=function(hdar=NULL,noaa=NULL,yr1=1952,yr2=2012)
       {
          qi = hdar[n,]$quarter
          j = (year-yr1)*4+qi
-         dat[j,1] = hdar[n,]$OffshoreHL
-         dat[j,2] = hdar[n,]$Troll
+         dat[j,1] = hdar[n,4]#$OffshoreHL
+         dat[j,2] = hdar[n,5] #$Troll
          dat[j,3] = LL[n,]$Mean # Longline
-         dat[j,4] = hdar[n,]$InshoreHL
-         dat[j,5] = hdar[n,]$AkuBoat
+         dat[j,4] = hdar[n,7]#$InshoreHL
+         dat[j,5] = hdar[n,8]#$AkuBoat
+         yy[j] = LL$time[n]
       }
    }
+   colnames(dat) = c("Tuna HL","Troll","Longline","Bottom/inshore HL","Aku boat")
 
    dat.file = paste("five_gears_",yr1,"_",yr2,".dat",sep="")
    print(paste("writing",dat.file))
    write(as.matrix(dat),file=dat.file,ncolumns=dim(dat)[1])
    print(paste("finished",dat.file))
 
+   width = 6.5
+   height <- 9.0
+   x11(width=width,height=height)
+   par(mar=c(2.5,4,0,0)+0.1)
+#  par(mar=c(5  ,4,4,2)+0.1)
+   np = ncol(dat)
+   lm <- layout(matrix(c(1:np),ncol=1,byrow=TRUE))
+   layout.show(lm)
+
+   for (j in 1:ncol(dat))
+   {
+      nice.ts.plot(yy,dat[,j],lwd=3,label=colnames(dat)[j],
+                   ylab="Catch (mt)")
+   }
+
+   save.png.plot(paste(ncol(dat),"_gear_catch_history",sep=""),width=width,height=height)
+
+
+
+
    par(old.par)
-   return(dat)
+   return(cbind(yy,dat))
 }
 
 make.catch.diffs=function(file="five_gears.dat")

@@ -95,7 +95,7 @@ DATA_SECTION;
   init_int phase_logK;
   !! TTRACE(init_logK,phase_logK)
 
-  init_vector init_logsdlogF(1,ngear);
+  init_number init_logsdlogF;
   init_int phase_logsdlogF;
   !! TTRACE(init_logsdlogF,phase_logsdlogF)
 
@@ -233,7 +233,8 @@ PARAMETER_SECTION
   init_number logr(phase_logr);
   init_number logK(phase_logK);
 
-  init_vector logsdlogF(1,ngear,phase_logsdlogF);
+  //init_vector logsdlogF(1,ngear,phase_logsdlogF);
+  init_number logsdlogF(phase_logsdlogF);
   init_vector logsdlogPop(1,2,phase_logsdlogPop);
   //init_number logsdlogPop(phase_logsdlogPop);
   init_vector logsdlogYield(1,ngear,phase_logsdlogYield);
@@ -263,9 +264,9 @@ PRELIMINARY_CALCS_SECTION
        logK = init_logK;
        TTRACE(logK,mfexp(logK))
 
+       logsdlogF = init_logsdlogF;
        for (int g = 1; g <= ngear; g++)
        {
-          logsdlogF(g) = init_logsdlogF(g);
           logsdlogYield(g) = init_logsdlogYield(g);
        }
        logsdlogPop = init_logsdlogPop;
@@ -439,20 +440,40 @@ PROCEDURE_SECTION
 
   //TRACE(++userfun_entries)
   ++userfun_entries;
-  if ((userfun_entries % lengthU) == 0)
+  int status_print = ntime;
+  if (userfun_entries > lengthU)
+     status_print = lengthU;
+  if ((userfun_entries == 1) || (userfun_entries % status_print) == 0)
   {
      write_status(clogf);
   }
+  /*
+  clogf << "###param";
+  clogf << " " << userfun_entries;
+  clogf << " " << nll;
+  clogf << " " << logT12;
+  clogf << " " << logT21;
+  clogf << " " << logr;
+  clogf << " " << logK;
+  clogf << " " << logsdlogF;
+  clogf << " " << logsdlogPop;
+  clogf << " " << logsdlogYield;
+  clogf << " " << LmeanProportion_local;
+  clogf << " " << logsdLProportion_local;
+  clogf << " " << Lpfat;
+  clogf << endl;
+  */
+
   //if (1) ad_exit(1);
 
 
-SEPARABLE_FUNCTION void step(const int t, const dvar_vector& f1, const dvar_vector& f2, const dvar_vector& lsdlogF, const dvariable& p11, const dvariable p12, const dvariable& p21, const dvariable p22, const dvar_vector& lsdlogPop, const dvariable& lr, const dvariable& lK, const dvariable& lT12, const dvariable& lT21, const dvariable& LmPropL, const dvariable& lsdLProportion_local, const dvar_vector& Lpf)
+SEPARABLE_FUNCTION void step(const int t, const dvar_vector& f1, const dvar_vector& f2, const dvariable& lsdlogF, const dvariable& p11, const dvariable p12, const dvariable& p21, const dvariable p22, const dvar_vector& lsdlogPop, const dvariable& lr, const dvariable& lK, const dvariable& lT12, const dvariable& lT21, const dvariable& LmPropL, const dvariable& lsdLProportion_local, const dvar_vector& Lpf)
   // p11 U(utPop1+t-1) log N1 at start of time step
   // p12 U(utPop1+t)   log N1 at end   of time step
   // p21 U(utPop2+t-1) log N2 at start of time step
   // p22 U(utPop2+t)   log N2 at end   of time step
 
-  dvar_vector varlogF = square(mfexp(lsdlogF));
+  dvariable varlogF = square(mfexp(lsdlogF));
   dvar_vector varlogPop = square(mfexp(lsdlogPop));
   dvariable r = mfexp(lr);
   dvariable K = mfexp(lK);
@@ -477,8 +498,8 @@ SEPARABLE_FUNCTION void step(const int t, const dvar_vector& f1, const dvar_vect
   {
      if (use_robustF == 1)  // normal + t distribution
      {
-        dvariable z = square(ft1(g)-ft2(g))/varlogF(g);
-        dvariable norm_part = sqrt(varlogF(g)) + 0.5*LOG_TWO_M_PI + z;
+        dvariable z = square(ft1(g)-ft2(g))/varlogF;
+        dvariable norm_part = sqrt(varlogF) + 0.5*LOG_TWO_M_PI + z;
         dvariable fat_part = LOG_M_PI + log(1.0 + z);
         dvariable pfat = alogit(Lpf(g));
         Fnll += log((1.0-pfat)*mfexp(norm_part) + pfat*mfexp(fat_part));
@@ -507,12 +528,12 @@ SEPARABLE_FUNCTION void step(const int t, const dvar_vector& f1, const dvar_vect
 
      else
      {
-        Fnll += 0.5*(log(TWO_M_PI*varlogF(g)) + square(ft1(g)-ft2(g))/varlogF(g));
+        Fnll += 0.5*(log(TWO_M_PI*varlogF) + square(ft1(g)-ft2(g))/varlogF);
      }
      //TRACE(Fnll)
      if (isnan(value(Fnll)))
      {
-        TTRACE(Fnll,varlogF(g))
+        TTRACE(Fnll,varlogF)
         TTRACE(ft1(g),ft2(g))
         TTRACE(t,g)
         write_status(clogf);
