@@ -1,7 +1,8 @@
 #include <TMB.hpp>
 #include <iostream>
 //#include "trace.h"
-//ofstream clogf("xssams.log");
+std::ofstream clogf;//("xssams.log");
+clogf.open("xssams.log", ios::out);
 
 template <class Type> 
 Type square(Type x){return x*x;}
@@ -70,6 +71,8 @@ Type objective_function<Type>::operator() ()
    {
       for (int g = 0; g < ngear; g++)
       {
+         std::cout << "t = " << t << ", g = " << g << std::endl;
+         clogf << "t = " << t << ", g = " << g << std::endl;
          Type Fdiff = U(Fndxl(t-1)+g)-U(Fndxl(t)+g);
          Type Fsd = sdlogF(g);
          nll += square(Fdiff/Fsd);

@@ -53,7 +53,32 @@ GLOBALS_SECTION;
      return p;
   }
 
+  
+  /*
+  // can't declare pointer to member function
+  class  model_parameters;
+  class df1b2_parameters;
+  extern "C"
+  {
+     void ad_boundf(int i); 
+     void write_status(ofstream&);
+     void model_parameters::write_status(ofstream& s);
+     void df1b2_parameters::write_status(ofstream& s);
+
+     void xssams_exit(int i)
+     {
+        ad_exit=&ad_boundf; 
+        HERE
+        write_status(clogf);
+        exit(i);
+     }
+  }
+  */
+ 
+
 TOP_OF_MAIN_SECTION
+
+  //ad_exit = &xssams_exit;
   arrmblsize = 50000000;
   gradient_structure::set_CMPDIF_BUFFER_SIZE(  150000000L);
   gradient_structure::set_GRADSTACK_BUFFER_SIZE(12550000L);
@@ -443,7 +468,8 @@ PROCEDURE_SECTION
   int status_print = ntime;
   if (userfun_entries > lengthU)
      status_print = lengthU;
-  if ((userfun_entries == 1) || (userfun_entries % status_print) == 0)
+  //if ((userfun_entries == 1) || (userfun_entries % status_print) == 0)
+  if (userfun_entries % status_print == 0)
   {
      write_status(clogf);
   }
