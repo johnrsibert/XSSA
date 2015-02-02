@@ -92,3 +92,17 @@ parameters$U = vector(length=data$lengthU,mode="numeric")
 parameters$U=rep(0.0,data$lengthU)
 
 obj = MakeADFun(data,parameters,random=c("U"),DLL="xssams")
+
+#obj <- MakeADFun(data,parameters,random=c("U"),DLL="sam")
+print(names(obj))
+print(obj$par)
+lower <- obj$par*0-Inf
+upper <- obj$par*0+Inf
+print(paste(lower,upper))
+#lower["rho"] <- 0.01
+#upper["rho"] <- 0.99
+
+system.time(opt<-nlminb(obj$par,obj$fn,obj$gr,lower=lower,upper=upper))
+#system.time(opt<-nlminb(obj$par,obj$fn,obj$gr,lower=lower,upper=upper))
+rep<-sdreport(obj)
+rep

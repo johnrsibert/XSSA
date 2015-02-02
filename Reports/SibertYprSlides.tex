@@ -63,29 +63,15 @@ mortality, fishing mortality}}
 \definecolor{myauthor}{rgb}{0.9,0.9,0}
 \author{\scalebox{1}[1.3]{John Sibert, Retirement-failure Consulting}} 
 \title{Yield per Recruit Analysis of the Hawaiian
-Yellowfin Tuna Fishery}
-
+Yellowfin Tuna Fishery\\~\\
+{\Large \color{section3}
+Is there evidence to support increasing the minimum size limit for
+Yellowfin in Hawaii?}}
 \address{\href{mailto:sibert@hawaii.edu}{sibert@hawaii.edu}}
-
-
 \begin{slide}
 \maketitle
 \end{slide}
 \centerslidesfalse
-
-\begin{slide}\section{Yield Per Recruit}
-\subsubsection{Simple analysis for advice to fishery management}
-\subsubsection{Requires only measures of fishing and natural
-mortality and growth}
-\begin{eqnarray}
-Z_a &=& M_a +F_a \\
-N_a &=& N_{a-\Delta a}e^{-\Delta aZ_{a-\Delta a}}\\
-Y_a &=& F_aN_aW_a\\
-\frac{Y}{R} &=& \sum_a Y_a.
-\end{eqnarray}
-\subsubsection{Estimates available from MFCL and HTTP}
-\subsubsection{Insights into fishery, not necessarily about stocks}
-\end{slide}
 
 \begin{slide}\section{Yellowfin landings in Hawaii, 1952 -- 2012}
 \begin{center}
@@ -93,37 +79,55 @@ Y_a &=& F_aN_aW_a\\
 \end{center}
 \end{slide}
 
-\begin{slide}\section{MFCL Stock Assessment}
+\begin{slide}\section{Yield Per Recruit}
+\subsubsection{Simple analysis to provide advice to fishery management}
+\subsubsection{Requires only measures of fishing and natural
+mortality and growth}
+\subsubsection{No advice about stock status}
+\begin{eqnarray}
+Z_a &=& M_a +F_a \\
+N_a &=& N_{a-\Delta a}e^{-\Delta aZ_{a-\Delta a}}\\
+N_0 &=& 1 = R\\
+Y_a &=& F_aN_aW_a\\
+\frac{Y}{R} &=& \sum_a Y_a.
+\end{eqnarray}
+\subsubsection{Estimates $M_a$ and $F_a$ available from two sources:
+WCPFC and HTTP}
+\end{slide}
+
+\begin{slide}\section{WCPFC Multifan-CL Yellowfin Stock Assessment}
 \begin{center}
-\includegraphics[height=0.85\textheight]{./graphics/MFCLregions.png}
+{\color{section3}\small (A ``worked'' example)}\par
+\includegraphics[height=0.8\textheight]{./graphics/MFCLregions.png}
 \end{center}
 \end{slide}
 
-\begin{slide}\section{MFCL Mortality ``Estimates''}
+\begin{slide}\section{MFCL Mortality Values}
 \begin{center}
-\includegraphics[height=0.85\textheight]{./graphics/MFCL_MF.pdf}
+{\color{section3}\small (M specified ``reference case''; F estimates averaged 2008 - 2012)}\par
+\includegraphics[height=0.80\textheight]{./graphics/MFCL_MF.pdf}
 \end{center}
 \end{slide}
 
-\begin{slide}\section{YPR MFCL Region 4}
+\begin{slide}\section{YPR Region 4: 10\deg{S} to 20\deg{N}}
 \begin{center}
 \includegraphics[height=0.85\textheight]{./graphics/YPR_MFCL_R4.pdf}
 \end{center}
 \end{slide}
 
-\begin{slide}\section{YPR MFCL Region 2}
+\begin{slide}\section{YPR Region 2: 20\deg{N} to 50\deg{N}}
 \begin{center}
 \includegraphics[height=0.85\textheight]{./graphics/YPR_MFCL_R2.pdf}
 \end{center}
 \end{slide}
 
-\begin{slide}\section{HTTP Mortality Estimates}
+\begin{slide}\section{HTTP Mortality Estimates; 1995 -- 2000}
 \begin{center}
 \includegraphics[height=0.85\textheight]{./graphics/csm_MF.pdf}
 \end{center}
 \end{slide}
 
-\begin{slide}\section{YPR Main Hawaiian Island}
+\begin{slide}\section{YPR Main Hawaiian Islands}
 \begin{center}
 \includegraphics[height=0.85\textheight]{./graphics/YPR_csm.pdf}
 \end{center}
@@ -137,26 +141,29 @@ Y_a &=& F_aN_aW_a\\
 
 \begin{slide}\section{Conclusions}
 \begin{enumerate}
-\item The YPR analysis for MFCL Region 4 shows clearly that reducing
-the size at capture would increase the yield to the entire fishery.
-Whether change in minimum size at capture in Region~4 would benefit the MHI
-yellowfin fishery is not clear.
+\item The YPR analysis for MFCL Region 4 shows clearly that increasing
+the size at first capture would increase the yield to the entire fishery.
+Whether such a change in minimum size in Region~4 would
+benefit the MHI yellowfin fishery is unknown.
 
-\item The YPR analysis for MFCL Region 2 is ambiguous because only
-longline catches from this region are included in the MFCL assessment
-and because the
-MFCL regions are ill-addapted to support management of fisheries in
-Hawaii.
+\item The YPR analysis for MFCL Region 2 is inconclusive because only
+longline catches from Region~2 are included in the assessment.
 
-\item The YPR analysis using mortality estimates from tagging data are
-are inconclusive, but there is no clear benefit to the fishery of
-increasing the minimum size restrictions.
+\item The YPR analysis using mortality estimates from tagging data is
+also inconclusive because only small fish were returned and were
+available for the analysis. 
 
 \item The WCPFC convention area stock assessment is unsuitable for
-addressing sub-regional management issues.
+addressing management issues in Hawaii because the
+MFCL regions are ill-addapted to Hawaii and the data do not include
+all of the catch.
+
+\item There is no clear benefit to the fishery of increasing the
+minimum size restriction.
 \end{enumerate}
 \end{slide}
 
+%%%%%%%% extra figures begin here %%%%%%%%%%%%%%%%%%%%%%
 
 \begin{slide}\section{HDAR Yellowfin Landings, 1949 -- 2014}
 \begin{center}
@@ -165,11 +172,8 @@ addressing sub-regional management issues.
 \end{slide}
 
 
-
-
 \end{document}
 
 
-%%%%%%%% figures begin here %%%%%%%%%%%%%%%%%%%%%%
 
 

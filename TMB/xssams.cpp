@@ -1,8 +1,8 @@
 #include <TMB.hpp>
 #include <iostream>
 //#include "trace.h"
-std::ofstream clogf;//("xssams.log");
-clogf.open("xssams.log", ios::out);
+//std::ofstream clogf;//("xssams.log");
+//clogf.open("xssams.log", ios::out);
 
 template <class Type> 
 Type square(Type x){return x*x;}
@@ -65,20 +65,21 @@ Type objective_function<Type>::operator() ()
    Type T12 = exp(logT12);
    Type T21 = exp(logT21);
 
+   array <Type> logF(ngear,ntime);
    Type nll = 0.0;
-   using namespace density;
-   for (int t = 1; t < ntime; t++)
+   for (int t = 0; t < maxtime; t++)
    {
-      for (int g = 0; g < ngear; g++)
-      {
-         std::cout << "t = " << t << ", g = " << g << std::endl;
-         clogf << "t = " << t << ", g = " << g << std::endl;
-         Type Fdiff = U(Fndxl(t-1)+g)-U(Fndxl(t)+g);
-         Type Fsd = sdlogF(g);
-         nll += square(Fdiff/Fsd);
-      //   nll -= dnorm(Fdiff,Fsd,true);
-      // nll += -density::dnorm(U(Fndxl(t-1)+g)-U(Fndxl(t)+g),sdlogF(g));
-      }
+       for (int g = 0; g < ngear; g++)
+       {
+          logF(g,t) = U(Fndxl(t)+g);
+          nll += square(logF(g,t));
+       }
+   }
+
+
+   for (int t = 1; t < maxtime; t++)
+   {
+     //step(t, U(Fndxl(t-1),Fndxu(t-1)), U(Fndxl(t),Fndxu(t)), logsdlogF,
 
    }
 
