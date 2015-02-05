@@ -2,6 +2,12 @@
 # 1 pound = 0.00045359237 metric tons
 tplb <- 0.00045359237
 
+yq.time = function(year,quarter)
+{
+   time = year + (quarter-1)*0.25+0.125
+   return(time)
+}
+
 make.hdar.dat<-function(file="hdar_calendar.csv",yr1=1952,yr2=2012)
 {
    print(paste("Reading ",file))

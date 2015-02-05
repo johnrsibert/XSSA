@@ -1,0 +1,45 @@
+# Catch data file path
+ five_gears.dat
+# one_gear.dat
+# MFCL forcing data matrix path
+total_biomass.dat
+#
+# Number of time periods
+244
+# Number of fishing gears
+5
+# Time step (quarters)
+1.0
+# MFCL forcing region number
+2
+#
+# logT12:
+-4 1
+# logT21:
+-4 1
+# logr:
+# -4.6052 2
+  -2.3026 1
+#  -1.2 2
+# logsdlogK
+ -2.0 2
+# logsdlogF:
+ -1.5  2
+#     logsdlogF:  -0.43243 0.95277 2.0287 0.27531 (1)
+# -0.43243 0.95277 2.0287 0.27531 2
+#
+# logsdlogPop:
+ -1.0 2
+# logsdlogYield:
+  -1.0 -1.0 -1.0 -1.0 -1.0   1
+# logsdlogYield:  -0.81118 -0.65972 0.67215 -0.099141 (1)
+# -0.81118 -0.65972 0.67215 -0.099141 2
+# LmeanProportion_local:
+0  -1
+# logsdLProportion_local:
+ 0    1
+#1.0   1
+# robust F random walk
+  0
+# pfat
+   0.05 0.05 0.05 0.05 0.05 -1

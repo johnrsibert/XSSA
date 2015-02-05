@@ -217,6 +217,9 @@ make.catch.diffs=function(file="five_gears.dat")
    lm = layout(matrix(c(1:np),ncol=1,byrow=TRUE))
    layout.show(lm)
    breaks = seq(-4.25,4.25,0.5)
+   dt.stats = matrix(nrow=ngear,ncol=2)
+   colnames(dt.stats) = c("Mean","S. D.")
+   rownames(dt.stats) = colnames(dat)
 
    for (g in 1:ngear)
    {
@@ -227,6 +230,8 @@ make.catch.diffs=function(file="five_gears.dat")
       dts = diff(ts)
       sd = sd(dts)
       mean = mean(dts)
+      dt.stats[g,1] = mean
+      dt.stats[g,2] = sd
       print(paste(g,mean,sd))
       hist(dts,breaks=breaks,main=colnames(dat)[g],freq=FALSE,las=1)
       x = seq(-4*sd,4*sd,0.1)
@@ -235,6 +240,7 @@ make.catch.diffs=function(file="five_gears.dat")
    #  lines(x,dcauchy(x,location=mean,scale=1),col="green" ,lty="dashed")
    }
    save.png.plot("first_difference_histograms",width=width,height=height)
+   print(dt.stats)
 }
 #dnorm(x, mean = 0, sd = 1, log = FALSE)
 dtdist=function(x, mean = 0, sd = 1)
