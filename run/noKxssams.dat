@@ -14,28 +14,28 @@ total_biomass.dat
 2
 #
 # logT12:
--4 1
+-6 1
 # logT21:
--4 1
+-6 1
 # logr:
 # -4.6052 2
   -2.3026 1
 #  -1.2 2
 # logsdlogK
- -2.0 2
+ -2.0 1
 # logsdlogF:
- -1.5  2
+ -1.5  1
 #     logsdlogF:  -0.43243 0.95277 2.0287 0.27531 (1)
 # -0.43243 0.95277 2.0287 0.27531 2
 #
 # logsdlogPop:
- -1.0 2
+ -1.0 -1
 # logsdlogYield:
-  -1.0 -1.0 -1.0 -1.0 -1.0   1
+  -1.0   1
 # logsdlogYield:  -0.81118 -0.65972 0.67215 -0.099141 (1)
 # -0.81118 -0.65972 0.67215 -0.099141 2
 # LmeanProportion_local:
-0  -1
+0  1
 # logsdLProportion_local:
  0    1
 #1.0   1

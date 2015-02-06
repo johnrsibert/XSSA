@@ -16,7 +16,11 @@ plot.diagnostics=function(dat=NULL,file="diagnostics.dat",ngear,devices)
    print(names(dat)[dd])
    dat[,dd] = exp(dat[,dd])
 
-   gear.names = c("TunaHL","Troll","Longline","InshoreHL","AkuBoat")
+#  g2 <- as.vector(c("Tuna HL","Troll","Longline","Bottom/inshore HL","Aku boat","Misc"),mode="character")
+   # tuna handline, troll, longline, bottom fish/inshore handline and aku boat
+
+
+   gear.names = c("TunaHL","Troll","Longline","Bottom/inshore HL","AkuBoat")
    title.line = -1
    lwd = 3
 
@@ -49,9 +53,9 @@ plot.diagnostics=function(dat=NULL,file="diagnostics.dat",ngear,devices)
    double.lines(dat$t,(dat$pop1+dat$pop2),bcol="blue",fcol="lightblue",lwd=lwd)
    par("new"=TRUE)
    plot(dat$t,dat$propL,type='l',ann=FALSE,axes=FALSE,
-        col="red",lwd=2,lty="dotted",ylim=c(0,1))
+        col="red4",lwd=2,lty="solid",ylim=c(0,1))
    axis(4,line=0,outer=FALSE,tcl=0.5,labels=FALSE,col="red")
-   abline(h=0.9,col="lightgray",lty="dashed")
+   abline(h=0.9,col="red1",lty="dotdash")
    title(main="Total Population",line=title.line)
 
    width = 9.0
@@ -97,7 +101,7 @@ plot.diagnostics=function(dat=NULL,file="diagnostics.dat",ngear,devices)
    layout.show(lm)
    for (g in 1:ngear)
    {
-      nice.ts.plot(dat$t,dat[,(g+4)],bcol="orange4",fcol="orange",lwd=lwd)
+      nice.ts.plot(dat$t,dat[,(g+5)],bcol="orange4",fcol="orange",lwd=lwd)
    #  title(main=paste("F mort, gear",g))
       title(main=paste("F mort,",gear.names[g]),,line=title.line)
    }

@@ -32,7 +32,7 @@ GLOBALS_SECTION;
   }
   template double logit<double>(const double& p);
   //template dvariable logit<dvariable>(const dvariable& p);
-  //template df1b2variable logit(const df1b2variable& p); 
+  //template df1b2_init_number logit(const df1b2_init_number& p); 
 
   template <typename SCALAR> SCALAR alogit(const SCALAR& a)
   {
@@ -40,7 +40,7 @@ GLOBALS_SECTION;
      return p;
   }
   template double alogit<double>(const double& a);
-  //template dvariable alogit<dvariable>(const dvariable& a);
+  template dvariable alogit<dvariable>(const dvariable& a);
   //template df1b2variable alogit(const df1b2variable& a); 
 
   dvector alogit(const dvector& a)
@@ -130,7 +130,8 @@ DATA_SECTION;
   init_int phase_logsdlogPop;
   !! TTRACE(init_logsdlogPop,phase_logsdlogPop)
 
-  init_vector init_logsdlogYield(1,ngear);
+  //init_vector init_logsdlogYield(1,ngear);
+  init_number init_logsdlogYield;
   init_int phase_logsdlogYield;
   !! TTRACE(init_logsdlogYield,phase_logsdlogYield)
 
@@ -266,7 +267,8 @@ PARAMETER_SECTION
   init_number logsdlogF(phase_logsdlogF);
   //init_vector logsdlogPop(1,2,phase_logsdlogPop);
   init_number logsdlogPop(phase_logsdlogPop);
-  init_vector logsdlogYield(1,ngear,phase_logsdlogYield);
+  //init_vector logsdlogYield(1,ngear,phase_logsdlogYield);
+  init_number logsdlogYield(phase_logsdlogYield);
 
   // logit transformed porportion local
   init_number LmeanProportion_local(phase_LmeanProportion_local);
@@ -293,10 +295,7 @@ PRELIMINARY_CALCS_SECTION
        TTRACE(logr,mfexp(logr))
 
        logsdlogF = init_logsdlogF;
-       for (int g = 1; g <= ngear; g++)
-       {
-          logsdlogYield(g) = init_logsdlogYield(g);
-       }
+       logsdlogYield = init_logsdlogYield;
        logsdlogPop = init_logsdlogPop;
 
 
@@ -319,7 +318,7 @@ PRELIMINARY_CALCS_SECTION
        TRACE(init_pfat)
        TRACE(Lpfat)
 
-       double K = immigrant_biomass[1];
+       double K = immigrant_biomass(1);
        double logK = log(K);
        TTRACE(K,logK)
        double Pop1 = prop*K;
@@ -336,7 +335,7 @@ PRELIMINARY_CALCS_SECTION
        {   
           for (int g = 1; g <= ngear; g++)
           {
-             U(++ut) = -18*mfexp(0.001*Ferr(t,g));
+             U(++ut) = -4.0*mfexp(0.001*Ferr(t,g));
              if ((t<=2) && (g==1))
                TTRACE(Ferr(t,g),U(ut))
           }
@@ -463,6 +462,12 @@ PROCEDURE_SECTION
 
   nll = 0.0;
 
+  // set initial K to initial immigrant biomass
+  //U(utK+1) = log(immigrant_biomass(1));
+  //dvariable dprop = LmeanProportion_local;
+  //dvariable prop = alogit(dprop);
+  //U(utPop1+1) = prop*U(utK+1);
+  //U(utPop2+1) = (1.0-prop)*U(utK+1);
   for (int t = 2; t <= ntime; t++)
   {
      step(t, U(Fndxl(t-1),Fndxu(t-1)), U(Fndxl(t),Fndxu(t)), logsdlogF,
@@ -473,7 +478,8 @@ PROCEDURE_SECTION
 
   for (int t = 1; t <= ntime; t++)
   {
-     obs(t,U(Fndxl(t),Fndxu(t)),U(utPop1+t-1),U(utPop1+t),U(utPop2+t-1),U(utPop2+t),
+     obs(t,U(Fndxl(t),Fndxu(t)),U(utPop1+t-1),U(utPop1+t),
+           U(utPop2+t-1),U(utPop2+t),
            logsdlogYield);
   }
 
@@ -516,7 +522,7 @@ SEPARABLE_FUNCTION void step(const int t, const dvar_vector& f1, const dvar_vect
   dvariable Knll = 0.0;
   dvariable varlogK = square(mfexp(lsdlogK));
   Knll += 0.5*(log(TWO_M_PI*varlogK) + square(logK1 - logK2)/varlogK);
-  dvariable K = mfexp(logK2);
+  dvariable K = mfexp(logK1);
 
   dvariable varlogF = square(mfexp(lsdlogF));
   dvariable varlogPop = square(mfexp(lsdlogPop));
@@ -602,10 +608,11 @@ SEPARABLE_FUNCTION void step(const int t, const dvar_vector& f1, const dvar_vect
      prevN1 = mfexp(prevLogN1);
      prevN2 = mfexp(prevLogN2);
      //TTRACE(prevN1,prevN2)
+     //TTRACE((prevN1+prevN2),K)
 
      nextLogN1 += dt*(r*(1.0 - prevN1/K) - sumFg - T12 - r*prevN2/K);
-     nextLogN2 += dt*(r*(1.0 - prevN2/K) - sumFg - T12 - r*prevN1/K + T21*immigrant_biomass(t)/prevN2);
-     //TTRACE(nextLogN1,nextLogN2)
+     nextLogN2 += dt*(r*(1.0 - prevN2/K) - sumFg - T12 - r*prevN1/K + T21*immigrant_biomass(t-1)/prevN2);
+     //TTRACE((nextLogN1-prevLogN1),(nextLogN2-prevLogN2))
   }
   
 
@@ -655,7 +662,7 @@ SEPARABLE_FUNCTION void step(const int t, const dvar_vector& f1, const dvar_vect
   // logit(p) = log(N1)-log(N2)
   dvariable LpropL = nextLogN1 - nextLogN2;
   //TTRACE(alogit(LmeanPropL),alogit(LpropL))
-  PLnll += 0.5*(log(TWO_M_PI*varLPropL) + square(LpropL - LmeanPropL)/varLPropL);
+  //PLnll += 0.5*(log(TWO_M_PI*varLPropL) + square(LpropL - LmeanPropL)/varLPropL);
   if (isnan(value(PLnll)))
   {
      TRACE(PLnll)
@@ -674,7 +681,7 @@ SEPARABLE_FUNCTION void step(const int t, const dvar_vector& f1, const dvar_vect
 
   
 
-SEPARABLE_FUNCTION void obs(const int t, const dvar_vector& f,const dvariable& pop11, const dvariable& pop21,  const dvariable& pop12, const dvariable& pop22, const dvar_vector& logsdlogYield)
+SEPARABLE_FUNCTION void obs(const int t, const dvar_vector& f,const dvariable& pop11, const dvariable& pop21,  const dvariable& pop12, const dvariable& pop22, const dvariable& logsdlogYield)
   // pop11 U(utPop1+t-1)
   // pop21 U(utPop1+t)
   // pop12 U(utPop2+t-1)
@@ -696,12 +703,12 @@ SEPARABLE_FUNCTION void obs(const int t, const dvar_vector& f,const dvariable& p
      log_pred_yield(g) =  ft(g) + log_total_mean_pop;
   }
 
-  dvar_vector varlogYield = square(mfexp(logsdlogYield));
+  dvariable varlogYield = square(mfexp(logsdlogYield));
   dvariable Ynll = 0.0;
   for (int g = 1; g <= ngear; g++)
   {
         // observation error
-        Ynll += 0.5*(log(TWO_M_PI*varlogYield(g)) + square(obs_catch(g,t)-log_pred_yield(g))/varlogYield(g));
+        Ynll += 0.5*(log(TWO_M_PI*varlogYield) + square(obs_catch(g,t)-log_pred_yield(g))/varlogYield);
         if (isnan(value(Ynll)))
         {
            TRACE(Ynll)
@@ -744,6 +751,7 @@ FUNCTION void write_status(ofstream& s)
     s << "#    r = " << mfexp(logr) << endl;
     s << "#     logsdlogK: " << logsdlogK 
              <<  " (" << active(logsdlogK) <<")" << endl;
+    s << "#        sdlogK: " << mfexp(logsdlogK) << endl; 
     s << "#     logsdlogF: " << logsdlogF 
              <<  " (" << active(logsdlogF) <<")" << endl;
     s << "#        sdlogF: " << mfexp(logsdlogF) << endl;
