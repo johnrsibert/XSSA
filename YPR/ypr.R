@@ -38,6 +38,7 @@ mfcl.wb = 2.9396
 # what would be the impact of 15 lb and 20 lb on the Y/R.
 
 kgperlb = 0.453592
+
 mfcl.rep.file = paste(path.expand("~"),
                      "/Projects/xssa/mfcl/yft/2014/basecase/plot-12.Rdata",
                      sep="")
@@ -83,7 +84,7 @@ mfcl.ypr<-function(epoch=NULL,region=2,astar=NULL)
    nReg = rep$nReg
    yrs = rep$yrs
    MatAge = rep$MatAge
-   MeanWatAge = rep$mean.WatAge
+   MeanWatAge = rep$mean.WatAge/kgperlb
    MeanLatAge = rep$mean.LatAge
    FatAgeReg = rep$FatYrAgeReg
    if (is.null(astar))
@@ -156,13 +157,14 @@ mfcl.ypr<-function(epoch=NULL,region=2,astar=NULL)
    layout.show(lm)
 
    nice.ts.plot(Fmult,YPR.f,
-         xlab="F multiplier",ylab="Yield per Recruit (kg)",lwd=7)
+         xlab="F multiplier",ylab="Yield per Recruit (lb)",lwd=7)
    abline(v=1.0,col="red",lty="dotdash")
    label.panel("A")
 
    nice.ts.plot(MeanWatAge,YPR.a,
-         xlab="Weight at First Capture (kg)",ylab="Yield per Recruit (kg)",lwd=7)
-   points(c(3*kgperlb,10*kgperlb,15*kgperlb,20*kgperlb),c(0,0,0,0),col="red",pch='|',cex=2)
+         xlab="Weight at First Capture (lb)",ylab="Yield per Recruit (lb)",lwd=7)
+#  points(c(3*kgperlb,10*kgperlb,15*kgperlb,20*kgperlb),c(0,0,0,0),col="red",pch='|',cex=2)
+   points(c(3,10,15,20),c(0,0,0,0),col="red",pch='|',cex=2)
    abline(v=MeanWatAge[maxa],col="red",lty="dotdash")
    label.panel("B")
 
@@ -182,7 +184,7 @@ csm.ypr=function()
    qq = nmort*2
    qF = (qq+1):(qq+nmort)
    qM = (qq+nmort+1):(qq+2*nmort)
-
+   wt = rep$mort.mat$wt/kgperlb
    nAges = nmort
    astar = nAges
 
@@ -205,14 +207,14 @@ csm.ypr=function()
       FF= fit$est[qF]
       for (a in 1:m)
          FF[a] = 0.0;
-      YPR.a[m] = ypr.comp(rep$mort.mat$wt,fit$est[qM],FF)
+      YPR.a[m] = ypr.comp(wt,fit$est[qM],FF)
       if (YPR.a[m] > maxYPR)
       {
          maxYPR = YPR.a[m]
          maxa = m;
       }
    }
-   print(paste(maxa,rep$mort.mat$wt[maxa],rep$mort.mat$wt[maxa]/kgperlb))
+   print(paste(maxa,wt[maxa],rep$mort.mat$wt[maxa]/kgperlb))
 
    width = 6.5
    height = 9.0
@@ -223,15 +225,16 @@ csm.ypr=function()
    layout.show(lm)
 
    nice.ts.plot(Fmult,YPR.f,
-         xlab="F multiplier",ylab="Yield per Recruit (kg)",lwd=7)
+         xlab="F multiplier",ylab="Yield per Recruit (lb)",lwd=7)
    abline(v=1.0,col="red",lty="dotdash")
    label.panel("A")
 
-   nice.ts.plot(rep$mort.mat$wt,YPR.a,
-         xlab="Weight at First Capture (kg)",ylab="Yield per Recruit (kg)",lwd=7)
-   points(c(3*kgperlb,10*kgperlb,15*kgperlb,20*kgperlb),c(0,0,0,0),col="red",pch='|',cex=2)
+   nice.ts.plot(wt,YPR.a,
+         xlab="Weight at First Capture (lb)",ylab="Yield per Recruit (lb)",lwd=7)
+#  points(c(3*kgperlb,10*kgperlb,15*kgperlb,20*kgperlb),c(0,0,0,0),col="red",pch='|',cex=2)
+   points(c(3,10,15,20),c(0,0,0,0),col="red",pch='|',cex=2)
    label.panel("B")
-   abline(v=rep$mort.mat$wt[maxa],col="red",lty="dotdash")
+   abline(v=wt[maxa],col="red",lty="dotdash")
 
    save.png.plot("YPR_csm",width=width,height=height)
    par(old.par)
@@ -312,7 +315,7 @@ plot.mfcl.mortality=function(epoch=NULL)
    nReg = rep$nReg
    yrs = rep$yrs
    MatAge = rep$MatAge
-   MeanWatAge = rep$mean.WatAge
+   MeanWatAge = rep$mean.WatAge/kgperlb
    MeanLatAge = rep$mean.LatAge
    FatAgeReg = rep$FatYrAgeReg
 
@@ -329,7 +332,7 @@ plot.mfcl.mortality=function(epoch=NULL)
    layout.show(lm)
 
    nice.ts.plot(MeanWatAge,MatAge,
-        xlab="Weight (kg)",lwd=7,
+        xlab="Weight (lb)",lwd=7,
         ylab=substitute(paste("Natural Mortality ",(q^{-1}))))
 #  legend("topleft",bty='n',cex=1.6,legend="M")
    label.panel("M")
@@ -353,8 +356,8 @@ plot.mfcl.mortality=function(epoch=NULL)
       
       nice.ts.plot(MeanWatAge,AveFatAge,
            ylab=substitute(paste("Fishing Mortality ",(q^{-1}))),
-           xlab="Weight (kg)",lwd=7)
-      points(c(3*kgperlb,10*kgperlb,15*kgperlb,20*kgperlb),c(0,0,0,0),col="red",pch='|',cex=2)
+           xlab="Weight (lb)",lwd=7)
+      points(c(3,10,15,20),c(0,0,0,0),col="red",pch='|',cex=2)
   #   legend("topleft",bty='n',cex=1.6,legend=paste("F(",r,")",sep=""))
       label.panel(paste("F(",r,")",sep=""))
    }
@@ -374,7 +377,7 @@ plot.csm.mortality=function(epoch=NULL)
    nReg = rep$nReg
    yrs = rep$yrs
    MatAge = rep$MatAge
-   MeanWatAge = rep$mean.WatAge
+   MeanWatAge = rep$mean.WatAge/kgperlb
    MeanLatAge = rep$mean.LatAge
    FatAgeReg = rep$FatYrAgeReg
 
@@ -409,6 +412,7 @@ plot.csm.mortality=function(epoch=NULL)
 #  print(csm.rep$mort.mat$qF)
    csm = read.fit("csm")
    nmort = csm$npar/4
+   wt = csm.rep$mort.mat$wt/kgperlb
    qq = nmort*2
    qF = (qq+1):(qq+nmort)
    print(csm$names[qF])
@@ -427,20 +431,20 @@ plot.csm.mortality=function(epoch=NULL)
    maxM = 1.2*max(MatAge,csm.rep$mort.mat$qM)
    print(maxM)
    nice.ts.plot(MeanWatAge,MatAge,ylim=c(0,maxM),bcol="black",fcol="lightgray",
-                xlab="Weight (kg)", 
+                xlab="Weight (lb)", 
                 ylab=substitute(paste("Natural Mortality ",(q^{-1}))))
-   double.lines(csm.rep$mort.mat$wt,csm$est[qM],bcol="blue",fcol="lightblue",lwd=7)
-   sd.bars(csm.rep$mort.mat$wt,csm$est[qM],2.0*csm$std[qM],lwd=5,col="blue")
+   double.lines(wt,csm$est[qM],bcol="blue",fcol="lightblue",lwd=7)
+   sd.bars(wt,csm$est[qM],2.0*csm$std[qM],lwd=5,col="blue")
    label.panel("A")
 
    maxF = 1.2*max(AveFatAge,csm$est[qF])
    print(maxF)
    nice.ts.plot(MeanWatAge,AveFatAge,bcol="black",fcol="lightgray",
                 legend=c(" R2"," R4"), ylim = c(0,maxF),
-                xlab="Weight (kg)", 
+                xlab="Weight (lb)", 
                 ylab=substitute(paste("Fishing Mortality ",(q^{-1}))))
-   double.lines(csm.rep$mort.mat$wt,csm$est[qF],bcol="blue",fcol="lightblue",lwd=7)
-   sd.bars(csm.rep$mort.mat$wt,csm$est[qF],2.0*csm$std[qF],lwd=5,col="blue")
+   double.lines(wt,csm$est[qF],bcol="blue",fcol="lightblue",lwd=7)
+   sd.bars(wt,csm$est[qF],2.0*csm$std[qF],lwd=5,col="blue")
    label.panel("B")
 
 
@@ -492,7 +496,7 @@ bogus.ypr<-function(bogus.mode=4,epoch=NULL,region=2,astar=NULL)
    nReg = rep$nReg
    yrs = rep$yrs
    MatAge = rep$MatAge
-   MeanWatAge = rep$mean.WatAge
+   MeanWatAge = rep$mean.WatAge/kgperlb
    MeanLatAge = rep$mean.LatAge
    FatAgeReg = rep$FatYrAgeReg
    if (is.null(astar))
@@ -579,7 +583,6 @@ bogus.ypr<-function(bogus.mode=4,epoch=NULL,region=2,astar=NULL)
    }
    print(paste(maxa,MeanWatAge[maxa],MeanWatAge[maxa]/kgperlb))
 
-
    width = 6.5
    height = 9.0
    x11(width=width,height=height)
@@ -591,21 +594,21 @@ bogus.ypr<-function(bogus.mode=4,epoch=NULL,region=2,astar=NULL)
 
    nice.ts.plot(MeanWatAge,bogusF,
            ylab=substitute(paste("Fishing Mortality ",(q^{-1}))),
-           xlab="Weight (kg)",lwd=7)
+           xlab="Weight (lb)",lwd=7)
    lines(MeanWatAge,sFR,col="blue",lwd=3,lty="dashed")
    lines(MeanWatAge,sfB,col="red",lwd=3,lty="dashed")
-   points(c(3*kgperlb,10*kgperlb,15*kgperlb,20*kgperlb),c(0,0,0,0),col="red",pch='|',cex=2)
+   points(c(3,10,15,20),c(0,0,0,0),col="red",pch='|',cex=2)
    abline(v=MeanWatAge[bogus.mode],col="red",lty="dotdash")
    label.panel("A")
 
    nice.ts.plot(Fmult,YPR.f,
-         xlab="F multiplier",ylab="Yield per Recruit (kg)",lwd=7)
+         xlab="F multiplier",ylab="Yield per Recruit (lb)",lwd=7)
    abline(v=1.0,col="red",lty="dotdash")
    label.panel("B")
 
    nice.ts.plot(MeanWatAge,YPR.a,
-         xlab="Weight at First Capture (kg)",ylab="Yield per Recruit (kg)",lwd=7)
-   points(c(3*kgperlb,10*kgperlb,15*kgperlb,20*kgperlb),c(0,0,0,0),col="red",pch='|',cex=2)
+         xlab="Weight at First Capture (lb)",ylab="Yield per Recruit (lb)",lwd=7)
+   points(c(3,10,15,20),c(0,0,0,0),col="red",pch='|',cex=2)
    abline(v=MeanWatAge[maxa],col="red",lty="dotdash")
    label.panel("C")
 
