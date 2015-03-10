@@ -617,6 +617,126 @@ bogus.ypr<-function(bogus.mode=4,epoch=NULL,region=2,astar=NULL)
    return(as.data.frame(cbind(YPR.f,Fmult)))
 }
 
+
+multi.bogus.ypr<-function(Fmult=c(0.5,1.0,2.0,5.0,10.0),bogus.mode=4,epoch=NULL,region=2,astar=NULL)
+{
+
+   rep.file = mfcl.rep.file
+   print(rep.file)
+   load(rep.file)
+
+   nTime = rep$nTime
+   nAges = rep$nAges
+   nReg = rep$nReg
+   yrs = rep$yrs
+   MatAge = rep$MatAge
+   MeanWatAge = rep$mean.WatAge/kgperlb
+   MeanLatAge = rep$mean.LatAge
+   FatAgeReg = rep$FatYrAgeReg
+   if (is.null(astar))
+      astar=nAges
+   print(paste("astar =",astar))
+
+   if (is.null(epoch))
+      epoch = (nTime-19):nTime
+   print(paste("Averaging over",length(epoch),"quarter epoch:"))
+   print(epoch)
+
+   AveFatAge = matrix(0,nrow=nReg,ncol=nAges)
+
+   for (i in 1:nReg)
+   {
+      den = 0
+      for (j in epoch)
+      {
+         den = den + 1
+         for (k in 1:nAges)
+         {
+            AveFatAge[i,k] = AveFatAge[i,k] + FatAgeReg[j,k,i]
+         }
+      } 
+      for (k in 1:nAges)
+      {
+         AveFatAge[i,k] = AveFatAge[i,k]/den
+      }
+   }
+
+   FR = AveFatAge[region,]
+   maxFR = max(FR)
+   maxF4a = 0
+   maxF4 = 0
+   for (a in 1:nAges)
+   {
+      if (AveFatAge[4,a] > maxF4)
+      {
+         maxF4a = a
+         maxF4  = AveFatAge[4,a] 
+      }
+   }
+
+   average.catch = LL.nonLL.catch()
+   catch.ratio = average.catch[1]/average.catch[2]
+
+   fB = dlnorm(1:nAges,log(bogus.mode),log(2.0))
+   print(paste(sum(fB),sum(FR)))
+   sfB = fB/max(fB)*maxFR*catch.ratio
+   sFR = FR
+   print(paste(sum(sfB),sum(sFR)))
+ 
+   bogusF = sFR + sfB
+
+
+# do YPR
+   width = 6.5
+   height = 9.0
+   x11(width=width,height=height)
+   old.par = par(no.readonly = TRUE) 
+   par(mar=c(4,4,0,0)+0.1)
+#  par(mar=c(5,4,4,2)+0.1)
+   lm <- layout(matrix(c(1:2),nrow=2,byrow=TRUE))
+   layout.show(lm)
+   AB = c("A","B")
+   
+   for (i in 1:2)
+   {
+      nf = length(Fmult)
+      maxa = vector(length=nf)
+      maxYPR = 0
+      YPR.fa = matrix(nrow=nAges,ncol=nf)
+      for (f in 1:nf)
+      {
+         FF = bogusF*Fmult[f]
+         if (i == 2)
+            FF = Fmult[f]*sFR + sfB
+
+         for (m in 1:nAges)
+         {
+           for (a in 1:m)
+              FF[a] = 0.0;
+            YPR.fa[m,f] = ypr.comp(MeanWatAge,MatAge,FF)
+            if (YPR.fa[m,f] > maxYPR)
+            {
+               maxYPR = YPR.fa[m,f]
+               maxa[f] = m;
+            }
+         }
+      } 
+      print(maxa)
+      nice.ts.plot(MeanWatAge,YPR.fa,
+            xlab="Weight at First Capture (lb)",ylab="Yield per Recruit (lb)",lwd=7)
+      points(c(3,10,15,20),c(0,0,0,0),col="red",pch='|',cex=2)
+      label.panel(AB[i])
+      for (f in 1:nf)
+         text(MeanWatAge[maxa[f]],YPR.fa[maxa[f],f],paste(Fmult[f]),col="red",
+              pos=3,off=0.5)
+#             adj=c(0.5,1.0))
+   }
+
+   save.png.plot(paste("YPR_BOGUS_",bogus.mode,"_",length(Fmult),sep=""),width=width,height=height)
+   par(old.par)
+   return(as.data.frame(YPR.fa))
+}
+
    
 do.it.all=function()
 {
@@ -626,6 +746,7 @@ do.it.all=function()
    mfcl.ypr(region=4)->junk
    plot.csm.mortality()
    bogus.ypr()->junk
+   multi.bogus.ypr()->junk
    csm.ypr()
    LL.nonLL.catch()
 }
