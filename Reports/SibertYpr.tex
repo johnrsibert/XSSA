@@ -33,29 +33,24 @@ Yellowfin Tuna Fishery}}
 \newcommand\widebar[1]{\overline{#1}}
 \newcommand\EEZ{Exclusive Economic Zone}
 
-\title{
-{\bf\color{red}DRAFT REPORT\normalcolor}\\
-~\\
-Yield per Recruit Analysis of the Hawaiian
-Yellowfin Tuna Fishery}
+\title{Yield per Recruit Analysis of the Hawaiian
+Yellowfin Tuna Fishery
+\date{March 2015}}
 
 \author{
 John Sibert\thanks{sibert@hawaii.edu}\\
 Joint Institute of Marine and Atmospheric Research\\
 University of Hawai'i at Manoa\\
 Honolulu, HI  96822 U.S.A.\\[0.125in]
-\date{\today}
 }
 
-\pagestyle{myheadings}
-\markright{\color{red}Sibert\hfil YFT Yield Per Recruit\hfil{\bf
-DRAFT}\hfil\today}
+\pagestyle{headings}
+\markboth{John Sibert\hfil Yellowfin Yield Per Recruit}
+{Yellowfin Yield Per Recruit\hfil John Sibert}
 
 \begin{document}
 
-%\begin{titlepage}
 \maketitle
-%\end{titlepage}
 
 \begin{abstract}
 Estimates of natural and fishing mortality from two different sources
@@ -66,8 +61,6 @@ recruit by 30\%. The results for Hawaii-based fisheries are more
 difficult to interpret. The available data suggest that increasing the
 size a first capture would decrease the yield to the fishery.
 \end{abstract}
-
-%\doublespacing
 
 \section*{Introduction}
 The yield per recruit (YPR) is based on the theory of exploited fish
@@ -195,17 +188,26 @@ larger fish, as is the suspected case in the MHI. By analogy, it is
 possible that increasing the age at first capture in Hawaii could increase
 the total yield to the fishery. 
 
-The effects of including hypothetical fishing mortality on smaller
-sized fish in region~2 is shown in Figure~\ref{fig:yprbogus}. Fishing
-mortality on smaller sized fish is simulated by adding a log-normal F
-at age component with a modal age class of 4 quarters to the estimated
+Fishing mortality on smaller sized fish in MFCL region 2 is simulated
+by adding a log-normal F at age component with a modal age class of 4
+quarters to the estimated
 F at age from MFCL. The simulated F at age is scaled so that the
 ratio of its peak to the maximum F at age estimated by MFCL is in
-proportion to the ratio of non-longline to longline landing in Hawaii.
+proportion to the ratio of non-longline to longline landing in Hawaii
+(dashed red line in.Figure~\ref{fig:yprbogus}A). 
 If this hypothetical situation were the case, increasing the total
 fishing effort by a factor of 5 would more than double the total
 yield, and increasing the weight at first capture would decrease the
-total yield.
+total yield, Figure~\ref{fig:yprbogus}B~abd~C. 
+The combined effects of increasing both the hypothetical fishing
+mortality and size at first capture
+in MFCL region 2 is shown in  Figure~\ref{fig:yprmultibogus}.
+Benefits of increasing size at first capture are not apparent at
+do not become obvious at increases of fishing mortality less than
+5-fold increases. If fishing mortality increases are restricted to
+smaller sizes, benefits of increasing size a first capture are
+undetectable at fishing mortality increases less than 10-fold.
+
 
 The high mortality estimates from the HTTP tag recaptures are
 troubling. To some extent high mortality estimates reflect the
@@ -225,17 +227,23 @@ Although the new estimates are difficult to compare directly to the
 previous HTTP estimates because they use different size
 classes, the new estimates are generally slightly higher or similar to
 the previous estimates. 
-%\help{It should be possible to do a better
-%comparison between old and new HTTP estimates.}
 The YPR analysis based on HTTP mortality estimates shows that
 increasing the lower size limit on yellowfin could have a deleterious
 effect on the fishery.
 
+These results show clearly that current fishing mortality on yellowfin
+tuna in Hawaii is low relative to natural mortality. As a result,
+increasing the age at first capture will cause harm to the fishery and
+is unlikely to benefit the stock.
 Yield per recruit analysis only provides information about the effects
 of management actions on the yield to the fishery. YPR does not
 provide insight into stock conditions and does not offer any guidance
 in establishing biomass-based reference points. Therefore stock conservation
-decisions should not be based solely on YPR analysis.
+decisions should not be based solely on YPR analysis. Rather, such
+decisions should be made on the basis of a biomass-based stock
+assessment model that incorporates the salient features of tuna
+population dynamics, namely rapid growth, high juvenile mortality,
+and stock mixing with adjacent areas.
 
 \section*{Conclusions}
 \begin{enumerate}
@@ -370,6 +378,9 @@ Sparre, P. and S. Venema. 1998. Introduction to tropical fish stock
 assessment. Part 1: Manual. Food and Agricultural Organization of the
 United Nations. Fisheries Technical Paper 306/1.
 \par}
+\vfill
+\today
+\clearpage
 
 %%%%%%%% figures begin here %%%%%%%%%%%%%%%%%%%%%%
 \begin{figure}
@@ -468,5 +479,21 @@ Figure~\ref{fig:r4ypr}.
 }
 \end{center}
 \end{figure}
+
+\begin{figure}
+\begin{center}
+\includegraphics[height=0.8\textheight]{./graphics/YPR_BOGUS_4_5.pdf}
+\caption{\label{fig:yprmultibogus}
+Panel A shows the effects of increasing weight at first capture at
+different multiples of current fishing mortality, red numbers over the
+peak of each curve.
+Panel B shows the effects of increasing weight at first capture at
+different multiples of current fishing mortality on only the smaller
+size classes (dashed red line in Figure~\ref{fig:yprbogus}A).
+}
+\end{center}
+\end{figure}
+
+
 
 \end{document}

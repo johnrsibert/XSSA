@@ -158,7 +158,7 @@ document the development and subsequent shift away from a specific
 gear type. It is assumed that these declines in catches represent a
 ``collapse'' of a fishery due more to social and economic factors than
 to a decline of stock.
-Some time series are punctuated by brief, on or two quarters in
+Some time series are punctuated by brief, one or two quarters in
 length, of zero catches. Again it is assumed that these zero catches
 are not caused by low stock levels.
 The ``Aku Boat'' fishery was a small pole and line fishery
@@ -178,7 +178,7 @@ deeper sets.
 Figure~\ref{fig:hdarTS} also displays the first order differences
 between successive quarters. This statistic emphasizes the seasonal
 periodicity of all fishing fleets and helps to identify potential anomalies in
-the data such as changes in reporting protocol. Some possible
+the data such as changes in reporting protocol. Potential
 anomalies can be seen in the late 1980s in the Tuna HL fleet, the
 early 1990s in the longline fleet, and the mid 1950s in the Aku Boat
 fleet. 
@@ -266,7 +266,7 @@ of the HDAR and NOAA deep plus shallow.
 
 \clearpage
 \section*{Models}
-The general modeling approach to be applied will be similar to the
+The general modeling approach is similar to the
 state-space model utilized by Nielsen and Berg (2014). 
 State-space models separate variability in the biological
 processes in the system (transition model)
@@ -276,7 +276,7 @@ The general form of the transition equation is
 \begin{equation}
 \alpha_t=T(\alpha_{t-1}) + \eta_t
 \end{equation}
-where the function $T$ embodies the stock dynamics, describing the
+where the function $T$ embodies the stock dynamics mediating the
 development of the state at time $t$ from the state at the previous
 time with random process error, $\eta$.
 Similarly the general observation equation is
@@ -292,9 +292,7 @@ Fishing effort is not observed and fishing mortality is
 modeled explicitly. The logarithm of fishing mortality is assumed to
 follow a random walk with normal increments, i.e.
 \begin{equation}
-\log F_{g,t} = \log F_{g,t-1} + \xi_{g,t},\qquad {\rm where}\;
-\xi_{t,g}\sim N(0,\sigma_g)
-\label{eqn:Fwalk}
+\log F_{g,t} = \log F_{g,t-1} + \xi_{g,t},\qquad \xi_{t,g}\sim N(0,\sigma_g) \label{eqn:Fwalk}
 \end{equation}
 where  $\sigma^2_g$ is the characteristic variance of the fishing
 effort random walk for fleet $g$.
@@ -341,9 +339,10 @@ leading to a set of simultaneous differential equation for the
 components of the population inhabiting region 1.
 \begin{eqnarray}
 \frac{d\None}{dt}&=&\None\Big[r\Big(1-\frac{\None}{K}\Big)
--F - T_{12}\Big] - \frac{r}{K}T_{12}\None\Ntwo\nonumber\\
+-F - T_{12}\Big] - r\frac{\None\Ntwo}{K}\nonumber\\
+\\
 \frac{d\Ntwo}{dt}&=&\Ntwo\Big[r\Big(1-\frac{\Ntwo}{K}\Big)
--F - T_{12}\Big] - \frac{r}{K}T_{12}\None\Ntwo + T_{21}
+-F - T_{12}\Big] - r\frac{\None\Ntwo}{K} + T_{21}\nonumber
 \label{eqn:coupledschaefer}
 \end{eqnarray}
 The non-linear term from equation~\ref{eqn:logistic} appears the term
@@ -360,19 +359,26 @@ MHI yellowfin is ill advised.
 
 The log transformed equivalent of equation~\ref{eqn:coupledschaefer} can be written as
 \begin{eqnarray}
-\frac{d\log(\None)}{dt}&=&r\Big(1-\frac{\None}{K}\Big) -F - T_{12} - \frac{r}{K}T_{12}\Ntwo\nonumber\\
-\frac{d\log(\Ntwo)}{dt}&=&r\Big(1-\frac{\Ntwo}{K}\Big) -F - T_{12} - \frac{r}{K}T_{12}\None + T_{21}/\Ntwo
+\frac{d\log(\None)}{dt}&=&r\Big(1-\frac{\None}{K}\Big) -F - T_{12} -
+r\frac{\Ntwo}{K}\nonumber\\
+\\
+\frac{d\log(\Ntwo)}{dt}&=&r\Big(1-\frac{\Ntwo}{K}\Big) -F - T_{12} -
+r\frac{\None}{K} + T_{21}/\Ntwo\nonumber
 \label{eqn:coupledlogschaefer}
 \end{eqnarray}
 
 Equations \ref{eqn:coupledlogschaefer} are solved by finite difference
 approximations using explicit time stepping.
 \begin{eqnarray}
-\log \None_t &=& \log \None_{t-\Delta t} +\Delta t\bigg(r\Big(1-\frac{\None_{t-\Delta t}}{K}\Big)
--F_{t-\Delta t} - T_{12} - \frac{r}{K}T_{12}\Ntwo_{t-\Delta t}\bigg)+\eta_{1,t}\nonumber\\
-\log \Ntwo_t &=& \log \Ntwo_{t-\Delta t} +\Delta t\bigg(r\Big(1-\frac{\Ntwo_{t-\Delta t}}{K}\Big)
--F_{t-\Delta t} - T_{12} - \frac{r}{K}T_{12}\None_{t-\Delta t}\nonumber\\
-     &+&T_{21}/\Ntwo_{t-\Delta t}\bigg)+\eta_{2,t}
+\log \None_t &=& \log \None_{t-\Delta t}\nonumber\\ 
+             &+&\Delta t\bigg(r\Big(1-\frac{\None_{t-\Delta t}}{K}\Big)
+-F_{t-\Delta t} - T_{12} - r\frac{\Ntwo_{t-\Delta
+t}}{K}\bigg)+\eta_{1,t}\nonumber\\
+\\
+\log \Ntwo_t &=& \log \Ntwo_{t-\Delta t}\nonumber\\
+             &+&\Delta t\bigg(r\Big(1-\frac{\Ntwo_{t-\Delta t}}{K}\Big)
+-F_{t-\Delta t} - T_{12} - r\frac{\None_{t-\Delta t}}{K}
+     +T_{21}/\Ntwo_{t-\Delta t}\bigg)+\eta_{2,t}\nonumber
 \label{eqn:finitecoupledlogschaefer}
 \end{eqnarray}
 Addition of process error terms $\eta_{1,t}$ and $\eta_{2,t}$ yields a form suitable

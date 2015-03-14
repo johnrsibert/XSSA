@@ -19,10 +19,10 @@ test.bvnorm=function(sx,sy,rho,n=100)
    return(p)
 }
 
-plot.logistic.xfer=function(r=0.5,K=1.0,F1=r/2,T12=0.0,T21=0.0,std=c(0.0,0.0,0.0),dt=0.5,ntime=100)
+plot.logistic.xfer=function(r=0.5,K=1.0,F1=r/2,T12=0.0,T21=0.0,std=c(0.0,0.0,0.0),q=0.1,dt=0.5,ntime=100)
 {
 
-   main = paste("F=",F1,", T12=",T12,", T21=",T21,", S=(",std[1],",",std[2],",",std[3],")",sep="")
+   main = paste("F=",F1,", T12=",T12,", T21=",T21,", S=(",std[1],",",std[2],",",std[3],")",", q=",q,sep="")
    ss = 1.0/dt
    sub = paste("r = ",r,", K= ",K,", dt = ",dt,", (ss = ",ss,")",sep="")
    print(main)
@@ -31,7 +31,7 @@ plot.logistic.xfer=function(r=0.5,K=1.0,F1=r/2,T12=0.0,T21=0.0,std=c(0.0,0.0,0.0
    Nmsy = K*(1-Fmsy/r)
    MSY = Fmsy*Nmsy
 
-   res = logistic.xfer(r,K,F1,T12,T21,std,dt,ntime)
+   res = logistic.xfer(r,K,F1,T12,T21,std,dt,q,ntime)
 
    xrange = range(res$T)
    yrange = c(0.0,max(res$NN,K))
@@ -49,7 +49,7 @@ plot.logistic.xfer=function(r=0.5,K=1.0,F1=r/2,T12=0.0,T21=0.0,std=c(0.0,0.0,0.0
    abline(h=MSY,lty="dotdash",col="red",lwd=lwdab)
    abline(h=0.9,lty="dotdash",col="green",lwd=lwdab)
 
-   file = paste("r",r,"F",F1,"T12",T12,"T21",T21,"S",std[1],std[2],std[3],sep="")
+   file = paste("r",r,"F",F1,"T12",T12,"T21",T21,"S",std[1],std[2],std[3],"q",q,sep="")
    print(file)
    file = gsub(".","",file,fixed=TRUE)
    print(file)
@@ -79,7 +79,7 @@ draw.examples=function()
    plot.logistic.xfer(T21=0.001,T12=0.01,dt=0.1,std=c(0.025,0.025,-0.5))->tmp
 }
 
-logistic.xfer=function(r,K,F1,T12,T21,cov,dt,ntime)
+logistic.xfer=function(r,K,F1,T12,T21,cov,dt,q,ntime)
 {
    N11=vector(length=ntime)
    N11[1] = K
@@ -111,9 +111,9 @@ logistic.xfer=function(r,K,F1,T12,T21,cov,dt,ntime)
          nextNN = prevNN + dt*r*prevNN*(1.0 - prevNN/K) - dt*prevNN*(F1+T12) + dt*T21
          prevNN = nextNN
 
-         nextN11 = prevN11 + dt*r*prevN11*(1.0 - prevN11/K) - dt*prevN11*(F1+T12) - r*dt*prevN11*prevN21/K
+         nextN11 = prevN11 + dt*r*prevN11*(1.0 - prevN11/K) - dt*prevN11*(F1+T12) - 2.0*(1.0-q)*r*dt*prevN11*prevN21/K
          prevN11 = nextN11
-         nextN21 = prevN21 + dt*r*prevN21*(1.0 - prevN21/K) - dt*prevN21*(F1+T12) - r*dt*prevN11*prevN21/K + dt*T21
+         nextN21 = prevN21 + dt*r*prevN21*(1.0 - prevN21/K) - dt*prevN21*(F1+T12) - 2.0*q*r*dt*prevN11*prevN21/K + dt*T21
          prevN21 = nextN21
 
       }
