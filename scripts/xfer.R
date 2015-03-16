@@ -44,6 +44,7 @@ plot.logistic.xfer=function(r=0.5,K=1.0,F1=r/2,T12=0.0,T21=0.0,std=c(0.0,0.0,0.0
    lines(res$T,res$N21,col="blue",lty="dotted",lwd=lwd)
    lines(res$T,(res$N11+res$N21),col="blue",lwd=lwd)
    lines(res$T,res$N11/(res$N11+res$N21),col="green",lwd=lwd)
+#  points(res$T,res$NN,col="white",pch='+')
    abline(h=K,lty="dotdash",lwd=lwdab)
    abline(h=Nmsy,lty="dotdash",lwd=lwdab)
    abline(h=MSY,lty="dotdash",col="red",lwd=lwdab)

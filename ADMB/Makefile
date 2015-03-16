@@ -29,13 +29,13 @@ BIN_DIR = ../run
 
 xssams: xssams.tpl
 	@echo ------- Translate $<
-	admb -r $(FLAGS) $<
+	admb  $(FLAGS) $<
 	@echo -------- move $@
 	mv -f $@ $(BIN_DIR)
 
 noKxssams: noKxssams.tpl
 	@echo ------- Translate $<
-	admb -r $(FLAGS) $<
+	admb  $(FLAGS) $<
 	@echo -------- move $@
 	mv -f $@ $(BIN_DIR)
 
