@@ -142,6 +142,7 @@ DATA_SECTION;
 
   init_number init_qProp;
   init_int phase_qProp;
+  !! TTRACE(init_qProp,phase_qProp)
 
   init_int use_robustF;
   init_vector init_pfat(1,ngear);
@@ -205,13 +206,15 @@ DATA_SECTION;
     ZeroCatch = 1.0; //1.0e-8;
     logZeroCatch = log(ZeroCatch);
     TTRACE(ZeroCatch,logZeroCatch)
-    //ZeroF = 1.0e-11;
-    //logZeroF = log(ZeroF);
-    //TTRACE(ZeroF,logZeroF)
-    //for (int g = 1; g <= ngear; g++)
-    //  for (int t = 1; t <= ntime; t++)
-    //     if (obs_catch(g,t) <= 0.0)
-    //        obs_catch(g,t) = ZeroCatch;
+    for (int g = 1; g <= ngear; g++)
+      for (int t = 2; t <= ntime; t++)
+         if ( (obs_catch(g,t) <= 0.0) && (obs_catch(g,t-1) > 0.0) )
+         {
+            obs_catch(g,t) = obs_catch(g,t-1);
+            clogf << "catch for gear " << g << " at time " << t
+                  << " set to catch for time " << (t-1) << endl;
+         }
+
     obs_catch = log(obs_catch+ZeroCatch);
 
     TRACE(forcing_dat_file)
@@ -234,8 +237,8 @@ DATA_SECTION;
     TRACE(fr);
     immigrant_biomass.allocate(1,ntime);
     mean_immigrant_biomass = mean(forcing_matrix(fr));
-    immigrant_biomass = forcing_matrix(fr);
-    //immigrant_biomass = mean_immigrant_biomass;
+    //immigrant_biomass = forcing_matrix(fr);
+    immigrant_biomass = mean_immigrant_biomass;
     TRACE(mean_immigrant_biomass)
     TRACE(immigrant_biomass)
 
@@ -275,8 +278,8 @@ PARAMETER_SECTION
   // robust F likelihood
   init_vector Lpfat(1,ngear,phase_pfat);
 
-  //random_effects_vector U(1,lengthU);
-  vector U(1,lengthU);
+  random_effects_vector U(1,lengthU);
+  //vector U(1,lengthU);
 
   objective_function_value nll;
 
@@ -292,8 +295,7 @@ PRELIMINARY_CALCS_SECTION
        TTRACE(logT12,logT21)
        logr = init_logr;
        TTRACE(logr,mfexp(logr))
-       //logK = init_logK;
-       logK = log(immigrant_biomass[1]);
+       logK = init_logK;
        TTRACE(logK,mfexp(logK))
 
        logsdlogF = init_logsdlogF;
@@ -502,8 +504,8 @@ PROCEDURE_SECTION
   //if (1) ad_exit(1);
 
 
-  //SEPARABLE_FUNCTION void step(const int t, const dvar_vector& f1, const dvar_vector& f2, const dvar_vector& lsdlogF, const dvariable& p11, const dvariable p12, const dvariable& p21, const dvariable p22, const dvar_vector& lsdlogPop, const dvariable& lr, const dvariable& lK, const dvariable& lT12, const dvariable& lT21, const dvariable& LmPropL, const dvariable& lsdLProportion_local, const dvar_vector& Lpf, const dvariable& qP)
-FUNCTION void step(const int t, const dvar_vector& f1, const dvar_vector& f2, const dvar_vector& lsdlogF, const dvariable& p11, const dvariable p12, const dvariable& p21, const dvariable p22, const dvar_vector& lsdlogPop, const dvariable& lr, const dvariable& lK, const dvariable& lT12, const dvariable& lT21, const dvariable& LmPropL, const dvariable& lsdLProportion_local, const dvar_vector& Lpf, const dvariable& qP)
+SEPARABLE_FUNCTION void step(const int t, const dvar_vector& f1, const dvar_vector& f2, const dvar_vector& lsdlogF, const dvariable& p11, const dvariable p12, const dvariable& p21, const dvariable p22, const dvar_vector& lsdlogPop, const dvariable& lr, const dvariable& lK, const dvariable& lT12, const dvariable& lT21, const dvariable& LmPropL, const dvariable& lsdLProportion_local, const dvar_vector& Lpf, const dvariable& qP)
+  //FUNCTION void step(const int t, const dvar_vector& f1, const dvar_vector& f2, const dvar_vector& lsdlogF, const dvariable& p11, const dvariable p12, const dvariable& p21, const dvariable p22, const dvar_vector& lsdlogPop, const dvariable& lr, const dvariable& lK, const dvariable& lT12, const dvariable& lT21, const dvariable& LmPropL, const dvariable& lsdLProportion_local, const dvar_vector& Lpf, const dvariable& qP)
   // p11 U(utPop1+t-1) log N1 at start of time step
   // p12 U(utPop1+t)   log N1 at end   of time step
   // p21 U(utPop2+t-1) log N2 at start of time step
@@ -668,8 +670,8 @@ FUNCTION void step(const int t, const dvar_vector& f1, const dvar_vector& f2, co
 
   
 
-  //SEPARABLE_FUNCTION void obs(const int t, const dvar_vector& f,const dvariable& pop11, const dvariable& pop21,  const dvariable& pop12, const dvariable& pop22, const dvar_vector& logsdlogYield)
-FUNCTION void obs(const int t, const dvar_vector& f,const dvariable& pop11, const dvariable& pop21,  const dvariable& pop12, const dvariable& pop22, const dvar_vector& logsdlogYield)
+SEPARABLE_FUNCTION void obs(const int t, const dvar_vector& f,const dvariable& pop11, const dvariable& pop21,  const dvariable& pop12, const dvariable& pop22, const dvar_vector& logsdlogYield)
+  //FUNCTION void obs(const int t, const dvar_vector& f,const dvariable& pop11, const dvariable& pop21,  const dvariable& pop12, const dvariable& pop22, const dvar_vector& logsdlogYield)
   // pop11 U(utPop1+t-1)
   // pop21 U(utPop1+t)
   // pop12 U(utPop2+t-1)

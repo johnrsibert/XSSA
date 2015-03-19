@@ -40,6 +40,7 @@ Yellowfin Tuna Population}}
 
 \title{Two-compartment models of Main Hawaiian Islands Yellowfin Tuna
 Population\\
+~\\
 Interim Report}
 
 \author{
@@ -51,7 +52,7 @@ Honolulu, HI  96822 U.S.A.\\[0.125in]
 }
 
 \pagestyle{myheadings}
-\markright{Sibert\hfil MHI Comparment Model\hfil{\bf DRAFT}\hfil\today}
+\markright{Sibert\hfil MHI Comparment Model\hfil{\bf INTERIM}\hfil\today}
 
 \begin{document}
 \maketitle
@@ -67,20 +68,21 @@ Recent tagging, tracking and
 studies show that the rate of exchange between the MHI population
 and the larger stock is low (Itano and Holland 2000). Analysis
 of YFT otoliths sampled from
-throughout the Pacific conclude that approximately 90\% of the MHI
+throughout the Pacific conclude that 90\% or more of the MHI
 population was reared in the MHI (Wells et al 2012).
 The Hawaii based longline along with various small-scale fisheries
 land a combined catch
-approximately 5000 mt of YFT annually (ref). Management of these
+approximately \help{???? mt} of YFT annually. Management of these
 fisheries is an important an important  local issue deserving of scientific support.
 
 This paper explores some potential models that might be used to
-analyze options for the management of fisheries for YFT in the MHI.
+inform development of options for the management of fisheries for YFT
+in the MHI.
 
 The principle assumptions for modeling the MHI YFT population are:
 \begin{enumerate}
 \item The Pacific Ocean near Hawaii is divided into two regions:
-MHI (region 1) and elsewhere (region 2); see Figure~\ref{fig:MHImap}.
+MHI (region 1) and elsewhere (region 2).%; see Figure~\ref{fig:MHImap}.
 \item Fish emigrate from region 1 to region 2, but emigrant fish have
 no effect on region 2 population dynamics. Region 2 is an ``infinite
 sink''.
@@ -91,29 +93,26 @@ interact with the fishing gear identically.
 \item Immigration into the MHI is dependent on the
 biomass of the yellowfin population outside of the MHI as estimated by
 some other model, e.g., \MFCL\ or \SD.
-\item The fishery comprises of several gear types, each with characteristic
+\item The fishery comprises several gear types, each with characteristic
 fishing mortality.
 \item The evolution of fishing mortality over time is a random walk
 where the current fishing mortality in the current time step is equal
-to the fishing mortality in the previous time step plus a random deviation
-(equation~\ref{eqn:Fwalk}).
+to the fishing mortality in the previous time step plus a random
+deviation.
 \end{enumerate}
 
 \section*{Data}
 Several sources of data used are used in this analysis:
 \begin{enumerate}
 \item  Yellowfin catch weights reported to the Hawaii Department of Aquatic
-Resources (HDAR) from 1949 to 2014 from the  Offshore Handline, Toll,
-Inshore Handline, Longline, and Aku Boat fleets.
+Resources (HDAR) from 1949 to 2014.
 \item Longline yellowfin catch weights reported to the National Oceanic and
 Atmospheric Administration, National Marine Fisheries Service (NOAA)
 under the federally mandated log book program from 1995 through 2013.
-\item Measurements of individual yellowfin weights fish sampled at the
+\item Measurements of average yellowfin fish weights sampled at the
 Honolulu auction by NMFS staff from 2000 through 2013.
-\item Model estimates of yellowfin biomass for MFCL regions 2 and 4
-provided by the Oceanic Fisheries Programme at the Secretariat of the
-Pacific Community (SPC) in Noumea, New Caledonia. These estimates span
-the period 1952 through 2012.
+\item Model estimates of yellowfin biomass by MULTIFAN-CL for regions
+2 and 4 from the most recent WCPFC stock assessment (Davies et al 2014).
 \end{enumerate}
 All data are reported by quarter of the year.
 
@@ -141,14 +140,15 @@ All data are reported by quarter of the year.
 
 
 The HDAR data comprise catch reports for the following gear
-categories"
-``Aku boat'',``Bottom/inshore HL'',``Longline'',
-``Troll'',``Tuna HL'',``Casting'',``Hybrid'',
-``Shortline'',``Other'',and ``Vertical line''.
-For this analysis catches by ``Casting'',``Hybrid'',
-``Shortline'',``Other'',and ``Vertical line'' are combined into a new
-category, ``Misc.''. The ``Misc'' catches are highest after year 2000,
-but represent a small proportion of the catch.
+categories:
+``Aku boat'', ``Bottom/inshore HL'', ``Longline'',  ``Troll'', ``Tuna
+HL'', ``Casting'', ``Hybrid'',  ``Shortline'', ``Other'', and
+``Vertical line''.
+For this analysis catches by ``Casting'', ``Hybrid'',
+``Shortline'', ``Other'', and ``Vertical line'' are combined into a new
+category, ``Misc.''. The ``Misc''
+catches are highest after year 2000,
+but comprise a very small proportion of the catch.
 The catch time series for the HDAR data are shown in
 Figure~\ref{fig:hdarTS}. These time
 series exhibit marked quarterly cycles suggesting a strong seasonal
@@ -163,8 +163,7 @@ length, of zero catches. Again it is assumed that these zero catches
 are not caused by low stock levels.
 The ``Aku Boat'' fishery was a small pole and line fishery
 targeting skipjack tuna in Hawaii, for which yellowfin was an
-incidental catch ceased operation because of
-problems marketing fresh skipjack.
+incidental catch. 
 
 The longline fishery has changed drastically over time. In the late
 1940s, it was a relatively small fishery using traditional
@@ -172,7 +171,7 @@ Okinwawan-style gear \help{(reference)}, usually labeled ``flag
 line''. Participation in this fishery generally declined from 1950 to
 late 1980s, as can be seen in the time series plots. In the 1990s, the longline
 fishery expanded rapidly with the introduction of US fishing boats
-from the Atlantic ocean with modern monofilament longline gear and
+from the Atlantic ocean using modern monofilament longline gear and
 deeper sets.
 
 Figure~\ref{fig:hdarTS} also displays the first order differences
@@ -185,9 +184,12 @@ fleet.
 
 The partial autocorrelations within each time
 series are shown in Figure~\ref{fig:catchPACF}. These correlations
-confirm the periodic nature of the catch time series which have
-significant positive correlations at lags of 1,3 and 4 quarters.
-
+confirm the quarterly periodicity  of the catch time series.
+The catch time series for Inshore HL,Longline, Troll, and Tuna HL show
+similar patters with
+significant positive autocorrelations at lags of 1,3 and 4 quarters.
+The autocorrelation pattern appears some what different for the Aku
+boat catch time series.
 
 NOAA began to collect data from the longline fleet under a federally
 mandated logbook program in 1990, and in 1995 the deep and shallow
@@ -266,8 +268,8 @@ of the HDAR and NOAA deep plus shallow.
 
 \clearpage
 \section*{Models}
-The general modeling approach is similar to the
-state-space model utilized by Nielsen and Berg (2014). 
+The general modeling approach is to develop a state-space model
+similar to the that utilized by Nielsen and Berg (2014).
 State-space models separate variability in the biological
 processes in the system (transition model)
 from errors in observing features of interest
@@ -279,46 +281,36 @@ The general form of the transition equation is
 where the function $T$ embodies the stock dynamics mediating the
 development of the state at time $t$ from the state at the previous
 time with random process error, $\eta$.
-Similarly the general observation equation is
+The general form of the observation equation is
 \begin{equation}
 x_t = O(\alpha_t) + \varepsilon_t
 \end{equation}
 where the function $O$ describes the measurement process and with
 error $\varepsilon$
-Separation if process from measurement offers statistical advantages in
-estimating model parameters.
 
-Fishing effort is not observed and fishing mortality is
-modeled explicitly. The logarithm of fishing mortality is assumed to
-follow a random walk with normal increments, i.e.
-\begin{equation}
-\log F_{g,t} = \log F_{g,t-1} + \xi_{g,t},\qquad \xi_{t,g}\sim N(0,\sigma_g) \label{eqn:Fwalk}
-\end{equation}
-where  $\sigma^2_g$ is the characteristic variance of the fishing
-effort random walk for fleet $g$.
+\subsection*{Age-aggregated model: logistic population dynamics}
 
-\subsection*{Age-aggregated model: logistic population dynamics (Schaefer Model)}
-
-Let $\None$ equal the population size of fish originating in region 1
+Let $\None$ equal the biomass of fish originating in region 1
 and residing in region 1
-and $\Ntwo$ equal the population size of fish originating in region 2
+and $\Ntwo$ equal the biomass of fish originating in region 2
 but residing in region 1.
-The total population size of fish residing in region 1 is thus
-$\Nsum$, and the dynamics of the population in region 1 is represented as
+The total biomass of fish residing in region 1 is thus
+$\Nsum$, and the dynamics of the population in region 1 is represented
+as a modified Schaefer Model:
 \begin{equation}
 \frac{d}{dt}\big(\Nsum\big)=\big(\Nsum\big)\Big[r\Big(1-\frac{\Nsum}{K}\Big)-F-T_{12}\Big]+T_{21}
 \label{eqn:logistic}
 \end{equation}
-where $r$ is the per capita logistic growth rate per year $K$ is the
-logistic ``carrying capacity'' measured in the same units as $\None$
-and $\Ntwo$, $F$ is the total fishing mortality in region 1, and $T_{12}$
-is the emigration rate from region 1 to region 2. $T_{21}$
-is the annual rate of immigration of fish from region 2 to region 1
-measured in the same units as $K$ per year.
+where $r$ is the per capita logistic growth rate per year, $K$ is the
+asymptotic biomass (``carrying capacity'') i
+$F$ is the total fishing mortality in region 1, $T_{12}$
+is the emigration rate from region 1 to region 2, and $T_{21}$
+is the annual rate of immigration of biomass from region 2 to region 1.
+
 
 Equivalent differential equations could be devised for the dynamics of
-fish residing in region 2 (i.e., $\frac{dN_{2,2}}{dt}$ and
-$\frac{dN_{1,2}}{dt}$) but 
+fish residing in region 2 
+(i.e., $\frac{d}{dt}\big(N_{2,2}+N_{1,2}\big)$). but 
 the dynamics of the fish population in region 2 is external to this
 model. $T_{21}$ can be considered to be form of population forcing
 from the larger stock in which the MHI population is embedded, perhaps
@@ -333,38 +325,52 @@ overwhelming of the
 local stock by a more numerous immigrant stock as is often characteristics of
 mixed-stock fisheries.
 
-The ratio $\frac{\None}{\Nsum}$ is of potential interest, so
-equation~\ref{eqn:logistic} needs to be expanded and rearranged
+The ratio $\frac{\None}{\Nsum}$ is of potential interest.
+Equation~\ref{eqn:logistic} can be expanded and rearranged to become
+\begin{eqnarray}
+\label{eqn:coupledschaefer}
+\frac{d}{dt}\big(\Nsum\big) &=&\None\Big[r\Big(1-\frac{\None}{K}\Big)
+-F - T_{12}\Big] \nonumber\\
+&+&\Ntwo\Big[r\Big(1-\frac{\Ntwo}{K}\Big)
+-F - T_{12}\Big]  + T_{21}\\
+&-& 2r\frac{\None\Ntwo}{K}\nonumber
+\end{eqnarray}
+The non-linear term, $2r\frac{\None\Ntwo}{K}$, in
+equation~\ref{eqn:coupledschaefer} represents the reduction in biomass
+of one population by the presence of the other population.
+In order to represent
+the two populations by two separate equations, this
+nonlinear term must be appropriately apportioned. Otherwise, one of
+the two populations will overwhelm the other.
+A new parameter, $q$, is introduced to accomplish the apportionment,
 leading to a set of simultaneous differential equation for the
 components of the population inhabiting region 1.
 \begin{eqnarray}
+\label{eqn:coupledschaeferq}
 \frac{d\None}{dt}&=&\None\Big[r\Big(1-\frac{\None}{K}\Big)
--F - T_{12}\Big] - r\frac{\None\Ntwo}{K}\nonumber\\
+-F - T_{12}\Big] - (1-q)2r\frac{\None\Ntwo}{K}\nonumber\\
 \\
 \frac{d\Ntwo}{dt}&=&\Ntwo\Big[r\Big(1-\frac{\Ntwo}{K}\Big)
--F - T_{12}\Big] - r\frac{\None\Ntwo}{K} + T_{21}\nonumber
-\label{eqn:coupledschaefer}
+-F - T_{12}\Big] - q2r\frac{\None\Ntwo}{K} + T_{21}\nonumber
 \end{eqnarray}
-The non-linear term from equation~\ref{eqn:logistic} appears the term
-$r\frac{\None\Ntwo}{K}$ in both of the above equations.
 
-The equilibrium of this system can be found by setting
-$\frac{d\None}{dt} = 0 = \frac{d\Ntwo}{dt}$. After some simplification
-the result is $\frac{T_{21}}{\Ntwo} = 0$. In other words, there is no
-equilibrium in this coupled system, other than the degenerate case of
-no immigration ($T_{21}=0$) into the region 1. Thus, the notion of using
-equilibrium-based reference points such as MSY to manage fisheries for
-MHI yellowfin is ill advised.
+%The equilibrium of this system can be found by setting
+%$\frac{d\None}{dt} = 0 = \frac{d\Ntwo}{dt}$. After some simplification
+%the result is $\frac{T_{21}}{\Ntwo} = 0$. In other words, there is no
+%equilibrium in this coupled system, other than the degenerate case of
+%no immigration ($T_{21}=0$) into the region 1. Thus, the notion of using
+%equilibrium-based reference points such as MSY to manage fisheries for
+%MHI yellowfin is ill advised.
 
-
-The log transformed equivalent of equation~\ref{eqn:coupledschaefer} can be written as
+The log transformed equivalent of equation~\ref{eqn:coupledschaeferq}
+is
 \begin{eqnarray}
+\label{eqn:coupledlogschaefer}
 \frac{d\log(\None)}{dt}&=&r\Big(1-\frac{\None}{K}\Big) -F - T_{12} -
-r\frac{\Ntwo}{K}\nonumber\\
+(1-q)2r\frac{\Ntwo}{K}\nonumber\\
 \\
 \frac{d\log(\Ntwo)}{dt}&=&r\Big(1-\frac{\Ntwo}{K}\Big) -F - T_{12} -
-r\frac{\None}{K} + T_{21}/\Ntwo\nonumber
-\label{eqn:coupledlogschaefer}
+q2r\frac{\None}{K} + \frac{T_{21}}{\Ntwo}\nonumber
 \end{eqnarray}
 
 Equations \ref{eqn:coupledlogschaefer} are solved by finite difference
@@ -372,28 +378,55 @@ approximations using explicit time stepping.
 \begin{eqnarray}
 \log \None_t &=& \log \None_{t-\Delta t}\nonumber\\ 
              &+&\Delta t\bigg(r\Big(1-\frac{\None_{t-\Delta t}}{K}\Big)
--F_{t-\Delta t} - T_{12} - r\frac{\Ntwo_{t-\Delta
+-F_{t-\Delta t} - T_{12} - (1-q)2r\frac{\Ntwo_{t-\Delta
 t}}{K}\bigg)+\eta_{1,t}\nonumber\\
 \\
 \log \Ntwo_t &=& \log \Ntwo_{t-\Delta t}\nonumber\\
              &+&\Delta t\bigg(r\Big(1-\frac{\Ntwo_{t-\Delta t}}{K}\Big)
--F_{t-\Delta t} - T_{12} - r\frac{\None_{t-\Delta t}}{K}
-     +T_{21}/\Ntwo_{t-\Delta t}\bigg)+\eta_{2,t}\nonumber
+-F_{t-\Delta t} - T_{12} - q2r\frac{\None_{t-\Delta t}}{K}
+     +\frac{T_{21}}{\Ntwo_{t-\Delta t}}\bigg)+\eta_{2,t}\nonumber
 \label{eqn:finitecoupledlogschaefer}
 \end{eqnarray}
 Addition of process error terms $\eta_{1,t}$ and $\eta_{2,t}$ yields a form suitable
 for use as the transition equation in a state-space model.
 
-The predicted catch in region 1 is the product of fishing mortality
+Fishing effort is not observed, and fishing mortality is
+modeled explicitly as a random walk
+without recourse to effort standardization or
+estimation of catchability. The logarithm of fishing
+mortality is assumed to
+follow a random walk with normal increments, i.e.
+\begin{equation}
+\log F_{g,t} = \log F_{g,t-1} + \xi_{g,t};\qquad \xi_{t,g}\sim N(0,\sigma_g) \label{eqn:Fwalk}
+\end{equation}
+where  $\sigma^2_g$ is the characteristic variance of the fishing
+effort random walk for fleet $g$.
+
+Predicted catch in region 1 is the product of fishing mortality
 and the total population in region, $\None+\Ntwo$.
 Thus the observation model predicting catch in the region 1
 under this model is
 \begin{equation}
-C_{g,t} = F_{g,t}\cdot(\None_{t-\Delta t}+\None_t+\Ntwo_{t-\Delta t}+\Ntwo_t)/2
+C_{g,t} = F_{g,t}\cdot\Bigl(\frac{\None_{t-\Delta t}+\None_t}{2}
+                           +\frac{\Ntwo_{t-\Delta t}+\Ntwo_t}{2}\Bigr)
 \label{eqn:catcheqn}
 \end{equation}
 where the total population in region 1 is the sum of the average
 population over the time step (Quinn and Deriso, 1999).
+
+Parameterization of $T_{21}$
+
+Parameterization of K
+
+Observation equation
+
+Likelihood
+
+\subsection*{Age-structured models}
+
+\section*{Results \& Discussion}
+
+\section*{Next steps}
 
 \vspace{4ex}
 \noindent {\bf Acknowledgements.}
@@ -418,11 +451,11 @@ Davies for sharing R scripts and advice to decode the MFCL output files.
 {\parindent=0cm \small
 \everypar={\hangindent=2em \hangafter=1}\par
 \doublespacing
-Adam, M. S., J. Sibert, D. Itano and K. Holland. 2003. Dynamics of
-bigeye (Thunnus obesus) and yellowfin tuna (T. albacares) in Hawaii's
-pelagic fishery: analysis of tagging data with a bulk transfer model
-incorporating size specific attrition. Fishery Bulletin 101(2):
-215-228.
+%Adam, M. S., J. Sibert, D. Itano and K. Holland. 2003. Dynamics of
+%bigeye (Thunnus obesus) and yellowfin tuna (T. albacares) in Hawaii's
+%pelagic fishery: analysis of tagging data with a bulk transfer model
+%incorporating size specific attrition. Fishery Bulletin 101(2):
+%215-228.
 
 Davies, N., S. Harley, J. Hampton, S. McKechnie. 2014. Stock
 assessment of yellowfin tuna in the western and central pacific ocean.

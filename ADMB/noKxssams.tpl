@@ -15,7 +15,7 @@ GLOBALS_SECTION;
   const double LOG_TWO_M_PI = log(TWO_M_PI);
   const double LOG_M_PI = log(M_PI);
 
-  // ./xssams -noinit -nr 2 -est -l2 10000000  -l3 10000000
+  // ./noKxssams -noinit -nr 2 -est -l2 10000000  -l3 10000000
   int fexists(const adstring& filename)
   {
     std::ifstream ifile(filename);
@@ -279,8 +279,8 @@ PARAMETER_SECTION
   // robust F likelihood
   init_vector Lpfat(1,ngear,phase_pfat);
 
-  //random_effects_vector U(1,lengthU);
-  vector U(1,lengthU);
+  random_effects_vector U(1,lengthU);
+  //vector U(1,lengthU);
 
   objective_function_value nll;
 
@@ -300,6 +300,7 @@ PRELIMINARY_CALCS_SECTION
        logsdlogF = init_logsdlogF;
        logsdlogYield = init_logsdlogYield;
        logsdlogPop = init_logsdlogPop;
+       logsdlogK = init_logsdlogK;
 
 
        LmeanProportion_local = init_LmeanProportion_local;
@@ -518,8 +519,8 @@ PROCEDURE_SECTION
   //if (1) ad_exit(1);
 
 
-  //SEPARABLE_FUNCTION void step(const int t, const dvar_vector& f1, const dvar_vector& f2, const dvariable& lsdlogF, const dvariable& p11, const dvariable p12, const dvariable& p21, const dvariable p22, const dvariable& lsdlogPop, const dvariable& logK1, const dvariable& logK2, const dvariable& lsdlogK, const dvariable& lr, const dvariable& lT12, const dvariable& lT21, const dvariable& LmPropL, const dvariable& lsdLProportion_local, const dvar_vector& Lpf)
-FUNCTION void step(const int t, const dvar_vector& f1, const dvar_vector& f2, const dvar_vector& lsdlogF, const dvariable& p11, const dvariable p12, const dvariable& p21, const dvariable p22, const dvar_vector& lsdlogPop, const dvariable& logK1, const dvariable& logK2, const dvariable& lsdlogK, const dvariable& lr, const dvariable& lT12, const dvariable& lT21, const dvariable& LmPropL, const dvariable& lsdLProportion_local, const dvar_vector& Lpf, const dvariable& qP)
+SEPARABLE_FUNCTION void step(const int t, const dvar_vector& f1, const dvar_vector& f2, const dvar_vector& lsdlogF, const dvariable& p11, const dvariable p12, const dvariable& p21, const dvariable p22, const dvar_vector& lsdlogPop, const dvariable& logK1, const dvariable& logK2, const dvariable& lsdlogK, const dvariable& lr, const dvariable& lT12, const dvariable& lT21, const dvariable& LmPropL, const dvariable& lsdLProportion_local, const dvar_vector& Lpf, const dvariable& qP)
+  //FUNCTION void step(const int t, const dvar_vector& f1, const dvar_vector& f2, const dvar_vector& lsdlogF, const dvariable& p11, const dvariable p12, const dvariable& p21, const dvariable p22, const dvar_vector& lsdlogPop, const dvariable& logK1, const dvariable& logK2, const dvariable& lsdlogK, const dvariable& lr, const dvariable& lT12, const dvariable& lT21, const dvariable& LmPropL, const dvariable& lsdLProportion_local, const dvar_vector& Lpf, const dvariable& qP)
   // p11 U(utPop1+t-1) log N1 at start of time step
   // p12 U(utPop1+t)   log N1 at end   of time step
   // p21 U(utPop2+t-1) log N2 at start of time step
@@ -690,8 +691,8 @@ FUNCTION void step(const int t, const dvar_vector& f1, const dvar_vector& f2, co
 
   
 
-//SEPARABLE_FUNCTION void obs(const int t, const dvar_vector& f,const dvariable& pop11, const dvariable& pop21,  const dvariable& pop12, const dvariable& pop22, const dvariable& logsdlogYield)
-FUNCTION void obs(const int t, const dvar_vector& f,const dvariable& pop11, const dvariable& pop21,  const dvariable& pop12, const dvariable& pop22, const dvar_vector& logsdlogYield)
+SEPARABLE_FUNCTION void obs(const int t, const dvar_vector& f,const dvariable& pop11, const dvariable& pop21,  const dvariable& pop12, const dvariable& pop22, const dvar_vector& logsdlogYield)
+  //FUNCTION void obs(const int t, const dvar_vector& f,const dvariable& pop11, const dvariable& pop21,  const dvariable& pop12, const dvariable& pop22, const dvar_vector& logsdlogYield)
   // pop11 U(utPop1+t-1)
   // pop21 U(utPop1+t)
   // pop12 U(utPop2+t-1)

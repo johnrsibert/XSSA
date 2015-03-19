@@ -49,7 +49,7 @@ plot.diagnostics=function(dat=NULL,file="diagnostics.dat",ngear,devices)
    nice.ts.plot(dat$t,dat$pop2,lwd=lwd)
    title(main="Population 2",line=title.line)
 
-   nice.ts.plot(dat$t,dat$K,bcol="black",fcol="lightgray",lwd=lwd-2)
+   nice.ts.plot(dat$t,dat$K,bcol="black",fcol="lightgray",lwd=lwd)
    double.lines(dat$t,(dat$pop1+dat$pop2),bcol="blue",fcol="lightblue",lwd=lwd)
    par("new"=TRUE)
    plot(dat$t,dat$propL,type='l',ann=FALSE,axes=FALSE,
