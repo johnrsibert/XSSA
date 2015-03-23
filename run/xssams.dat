@@ -16,10 +16,11 @@ total_biomass.dat
 # logT12:
 -4  1
 # logT21:
--9.4  1
+-4  1
+#-9.4  1
 # logr:
-  -2.3026 2
-# -4.6052 2
+# -2.3026 1
+  -4.6052 1
 # logK
  11.8831 -1
 # logsdlogF:
@@ -32,7 +33,7 @@ total_biomass.dat
 # LmeanProportion_local:
  2.2  -1
 # logsdLProportion_local:
- 1    1
+ 1   -1
 # qProp
  0.54 3
 # robust F random walk

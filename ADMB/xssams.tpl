@@ -206,14 +206,23 @@ DATA_SECTION;
     ZeroCatch = 1.0; //1.0e-8;
     logZeroCatch = log(ZeroCatch);
     TTRACE(ZeroCatch,logZeroCatch)
-    for (int g = 1; g <= ngear; g++)
-      for (int t = 2; t <= ntime; t++)
-         if ( (obs_catch(g,t) <= 0.0) && (obs_catch(g,t-1) > 0.0) )
-         {
-            obs_catch(g,t) = obs_catch(g,t-1);
-            clogf << "catch for gear " << g << " at time " << t
-                  << " set to catch for time " << (t-1) << endl;
-         }
+    int nzero = ntime;
+    int ziter = 0;
+    while (nzero > 0)
+    {
+       ziter ++;
+       nzero = 0;
+       for (int g = 1; g <= ngear; g++)
+         for (int t = 2; t <= ntime; t++)
+            if ( (obs_catch(g,t) <= 0.0) 
+              && (obs_catch(g,t-1) > 0.0) && (obs_catch(g,t+1) > 0.0) )
+            {
+               clogf << ++nzero << " " << ziter << endl;
+               obs_catch(g,t) = 0.5*(obs_catch(g,t-1) + obs_catch(g,t+1));
+               clogf << nzero<< " catch for gear " << g << " at time " << t
+                  << " set to " << obs_catch(g,t)  << endl;
+            }
+    }
 
     obs_catch = log(obs_catch+ZeroCatch);
 
@@ -237,8 +246,8 @@ DATA_SECTION;
     TRACE(fr);
     immigrant_biomass.allocate(1,ntime);
     mean_immigrant_biomass = mean(forcing_matrix(fr));
-    //immigrant_biomass = forcing_matrix(fr);
-    immigrant_biomass = mean_immigrant_biomass;
+    immigrant_biomass = forcing_matrix(fr);
+    //immigrant_biomass = mean_immigrant_biomass;
     TRACE(mean_immigrant_biomass)
     TRACE(immigrant_biomass)
 
@@ -325,8 +334,8 @@ PRELIMINARY_CALCS_SECTION
        TRACE(init_pfat)
        TRACE(Lpfat)
 
-       //double K = mfexp(value(logK));
-       double K = immigrant_biomass[1];
+       double K = mfexp(value(logK));
+       //double K = immigrant_biomass[1];
        double Pop1 = prop*K;
        double Pop2 = K-Pop1;
        TTRACE(Pop1,Pop2)
@@ -352,13 +361,13 @@ PRELIMINARY_CALCS_SECTION
        for (int t = 1; t <= ntime; t++)
        {   
           //logPop(t,1) = log(Pop1)+0.5*logPop1Err(t,1);
-          U(++ut) = log(Pop1)+0.5*logPop1Err(t,1);
+          U(++ut) = log(Pop1);//+0.5*logPop1Err(t,1);
        }
        TTRACE(ut,utPop2)
        for (int t = 1; t <= ntime; t++)
        {   
           //logPop(t,2) = log(Pop2)+0.5*logPop2Err(t,2);
-          U(++ut) = log(Pop2)+0.5*logPop2Err(t,2);
+          U(++ut) = log(Pop2);//+0.5*logPop2Err(t,2);
        }
        TRACE(ut)
        adstring pinname(adstring(argv[0])+".p00");
