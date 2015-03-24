@@ -357,6 +357,7 @@ components of the population inhabiting region 1.
 \frac{d\Ntwo}{dt}&=&\Ntwo\Big[r\Big(1-\frac{\Ntwo}{K}\Big)
 -F - T_{12}\Big] - q2r\frac{\None\Ntwo}{K} + T_{21}\nonumber
 \end{eqnarray}
+\help{Does this system have any meaningful equilibrium?}
 
 %The equilibrium of this system can be found by setting
 %$\frac{d\None}{dt} = 0 = \frac{d\Ntwo}{dt}$. After some simplification
@@ -377,7 +378,7 @@ is
 q2r\frac{\None}{K} + \frac{T_{21}}{\Ntwo}\nonumber
 \end{eqnarray}
 
-{\bf Transition Equation.}
+{\bf Transition Equation $T(\alpha_{t-1})$.}
 The state space transition equation for the two components of the MHI
 population is developed by solving
 equations \ref{eqn:coupledlogschaefer} with a finite difference
@@ -410,14 +411,14 @@ mortality is assumed to
 follow a random walk with normal increments, i.e.
 \begin{equation}
 \log F_{g,t} = \log F_{g,t-1} + \xi_{g,t};\qquad \xi_{t,g}\sim
-N(0,\sigma^2_g) \label{eqn:Fwalk}
+N(0,\sigma^2_{\xi,g}) \label{eqn:Fwalk}
 \end{equation}
 where  $\sigma^2_{\xi,g}$ is the characteristic variance of the fishing
 effort random walk for fleet $g$.
 
 %Parameterization of $T_{21}$
-{\bf Population Forcing.}
-Immigration of stock from region 2 to region 1 can be regarded as a
+{\bf Population Forcing $T_{21}$.}
+Immigration of stock from region 2 to region 1 is a
 form of ``forcing'' whereby events outside of the model influence the
 model dynamics. The term $T_{21}$ is the amount of biomass immigrating
 into the MHI stock at each time step. For the model under development
@@ -446,7 +447,19 @@ parameterizations of $K$ can be envisaged, for example, constant tat
 the maximum of $B_{2,t}$, an unknown parameter, or even a random walk.
 For testing purposes I have assumed the maximum of $B_{2,t}$.
 
-{\bf Observation Equation, $O(x)$.}
+Given that the model forcing $B_{r,t}$ is not constant and that the
+fishery is developing in a period of profound change in the oceans,
+it is difficult to justify the assumption of constant $K$. An
+alternative parameterization for $K$ is to assume a random walk, for
+example,
+\begin{equation}
+\log K_t = \log K_{t-1} + \omega_t;\qquad \omega_t\sim
+N(0,\sigma^2_\omega) \label{eqn:Kwalk}
+\end{equation}
+where  $\sigma^2_\omega$ is the characteristic variance of the
+assymptoc population size random walk.
+
+{\bf Observation Equation, $O(\alpha)$.}
 Predicted catch in region 1 is the product of fishing mortality
 and the total population in region, $\None+\Ntwo$.
 Thus the state-space observation model predicting catch in the region 1
@@ -461,9 +474,35 @@ where the total population in region 1 is the sum of the average
 population over the time step (Quinn and Deriso, 1999), and
 $\varepsilon_{t,g} \sim N(0,\sigma^2_{\varepsilon,g})$.
 
-{\bf Constraint on ``Proportion Local''}
+{\bf Constraint on ``Proportion Local''.}
+Proportion local is defined as $p = \frac{\None}{\Nsum}$. The logit
+transformed proportion local, $L(p)$, is assumed to be normally
+distributed around a mean value, $\bar{p}$.
+\begin{equation}
+\label{eqn:LpropL}
+L(p)\sim N(L(\bar{p}),\sigma^2_{L(p)}).
+\end{equation} 
+$p$ is generally assumed to be approximately $0.9$. By varying the
+value of the variance, $\sigma^2_{L(p)}$, $p$, can be made as
+close to $0.9$ as is prudent. In principle, it may be possible to
+estimate $\bar{p}$ and $\sigma^2_{L(p)}$, but interaction with
+the parameter $q$ in equation~\ref{eqn:coupledschaeferq} needs to be
+explored.
 
-{\bf Estimation}
+{\bf Estimation.} The model states, $\alpha_t$, are assumed to be random
+effects (Skaug and Fournier, 2006). Model parameters are estimated by
+maximum likelihood by defining the joint likelihood of the random
+effects and the observations.
+\begin{equation}
+L(\theta,\alpha,x)=
+\prod^m_{t=2}\big[\phi\big(\alpha_t-T(\alpha_{t-1}), \Sigma_\eta\big)\big]
+\prod^m_{t=1}\big[\phi\big(x_t-O(\alpha_t), \Sigma_\varepsilon\big)\big]
+\end{equation}
+Here, $m$ is the number of time steps in the catch time series and
+$\phi$ is a vector of model parameters. A complete list of
+parameters is found int Table~\ref{tab:allparam}. The actual number of
+parameters to be estimated depends on the model configuration. The
+model is implemented in AD Model Builder (Fournier et al 2012).
 
 \subsection*{Age-structured models}
 
@@ -478,6 +517,8 @@ Managment Council. I thank the Council for its generous support and
 Council Staff Paul Dalzell and Eric Kingma for encouraging me to
 actually take on this challenging project and for their on-going
 collaboration.
+Martha Maciasz, student intern at the Council, assisted with
+processing weight frequency data.
 Thanks to Mr. Reginald Kokubun of the Hawaii Division of Aquatic
 Resources for supplying catch report data from the HDAR commercial
 fisheries data base.
@@ -504,6 +545,12 @@ Davies, N., S. Harley, J. Hampton, S. McKechnie. 2014. Stock
 assessment of yellowfin tuna in the western and central pacific ocean.
 WCPFC-SC10-2014/SA-WP-04.
 
+Fournier, D.A., Skaug, H.J., Ancheta, J., Sibert, J., Ianelli, J.,
+Magnusson, A., Maunder,M.N., Nielsen, A., 2012. AD Model Builder:
+using automatic differentiation for forstatistical inference of highly
+parameterized complex nonlinear models. Opti-mization Methods and
+Software 27, 233–249.
+
 Itano, D., K. Holland. 2000.  Movement and vulnerability of bigeye
 (Thunnus obesus) and yellowfin tuna (Thunnus albacares) in relation to
 FADs and natural aggregation points.Aquat. Living Resour. 13: 213-223.
@@ -512,11 +559,15 @@ Kleiber, P., J. Hampton, N. Davies, S. Hoyle, D. Fournier. 2014.
 MULTIFAN-CL User’s Guide
 
 Nielsen, A. and C. Berg. 2014. Estimation of time-varying selectivity
-in stock assessments usingstate-space models. Fisheries Research
+in stock assessments using state-space models. Fisheries Research
 158:96-101.
 
 Quinn, T and R. Deriso. 1999. Quantitative fish dynamics. Oxford
 University Press, New York.
+
+Skaug, H., Fournier, D., 2006. Automatic approximation of the marginal
+likelihood in non-Gaussian hierarchical models. Computational
+Statistics \& Data Analysis 51, 699–709.
 
 Wells, D., J. Rooker, D. Itano. 2012.  Nursery origin of yellowfin
 tuna in the Hawaiian Islands. Mar. Ecol. Prog. Ser. 461:187-196. 
