@@ -208,7 +208,7 @@ have not yet been included in this analysis.}
 
 \begin{figure}
 \begin{center}
-\includegraphics[height=0.9\textheight]{./graphics/hdar_catch_history.png}
+\includegraphics[height=0.8\textheight]{./graphics/hdar_catch_history.pdf}
 \caption{\label{fig:hdarTS}
 Yellowfin catch in metric tonnes by principle fisheries operating in
 the Main Hawaiian Islands from the HDAR data.
@@ -222,7 +222,7 @@ were zero.
 
 \begin{figure}
 \begin{center}
-\includegraphics[height=0.9\textheight]{./graphics/partial_acf.png}
+\includegraphics[height=0.8\textheight]{./graphics/partial_acf.pdf}
 \caption{\label{fig:catchPACF}
 Partial autocorrelation coefficients of the catch time series. The
 dashed blue lines indicate approximate 95\% confidence limits of the
@@ -232,7 +232,7 @@ correlations.}
 
 \begin{figure}
 \begin{center}
-\includegraphics[height=0.9\textheight]{./graphics/hdar_noaa_LL_ts.png}
+\includegraphics[height=0.8\textheight]{./graphics/hdar_noaa_LL_ts.pdf}
 \caption{\label{fig:hdarnoaaLLTS}
 Comparison between HDAR and NOAA longline time series. The upper panel
 shows the NOAA deep and shallow set data superimposed on the HDAR
@@ -244,7 +244,7 @@ catches.}
 
 \begin{figure}
 \begin{center}
-\includegraphics[height=0.9\textheight]{./graphics/LL_partial_acf.png}
+\includegraphics[height=0.8\textheight]{./graphics/LL_partial_acf.pdf}
 \caption{\label{fig:LLpartialacf}
 Partial autocorrelations within the NOAA and combined time
 series. F refers to the HDAR longline data, D refers to the NOAA deep
@@ -257,7 +257,7 @@ of the HDAR and NOAA deep plus shallow.
 
 %\begin{figure}
 %\begin{center}
-%\includegraphics[height=0.9\textheight]{./graphics/ccf.png}
+%\includegraphics[height=0.8\textheight]{./graphics/ccf.pdf}
 %\caption{\label{fig:catchCCF}
 %Cross correlation coefficients between pairs of the first order
 %differences of each catch time series at different lags.
@@ -298,7 +298,7 @@ Let $\None$ equal the biomass of fish originating in region 1
 and residing in region 1
 and $\Ntwo$ equal the biomass of fish originating in region 2
 but residing in region 1.
-The total biomass of fish residing in region 1 is thus
+The total biomass of fish residing in region 1 is
 $\Nsum$, and the dynamics of the population in region 1 is represented
 as a modified Schaefer Model:
 \begin{equation}
@@ -306,30 +306,32 @@ as a modified Schaefer Model:
 \label{eqn:logistic}
 \end{equation}
 where $r$ is the per capita logistic growth rate per year, $K$ is the
-asymptotic biomass (``carrying capacity'') i
+asymptotic biomass,
 $F$ is the total fishing mortality in region 1, $T_{12}$
 is the emigration rate from region 1 to region 2, and $T_{21}$
 is the annual rate of immigration of biomass from region 2 to region 1.
 
 
-Equivalent differential equations could be devised for the dynamics of
+An equivalent differential equation could be devised for the dynamics of
 fish residing in region 2 
-(i.e., $\frac{d}{dt}\big(N_{2,2}+N_{1,2}\big)$). but 
+(i.e., $\frac{d}{dt}\big(N_{2,2}+N_{1,2}\big)$), but 
 the dynamics of the fish population in region 2 is external to this
-model. $T_{21}$ can be considered to be form of population forcing
-from the larger stock in which the MHI population is embedded, perhaps
-estimated from other models, such as \MFCL\ or \SD, or perhaps
-represented by an
-autocorrelated stochastic process. The appearance of
+model. $T_{21}$ can be considered to be form of population ``forcing''
+by the larger stock in which the MHI population is embedded. $T_{21}$
+could a prediction from other models, such as \MFCL\ or \SD, in a sort of
+``off-line'' coupling, or perhaps represented by an
+autocorrelated stochastic process. 
+
+The appearance of
 $\Nsum$ in the numerator of the logistic term reflects the assumption
-that the population dynamics fish immigrating into region 1 depend on
+that the population dynamics immigrant fish depends on
 the population dynamics in region 1. This assumption leads to an
-important non-linearity in the model that allows the possibility of
+important non-linearity in the model that predicts the possibility of
 overwhelming of the
-local stock by a more numerous immigrant stock as is often characteristics of
+local stock by a more numerous immigrant stock as is often characteristic of
 mixed-stock fisheries.
 
-The ratio $\frac{\None}{\Nsum}$ is of potential interest.
+The proportion of ``local'' fish $\frac{\None}{\Nsum}$ is of potential interest.
 Equation~\ref{eqn:logistic} can be expanded and rearranged to become
 \begin{eqnarray}
 \label{eqn:coupledschaefer}
@@ -343,11 +345,10 @@ The non-linear term, $2r\frac{\None\Ntwo}{K}$, in
 equation~\ref{eqn:coupledschaefer} represents the reduction in biomass
 of one population by the presence of the other population.
 In order to represent
-the two populations by two separate equations, this
-nonlinear term must be appropriately apportioned. Otherwise, one of
-the two populations will overwhelm the other.
+the two populations by separate equations, this
+nonlinear term must be appropriately apportioned.
 A new parameter, $q$, is introduced to accomplish the apportionment,
-leading to a set of simultaneous differential equation for the
+leading to a set of simultaneous non-linear differential equation for the
 components of the population inhabiting region 1.
 \begin{eqnarray}
 \label{eqn:coupledschaeferq}
@@ -381,8 +382,8 @@ q2r\frac{\None}{K} + \frac{T_{21}}{\Ntwo}\nonumber
 {\bf Transition Equation $T(\alpha_{t-1})$.}
 The state space transition equation for the two components of the MHI
 population is developed by solving
-equations \ref{eqn:coupledlogschaefer} with a finite difference
-approximation using explicit time stepping and adding process error
+equations \ref{eqn:coupledlogschaefer} by finite differences
+approximation with explicit time stepping and adding process error
 terms.
 \begin{eqnarray}
 \log \None_t &=& \log \None_{t-\Delta t}\nonumber\\ 
@@ -403,32 +404,33 @@ expresses individual process errors for both population as well as a
 correlation between the errors.
 
 {\bf Fishing Mortality.}
-Fishing effort is not observed, and fishing mortality is
+Fishing mortality is
 modeled explicitly as a random walk
-without recourse to effort standardization or
-estimation of catchability. The logarithm of fishing
+without recourse to effort standardization and
+estimation of catchability coefficients. The logarithm of fishing
 mortality is assumed to
 follow a random walk with normal increments, i.e.
 \begin{equation}
 \log F_{g,t} = \log F_{g,t-1} + \xi_{g,t};\qquad \xi_{t,g}\sim
 N(0,\sigma^2_{\xi,g}) \label{eqn:Fwalk}
 \end{equation}
-where  $\sigma^2_{\xi,g}$ is the characteristic variance of the fishing
+where  $\sigma^2_{\xi,g}$ is the variance of the fishing
 effort random walk for fleet $g$.
+\help{Distribution of increments?}
 
 %Parameterization of $T_{21}$
 {\bf Population Forcing $T_{21}$.}
 Immigration of stock from region 2 to region 1 is a
-form of ``forcing'' whereby events outside of the model influence the
-model dynamics. The term $T_{21}$ is the amount of biomass immigrating
+form of forcing whereby events outside of the model influence the
+model dynamics. The term $T_{{21}_t}$ is the biomass immigrating
 into the MHI stock at each time step. For the model under development
 I assume that source of immigrants is MFCL region 2, so that
 \begin{equation}
-T_{21} = T^*_{21}\cdot B_{2,t}
+T_{{21}_t} = T^*_{21}\cdot B_{2,t}
 \end{equation}
-where $B_{2,t}$ is biomass in region 2 taken from the MFCL output file
-{\tt plot-12.par.rep} from the WCPFC 2014 stock assessment
-(Davies et al 2014) at time $t$. $T^*_{21}$ is the proportion on
+where $B_{2,t}$ is biomass in region 2 at time $t$ taken from the MFCL output file
+{\tt plot-12.par.rep} from the 2014 WCPFC stock assessment
+(Davies et al 2014). $T^*_{21}$ is the proportion on
 $B_{2,t}$ which migrates at each time step.
 Alternatively $B_{2,t}$ may be assumed to be constant at the average
 of the estimate biomass in region 2, $\widebar{B_{2}}$.
@@ -504,15 +506,177 @@ parameters is found int Table~\ref{tab:allparam}. The actual number of
 parameters to be estimated depends on the model configuration. The
 model is implemented in AD Model Builder (Fournier et al 2012).
 
+
+
+\begin{table}
+\label{tab:allvars}
+\caption{Model variables.}
+\begin{center}
+\begin{tabular}{ll}
+\hline
+Variable & Definition\\
+\hline
+\hline
+$m$ & Number of quarterly time steps\\
+$n$ & Number of fishing fleets\\
+\hline
+\hline
+$r$ & Instantaneous growth rate $(q^{-1})$\\
+$K$ & Asymptotic biomass (mt) \\
+$T_{12}$ & Emigration rate $(q^{-1})$\\
+$T^*_{21}$& Immigration rate $(q^{-1})$\\
+$\sigma_{1,\eta}, \sigma_{2,\eta}$ & Population growth SD\\
+$\rho_\eta$ & Correlation between population growth precess errors\\
+$\sigma_{\xi,g}\; g=1\ldots n$ & Fishing mortality random walk SD\\
+$c_g\; g=1\ldots n$ & Proportion of $F$ random walk contaminated by 
+fat-tailed distribution\\
+$\sigma_{\varepsilon,g}\; g=1\ldots n$ & Observation error SD \\
+$\bar{p}$ & Mean proportion local\\
+$\sigma_{L(p)}$ & SD logit transformed $p$\\
+$q$ & Nonlinear apportionment proportion\\
+\hline
+\end{tabular}
+\end{center}
+\end{table}
+
+% Status after 244 PROCEDURE_SECTION entries;
+% Status block 1
+% nll = 1610.9
+% nvar = 1708
+% current phase = 1
+%  logT12 = -4 (1)
+%  T12 = 0.018316
+%  logT21 = -4 (1)
+%  T21 = 0.018316
+% logr = -2.3026 (1)
+%    r = 0.099999
+% logK = 11.883 (0)
+%    K = 1.448e+05
+%     logsdlogF:  -1 -1 -1 -1 -1 (1)
+%        sdlogF:  0.36788 0.36788 0.36788 0.36788 0.36788
+%   logsdlogPop:  -1 -1 (1)
+%      sdlogPop:  0.36788 0.36788
+% logsdlogYield:  0.05 0.05 0.05 0.05 0.05 (1)
+%    sdlogYield:  1.0513 1.0513 1.0513 1.0513 1.0513
+% LmeanProportion_local = 2.2 (0)
+%                  prop = 0.90025
+% logsdLProportion_local = 1 (0)
+% pfat =  0.05 0.05 0.05 0.05 0.05 (0)
+% qProp = 0.54 (0)
+% Residuals:
+
+% Status after 1708 PROCEDURE_SECTION entries;
+% Status block 7
+% nll = 1199.9
+% nvar = 1708
+% current phase = 1
+%  logT12 = -4.4597 (1)
+%  T12 = 0.011566
+%  logT21 = -6.3717 (1)
+%  T21 = 0.0017093
+% logr = -1.2296 (1)
+%    r = 0.29241
+% logK = 11.883 (0)
+%    K = 1.448e+05
+%     logsdlogF:  -1 -1 -1 -1 -1 (1)
+%        sdlogF:  0.36788 0.36788 0.36788 0.36788 0.36788
+%   logsdlogPop:  -2.1213 -1.5325 (1)
+%      sdlogPop:  0.11987 0.216
+% logsdlogYield:  0.041554 0.04353 0.044339 0.044224 0.048407 (1)
+%    sdlogYield:  1.0424 1.0445 1.0453 1.0452 1.0496
+% LmeanProportion_local = 2.2 (0)
+%                  prop = 0.90025
+% logsdLProportion_local = 1 (0)
+% pfat =  0.05 0.05 0.05 0.05 0.05 (0)
+% qProp = 0.54 (0)
+% Residuals:
+
+
+
 \subsection*{Age-structured models}
 
 \section*{Results \& Discussion}
+
+\begin{table}
+\label{tab:testrun}
+\caption{Model ``estimates''. Initial values of model parameters and
+final values just prior to program exit with ``Matrix not positive
+definite in Ln\_det\_choleski'' message.}
+\begin{center}
+\begin{tabular}{lrr}
+\hline
+Vatiable & Initial Value & Final Value\\
+\hline
+$m$ &  244\\
+$n$ &  5\\
+\hline
+$r$ & 0.100 &  0.292\\
+$K$ & 144,800 & --- \\
+$T_{12}$ & 0.018 & 0.0116\\
+$T^*_{21}$& 0.018 & 0.00171\\
+\hline
+$\sigma_{1,\eta}$ & 0.378 & 0.120\\
+$\sigma_{2,\eta}$ & 0.378 & 0.216\\
+$\rho_\eta$ & 0.0 & --- \\
+\hline
+$\sigma_{\xi,1}$ & 0.368 & 0.368\\
+$\sigma_{\xi,2}$ & 0.368 & 0.368\\
+$\sigma_{\xi,3}$ & 0.368 & 0.368\\
+$\sigma_{\xi,4}$ & 0.368 & 0.368\\
+$\sigma_{\xi,5}$ & 0.368 & 0.368\\
+\hline
+$\sigma_{\varepsilon,1}$ & 1.051 & 1.042\\
+$\sigma_{\varepsilon,2}$ & 1.051 & 1.045\\
+$\sigma_{\varepsilon,3}$ & 1.051 & 1.045\\
+$\sigma_{\varepsilon,4}$ & 1.051 & 1.045\\
+$\sigma_{\varepsilon,5}$ & 1.051 & 1.050\\
+\hline
+$\bar{p}$ & 0.9 & ---\\
+$\sigma_{L(p)}$ & 2.72 & ---\\
+$q$ & 0.54 & ---\\
+\hline
+\end{tabular}
+\end{center}
+\end{table}
+
+% graphics/est_catch.pdf  graphics/est_F.pdf  graphics/est_pop.pdf
+
+\begin{figure}
+\begin{center}
+\includegraphics[height=0.8\textheight]{./graphics/est_catch.pdf}
+\caption{\label{fig:estC}
+Estimated catch by fleet. The dark green dots indicate observed catch
+and light green lines indicate predicted catch,
+}
+\end{center}
+\end{figure}
+
+\begin{figure}
+\begin{center}
+\includegraphics[height=0.8\textheight]{./graphics/est_F.pdf}
+\caption{\label{fig:estF}
+Estimated fishing mortality by fleet.
+}
+\end{center}
+\end{figure}
+
+\begin{figure}
+\begin{center}
+\includegraphics[height=0.8\textheight]{./graphics/est_pop.pdf}
+\caption{\label{fig:estB}
+Estimated biomass. Light blue lines indicate predicted $\None$ (upper
+panel), $\Ntwo$ (middle panel) and $Nsum$ bottom panel. Red line in
+bottom panel indicates proportion local; dashed red line indicates
+$p=0.9$. Grey line in bottom panel is $K$.
+}
+\end{center}
+\end{figure}
 
 \section*{Next steps}
 
 \vspace{4ex}
 \noindent {\bf Acknowledgements.}
-This work was funded by the Western Pacficic Regional Fisheries
+This work was funded by the Western Pacific Regional Fisheries
 Managment Council. I thank the Council for its generous support and
 Council Staff Paul Dalzell and Eric Kingma for encouraging me to
 actually take on this challenging project and for their on-going
