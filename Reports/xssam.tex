@@ -70,10 +70,9 @@ and the larger stock is low (Itano and Holland 2000). Analysis
 of YFT otoliths sampled from
 throughout the Pacific conclude that 90\% or more of the MHI
 population was reared in the MHI (Wells et al 2012).
-The Hawaii based longline along with various small-scale fisheries
-land a combined catch
-approximately \help{???? mt} of YFT annually. Management of these
-fisheries is an important an important  local issue deserving of scientific support.
+The average annual catch of YFT in the MHI between 2009 and 2012 by Hawaii
+based fleets approximately 814 mt. Management of these
+fisheries is an important an important local issue deserving of scientific support.
 
 This paper explores some potential models that might be used to
 inform development of options for the management of fisheries for YFT
@@ -84,19 +83,19 @@ The principle assumptions for modeling the MHI YFT population are:
 \item The Pacific Ocean near Hawaii is divided into two regions:
 MHI (region 1) and elsewhere (region 2).%; see Figure~\ref{fig:MHImap}.
 \item Fish emigrate from region 1 to region 2, but emigrant fish have
-no effect on region 2 population dynamics. Region 2 is an ``infinite
+no effect on region 2 population dynamics, i.e. region 2 is an ``infinite
 sink''.
 \item Fish immigrate from region 2 to region 1, and mix completely.
 \item Immigrant fish are indistinguishable from ``resident'' fish
 (i.e. both groups of fish have the same population dynamics) and
-interact with the fishing gear identically.
+interact with the fishing gear in region 1 identically.
 \item Immigration into the MHI is dependent on the
 biomass of the yellowfin population outside of the MHI as estimated by
-some other model, e.g., \MFCL\ or \SD.
-\item The fishery comprises several gear types, each with characteristic
-fishing mortality.
-\item The evolution of fishing mortality over time is a random walk
-where the current fishing mortality in the current time step is equal
+some other model, e.g., \MFCL\ (MFCL) or \SD.
+\item The fishery comprises several gear types characterized by its
+own fishing mortality.
+\item The evolution of fishing mortality over time is a random walk,
+i.e., the fishing mortality in the current time step is equal
 to the fishing mortality in the previous time step plus a random
 deviation.
 \end{enumerate}
@@ -111,8 +110,8 @@ Atmospheric Administration, National Marine Fisheries Service (NOAA)
 under the federally mandated log book program from 1995 through 2013.
 \item Measurements of average yellowfin fish weights sampled at the
 Honolulu auction by NMFS staff from 2000 through 2013.
-\item Model estimates of yellowfin biomass by MULTIFAN-CL for regions
-2 and 4 from the most recent WCPFC stock assessment (Davies et al 2014).
+\item Model estimates of yellowfin biomass by MFCL
+from the most recent WCPFC stock assessment (Davies et al 2014).
 \end{enumerate}
 All data are reported by quarter of the year.
 
@@ -152,8 +151,8 @@ catches are highest after year 2000,
 but comprise a very small proportion of the catch.
 The catch time series for the HDAR data are shown in
 Figure~\ref{fig:hdarTS}. These time
-series exhibit marked quarterly cycles suggesting a strong seasonal
-signal in the catches by all fleets.
+series exhibit marked annual cycles suggesting a strong seasonal
+signal in the catches by all gears.
 Some series also contain sustained periods of zero catch which
 document the development and subsequent shift away from a specific
 gear type. It is assumed that these declines in catches represent a
@@ -177,7 +176,7 @@ deeper sets.
 
 Figure~\ref{fig:hdarTS} also displays the first order differences
 between successive quarters. This statistic emphasizes the seasonal
-periodicity of all fishing fleets and helps to identify potential anomalies in
+periodicity of all fishing gears and helps to identify potential anomalies in
 the data such as changes in reporting protocol. Potential
 anomalies can be seen in the late 1980s in the Tuna HL fleet, the
 early 1990s in the longline fleet, and the mid 1950s in the Aku Boat
@@ -255,6 +254,16 @@ of the HDAR and NOAA deep plus shallow.
 \end{center}
 \end{figure}
 
+\begin{figure}
+\begin{center}
+\includegraphics[height=0.8\textheight]{./graphics/first_difference_histograms.pdf}
+\caption{\label{fig:diff1histo}
+Histograms of first differences of catch time series. The blue line is
+a normal distribution with the same mean and standard deviation of the
+first differences. The red line is a t-distribution.}
+\end{center}
+\end{figure}
+
 %\begin{figure}
 %\begin{center}
 %\includegraphics[height=0.8\textheight]{./graphics/ccf.pdf}
@@ -269,6 +278,9 @@ of the HDAR and NOAA deep plus shallow.
 
 \clearpage
 \subsection*{Fish Weight Time Series}
+~
+
+\centerline{\help{Not yet available.}}
 
 %\clearpage
 \section*{Models}
@@ -388,12 +400,12 @@ terms.
 \begin{eqnarray}
 \log \None_t &=& \log \None_{t-\Delta t}\nonumber\\ 
              &+&\Delta t\bigg(r\Big(1-\frac{\None_{t-\Delta t}}{K}\Big)
--F_{t-\Delta t} - T_{12} - (1-q)2r\frac{\Ntwo_{t-\Delta
+-\sum_{g=1}^n F_{g,t-\Delta t} - T_{12} - (1-q)2r\frac{\Ntwo_{t-\Delta
 t}}{K}\bigg)+\eta_{1,t}\nonumber\\
 \\ \log \Ntwo_t &=& \log \Ntwo_{t-\Delta t}\nonumber\\
              &+&\Delta t\bigg(r\Big(1-\frac{\Ntwo_{t-\Delta t}}{K}\Big)
--F_{t-\Delta t} - T_{12} - q2r\frac{\None_{t-\Delta t}}{K}
-     +\frac{T_{21}}{\Ntwo_{t-\Delta t}}\bigg)+\eta_{2,t}\nonumber
+-\sum_{g=1}^n F_{t-\Delta t} - T_{12} - q2r\frac{\None_{t-\Delta t}}{K}
+     +\frac{T_{{21}_{t-\Delta t}}}{\Ntwo_{t-\Delta t}}\bigg)+\eta_{2,t}\nonumber
 \label{eqn:finitecoupledlogschaefer}
 \end{eqnarray}
 where $\eta_{k,t} \sim N(0,\Sigma_\eta),k=1,2$. The covariance matrix,
@@ -415,8 +427,7 @@ follow a random walk with normal increments, i.e.
 N(0,\sigma^2_{\xi,g}) \label{eqn:Fwalk}
 \end{equation}
 where  $\sigma^2_{\xi,g}$ is the variance of the fishing
-effort random walk for fleet $g$.
-\help{Distribution of increments?}
+effort random walk for gear $g\;g=1\ldots n$.
 
 %Parameterization of $T_{21}$
 {\bf Population Forcing $T_{21}$.}
@@ -486,14 +497,16 @@ L(p)\sim N(L(\bar{p}),\sigma^2_{L(p)}).
 \end{equation} 
 $p$ is generally assumed to be approximately $0.9$. By varying the
 value of the variance, $\sigma^2_{L(p)}$, $p$, can be made as
-close to $0.9$ as is prudent. In principle, it may be possible to
-estimate $\bar{p}$ and $\sigma^2_{L(p)}$, but interaction with
+close to $0.9$ as is prudent.
+This representation of $p$ can be interpreted at a Bayesian prior.
+In principle, it may be possible to
+estimate $\bar{p}$ and $\sigma^2_{L(p)}$, but interactions with
 the parameter $q$ in equation~\ref{eqn:coupledschaeferq} needs to be
 explored.
 
 {\bf Estimation.} The model states, $\alpha_t$, are assumed to be random
 effects (Skaug and Fournier, 2006). Model parameters are estimated by
-maximum likelihood by defining the joint likelihood of the random
+maximizing the joint likelihood of the random
 effects and the observations.
 \begin{equation}
 L(\theta,\alpha,x)=
@@ -501,16 +514,16 @@ L(\theta,\alpha,x)=
 \prod^m_{t=1}\big[\phi\big(x_t-O(\alpha_t), \Sigma_\varepsilon\big)\big]
 \end{equation}
 Here, $m$ is the number of time steps in the catch time series and
-$\phi$ is a vector of model parameters. A complete list of
-parameters is found int Table~\ref{tab:allparam}. The actual number of
-parameters to be estimated depends on the model configuration. The
-model is implemented in AD Model Builder (Fournier et al 2012).
-
-
+$\theta$ is a vector of model parameters. A complete list of
+parameters is found in Table~\ref{tab:allvars}. 
+The model is implemented in AD Model Builder (Fournier et al 2012).
+The actual number of
+parameters to be estimated depends on the model configuration,
+specified by the phase flags in the input file. 
 
 \begin{table}
-\label{tab:allvars}
-\caption{Model variables.}
+\caption{Model variables.
+\label{tab:allvars}}
 \begin{center}
 \begin{tabular}{ll}
 \hline
@@ -518,7 +531,7 @@ Variable & Definition\\
 \hline
 \hline
 $m$ & Number of quarterly time steps\\
-$n$ & Number of fishing fleets\\
+$n$ & Number of fishing gears\\
 \hline
 \hline
 $r$ & Instantaneous growth rate $(q^{-1})$\\
@@ -539,69 +552,90 @@ $q$ & Nonlinear apportionment proportion\\
 \end{center}
 \end{table}
 
-% Status after 244 PROCEDURE_SECTION entries;
-% Status block 1
-% nll = 1610.9
-% nvar = 1708
-% current phase = 1
-%  logT12 = -4 (1)
-%  T12 = 0.018316
-%  logT21 = -4 (1)
-%  T21 = 0.018316
-% logr = -2.3026 (1)
-%    r = 0.099999
-% logK = 11.883 (0)
-%    K = 1.448e+05
-%     logsdlogF:  -1 -1 -1 -1 -1 (1)
-%        sdlogF:  0.36788 0.36788 0.36788 0.36788 0.36788
-%   logsdlogPop:  -1 -1 (1)
-%      sdlogPop:  0.36788 0.36788
-% logsdlogYield:  0.05 0.05 0.05 0.05 0.05 (1)
-%    sdlogYield:  1.0513 1.0513 1.0513 1.0513 1.0513
-% LmeanProportion_local = 2.2 (0)
-%                  prop = 0.90025
-% logsdLProportion_local = 1 (0)
-% pfat =  0.05 0.05 0.05 0.05 0.05 (0)
-% qProp = 0.54 (0)
-% Residuals:
-
-% Status after 1708 PROCEDURE_SECTION entries;
-% Status block 7
-% nll = 1199.9
-% nvar = 1708
-% current phase = 1
-%  logT12 = -4.4597 (1)
-%  T12 = 0.011566
-%  logT21 = -6.3717 (1)
-%  T21 = 0.0017093
-% logr = -1.2296 (1)
-%    r = 0.29241
-% logK = 11.883 (0)
-%    K = 1.448e+05
-%     logsdlogF:  -1 -1 -1 -1 -1 (1)
-%        sdlogF:  0.36788 0.36788 0.36788 0.36788 0.36788
-%   logsdlogPop:  -2.1213 -1.5325 (1)
-%      sdlogPop:  0.11987 0.216
-% logsdlogYield:  0.041554 0.04353 0.044339 0.044224 0.048407 (1)
-%    sdlogYield:  1.0424 1.0445 1.0453 1.0452 1.0496
-% LmeanProportion_local = 2.2 (0)
-%                  prop = 0.90025
-% logsdLProportion_local = 1 (0)
-% pfat =  0.05 0.05 0.05 0.05 0.05 (0)
-% qProp = 0.54 (0)
-% Residuals:
-
-
-
 \subsection*{Age-structured models}
+~
+
+\centerline{\help{Not yet available.}}
+
 
 \section*{Results \& Discussion}
+Initial model testing gives mixed results. The numerical estimation
+procedure inevitably terminates with the dreaded error message 
+\help{``Matrix not positive definite in Ln\_det\_choleski''.
+This message indicates that there are probably redundant and
+ill-determined parameters.}
+Values of the model parameters just prior to termination of the program are
+compared to their initial values in Table~\ref{tab:testrun}.
+The model seems sensitive to the population dynamics parameters. The
+values of the
+growth rate and transfer rates parameters ($r,T_{12}, T_{21}^*$)
+change substantially away from their initial values.
+The state equation process errors, $\sigma_{1,\eta},\sigma_{2,\eta}$,
+also move away from their initial values.
+The process error correlation, $\rho$, is not yet implemented in the model
+code which is equivalent to constraining $\rho$ to be zero.
+
+The random-walk representation of fishing mortality
+produces a credible time series
+capable of accurately predicting catches
+of all 5 gear types in the model 
+Figures~\ref{fig:estC} and~\ref{fig:estF}.
+These estimates of $F$ depend on a ``robust'' likelihood representation
+of variance of the random walk with a 5\% contamination by a fat-tailed
+distribution to accommodate outliers; $a_g$ in Table~\ref{tab:testrun}.
+
+Fifteen parameters are used to represent the variance in catch, $a_g$, 
+$\sigma_{\varepsilon,g}$ and $\sigma_{\xi,g}$.
+These parameters are changed little or not at all by the estimation
+procedure, suggesting that some are redundant.
+It may be possible to represent these errors by a single parameter for
+each fleet.
+
+The predicted biomass corresponding from the test run is shown in
+Figure~\ref{fig:estB}. After some fluctuations at the beginning of
+the time series the total biomass, $\Nsum$, appears to stabilize to a
+constant value slightly below the asymptotic biomass, $K$. The
+proportion local stays close to 0.9 as it is constrained to do by the
+prior, equation~\ref{eqn:LpropL}.
+In other test runs (not illustrated here), 
+the total biomass is less steady and has a
+increasing and subsequent decreasing trend reflecting the trend in the
+forcing biomass.
+The cause of the initial fluctuation is unknown. The procedure seems
+to set the initial population random effects higher than $K$ for some
+reason.
+
+The catch time series include a fairly large numbers of zero catch
+observations, Figures~\ref{fig:hdarTS} and~\ref{fig:diff1histo}.
+Zero observations at the
+beginning of the time series, as the fishery develops, or at the end of
+the time series, as a particular fleets ceases operation, do not appear
+to cause problems in estimating $F$.
+However, in the case of the Troll, Inshore Handline and Aku Boat
+fleets, there are isolated
+zero observations during periods of substantial catch.
+In early test runs of the model, these observations caused the model to predict
+zero biomass at those times followed by periods of recovery. The
+problem of intercalated zero observations
+was provisionally solved by substituting the average of the immediately
+preceding and following observations for the intercalated zero
+observation. There are 9 such substitutions among the 1220
+observations.
+
+There appear to be excessive numbers of zero first differences
+in the data for most gears, Figure~\ref{fig:diff1histo}. Only one
+gear, Aku Boat, appears to have particularly fat tails. A zero
+inflated distribution may be a better choice of error model for the
+fishing mortality random walk than a robustified Normal.
 
 \begin{table}
-\label{tab:testrun}
-\caption{Model ``estimates''. Initial values of model parameters and
-final values just prior to program exit with ``Matrix not positive
-definite in Ln\_det\_choleski'' message.}
+\caption{\label{tab:testrun}
+Model ``estimates''. Initial values of model parameters and
+final values just prior to program exit with 
+``Matrix not positive definite in Ln\_det\_choleski'' message.
+``---'' indicates that the variable was constrained to be constant at
+its initial value, i.e., not estimated.
+}
 \begin{center}
 \begin{tabular}{lrr}
 \hline
@@ -634,12 +668,15 @@ $\sigma_{\varepsilon,5}$ & 1.051 & 1.050\\
 $\bar{p}$ & 0.9 & ---\\
 $\sigma_{L(p)}$ & 2.72 & ---\\
 $q$ & 0.54 & ---\\
+$a_1$ & 0.05 & ---\\
+$a_2$ & 0.05 & ---\\
+$a_3$ & 0.05 & ---\\
+$a_4$ & 0.05 & ---\\
+$a_5$ & 0.05 & ---\\
 \hline
 \end{tabular}
 \end{center}
 \end{table}
-
-% graphics/est_catch.pdf  graphics/est_F.pdf  graphics/est_pop.pdf
 
 \begin{figure}
 \begin{center}
@@ -665,7 +702,7 @@ Estimated fishing mortality by fleet.
 \includegraphics[height=0.8\textheight]{./graphics/est_pop.pdf}
 \caption{\label{fig:estB}
 Estimated biomass. Light blue lines indicate predicted $\None$ (upper
-panel), $\Ntwo$ (middle panel) and $Nsum$ bottom panel. Red line in
+panel), $\Ntwo$ (middle panel) and $\Nsum$ bottom panel. Red line in
 bottom panel indicates proportion local; dashed red line indicates
 $p=0.9$. Grey line in bottom panel is $K$.
 }

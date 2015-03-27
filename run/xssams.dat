@@ -24,18 +24,18 @@ total_biomass.dat
 # logK
  11.8831 -1
 # logsdlogF:
- -1.0   -1.0   -1.0   -1.0   -1.0   1
+ -1.0   -1.0   -1.0   -1.0   -1.0  -1
 #
 # logsdlogPop:
  -1.0 -1.0 1
 # logsdlogYield:
-   0.05  0.05  0.05  0.05  0.05 1
+   0.05  0.05  0.05  0.05  0.05  1
 # LmeanProportion_local:
  2.2  -1
 # logsdLProportion_local:
- 1   -1
+ 0  -1
 # qProp
- 0.54 3
+ 0.54 -1
 # robust F random walk
   2
 # pfat
