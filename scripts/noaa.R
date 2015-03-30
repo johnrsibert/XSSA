@@ -173,6 +173,15 @@ LL.join=function(hdar=NULL,noaa=NULL,yr1=1952,yr2=2012)
    write(as.matrix(dat),file=dat.file,ncolumns=dim(dat)[1])
    print(paste("finished",dat.file))
 
+   yy2008 = which(yy >= 2008)
+   print(yy2008)
+   print(paste(length(yy2008), 0.25*length(yy2008)))
+   print(dat[yy2008,])
+   print(sum(dat[yy2008,],na.rm=TRUE))
+   print(paste("Post 2008 annual average: ",
+         sum(dat[yy2008,],na.rm=TRUE)/(0.25*length(yy2008))))
+   
+
    width = 6.5
    height <- 9.0
    x11(width=width,height=height)
@@ -189,9 +198,6 @@ LL.join=function(hdar=NULL,noaa=NULL,yr1=1952,yr2=2012)
    }
 
    save.png.plot(paste(ncol(dat),"_gear_catch_history",sep=""),width=width,height=height)
-
-
-
 
    par(old.par)
    return(cbind(yy,dat))
