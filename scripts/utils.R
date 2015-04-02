@@ -39,7 +39,7 @@ nice.ts.plot<-function(x,y,label=NULL,legend=NULL,bcol="blue",fcol="lightblue",l
    if (!is.null(legend))
    {
    # print(paste(legend,nchar(legend)))
-     xrange[2] = xrange[2]+nchar(legend)*1.5
+     xrange[2] = xrange[2]+max(nchar(legend))*1.5
    # print(xrange)
    }
 
