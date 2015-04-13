@@ -105,6 +105,7 @@ NNphase=function(r=0.3, K=1.0, FF = 0.007, q=0.54, T12=0.01, T21=0.002, dt = 1.0
    vectorplot(rr,xlab="N1",ylab="N2",main=paste("q =",q))
    }
 
+   #### here
    else
    {
    require("plotrix")
@@ -134,16 +135,32 @@ NNphase=function(r=0.3, K=1.0, FF = 0.007, q=0.54, T12=0.01, T21=0.002, dt = 1.0
       v[i] = daN2(df[i,1],df[i,2],r, K, FF, q, T12, T21)
    }
 #  plot(pN1,pN2,type='n',xlab="N1",ylab="N2")
-   plot(c(0.0,1.1),c(0.0,1.15),type='n',xlab="N1",ylab="N2")
-   image(iN1,iN2,prop,zlim=c(0,1),col=heat.colors(20),add=TRUE)
-   pl = 0.9
-   p = pN1*(1.0/pl - 1.0)
+   plot(c(0.0,1.1),c(0.0,1.15),type='n',
+        xlab=expression("N"[1][,][1]),ylab=expression("N"[2][,][1]))
+   image(iN1,iN2,prop,zlim=c(0,1),col=heat.colors(5),add=TRUE)
+
+#  pl = 0.9
+#  p = pN1*(1.0/pl - 1.0)
+   p = aPropL(pN1,0.9)
    double.lines(pN1,p,lwd=15,bcol="darkgreen",fcol="lightgreen")
+
+#  contour(iN1,iN2,prop,zlim=c(0,1),col="darkgreen",add=TRUE)
+
+   pl = seq(0,1,0.1)
+   npl = length(pl)
+   nn = length(pN1)
+   for (i in 1:npl)
+   {
+      N2 = aPropL(pN1,pl[i])
+      lines(pN1,N2,col="darkgreen",lwd=2,lty="dashed")
+      text(pN1[nn],N2[nn],pl[i],col="darkgreen",adj=c(0,0.5))
+   }
    lines(c(0.0,K),c(K,0.0), col="red",lwd=3)
-   title(main=paste("r=",r,", K=", K, ", F=", FF, ", q=", q,
-                    ", T12=", T12, ",T21=", T21,sep=""),
-          line=-1,font.main=1,cex=0.8)
-   
+#  title(main=paste("r=",r,", K=", K, ", F=", FF, ", q=", q,
+#                   ", T12=", T12, ",T21=", T21,sep=""),
+#         line=-1,font.main=1,cex=0.8)
+#  legend("topleft",bty='n',cex=1.6,legend=paste("T21/q=",T21/q,sep=""),text.font=2)
+ 
 #  mat = cbind(u,v,df)
 #  print(tail(mat))
    vectorField(u,v,xpos=df[,1],ypos=df[,2],vecspec="lonlat",
@@ -151,15 +168,36 @@ NNphase=function(r=0.3, K=1.0, FF = 0.007, q=0.54, T12=0.01, T21=0.002, dt = 1.0
    }
 }
 
-qcomp=function(qq=c(0.25,0.5,0.75))
+aPropL = function(N1,p)
 {
-   for(k in 1:length(qq))
+   N2 = N1*(1.0/(p+1e-8) - 1.0)
+}
+
+qcomp=function()
+{
+   width = 9.0
+   height = 9.0
+   x11(width=width,height=height)
+   old.par = par(no.readonly = TRUE) 
+   par(mar=c(4,4,0,0)+0.1)
+
+   lm = layout(matrix(c(1:9),ncol=3,nrow=3,byrow=TRUE))
+   
+   q = c(0.25,0.5,0.75)
+   T21 = c(0.02,0.002,0.0002)
+   for (t in 1:length(T21))
    {
-      x11(width=9,height=9)
-      NNphase(q=qq[k])
-
+      for(k in 1:length(q))
+      {
+         NNphase(q=q[k],T21=T21[t])
+         rat = round(T21[t]/q[k],3)
+         title(main=paste("q=",q[k],", T21=",T21[t],", T21/q=",rat,sep=""),
+                          line=-1,font.main=1,cex=0.8)
+      }
    }
+   save.png.plot("qcomp_9",width=width,height=height)
 
+   par(old.par)
 }
 plotN1N2=function(ntime=100,r=0.3, K=1.0, F = 0.007, q=0.54, 
                   T12=0.01, T21=0.002, p=0.9, 
@@ -232,3 +270,33 @@ a.log.disp=function(ntime=100,r=0.3, K=1.0, F = 0.007, q=0.54,
 
 }
 
+# logit(N1/(N1+N2)) = log(N1)-log(N2)
+logit<-function(p)
+{
+   return(log(p/(1-p)))
+}
+
+alogit=function(alpha)
+{
+   return(1/(1+exp(-alpha)))
+}
+
+
+plot.propL.prior=function(propL=0.9)
+{
+   p = seq(0.01,0.99,0.01)
+   p = c(0.0001,p,0.9999)
+   wp = which(p == propL)
+   
+   plot(c(0.0,1.0),c(0.0,1.0),type='n',xlab="x",ylab="p(L(x))")
+   abline(v=propL,col="red",lty="dotdash")
+   for (sd in c(0.6,0.7,0.8,0.9,0.99,0.999,0.9999))
+#  sd = 0.9
+   {
+      pp = dnorm(logit(p),mean=logit(propL),sd=logit(sd))
+      double.lines(p,pp,lwd=5,fcol="lightblue",bcol="blue")
+      text(propL,pp[wp],sd,col="blue")
+   }
+
+   save.png.plot("propL_prior",width=6.5,height=6.5)
+}
