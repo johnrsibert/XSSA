@@ -175,7 +175,24 @@ aPropL = function(N1,p)
    N2 = N1*(1.0/(p+1e-8) - 1.0)
 }
 
-qcomp=function()
+qcomp.ts=function(q)
+{
+   n = length(q)
+#  width = 6.5
+#  height = 9.0
+#  x11(width=width,height=height)
+#  old.par = par(no.readonly = TRUE) 
+#  par(mar=c(4,4,0,0)+0.1)
+#  lm = layout(matrix(c(1:n),ncol=1,nrow=length(q),byrow=TRUE))
+   for(k in 1:length(q))
+   {
+      xssams.sim(q=q[k])
+      title(main=paste("q = ",q[k],sep=""),
+                          line=2,font.main=1,cex=0.8)
+   }
+}
+
+qcomp.phase=function()
 {
    q = c(0.25,0.75)
    T21 = c(0.02,0.0002)
@@ -227,7 +244,7 @@ plot.NN.ts=function(pop,K)
    axis(4,col="red",ylab="p",col.axis="red")
    abline(v=par("usr")[2],lwd=2,col="red")
    mtext("p",side=4,col="red",line=3)
-#  title("Log")
+   save.png.plot("NNts",width=width,height=height)
    par(old.par)
 }
 
@@ -396,7 +413,8 @@ compute.F<-function(yr1=1952,yr2=2012,cfile="../HDAR/hdar_1952_2012.dat",plot=TR
 }
 
 xssams.sim=function(r=0.3, K=200000, q=0.54, T12=0.01, T21=0.002,
-                  dt = 1.0, s=c(0.0,0.0,0.0), fr=2, p=0.9)
+                  dt = 1.0, s=c(0.0,0.0,0.0), fr=2, p=0.9,
+                  do.plot=TRUE)
 {
    F.matrix = compute.F(plot=FALSE) 
    sum.F = colSums(F.matrix)
@@ -405,7 +423,7 @@ xssams.sim=function(r=0.3, K=200000, q=0.54, T12=0.01, T21=0.002,
    region.biomass = as.matrix(read.table("../run/total_biomass.dat"))
    immigrant.biomass = T21*region.biomass[fr,]
    pop = matrix(ncol=3,nrow=ntime)
-   colnames(pop)=c("N1","N2","N1+N2")
+   colnames(pop)=c(" N1"," N2"," N1+N2  ")
    pop[1,1] = p*K
    pop[1,2] = (1-p)*K
    pop[1,3] = pop[1,1]+pop[1,2]
@@ -419,9 +437,13 @@ xssams.sim=function(r=0.3, K=200000, q=0.54, T12=0.01, T21=0.002,
       pop[t,3] = pop[t,1]+pop[t,2]
    }
   
-   plot.NN.ts(pop,K)
-
-   plot.sim.catch.ts(pop[,3],F.matrix)
+   if (do.plot)
+   {
+      plot.NN.ts(pop,K)
+   #  title(main=paste("q = ",q,sep=""),
+   #                      line=2,font.main=1,cex=0.8)
+   }
+#  plot.sim.catch.ts(pop[,3],F.matrix)
 }
 
 plot.sim.catch.ts=function(t.pop,F)

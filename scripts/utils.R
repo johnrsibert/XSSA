@@ -16,8 +16,8 @@ double.lines<-function(x,y,bcol="black",fcol,lwd,lty="solid",pretty=TRUE)
     lines(x,y,col=fcol,lwd=2)
 }
 
-nice.ts.plot<-function(x,y,label=NULL,legend=NULL,bcol="blue",fcol="lightblue",lwd=5,
-              ylab=NULL,xlab=NULL,ylim=NULL)
+nice.ts.plot<-function(x,y,label=NULL,legend=NULL,bcol="blue",fcol="lightblue",
+              lwd=5, ylab=NULL,xlab=NULL,ylim=NULL)
 {
    nlines <- 1
    if (!is.null(ncol(y)))
@@ -38,9 +38,10 @@ nice.ts.plot<-function(x,y,label=NULL,legend=NULL,bcol="blue",fcol="lightblue",l
 #  print(xrange)
    if (!is.null(legend))
    {
-   # print(paste(legend,nchar(legend)))
-     xrange[2] = xrange[2]+max(nchar(legend))*1.5
-   # print(xrange)
+      print(xrange)
+   #  print(paste(legend,max(nchar(legend))))
+      xrange[2] = xrange[2]+max(nchar(legend))*1.8
+      print(xrange)
    }
 
    old.par <- par(no.readonly = TRUE) 

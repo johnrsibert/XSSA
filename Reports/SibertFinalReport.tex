@@ -9,10 +9,10 @@
 \usepackage{verbatim}
 \usepackage[pdftex,bookmarksopen]{hyperref}
 \hypersetup{pdfauthor={John Sibert}}
-\hypersetup{pdfsubject={Compartment model of MHI YFT}}
-\hypersetup{pdftitle={Two-compartment models of Main Hawaiian Islands
+\hypersetup{pdfsubject={Assessment Model of MHI YFT Stocks}}
+\hypersetup{pdftitle={Assessment model of Main Hawaiian Islands
 Yellowfin Tuna Population}}
-\hypersetup{pdfkeywords={yellowfin,state space,compartment model,Hawaii}}
+\hypersetup{pdfkeywords={yellowfin,state space,transfer model,Hawaii}}
 
 \newcommand\doublespacing{\baselineskip=1.6\normalbaselineskip}
 \newcommand\singlespacing{\baselineskip=1.0\normalbaselineskip}
@@ -38,7 +38,7 @@ Yellowfin Tuna Population}}
 \newcommand\prevN[1]{{#1_{t-\Delta t}}}
 \newcommand\nextN[1]{{#1_t}}
 
-\title{Compartment models of Main Hawaiian Islands Yellowfin Tuna
+\title{Potential assessment model for Main Hawaiian Islands Yellowfin Tuna
 Populations\\
 ~\\
 \color{red}DRAFT\normalcolor\\
@@ -54,7 +54,7 @@ Honolulu, HI  96822 U.S.A.\\[0.125in]
 }
 
 \pagestyle{myheadings}
-\markright{Sibert\hfil {\bf DRAFT} MHI Comparment Model\hfil\today}
+\markright{Sibert\hfil {\bf DRAFT}\hfil MHI Assessment Model\hfil\today}
 
 \begin{document}
 \maketitle
@@ -381,19 +381,6 @@ components of the population inhabiting region~1.
 -F - T_{12}\Big] - q2r\frac{\None\Ntwo}{K} + T_{21}\nonumber
 \end{eqnarray}
 
-Efforts to derive an analytical expression to determine 
-a meaningful equilibrium 
-with both $\None > 0$ and $\Ntwo > 0$ 
-have not been fruitful.
-Figure~\ref{fig:NNphase} shows phase plane diagrams for several
-combinations of model parameters. Apparently the system tends towards
-equilibrium with both $0 < \None \le K$ and $0 < \Ntwo \le K$.
-The proportion of ``local'' fish, $p = \frac{\None}{\Nsum}$, depends on
-the assumed value of $q$. For values of $q < 0.5$, the equilibrium
-value of $p$ is less than 0.9. The functional relationship, if any,
-between $p$ and $q$ is not clear, but it would appear that $q$ must be
-constrained to be greater than 0.5 to achieve $p=0.9$.
-
 The log transformed equivalent of equation~\ref{eqn:coupledschaeferq}
 is
 \begin{eqnarray}
@@ -428,6 +415,28 @@ $\Sigma_\eta = \left[\begin{array}{cc}\sigma^2_{\eta,1}&\rho_\eta\\
 \end{array}\right]$,
 expresses process errors for both populations as well as a
 correlation between the errors.
+
+{\bf Behavior of model system.}
+Efforts to derive an analytical expression to determine 
+a meaningful equilibrium for equations~\ref{eqn:coupledlogschaefer}.
+have not been fruitful.
+Figure~\ref{fig:NNphase} shows phase plane diagrams for several
+combinations of model parameters assuming constant $K$ and
+$T_{21}$. Apparently the system tends towards
+equilibrium with both $0 < \None \le K$ and $0 < \Ntwo \le K$.
+The proportion of ``local'' fish, $p = \frac{\None}{\Nsum}$, depends on
+the assumed value of $q$. For values of $q < 0.5$, the equilibrium
+value of $p$ is less than 0.9. The functional relationship, if any,
+between $p$ and $q$ is not clear, but it would appear that $q$ must be
+be greater than $\simeq 0.5$ to achieve $p=0.9$.
+
+The evolution of the model system
+equation~\ref{eqn:finitecoupledlogschaefer} with time in shown in
+Figure~\ref{fig:NNts}. The system starts with $\None + \Ntwo = K$ and
+$p=0.9$. After a few time steps the population decreases to reflect
+competition from the immigrants and the onset of fishing.
+The total population fluctuates fairly widely, reflecting the forcing
+from region MFCL 2. The proportion local fluctuates around 0.9.
 
 {\bf Fishing Mortality.}
 Fishing mortality is
@@ -528,7 +537,7 @@ explored.
 \begin{center}
 \includegraphics[width=1.00\textwidth]{./graphics/qcomp_4.pdf}
 \caption{\label{fig:NNphase}
-Phase plane for equation \ref{eqn:coupledschaeferq}. Arrows represent
+Phase plane for equation \ref{eqn:coupledlogschaefer}. Arrows represent
 the trajectory of the system for different combinations of $\None$ and
 $\Ntwo$; dashed red  line indicates $K = 1$; dashed green lines indicate
 different values of $p$. The thick light green line indicates $p=0.9$.
@@ -538,6 +547,21 @@ Other parameter values: $r=0.3, K=1.0, F = 0.007, T_{12}=0.01$.
 \end{center}
 \end{figure}
 
+\begin{figure}
+\begin{center}
+\includegraphics[width=1.00\textwidth]{./graphics/NNts.pdf}
+\caption{\label{fig:NNts}
+Behavior of equations \ref{eqn:finitecoupledlogschaefer} over time with
+forcing from MFCL region 2 biomass (Figure~\ref{fig:MFCLregionB}) and
+fishing mortality by fleet set proportional to observed catch.
+Light blue lines indicate population components as indicated; 
+dashed blue line indicates $K$;
+solid red line indicates the proportion local, $p$;  
+dashed red line line indicates $p=0.9$.
+Other parameter values: $q=0.54, r=0.3, K=200000, T12=0.01, T21=0.002$.
+}
+\end{center}
+\end{figure}
 
 {\bf Estimation.} The model states, $\alpha_t$, are assumed to be random
 effects (Skaug and Fournier, 2006). Model parameters are estimated by
@@ -750,12 +774,16 @@ $p=0.9$. Grey line in bottom panel is $K$.
 
 \section*{Conclusions and Next steps}
 
-The age-aggregated approach using a Schaefer model with emigration and
-immigration shows promise. The random walk
+Despite the failure to obtain credible parameter estimates,
+the age-aggregated approach using a Schaefer model with emigration and
+immigration shows sufficient promise to continue model development.
+The random walk
 representation of fishing mortality is particularly encouraging.
-Population growth and exchange rates and process errors all 
-appear to be estimatable. 
-Fishing mortality and observation
+The capacity of the model to maintain the value of $p$ near 0.9
+depends strongly on the value of $q$.
+Population growth parameters (including $q$),  exchange rates,
+ and process errors all appear to be estimatable. 
+Fishing mortality errors and observation
 errors do not appear to be estimatable in the current parameterization.
 
 Some obvious next steps are: use annual catch totals by gear rather
