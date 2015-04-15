@@ -250,21 +250,21 @@ plot.region.biomass<-function(yr1=1952,yr2=2012,bfile="total_biomass.dat")
    layout.show(lm)
 
    nice.ts.plot(tt,region.biomass[2,],bcol="darkgreen",fcol="lightgreen",lwd=lwd,label="Region 2")
-   mtext(2,line=4,text="MFCL Biomass")
+   mtext(2,line=4,text="Estimated Biomass")
    dR2 = diff(region.biomass[2,])
    ddR2 = diff(dR2)
-   print(paste(length(tt),length(ddR2)))
-   par("new"=TRUE)
-   plot(tt[-1],dR2,type='l',lty="dotted",axes=FALSE,ann="FALSE",col="blue",lwd=2)
-   lines(tt[2:(length(tt)-1)],ddR2,lty="dotted",col="red",lwd=2)
+#  print(paste(length(tt),length(ddR2)))
+#  par("new"=TRUE)
+#  plot(tt[-1],dR2,type='l',lty="dotted",axes=FALSE,ann="FALSE",col="blue",lwd=2)
+#  lines(tt[2:(length(tt)-1)],ddR2,lty="dotted",col="red",lwd=2)
 
    nice.ts.plot(tt,region.biomass[4,],bcol="darkgreen",fcol="lightgreen",lwd=lwd,label="Region 4")
-   mtext(2,line=4,text="MFCL Biomass")
+   mtext(2,line=4,text="Estimated Biomass")
    dR4 = diff(region.biomass[4,])
    ddR4 = diff(dR2)
-   par("new"=TRUE)
-   plot(tt[-1],dR4,type='l',lty="dotted",axes=FALSE,ann="FALSE",col="blue",lwd=2)
-   lines(tt[2:(length(tt)-1)],ddR4,lty="dotted",col="red",lwd=2)
+#  par("new"=TRUE)
+#  plot(tt[-1],dR4,type='l',lty="dotted",axes=FALSE,ann="FALSE",col="blue",lwd=2)
+#  lines(tt[2:(length(tt)-1)],ddR4,lty="dotted",col="red",lwd=2)
 
    print(summary(t(region.biomass[c(2,4),])))
    save.png.plot("MFCL_region_biomass",width=width,height=height)
@@ -283,6 +283,8 @@ plot.region.biomass<-function(yr1=1952,yr2=2012,bfile="total_biomass.dat")
    hist(dR2,breaks=breaks,main="delta R2",freq=FALSE,las=1)
    x = seq(-3*sd,3*sd,0.1*sd)
    lines(x,dnorm(x,mean=mean,sd=sd),col="blue")
+#  lines(x,dtdist(x,mean=mean,sd=1),col="green")
+#  lines(x,dt(x,ncp=mean,df=3),col="red")
 
    sd = sd(dR4)
    mean = mean(dR4)
@@ -292,14 +294,26 @@ plot.region.biomass<-function(yr1=1952,yr2=2012,bfile="total_biomass.dat")
    hist(dR4,breaks=breaks,main="delta R4",freq=FALSE,las=1)
    x = seq(-3*sd,3*sd,0.1*sd)
    lines(x,dnorm(x,mean=mean,sd=sd),col="blue")
+#  lines(x,dtdist(x,mean=mean,sd=1),col="green")
+#  lines(x,dt(x,ncp=mean,df=3),col="red")
    print(paste(sd(dR2),sd(dR4)))
    save.png.plot("MFCL_region_biomass_delta",width=width,height=height)
-
-
 
    par(old.par)
 #  return(region.biomass)
 }
+
+#dnorm(x, mean = 0, sd = 1, log = FALSE)
+# from noaa.R
+dtdist=function(x, mean = 0, sd = 1)
+{
+  xx = (x-mean)/sd
+# print(paste(xx,xx*xx,(1.0+xx*xx)))
+  dt = 1.0/(pi*(1.0+xx*xx))
+  return(dt)
+}
+
+
 
 # compute initial estimates of sdlogF and sdlogYield as
 # third quartile of first differneces in time series

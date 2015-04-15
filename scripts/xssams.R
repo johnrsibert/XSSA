@@ -1,4 +1,6 @@
-
+gear.names = c("TunaHL","Troll","Longline","Bottom/inshore HL","AkuBoat")
+sgn = c("THL","Troll","LL","BHL","Aku")
+ 
 dLogN1=function(pN1,pN2,r, K, F, q, T12)
 {
 #  nextLogN1 += dt*(r*(1.0 - prevN1/K) - sumFg - T12 - 2.0*(1.0-q)*r*prevN2/K);
@@ -25,7 +27,7 @@ step=function(pN1,pN2,r, K, F, q, T12, T21, dt, s)
    nN = vector(length=2)
    nN[1] = exp(log(pN1) + dLN1 * dt)
    nN[2] = exp(log(pN2) + dLN2 * dt)
-   print(paste("n:",nN[1],nN[2]))
+#  print(paste("n:",nN[1],nN[2]))
    return(nN)
 }
 
@@ -153,9 +155,9 @@ NNphase=function(r=0.3, K=1.0, FF = 0.007, q=0.54, T12=0.01, T21=0.002, dt = 1.0
    {
       N2 = aPropL(pN1,pl[i])
       lines(pN1,N2,col="darkgreen",lwd=2,lty="dashed")
-      text(pN1[nn],N2[nn],pl[i],col="darkgreen",adj=c(0,0.5))
+      text(pN1[nn],N2[nn],pl[i],col="darkgreen",adj=c(0.5,0.5))
    }
-   lines(c(0.0,K),c(K,0.0), col="red",lwd=3)
+   lines(c(0.0,K),c(K,0.0), col="red",lwd=3, lty="dashed")
 #  title(main=paste("r=",r,", K=", K, ", F=", FF, ", q=", q,
 #                   ", T12=", T12, ",T21=", T21,sep=""),
 #         line=-1,font.main=1,cex=0.8)
@@ -175,16 +177,17 @@ aPropL = function(N1,p)
 
 qcomp=function()
 {
+   q = c(0.25,0.75)
+   T21 = c(0.02,0.0002)
+   n = length(q)*length(T21)
    width = 9.0
    height = 9.0
    x11(width=width,height=height)
    old.par = par(no.readonly = TRUE) 
    par(mar=c(4,4,0,0)+0.1)
 
-   lm = layout(matrix(c(1:9),ncol=3,nrow=3,byrow=TRUE))
+   lm = layout(matrix(c(1:n),ncol=length(q),nrow=length(T21),byrow=TRUE))
    
-   q = c(0.25,0.5,0.75)
-   T21 = c(0.02,0.002,0.0002)
    for (t in 1:length(T21))
    {
       for(k in 1:length(q))
@@ -195,19 +198,51 @@ qcomp=function()
                           line=-1,font.main=1,cex=0.8)
       }
    }
-   save.png.plot("qcomp_9",width=width,height=height)
+   save.png.plot(paste("qcomp_",n,sep=""),width=width,height=height)
 
    par(old.par)
 }
+
+plot.NN.ts=function(pop,K)
+{
+   ntime = nrow(pop)
+
+   lprop = pop[,1]/pop[,3]
+
+   width = 9.0
+   height = 9.0
+   x11(width=width,height=height)
+   old.par = par(no.readonly = TRUE) 
+   par(mar=c(4,4,0,4)+0.1,las=1)
+
+   x = c(1:ntime)
+   nice.ts.plot(x,pop,legend=colnames(pop),xlab="t",ylab="N")
+   abline(h=K,lwd=2,lty="dotdash",col="blue")
+   text(x[ntime],K,"K",adj=c(0,0),col="blue")
+
+   par("new"=TRUE)
+   plot(x,lprop,lwd=3,type='l',col="red",ylim=c(0,1),
+        ann=FALSE,axes=FALSE)
+   abline(h=0.9,lwd=2,lty="dotdash",col="red")
+   axis(4,col="red",ylab="p",col.axis="red")
+   abline(v=par("usr")[2],lwd=2,col="red")
+   mtext("p",side=4,col="red",line=3)
+#  title("Log")
+   par(old.par)
+}
+
 plotN1N2=function(ntime=100,r=0.3, K=1.0, F = 0.007, q=0.54, 
                   T12=0.01, T21=0.002, p=0.9, 
                   dt = 1.0, s=c(0.0,0.0,0.0))
 {
    pop = matrix(ncol=3,nrow=ntime)
    colnames(pop)=c("N1","N2","N1+N2")
+#  colnames(pop)=c(expression("N"[1]),
+#                  expression("N"[2]),
+#                  expression("N"[1]+"N"[2]))
    pop[1,1] = p*K
    pop[1,2] = (1-p)*K
-   pop[1,3] = pop[1,1]+pop[2,1]
+   pop[1,3] = pop[1,1]+pop[1,2]
 #  print(head(pop))
    for (t in 2:ntime)
    {
@@ -218,15 +253,9 @@ plotN1N2=function(ntime=100,r=0.3, K=1.0, F = 0.007, q=0.54,
       pop[t,3] = pop[t,1]+pop[t,2]
    #  print(pop[t,])
    }
-   lprop = pop[,1]/pop[,3]
+  
+   plot.NN.ts(pop,K)
 
-   x = c(1:ntime)
-   nice.ts.plot(x,pop,legend=colnames(pop))
-   par("new"=TRUE)
-   plot(x,lprop,lwd=3,type='l',col="red",ylim=c(0,1),
-        ann=FALSE,axes=FALSE)
-   abline(h=0.9,lty="dotdash",col="red")
-   title("Log")
 }
 
 plotN1N2a=function(ntime=100,r=0.3, K=1.0, F = 0.007, q=0.54, 
@@ -248,15 +277,8 @@ plotN1N2a=function(ntime=100,r=0.3, K=1.0, F = 0.007, q=0.54,
       pop[t,3] = pop[t,1]+pop[t,2]
    #  print(pop[t,])
    }
-   lprop = pop[,1]/pop[,3]
-
-   x = c(1:ntime)
-   nice.ts.plot(x,pop,legend=colnames(pop))
-   par("new"=TRUE)
-   plot(x,lprop,lwd=3,type='l',col="red",ylim=c(0,1),
-        ann=FALSE,axes=FALSE)
-   abline(h=0.9,lty="dotdash",col="red")
-   title("Arithmetic")
+   plot.NN.ts(pop,K)
+##   title("Arithmetic")
 }
 
 a.log.disp=function(ntime=100,r=0.3, K=1.0, F = 0.007, q=0.54, 
@@ -299,4 +321,131 @@ plot.propL.prior=function(propL=0.9)
    }
 
    save.png.plot("propL_prior",width=6.5,height=6.5)
+}
+
+# from MHI_sim.R
+compute.F<-function(yr1=1952,yr2=2012,cfile="../HDAR/hdar_1952_2012.dat",plot=TRUE)
+{
+   eps.na = 1e-8
+   obs.catch = read.table(file=cfile)
+   ngear = nrow(obs.catch)
+   ntime = ncol(obs.catch)
+
+   #  get rid of the NAs and compute maxima
+   max.catch = vector(length=ngear)
+   for (i in 1:ngear)
+   {
+      w = which(is.na(obs.catch[i,]))
+      obs.catch[i,w] = eps.na
+      max.catch[i] = max(obs.catch[i,])
+   }
+   max.catch = max.catch/sum(max.catch)
+
+   #  compute a multipation factor for the increase over previous observation   
+   f.mult = matrix(1.0,nrow=ngear,ncol=ntime)
+   for (i in 1:ngear)
+   {
+      for (j in 2:ntime)  
+      {
+         if (obs.catch[i,j-1] <= 0.0)
+           f.mult[i,j] = 1.0
+         else  
+           f.mult[i,j] = obs.catch[i,j]/obs.catch[i,j-1]
+         if (is.na(f.mult[i,j]))
+            print(paste(f.mult[i,j],obs.catch[i,j-1],obs.catch[i,j]))
+      }
+   }
+
+   # compute fishing mortality time series
+   F = matrix(1.0,nrow=ngear,ncol=ntime)
+   for (i in 1:ngear)
+   {
+      for (j in 2:ntime)  
+      {
+         F[i,j] = F[i,j-1]*f.mult[i,j]
+      }
+      # scaled to the maximum catch
+      F[i,] = max.catch[i]*F[i,]/max(F[i,])
+   }
+
+   if (plot)
+   {
+      x = c(1:ntime)
+      width = 9.0
+      height = 11.0
+      x11(width=width,height=height)
+      old.par = par(no.readonly = TRUE) 
+      par(mar=c(3.5,4.5,0,0)+0.1)
+      np = ngear
+      lm = layout(matrix(c(1:np),ncol=1,byrow=TRUE))
+      layout.show(lm)
+      for (g in 1:ngear)
+      {
+         if (g < ngear)
+            nice.ts.plot(x,F[g,],bcol="orange4",fcol="orange",lwd=3,ylab="F")
+         else
+            nice.ts.plot(x,F[g,],bcol="orange4",fcol="orange",lwd=3,ylab="F",
+                     xlab="Time")
+         title(main=gear.names[g],line=-1.5)
+      } 
+      par(old.par)
+   }
+#  ret=list(obs.catch=obs.catch,f.mult=f.mult,F=F)
+#  return(ret)
+   return(F)
+}
+
+xssams.sim=function(r=0.3, K=200000, q=0.54, T12=0.01, T21=0.002,
+                  dt = 1.0, s=c(0.0,0.0,0.0), fr=2, p=0.9)
+{
+   F.matrix = compute.F(plot=FALSE) 
+   sum.F = colSums(F.matrix)
+   ntime = ncol(F.matrix)
+
+   region.biomass = as.matrix(read.table("../run/total_biomass.dat"))
+   immigrant.biomass = T21*region.biomass[fr,]
+   pop = matrix(ncol=3,nrow=ntime)
+   colnames(pop)=c("N1","N2","N1+N2")
+   pop[1,1] = p*K
+   pop[1,2] = (1-p)*K
+   pop[1,3] = pop[1,1]+pop[1,2]
+   for (t in 2:ntime)
+   {
+      N1 = pop[t-1,1]
+      N2 = pop[t-1,2]
+      
+      tN = step(N1,N2,r,K,sum.F[t],q,T12,immigrant.biomass[t],dt,s)
+      pop[t,1:2] = tN
+      pop[t,3] = pop[t,1]+pop[t,2]
+   }
+  
+   plot.NN.ts(pop,K)
+
+   plot.sim.catch.ts(pop[,3],F.matrix)
+}
+
+plot.sim.catch.ts=function(t.pop,F)
+{
+   ntime = ncol(F)
+   ngear = nrow(F)
+
+   C.by.gear=matrix(nrow=ngear,ncol=ntime)
+
+   for (g in 1:ngear)
+   {
+      for (t in 1:ntime)
+         C.by.gear[g,t] = F[g,t]*t.pop[t]
+   }
+
+   total.C = colSums(C.by.gear)
+   x = c(1:ntime)
+   width = 9.0
+   height = 4.5
+   x11(width=width,height=height)
+   old.par = par(no.readonly = TRUE) 
+   par(mar=c(4,4,0,4)+0.1,las=1)
+   nice.ts.plot(x,total.C,xlab="t",ylab="C",
+                bcol="darkgreen",fcol="lightgreen",lwd=3)
+#  points(dat$t,dat[,(5+2*ngear+g)],col= "darkgreen",pch=16)
+   par(old.par)
 }
