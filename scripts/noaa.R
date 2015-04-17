@@ -257,5 +257,116 @@ dtdist=function(x, mean = 0, sd = 1)
   return(dt)
 }
 
+# draws multiple histograms per page in two columns
+# quarters go down columns
+yq.hist=function()
+{
+#                "C:/Users/laptopaccount/Documents/R"
+   YFT<-read.csv("/home/jsibert/xssa/NOAA/PICDR-90c-DAR-YFT-landings.csv",
+       header=TRUE, sep=",")
 
+   max.wt=max(YFT$WHOLE_WT,na.rm=TRUE)
+   print(max.wt)
 
+   wt.increment = 10
+   breaks=seq(0,max.wt+wt.increment,wt.increment)
+
+   width = 6.5
+   height = 9.0
+   x11(width=width,height=height)
+   old.par = par(no.readonly = TRUE) 
+   par(mar=c(2.0,2.5,0,0)+0.1)
+#  par(mar=c(5,4,4,2)+0.1)
+   nrow = 8
+   ncol = 2
+   maxhist = nrow*ncol
+   lm <- layout(matrix(c(1:maxhist),ncol=ncol,byrow=FALSE))
+   layout.show(lm)
+
+   nhist = 0 # count histograms per page
+   
+   years=2002:2013
+   for (y in years)
+   {
+      # get index of records for year y
+      wy  = which(YFT$LANDYR == y)
+      for (q in 1:4) 
+      {
+         print(paste(y,q))
+         # get index for quarter q within year y
+         wyq = which(YFT[wy,]$LANDQTR==q)
+         # get the weights
+         wt = as.vector(YFT[wyq,]$WHOLE_WT)
+         # plot the histogram
+         hist(wt,breaks=breaks,main="",xlab="kg",axes=FALSE)
+         legend("topright",legend=paste(y," q",q,sep=""),bty='n')
+         axis(2)
+      #  box()
+
+         nhist = nhist + 1
+
+         # draw x axis on bottom row
+         if ((nhist %% nrow) == 0)
+            axis(1)
+
+         # save plot when page is full and start new page
+         if (nhist == maxhist)
+         {
+            fname = paste("wf",y,"q",q,sep="")
+            print(paste("Save",fname," and reset"))
+            save.png.plot(fname,width=width,height=height)
+            nhist = 0
+         }
+      }
+   }
+   par(old.par)
+}
+
+q.hist=function()
+{
+   YFT<-read.csv("/home/jsibert/xssa/NOAA/PICDR-90c-DAR-YFT-landings.csv",
+       header=TRUE, sep=",")
+
+   max.wt=max(YFT$WHOLE_WT,na.rm=TRUE)
+   print(max.wt)
+
+   wt.increment = 10
+   breaks=seq(0,max.wt+wt.increment,wt.increment)
+
+   width = 6.5
+   height = 9.0
+   x11(width=width,height=height)
+   old.par = par(no.readonly = TRUE) 
+   par(mar=c(2.0,2.5,0,0)+0.1)
+#  par(mar=c(5,4,4,2)+0.1)
+   nrow = 4
+   ncol = 1
+   maxhist = nrow*ncol
+   lm <- layout(matrix(c(1:maxhist),ncol=ncol,byrow=FALSE))
+   layout.show(lm)
+
+   nhist = 0 # count histograms per page
+   for (q in 1:4) 
+   {
+      print(paste(q))
+      # get index for quarter q
+      wq = which(YFT$LANDQTR==q)
+      # get the weights
+      wt = as.vector(YFT[wq,]$WHOLE_WT)
+      # plot the histogram
+      hist(wt,breaks=breaks,main="",xlab="kg",axes=FALSE)
+      legend("topright",legend=paste("Q ",q,sep=""),bty='n')
+    # abline(h=0,lwd=1)
+      axis(2)
+      #  box()
+
+      nhist = nhist + 1
+
+      # draw x axis on bottom row
+      if ((nhist %% nrow) == 0)
+         axis(1)
+   }
+   # save plot when page is full and start new page
+   save.png.plot("qwf",width=width,height=height)
+   par(old.par)
+}
