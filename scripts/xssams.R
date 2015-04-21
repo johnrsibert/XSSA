@@ -1,3 +1,4 @@
+require("mvtnorm")
 gear.names = c("TunaHL","Troll","Longline","Bottom/inshore HL","AkuBoat")
 sgn = c("THL","Troll","LL","BHL","Aku")
  
@@ -25,8 +26,8 @@ step=function(pN1,pN2,r, K, F, q, T12, T21, dt, s)
 #  print(paste("d:",dLN1,dLN2))
 
    nN = vector(length=2)
-   nN[1] = exp(log(pN1) + dLN1 * dt)
-   nN[2] = exp(log(pN2) + dLN2 * dt)
+   nN[1] = exp(log(pN1) + dLN1 * dt + s[1])
+   nN[2] = exp(log(pN2) + dLN2 * dt + s[2])
 #  print(paste("n:",nN[1],nN[2]))
    return(nN)
 }
@@ -220,7 +221,7 @@ qcomp.phase=function()
    par(old.par)
 }
 
-plot.NN.ts=function(pop,K)
+plot.NN.ts=function(pop,K,save.graphics=TRUE)
 {
    ntime = nrow(pop)
 
@@ -244,7 +245,8 @@ plot.NN.ts=function(pop,K)
    axis(4,col="red",ylab="p",col.axis="red")
    abline(v=par("usr")[2],lwd=2,col="red")
    mtext("p",side=4,col="red",line=3)
-   save.png.plot("NNts",width=width,height=height)
+   if (save.graphics)
+      save.png.plot("NNts",width=width,height=height)
    par(old.par)
 }
 
@@ -413,61 +415,114 @@ compute.F<-function(yr1=1952,yr2=2012,cfile="../HDAR/hdar_1952_2012.dat",plot=TR
 }
 
 xssams.sim=function(r=0.3, K=200000, q=0.54, T12=0.01, T21=0.002,
-                  dt = 1.0, s=c(0.0,0.0,0.0), fr=2, p=0.9,
-                  do.plot=TRUE)
+                  dt = 1.0, sN=c(0.0,0.0,0.0), fr=2, p=0.9, 
+                  F=NULL, sC, do.plot=TRUE, save.graphics=FALSE)
 {
-   F.matrix = compute.F(plot=FALSE) 
+   if (is.null(F))
+   {
+      F.matrix = compute.F(plot=FALSE) 
+   #  F.matrix = 0.01*F.matrix
+   }
+   else
+      F.matrix = F
    sum.F = colSums(F.matrix)
    ntime = ncol(F.matrix)
+   ngear = nrow(F.matrix)
+#  print(paste(ngear,ntime))
 
    region.biomass = as.matrix(read.table("../run/total_biomass.dat"))
    immigrant.biomass = T21*region.biomass[fr,]
+
+   obs.catch = read.table(file="../HDAR/hdar_1952_2012.dat")
+#  print(head(t(obs.catch)))
+
+   print(sN)
+   cov = matrix(nrow=2,ncol=2)
+   cov[1,1] = sN[1]
+   cov[2,2] = sN[2]
+   cov[1,2] = sN[3]*cov[1,1]*cov[2,2]
+   cov[2,1] = cov[1,2]
+   print(cov)
+   s <- rmvnorm(n=ntime, sigma=cov)
+   print(dim(s))
+   print(colMeans(s))
+   print(var(s))
+
    pop = matrix(ncol=3,nrow=ntime)
    colnames(pop)=c(" N1"," N2"," N1+N2  ")
-   pop[1,1] = p*K
-   pop[1,2] = (1-p)*K
+   pop[1,1] = p*K*exp(s[1,1])
+   pop[1,2] = (1-p)*K*exp(s[1,2])
    pop[1,3] = pop[1,1]+pop[1,2]
    for (t in 2:ntime)
    {
       N1 = pop[t-1,1]
       N2 = pop[t-1,2]
       
-      tN = step(N1,N2,r,K,sum.F[t],q,T12,immigrant.biomass[t],dt,s)
+      tN = step(N1,N2,r,K,sum.F[t],q,T12,immigrant.biomass[t],dt,s[t,])
       pop[t,1:2] = tN
       pop[t,3] = pop[t,1]+pop[t,2]
    }
   
+   pred.catch = matrix(ncol=ngear,nrow=ntime)
+   for (t in 1:ntime)
+   {
+      pred.catch[t,] = obs(pop[t,3],F.matrix[,t],sC)
+   }
+
    if (do.plot)
    {
-      plot.NN.ts(pop,K)
-   #  title(main=paste("q = ",q,sep=""),
-   #                      line=2,font.main=1,cex=0.8)
+      plot.NN.ts(pop,K,save.graphics)
+      plot.catch.ts(obs.catch,pred.catch,save.graphics)
    }
-#  plot.sim.catch.ts(pop[,3],F.matrix)
 }
 
-plot.sim.catch.ts=function(t.pop,F)
+obs = function(NN,F,s)
 {
-   ntime = ncol(F)
-   ngear = nrow(F)
-
-   C.by.gear=matrix(nrow=ngear,ncol=ntime)
-
+   ngear = length(F)
+   pred.catch = vector(length=ngear)
    for (g in 1:ngear)
    {
-      for (t in 1:ntime)
-         C.by.gear[g,t] = F[g,t]*t.pop[t]
+      lpc = log(NN) + log(F[g]) # + s[g]
+      pred.catch[g] = exp(lpc)
    }
+   return(pred.catch)
+}
 
-   total.C = colSums(C.by.gear)
+
+plot.catch.ts=function(obs.catch,pred.catch,save.graphics=TRUE)
+{
+   ntime = nrow(pred.catch)
+   ngear = ncol(pred.catch)
    x = c(1:ntime)
    width = 9.0
-   height = 4.5
+   height = 11.0
    x11(width=width,height=height)
    old.par = par(no.readonly = TRUE) 
    par(mar=c(4,4,0,4)+0.1,las=1)
-   nice.ts.plot(x,total.C,xlab="t",ylab="C",
-                bcol="darkgreen",fcol="lightgreen",lwd=3)
-#  points(dat$t,dat[,(5+2*ngear+g)],col= "darkgreen",pch=16)
+   np = ngear+1
+   lm = layout(matrix(c(1:np),ncol=1,byrow=TRUE))
+   layout.show(lm)
+   for (g in 1:np)
+   {
+      if (g < np)
+      {
+         nice.ts.plot(x,pred.catch[,g],xlab="",ylab="",
+                  bcol="darkgreen",fcol="lightgreen",lwd=3)
+         points(x,obs.catch[g,],col= "darkgreen",pch=16)
+         title(main=gear.names[g],line=-1)
+      }
+      else
+      {
+         y = rowSums(pred.catch)
+         nice.ts.plot(x,y,xlab="t",ylab="",
+                  bcol="darkgreen",fcol="lightgreen",lwd=3)
+         y = colSums(obs.catch,na.rm=TRUE)
+         points(x,y,col= "darkgreen",pch=16)
+         title(main="Total",line=-1)
+      }
+   } 
+
+   if (save.graphics)
+      save.png.plot("catchts",width=width,height=height)
    par(old.par)
 }

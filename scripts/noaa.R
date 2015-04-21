@@ -298,7 +298,7 @@ yq.hist=function()
          # get the weights
          wt = as.vector(YFT[wyq,]$WHOLE_WT)
          # plot the histogram
-         hist(wt,breaks=breaks,main="",xlab="kg",axes=FALSE)
+         hist(wt,breaks=breaks,main="",xlab="",ylab="",axes=FALSE)
          legend("topright",legend=paste(y," q",q,sep=""),bty='n')
          axis(2)
       #  box()
@@ -307,7 +307,10 @@ yq.hist=function()
 
          # draw x axis on bottom row
          if ((nhist %% nrow) == 0)
+         {
             axis(1)
+            mtext("lb",side=1,line=1)
+         }
 
          # save plot when page is full and start new page
          if (nhist == maxhist)
@@ -337,7 +340,7 @@ q.hist=function()
    height = 9.0
    x11(width=width,height=height)
    old.par = par(no.readonly = TRUE) 
-   par(mar=c(2.0,2.5,0,0)+0.1)
+   par(mar=c(2.0,3.0,0,0)+0.1)
 #  par(mar=c(5,4,4,2)+0.1)
    nrow = 4
    ncol = 1
@@ -354,17 +357,23 @@ q.hist=function()
       # get the weights
       wt = as.vector(YFT[wq,]$WHOLE_WT)
       # plot the histogram
-      hist(wt,breaks=breaks,main="",xlab="kg",axes=FALSE)
-      legend("topright",legend=paste("Q ",q,sep=""),bty='n')
-    # abline(h=0,lwd=1)
+      hist(wt,breaks=breaks,main="",xlab="",ylab="",axes=FALSE,
+          col="lightblue",border="blue")
+      legend("topleft",legend=paste("Q ",q,sep=""),bty='n',cex=1.2,text.font=2)
       axis(2)
-      #  box()
+      mtext("N",side=2,line=2,las=1)
+    # box()
+      abline(h=0,lwd=1)
+    # abline(v=0,lwd=1)
 
       nhist = nhist + 1
 
       # draw x axis on bottom row
       if ((nhist %% nrow) == 0)
+      {
          axis(1)
+         mtext("lb",side=1,line=1)
+      }
    }
    # save plot when page is full and start new page
    save.png.plot("qwf",width=width,height=height)
