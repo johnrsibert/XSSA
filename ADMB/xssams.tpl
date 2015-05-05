@@ -93,75 +93,85 @@ TOP_OF_MAIN_SECTION
   cout << "Opened program log: " << logname << endl;
 
 
-DATA_SECTION;
-  init_adstring catch_dat_file;
-  init_adstring forcing_dat_file;
+DATA_SECTION
 
-  init_int ntime;
   init_int ngear;
-  init_number dt; // integration time step
+  init_int ntime;
+  init_number dt;
+  init_matrix tcatch(1,ngear,1,ntime);
+  //!! TRACE(tcatch)
+  matrix obs_catch(1,ntime,1,ngear);
+  !! obs_catch = trans(tcatch);
+  !! TRACE(obs_catch)
+
+  init_matrix forcing_matrix(1,9,1,ntime);
   init_int fr;
-  !! TTRACE(dt,fr)
+  init_int use_mean_forcing;
+  vector immigrant_biomass
+  number mean_immigrant_biomass;
+  !! immigrant_biomass = forcing_matrix(fr);
+  !! mean_immigrant_biomass = mean(forcing_matrix(fr));
+  //!! TRACE(forcing_matrix)
+  !! TRACE(mean_immigrant_biomass)
+  !! if (use_mean_forcing)
+  !!    immigrant_biomass = mean_immigrant_biomass;
+  !! TRACE(immigrant_biomass)
+  //!! if (1) exit(1);
 
-  init_number init_logT12;
-  init_int phase_logT12;
-  !! TTRACE(init_logT12,phase_logT12)
+  init_int phase_T12;
+  init_number init_T12;
+  !! TTRACE(init_T12,phase_T12)
 
+  init_int phase_T21;
+  init_number init_T21;
+  !! TTRACE(init_T21,phase_T21)
 
-  init_number init_logT21;
-  init_int phase_logT21;
-  !! TTRACE(init_logT21,phase_logT21)
+  init_int phase_r;
+  init_number init_r;
+  !! TTRACE(init_r,phase_r)
 
-  init_number init_logr;
-  init_int phase_logr;
-  !! TTRACE(init_logr,phase_logr)
+  init_int phase_K;
+  init_number init_K;
+  !! TTRACE(init_K,phase_K)
 
-  init_number init_logK;
-  init_int phase_logK;
-  !! TTRACE(init_logK,phase_logK)
+  init_int phase_sdlogF;
+  init_vector init_sdlogF(1,ngear);
+  !! TTRACE(init_sdlogF,phase_sdlogF)
 
-  init_vector init_logsdlogF(1,ngear);
-  init_int phase_logsdlogF;
-  !! TTRACE(init_logsdlogF,phase_logsdlogF)
+  init_int phase_sdlogPop;
+  init_vector init_sdlogPop(1,2);
+  !! TTRACE(init_sdlogPop,phase_sdlogPop)
 
-  init_vector init_logsdlogPop(1,2);
-  init_int phase_logsdlogPop;
-  !! TTRACE(init_logsdlogPop,phase_logsdlogPop)
+  init_int phase_sdlogYield;
+  init_vector init_sdlogYield(1,ngear);
+  !! TTRACE(init_sdlogYield,phase_sdlogYield)
 
-  init_vector init_logsdlogYield(1,ngear);
-  init_int phase_logsdlogYield;
-  !! TTRACE(init_logsdlogYield,phase_logsdlogYield)
+  init_int phase_meanProportion_local;
+  init_number init_meanProportion_local;
+  !! TTRACE(init_meanProportion_local,phase_meanProportion_local)
 
-  init_number init_LmeanProportion_local;
-  init_int phase_LmeanProportion_local;
-  !! TTRACE(init_LmeanProportion_local,phase_LmeanProportion_local)
+  init_int phase_sdProportion_local;
+  init_number init_sdLProportion_local;
+  !! TTRACE(init_sdLProportion_local,phase_sdProportion_local)
 
-  init_number init_logsdLProportion_local;
-  init_int phase_logsdLProportion_local;
-  !! TTRACE(init_logsdLProportion_local,phase_logsdLProportion_local)
-
-  init_number init_qProp;
   init_int phase_qProp;
+  init_number init_qProp;
   !! TTRACE(init_qProp,phase_qProp)
 
-  init_int use_robustF;
-  init_vector init_pfat(1,ngear);
+  init_int use_robustY;
   init_int phase_pfat;
+  init_vector init_pfat(1,ngear);
   !! TTRACE(init_pfat,phase_pfat)
 
-  number ss;      // 1/dt number of interations in the integration
-  matrix obs_catch;
-  matrix forcing_matrix;
-  vector immigrant_biomass;
-  number mean_immigrant_biomass;
+  //number mean_immigrant_biomass;
   int pininit;
-  number Fmsy;
-  number Bmsy;
-  number MSY;
-  number ZeroCatch;
-  number logZeroCatch;
-  number ZeroF;
-  number logZeroF;
+  //number Fmsy;
+  //number Bmsy;
+  //number MSY;
+  //number ZeroCatch;
+  //number logZeroCatch;
+  //number ZeroF;
+  //number logZeroF;
   int lengthU;
   int utPop1;
   int utPop2;
@@ -181,30 +191,10 @@ DATA_SECTION;
     UU.allocate(1,lengthU);
     for (int i = 1; i <= lengthU; i++)
        UU(i) = i;
-    ss = 1.0/dt;
-    TTRACE(dt,ss);
-    obs_catch.allocate(1,ngear,1,ntime);
     residuals.allocate(1,ntime,1,2*ngear+4);
     residuals.initialize();
-    TRACE(catch_dat_file);
-    cifstream cc(catch_dat_file);
-    if (!cc)
-    {
-       clogf << "error opening " << catch_dat_file << endl;
-       cerr  << "error opening " << catch_dat_file << endl;
-       ad_exit(1);
-    }
-
-    clogf << "Opened " << catch_dat_file << endl;
-    cc >> obs_catch;
-    if (!cc)
-    {
-       clogf << "error reading " << catch_dat_file << endl;
-       cerr  << "error reading " << catch_dat_file << endl;
-       ad_exit(1);
-    }
-    ZeroCatch = 1.0; //1.0e-8;
-    logZeroCatch = log(ZeroCatch);
+    double ZeroCatch = 1.0; //1.0e-8;
+    double logZeroCatch = log(ZeroCatch);
     TTRACE(ZeroCatch,logZeroCatch)
     int nzero = ntime;
     int ziter = 0;
@@ -214,43 +204,20 @@ DATA_SECTION;
        nzero = 0;
        for (int g = 1; g <= ngear; g++)
          for (int t = 2; t <= ntime; t++)
-            if ( (obs_catch(g,t) <= 0.0) 
-              && (obs_catch(g,t-1) > 0.0) && (obs_catch(g,t+1) > 0.0) )
+            if ( (obs_catch(t,g) <= 0.0) 
+              && (obs_catch(t-1,g) > 0.0) && (obs_catch(t+1,g) > 0.0) )
             {
                clogf << ++nzero << " " << ziter << endl;
-               obs_catch(g,t) = 0.5*(obs_catch(g,t-1) + obs_catch(g,t+1));
+               obs_catch(t,g) = 0.5*(obs_catch(t-1,g) + obs_catch(t+1,g));
                clogf << nzero<< " catch for gear " << g << " at time " << t
-                  << " set to " << obs_catch(g,t)  << endl;
+                  << " set to " << obs_catch(t,g)  << endl;
             }
     }
 
     obs_catch = log(obs_catch+ZeroCatch);
-
-    TRACE(forcing_dat_file)
-    forcing_matrix.allocate(1,9,1,ntime);
-    cifstream ff(forcing_dat_file);
-    if (!ff)
-    {
-       clogf << "error opening " << forcing_dat_file << endl;
-       cerr  << "error opening " << forcing_dat_file << endl;
-       ad_exit(1);
-    }
-    clogf << "Opened " << forcing_dat_file << endl;
-    ff >> forcing_matrix;
-    if (!ff)
-    {
-       clogf << "error reading " << forcing_dat_file << endl;
-       cerr  << "error reading " << forcing_dat_file << endl;
-       ad_exit(1);
-    }
-    TRACE(fr);
-    immigrant_biomass.allocate(1,ntime);
-    mean_immigrant_biomass = mean(forcing_matrix(fr));
-    immigrant_biomass = forcing_matrix(fr);
-    //immigrant_biomass = mean_immigrant_biomass;
-    TRACE(mean_immigrant_biomass)
-    TRACE(immigrant_biomass)
-
+    TRACE(obs_catch)
+    //if (1) ad_exit(1);
+  
     // set up U indexing
     Fndxl.allocate(1,ntime);
     Fndxu.allocate(1,ntime);
@@ -267,24 +234,24 @@ DATA_SECTION;
     //if (1) ad_exit(1);
 
 PARAMETER_SECTION
-  init_number logT12(phase_logT12);
-  init_number logT21(phase_logT21);
-  init_number logr(phase_logr);
-  init_number logK(phase_logK);
+  init_number logT12(phase_T12);
+  init_number logT21(phase_T21);
+  init_number logr(phase_r);
+  init_number logK(phase_K);
 
-  init_vector logsdlogF(1,ngear,phase_logsdlogF);
+  init_vector logsdlogF(1,ngear,phase_sdlogF);
   //init_number logsdlogF(phase_logsdlogF);
-  init_vector logsdlogPop(1,2,phase_logsdlogPop);
+  init_vector logsdlogPop(1,2,phase_sdlogPop);
   //init_number logsdlogPop(phase_logsdlogPop);
-  init_vector logsdlogYield(1,ngear,phase_logsdlogYield);
+  init_vector logsdlogYield(1,ngear,phase_sdlogYield);
 
   // logit transformed porportion local
-  init_number LmeanProportion_local(phase_LmeanProportion_local);
-  init_number logsdLProportion_local(phase_logsdLProportion_local);
+  init_number LmeanProportion_local(phase_meanProportion_local);
+  init_number logsdLProportion_local(phase_sdProportion_local);
 
   init_bounded_number qProp(0.0,1.0,phase_qProp);
 
-  // robust F likelihood
+  // robust Y likelihood
   init_vector Lpfat(1,ngear,phase_pfat);
 
   random_effects_vector U(1,lengthU);
@@ -299,21 +266,20 @@ PRELIMINARY_CALCS_SECTION
     TRACE(pininit)
     if (!pininit)
     {
-       logT12 = init_logT12;
-       logT21 = init_logT21;
+       logT12 = log(init_T12);
+       logT21 = log(init_T21);
        TTRACE(logT12,logT21)
-       logr = init_logr;
+       logr = log(init_r);
        TTRACE(logr,mfexp(logr))
-       logK = init_logK;
+       logK = log(init_K);
        TTRACE(logK,mfexp(logK))
 
-       logsdlogF = init_logsdlogF;
-       logsdlogYield = init_logsdlogYield;
-       logsdlogPop = init_logsdlogPop;
+       logsdlogF = log(init_sdlogF);
+       logsdlogYield = log(init_sdlogYield);
+       logsdlogPop = log(init_sdlogPop);
 
-
-       LmeanProportion_local = init_LmeanProportion_local;
-       logsdLProportion_local = init_logsdLProportion_local;
+       LmeanProportion_local = logit((double)init_meanProportion_local);
+       logsdLProportion_local = log(init_sdLProportion_local);
        TTRACE(LmeanProportion_local,logsdLProportion_local)
        //double prop = 1.0/(1.0+mfexp(-value(LmeanProportion_local)));
        double prop = alogit(value(LmeanProportion_local));
@@ -322,7 +288,7 @@ PRELIMINARY_CALCS_SECTION
        qProp = init_qProp;
        TTRACE(qProp,phase_qProp)
 
-       if (!use_robustF)
+       if (!use_robustY)
        {
           phase_pfat = -1;
           init_pfat = 1e-25;
@@ -544,40 +510,40 @@ SEPARABLE_FUNCTION void step(const int t, const dvar_vector& f1, const dvar_vect
   //   dvar_vector pfat(1,ngear);
   for (int g = 1; g <= ngear; g++)
   {
-     if (use_robustF == 1)  // normal + t distribution
-     {
-        dvariable z = square(ft1(g)-ft2(g))/varlogF(g);
-        dvariable norm_part = sqrt(varlogF(g)) + 0.5*LOG_TWO_M_PI * z;
-        dvariable fat_part = LOG_M_PI + log(1.0 + z);
-        dvariable pfat = alogit(Lpf(g));
-        Fnll += log((1.0-pfat)*mfexp(norm_part) + pfat*mfexp(fat_part));
-        //TTRACE(norm_part,fat_part)
-	//TTRACE(pfat,Lpf(g))
-     }
-     else if (use_robustF == 2) // from newreg2.cpp
-     {
-        double width=3.0;
-        double width2=width*width;
-        const double alpha = 0.7;
-        const double a2 = square(alpha);
-        dvariable diff2 = square(ft1(g)-ft2(g));
-        dvariable v_hat = diff2+1.0e-80;
+  // if (use_robustY == 1)  // normal + t distribution
+  // {
+  //    dvariable z = square(ft1(g)-ft2(g))/varlogF(g);
+  //    dvariable norm_part = sqrt(varlogF(g)) + 0.5*LOG_TWO_M_PI * z;
+  //    dvariable fat_part = LOG_M_PI + log(1.0 + z);
+  //    dvariable pfat = alogit(Lpf(g));
+  //    Fnll += log((1.0-pfat)*mfexp(norm_part) + pfat*mfexp(fat_part));
+  //    //TTRACE(norm_part,fat_part)
+  //    //TTRACE(pfat,Lpf(g))
+  // }
+  // else if (use_robustY == 2) // from newreg2.cpp
+  // {
+  //    double width=3.0;
+  //    double width2=width*width;
+  //    const double alpha = 0.7;
+  //    const double a2 = square(alpha);
+  //    dvariable diff2 = square(ft1(g)-ft2(g));
+  //    dvariable v_hat = diff2+1.0e-80;
 
-        dvariable pcon = alogit(Lpf(g));
-        dvariable b=2.*pcon/(width*sqrt(PI));  // This is the weight for the "robustifying" term
+   //   dvariable pcon = alogit(Lpf(g));
+   //   dvariable b=2.*pcon/(width*sqrt(PI));  // This is the weight for the "robustifying" term
 
-        dvariable norm_part = log(1.0-pcon)*mfexp(-diff2/(2.0*a2*v_hat));
+   //   dvariable norm_part = log(1.0-pcon)*mfexp(-diff2/(2.0*a2*v_hat));
    
-        dvariable fat_part =  b/(1.+pow(diff2/(width2*a2*v_hat),2));
-        //TTRACE(norm_part,fat_part)
-        //TRACE(mfexp(norm_part + fat_part))
-        Fnll += norm_part + fat_part;
-     }
+   //   dvariable fat_part =  b/(1.+pow(diff2/(width2*a2*v_hat),2));
+   //   //TTRACE(norm_part,fat_part)
+   //   //TRACE(mfexp(norm_part + fat_part))
+   //   Fnll += norm_part + fat_part;
+   //}
 
-     else
-     {
+   //else
+   //{
         Fnll += 0.5*(log(TWO_M_PI*varlogF(g)) + square(ft1(g)-ft2(g))/varlogF(g));
-     }
+   //}
      //TRACE(Fnll)
      if (isnan(value(Fnll)))
      {
@@ -598,6 +564,7 @@ SEPARABLE_FUNCTION void step(const int t, const dvar_vector& f1, const dvar_vect
   dvariable prevLogN2;
   dvariable prevN1;
   dvariable prevN2;
+  const int ss = 1;
   for (int s = 1; s <= ss; s++)
   {
      //TTRACE(s,dt)
@@ -707,7 +674,7 @@ SEPARABLE_FUNCTION void obs(const int t, const dvar_vector& f,const dvariable& p
   for (int g = 1; g <= ngear; g++)
   {
         // observation error
-        Ynll += 0.5*(log(TWO_M_PI*varlogYield(g)) + square(obs_catch(g,t)-log_pred_yield(g))/varlogYield(g));
+        Ynll += 0.5*(log(TWO_M_PI*varlogYield(g)) + square(obs_catch(t,g)-log_pred_yield(g))/varlogYield(g));
         if (isnan(value(Ynll)))
         {
            TRACE(Ynll)
@@ -784,7 +751,7 @@ FUNCTION void write_status(ofstream& s)
        for (int g = 1; g <= 2*ngear; g++)
           s << " " << residuals(t,++rc);
        for (int g = 1; g <= ngear; g++)
-          s << " " << obs_catch(g,t);
+          s << " " << obs_catch(t,g);
        s << endl;
     }
 
