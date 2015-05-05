@@ -41,6 +41,8 @@
             -1     0.4 0.4 0.4 0.4 0.4
 # sdlogPop    phase  initial values
                1     0.1  0.2
+# rho phase initial value
+       1    0.1
 # sdlogYield  phase initial values
                1    1.0  1.0  1.0  1.0  1.0
 # meanProportion_Local phase initial value
