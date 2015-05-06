@@ -246,7 +246,8 @@ PARAMETER_SECTION
   //init_number logsdlogF(phase_logsdlogF);
   init_vector logsdlogPop(1,2,phase_sdlogPop);
   //init_number logsdlogPop(phase_logsdlogPop);
-  init_bounded_number rho(0.0,1.0,phase_rho);
+  init_bounded_number rho(-0.99,0.99,phase_rho);
+
   init_vector logsdlogYield(1,ngear,phase_sdlogYield);
 
   // logit transformed porportion local
@@ -531,7 +532,6 @@ SEPARABLE_FUNCTION void step(const int t, const dvar_vector& f1, const dvar_vect
      }
   } 
 
-  //dvariable sumFg = 0.0; // total fishing mortality
   dvariable sumFg = sum(mfexp(ft1)); // total fishing mortality
   dvariable q = qP;
 
@@ -540,13 +540,14 @@ SEPARABLE_FUNCTION void step(const int t, const dvar_vector& f1, const dvar_vect
   dvariable nextLogN1 = p11 + dt*(r*(1.0 - prevN1/K) - sumFg - T12 - 2.0*(1.0-q)*r*prevN2/K);
   dvariable nextLogN2 = p21 + dt*(r*(1.0 - prevN2/K) - sumFg - T12 - 2.0*q*r*prevN1/K + T21*immigrant_biomass(t)/prevN2);
 
-  if (t == 2)
-  {
-     TTRACE(p11,p21)
-     TTRACE(prevN1,prevN2)
-     TTRACE(p12,p22)
-     TTRACE(nextLogN1,nextLogN2)
-  }
+  //if (t == 2)
+  //{
+  //   TTRACE(p11,p21)
+  //   TTRACE(prevN1,prevN2)
+  //   TTRACE(p12,p22)
+  //   TTRACE(nextLogN1,nextLogN2)
+  //}
+
   if ( isnan(value(nextLogN1)) || isnan(value(nextLogN2)) ||
        isinf(value(nextLogN1)) || isinf(value(nextLogN2)) )
   {

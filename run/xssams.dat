@@ -40,9 +40,9 @@
 # sdlogF    phase  initial values
             -1     0.4 0.4 0.4 0.4 0.4
 # sdlogPop    phase  initial values
-               1     0.1  0.2
+               1     0.1  0.1
 # rho phase initial value
-       1    0.1
+      -1    0.0
 # sdlogYield  phase initial values
                1    1.0  1.0  1.0  1.0  1.0
 # meanProportion_Local phase initial value
@@ -50,7 +50,7 @@
 # sdLproportion_local phase initial value
                       -1    2.72
 # qProp phase initial value
-        -1    0.54
+         1    0.54
 # robust yield likelihood
 # use pfat_phase pfat initial values
   0   -1  0.05 0.05 0.05 0.05 0.05
