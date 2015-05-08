@@ -168,7 +168,7 @@ LL.join=function(hdar=NULL,noaa=NULL,yr1=1952,yr2=2012)
    }
    colnames(dat) = c("Tuna HL","Troll","Longline","Bottom/inshore HL","Aku boat")
 
-   dat.file = paste("five_gears_",yr1,"_",yr2,".dat",sep="")
+   dat.file = paste("five_gears_q_",yr1,"_",yr2,".dat",sep="")
    print(paste("writing",dat.file))
    write(as.matrix(dat),file=dat.file,ncolumns=dim(dat)[1])
    print(paste("finished",dat.file))
@@ -197,10 +197,76 @@ LL.join=function(hdar=NULL,noaa=NULL,yr1=1952,yr2=2012)
                    ylab="Catch (mt)")
    }
 
-   save.png.plot(paste(ncol(dat),"_gear_catch_history",sep=""),width=width,height=height)
+   save.png.plot(paste(ncol(dat),"_gear_catch_history_q",sep=""),width=width,height=height)
+
+   ####################################
+   # sum catch over quarters to generate annual data
+
+   ya = seq(yr1,yr2,1)
+   nyear = length(ya)
+   print(paste("nyear =",nyear))
+   adat = as.data.frame(matrix(nrow=nyear,ncol=5))
+   colnames(adat) = colnames(dat)
+   for (i in 1:nyear)
+   {
+      y = ya[i]
+      wy = which (trunc(yy) == y)
+      for (j in 1:ncol(dat))
+      {
+         adat[i,j] = sum(dat[wy,j],na.rm=TRUE)
+      }
+   }
+
+   dat.file = paste("five_gears_a_",yr1,"_",yr2,".dat",sep="")
+   print(paste("writing",dat.file))
+   write(as.matrix(adat),file=dat.file,ncolumns=dim(adat)[1])
+   print(paste("finished",dat.file))
+
+   x11(width=width,height=height)
+   par(mar=c(2.5,4,0,0)+0.1)
+#  par(mar=c(5  ,4,4,2)+0.1)
+   np = ncol(adat)
+   lm <- layout(matrix(c(1:np),ncol=1,byrow=TRUE))
+   layout.show(lm)
+
+   for (j in 1:ncol(adat))
+   {
+      nice.ts.plot(ya,adat[,j],lwd=3,label=colnames(dat)[j],
+                   ylab="Catch (mt)")
+   }
+
+   save.png.plot(paste(ncol(adat),"_gear_catch_history_a",sep=""),width=width,height=height)
+
+
+   # now do the forcing biomass
+   region.biomass.q = as.matrix(read.table("../run/total_biomass_q.dat"))
+   print(dim(region.biomass.q))
+   region.biomass.a = matrix(nrow=nrow(region.biomass.q),ncol=nyear)
+   print(dim(region.biomass.a))
+   for (i in 1:nyear)
+   {
+      y = ya[i]
+      wy = which (trunc(yy) == y)
+      for (j in 1:nrow(region.biomass.a))
+      {
+         region.biomass.a[j,i] = sum(region.biomass.q[j,wy],na.rm=TRUE)
+      }
+   }
+   fr = 2
+   x11()
+   nice.ts.plot(yy,region.biomass.q[fr,],ylab=paste("Region",fr,"Biomass Q"))
+   points(yy,region.biomass.q[fr,],pch=16,col="blue")
+   x11()
+   nice.ts.plot(ya,region.biomass.a[fr,],ylab=paste("Region",fr,"Biomass A"))
+   points(ya,region.biomass.a[fr,],pch=16,col="blue")
+
+   bio.file = "../run/total_biomass_a.dat"
+   print(paste("writing",bio.file))
+   write(as.matrix(region.biomass.a),file=bio.file,ncolumns=nyear)
+   print(paste("finished",bio.file))
 
    par(old.par)
-   return(cbind(yy,dat))
+   return(list(dat=cbind(yy,dat),adat=cbind(ya,adat)))
 }
 
 make.catch.diffs=function(file="five_gears.dat")

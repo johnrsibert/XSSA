@@ -27,6 +27,16 @@ GLOBALS_SECTION;
        return 1;
   }
 
+
+  /*
+  template <typename SCALAR> SCALAR logdnorm(const SCALAR& x, const SCALAR& mean, const SCALAR& var)
+  {
+     SCALAR a = 0.5*(log(TWO_M_PI*var) + square(x-mean)/var);
+     return a;
+  }
+  template dvariable logdnorm(const dvariable& x, const dvariable& mean, const dvariable& var);
+  template df1b2variable logdnorm(const df1b2variable& x, const df1b2variable& mean, const df1b2variable& var);
+  */
   template <typename SCALAR> SCALAR logit(const SCALAR& p)
   {
      SCALAR a = log(p/(1.0-p));
@@ -100,6 +110,8 @@ DATA_SECTION
   init_int ngear;
   init_int ntime;
   init_number dt;
+  number logdt;
+  !!  logdt = log(dt);
   init_matrix tcatch(1,ngear,1,ntime);
   matrix obs_catch(1,ntime,1,ngear);
   !! obs_catch = trans(tcatch);
@@ -195,7 +207,7 @@ DATA_SECTION
     UU.allocate(1,lengthU);
     for (int i = 1; i <= lengthU; i++)
        UU(i) = i;
-    residuals.allocate(1,ntime,1,2*ngear+4);
+    residuals.allocate(1,ntime,1,2*ngear+5);
     residuals.initialize();
     double ZeroCatch = 1.0; //1.0e-8;
     double logZeroCatch = log(ZeroCatch);
@@ -217,7 +229,7 @@ DATA_SECTION
                   << " set to " << obs_catch(t,g)  << endl;
             }
     }
-
+    clogf << "Zero catch bridging instances: " << nzero << endl;
     obs_catch = log(obs_catch+ZeroCatch);
     //if (1) ad_exit(1);
   
@@ -467,22 +479,6 @@ PROCEDURE_SECTION
   {
      write_status(clogf);
   }
-  /*
-  clogf << "###param";
-  clogf << " " << userfun_entries;
-  clogf << " " << nll;
-  clogf << " " << logT12;
-  clogf << " " << logT21;
-  clogf << " " << logr;
-  clogf << " " << logK;
-  clogf << " " << logsdlogF;
-  clogf << " " << logsdlogPop;
-  clogf << " " << logsdlogYield;
-  clogf << " " << LmeanProportion_local;
-  clogf << " " << logsdLProportion_local;
-  clogf << " " << Lpfat;
-  clogf << endl;
-  */
 
   //if (1) ad_exit(1);
 
@@ -571,6 +567,10 @@ SEPARABLE_FUNCTION void step(const int t, const dvar_vector& f1, const dvar_vect
 
   // process error N2
   dvariable peN2 = 0.5*(log(TWO_M_PI*varlogPop(2)) + square(p22-nextLogN2)/varlogPop(2));
+  //dvariable tp22 = p22;
+  //dvariable tvar = varlogPop(2);
+  //dvariable tpen = logdnorm(tp22,nextLogN2,tvar);
+  //TTRACE(peN2,tpen)
 
   //Pnll += (peN1+peN2);
   if (isnan(value(Pnll)))
@@ -634,7 +634,7 @@ SEPARABLE_FUNCTION void obs(const int t, const dvar_vector& f,const dvariable& p
                                            mfexp(pop12) + mfexp(pop22)) ); // population 2
   for (int g = 1; g <= ngear; g++)
   {
-     log_pred_yield(g) =  ft(g) + log_total_mean_pop;
+     log_pred_yield(g) = logdt + ft(g) + log_total_mean_pop;
   }
 
   dvar_vector varlogYield = square(mfexp(logsdlogYield));
@@ -644,11 +644,13 @@ SEPARABLE_FUNCTION void obs(const int t, const dvar_vector& f,const dvariable& p
      // observation error
      if (use_robustY == 1)  // normal + t distribution
      {
-        dvariable z = square(obs_catch(t,g)-log_pred_yield(g));
-        dvariable norm_part = sqrt(varlogYield(g)) + 0.5*LOG_TWO_M_PI * z;
-        dvariable fat_part = LOG_M_PI + log(1.0 + z);
+        dvariable z = square(obs_catch(t,g)-log_pred_yield(g))/varlogYield(g);
+
+        dvariable norm_part = 0.5*(log(TWO_M_PI*varlogYield(g)) + z);
+
+        dvariable fat_part = 1.0/(M_PI*(1.0 + z));
         dvariable pfat = alogit(Lpf(g));
-        Ynll += log((1.0-pfat)*mfexp(norm_part) + pfat*mfexp(fat_part));
+        Ynll += log((1.0-pfat)*mfexp(norm_part) + pfat*fat_part);
         //TTRACE(norm_part,fat_part)
         //TTRACE(pfat,Lpf(g))
      }
@@ -690,6 +692,7 @@ SEPARABLE_FUNCTION void obs(const int t, const dvar_vector& f,const dvariable& p
   residuals(t,++rc) = value(pop21);
   residuals(t,++rc) = value(pop22);
   residuals(t,++rc) = mfexp(value(logK));
+  residuals(t,++rc) = immigrant_biomass(t);
   double propLa = value(pop21) - value(pop22);
   //double propLb = mfexp(value(pop21))/(mfexp(value(pop21)) + mfexp(value(pop22)));
   //TTRACE(alogit(propLa),propLb)
@@ -735,10 +738,9 @@ FUNCTION void write_status(ofstream& s)
     s << "# pfat = " << alogit(value(Lpfat)) << " (" << active(Lpfat) <<")" << endl;
     s << "# qProp = " << qProp << " (" << active(qProp) << ")" << endl;
     s << "# Residuals:" << endl;
-    s << "  t    pop1   pop2      K  propL";
+    s << "  t    pop1   pop2      K  forcing  propL";
     for (int g = 1; g <= ngear; g++)
        s << "     F" << g;
-
     for (int g = 1; g <= ngear; g++)
        s << "  predC" << g;
     for (int g = 1; g <= ngear; g++)
@@ -747,8 +749,9 @@ FUNCTION void write_status(ofstream& s)
     for (int t = 1; t <= ntime; t++)
     {
        s << t << " " << residuals(t,1) << " " << residuals(t,2)
-              << " " << residuals(t,3) << " " << residuals(t,4);
-       int rc = 4;
+              << " " << residuals(t,3) << " " << residuals(t,4)
+              << " " << residuals(t,5);
+       int rc = 5;
        for (int g = 1; g <= 2*ngear; g++)
           s << " " << residuals(t,++rc);
        for (int g = 1; g <= ngear; g++)

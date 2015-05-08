@@ -331,7 +331,7 @@ plot.propL.prior=function(propL=0.9)
    
    plot(c(0.0,1.0),c(0.0,1.0),type='n',xlab="x",ylab="p(L(x))")
    abline(v=propL,col="red",lty="dotdash")
-   for (sd in c(0.6,0.7,0.8,0.9,0.99,0.999,0.9999))
+   for (sd in c(0.6,0.7,0.8,0.9,0.95,0.99,0.999,0.9999))
 #  sd = 0.9
    {
       pp = dnorm(logit(p),mean=logit(propL),sd=logit(sd))
@@ -341,6 +341,55 @@ plot.propL.prior=function(propL=0.9)
 
    save.png.plot("propL_prior",width=6.5,height=6.5)
 }
+#dnorm(x, mean = 0, sd = 1, log = FALSE)
+dtdist=function(x, mean = 0, sd = 1)
+{
+  xx = (x-mean)/sd
+# print(paste(xx,xx*xx,(1.0+xx*xx)))
+  dt = 1.0/(pi*(1.0+xx*xx))
+  return(dt)
+}
+
+
+#  dvariable peN2 = 0.5*(log(TWO_M_PI*varlogPop(2)) + square(p22-nextLogN2)/varlogPop(2));
+mydnorm=function(x,mean=0,sd=1)
+{
+   y = 0.5*(log(2*pi*sd*sd) + ((x-mean)/sd)^2)
+   return(exp(-y))
+}
+
+
+plot.t.norm.mix=function(mean = 0,sd=1)
+{
+   x = seq(mean-4*sd,mean+4*sd,sd/10)
+#  print(x)
+   yn = dnorm(x,mean=mean,sd=sd)
+   myn = mydnorm(x,mean=mean,sd=sd)
+   print(paste("sum normal:",sum(yn)))
+   intn = integrate(function(x) dnorm(x,mean=mean,sd=sd),lower=-Inf,upper=Inf)
+   print(paste("  integral:",intn$value))
+   print(paste("sum mynormal:",sum(myn)))
+   intmyn = integrate(function(x) mydnorm(x,mean=mean,sd=sd),lower=-Inf,upper=Inf)
+   print(paste("  integral:",intmyn$value))
+   plot(x,myn,type='l')
+   points(x,yn)
+   tn = dtdist(x,mean=mean,sd=sd)
+   print(paste("     sum t:",sum(tn)))
+   intt = integrate(function(x) dtdist(x,mean=mean,sd=sd),lower=-Inf,upper=Inf)
+   print(paste("  integral:",intt$value))
+   lines(x,tn,col="red")
+
+   pf = seq(0.1,0.9,0.1)
+   for (pfat in pf)
+   {
+     robust=function() {pfat*tn+(1-pfat)*yn}
+     lines(x,robust(),col="blue")
+   }
+#  lines(x,(pfat*tn+(1-pfat)*yn),col="blue")
+
+}
+
+
 
 # from MHI_sim.R
 compute.F<-function(yr1=1952,yr2=2012,cfile="../HDAR/hdar_1952_2012.dat",plot=TRUE)
