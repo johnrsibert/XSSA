@@ -692,7 +692,7 @@ SEPARABLE_FUNCTION void obs(const int t, const dvar_vector& f,const dvariable& p
   residuals(t,++rc) = value(pop21);
   residuals(t,++rc) = value(pop22);
   residuals(t,++rc) = mfexp(value(logK));
-  residuals(t,++rc) = immigrant_biomass(t);
+  residuals(t,++rc) = mfexp(value(logT21))*immigrant_biomass(t);
   double propLa = value(pop21) - value(pop22);
   //double propLb = mfexp(value(pop21))/(mfexp(value(pop21)) + mfexp(value(pop22)));
   //TTRACE(alogit(propLa),propLb)

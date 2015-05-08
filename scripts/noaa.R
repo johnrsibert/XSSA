@@ -262,7 +262,7 @@ LL.join=function(hdar=NULL,noaa=NULL,yr1=1952,yr2=2012)
 
    bio.file = "../run/total_biomass_a.dat"
    print(paste("writing",bio.file))
-   write(as.matrix(region.biomass.a),file=bio.file,ncolumns=nyear)
+   write(t(region.biomass.a),file=bio.file,ncolumns=nyear)
    print(paste("finished",bio.file))
 
    par(old.par)

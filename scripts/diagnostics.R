@@ -8,19 +8,15 @@ plot.diagnostics=function(dat=NULL,file="diagnostics.dat",dt,ngear,devices)
    start.year = 1952
    if (dat$t[1] == 1)
    {
-   #  dat$t = (1951.875 + dat$t*0.25)
       dat$t = (start.year-0.4*dt +  dat$t*dt)
-      print(names(dat))
+   #  print(names(dat))
    }
    ncol = ncol(dat)
-   dd = c(2:3,6:ncol)
-#  print(dd)
-   print(names(dat)[dd])
+   gear.col = 6
+   dd = c(2:3,(gear.col+1):ncol)
+#  print("Names of log transformed variables:")
+#  print(names(dat)[dd])
    dat[,dd] = exp(dat[,dd])
-
-#  g2 <- as.vector(c("Tuna HL","Troll","Longline","Bottom/inshore HL","Aku boat","Misc"),mode="character")
-   # tuna handline, troll, longline, bottom fish/inshore handline and aku boat
-
 
    gear.names = c("TunaHL","Troll","Longline","Bottom/inshore HL","AkuBoat")
    title.line = -1
@@ -56,20 +52,16 @@ plot.diagnostics=function(dat=NULL,file="diagnostics.dat",dt,ngear,devices)
    title(main="Total Population",line=title.line)
 
    par("new"=TRUE)
-   print(dat$forcing)
-   plot(dat$t,dat$forcing,type='n',ann=FALSE,axes=FALSE)
+   plot(dat$t,dat$forcing,type='n',ann=FALSE,axes=FALSE,
+        ylim=c(0.0,max(dat$forcing)))
    double.lines(dat$t,dat$forcing,bcol="purple4",fcol="purple1",lwd=lwd)
-       
-#  nice.ts.plot(dat$t,dat$forcing,bcol="purple4",fcol="purple1",lwd=lwd)
-#  points(dat$t,dat$forcing,col="purple4",pch=16)
    axis(4,line=-1,outer=FALSE,labels=FALSE,tcl=0.5,col="purple1")
    
    par("new"=TRUE)
    plot(dat$t,dat$propL,type='l',ann=FALSE,axes=FALSE,
         col="red4",lwd=2,lty="solid",ylim=c(0,1))
    axis(4,line=0,outer=FALSE,tcl=0.5,labels=FALSE,col="red")
-   abline(h=0.9,col="red1",lty="dotdash")
-
+   abline(h=0.9,col="red4",lty="dotdash",lwd=2)
 
    width = 9.0
    height =11.0
@@ -90,8 +82,8 @@ plot.diagnostics=function(dat=NULL,file="diagnostics.dat",dt,ngear,devices)
    layout.show(lm)
    for (g in 1:ngear)
    {
-      nice.ts.plot(dat$t,dat[,(5+ngear+g)],bcol="darkgreen",fcol="lightgreen",lwd=lwd)
-      points(dat$t,dat[,(5+2*ngear+g)],col= "darkgreen",pch=16)
+      nice.ts.plot(dat$t,dat[,(gear.col+ngear+g)],bcol="darkgreen",fcol="lightgreen",lwd=lwd)
+      points(dat$t,dat[,(gear.col+2*ngear+g)],col= "darkgreen",pch=16)
    #  title(main=paste("Catch, gear",g))
       title(main=paste("Catch,",gear.names[g]),line=title.line)
    }
@@ -114,7 +106,7 @@ plot.diagnostics=function(dat=NULL,file="diagnostics.dat",dt,ngear,devices)
    layout.show(lm)
    for (g in 1:ngear)
    {
-      nice.ts.plot(dat$t,dat[,(g+5)],bcol="orange4",fcol="orange",lwd=lwd)
+      nice.ts.plot(dat$t,dat[,(gear.col+g)],bcol="orange4",fcol="orange",lwd=lwd)
    #  title(main=paste("F mort, gear",g))
       title(main=paste("F mort,",gear.names[g]),,line=title.line)
    }
@@ -134,7 +126,7 @@ log.diagnostics=function(file="xssams_program.log",ntime=244,dt=0.25,ngear=5)
    max.counter = length(res)
    counter = max.counter
    print(paste(max.counter, "blocks found:"))
-   print(res)
+#  print(res)
 
    ncol = (3*ngear+6)
    diag = matrix(nrow=ntime,ncol=ncol)
