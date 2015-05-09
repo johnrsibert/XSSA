@@ -189,7 +189,11 @@ log.diagnostics=function(file="xssams_program.log",ntime=244,dt=0.25,ngear=5)
 #  return(counter)
 }
 
+plot.resid.hist=function(dat)
+{
 
+
+}
 
 #plot.diagnostics.1=function(dat=NULL,file="diagnostics.dat")
 #{
