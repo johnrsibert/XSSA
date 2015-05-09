@@ -392,10 +392,11 @@ plot.t.norm.mix=function(mean = 0,sd=1)
 
 
 # from MHI_sim.R
-compute.F<-function(yr1=1952,yr2=2012,cfile="../HDAR/hdar_1952_2012.dat",plot=TRUE)
+#compute.F<-function(yr1=1952,yr2=2012,cfile="../HDAR/hdar_1952_2012.dat",plot=TRUE)
+compute.F<-function(obs.catch,plot=TRUE)
 {
    eps.na = 1e-8
-   obs.catch = read.table(file=cfile)
+#  obs.catch = read.table(file=cfile)
    ngear = nrow(obs.catch)
    ntime = ncol(obs.catch)
 
@@ -463,27 +464,43 @@ compute.F<-function(yr1=1952,yr2=2012,cfile="../HDAR/hdar_1952_2012.dat",plot=TR
    return(F)
 }
 
-xssams.sim=function(r=0.3, K=200000, q=0.54, T12=0.01, T21=0.002,
-                  dt = 1.0, sN=c(0.0,0.0,0.0), fr=2, p=0.9, 
-                  F=NULL, sC, do.plot=TRUE, save.graphics=FALSE)
+xssams.sim=function(r=0.12, K=200000, q=0.54, T12=0.001, T21=0.0002,
+                  dt=0.25, sN=c(0.01,0.01,0.0), fr=2, p=0.9, 
+                  F=NULL, sC=c(1,1,1,1,1), F.mult=0.0025,
+                  do.plot=TRUE, save.graphics=FALSE)
 {
-   if (is.null(F))
+   if (dt == 0.25)
    {
-      F.matrix = compute.F(plot=FALSE) 
-   #  F.matrix = 0.01*F.matrix
+      obs.catch = t(read.table(file="../run/five_gears_q_1952_2012.dat"))
+      region.biomass = as.matrix(read.table("../run/total_biomass_q.dat"))
+   }
+   else if (dt == 1.0)
+   {
+      obs.catch = t(read.table(file="../run/five_gears_a_1952_2012.dat"))
+      region.biomass = as.matrix(read.table("../run/total_biomass_a.dat"))
    }
    else
-      F.matrix = F
+   {
+      print(paste("dt = ",dt," Unknown.",sep=""))
+      return(FALSE)
+   }
+#  print(head(t(obs.catch)))
+#  if (is.null(F))
+#  {
+#     F.matrix = compute.F(plot=FALSE) 
+#     F.matrix = 0.01*F.matrix
+#  }
+#  else
+#     F.matrix = F
+   F.matrix = F.mult*compute.F(t(obs.catch),plot=FALSE)
    sum.F = colSums(F.matrix)
    ntime = ncol(F.matrix)
    ngear = nrow(F.matrix)
-#  print(paste(ngear,ntime))
+   print(paste(ngear,ntime))
 
-   region.biomass = as.matrix(read.table("../run/total_biomass.dat"))
+   region.biomass = as.matrix(read.table("../run/total_biomass_q.dat"))
    immigrant.biomass = T21*region.biomass[fr,]
 
-   obs.catch = read.table(file="../HDAR/hdar_1952_2012.dat")
-#  print(head(t(obs.catch)))
 
    print(sN)
    cov = matrix(nrow=2,ncol=2)
@@ -512,11 +529,31 @@ xssams.sim=function(r=0.3, K=200000, q=0.54, T12=0.01, T21=0.002,
       pop[t,3] = pop[t,1]+pop[t,2]
    }
   
+   sC.mat = matrix(ncol=ngear,nrow=ntime)
+   for (g in 1:ngear)
+   {
+      sC.mat[,g] = rnorm(ntime,mean=0.0,sd = sC[g])
+   }
+   print("sC.mat:")
+   print(dim(sC.mat))
+   print(head(sC.mat))
+   print(sC.mat[1,])
+
    pred.catch = matrix(ncol=ngear,nrow=ntime)
    for (t in 1:ntime)
    {
-      pred.catch[t,] = obs(pop[t,3],F.matrix[,t],sC)
+      pred.catch[t,] = obs(pop[t,3],F.matrix[,t],sC.mat[t,])
    }
+
+#  print("pop:")
+#  print(dim(pop))
+#  print(head(pop))
+   print("obs.catch:")
+   print(dim(obs.catch))
+#  print(head(obs.catch))
+   print("pred.catch:")
+   print(dim(pred.catch))
+   print(head(pred.catch))
 
    if (do.plot)
    {
@@ -531,7 +568,7 @@ obs = function(NN,F,s)
    pred.catch = vector(length=ngear)
    for (g in 1:ngear)
    {
-      lpc = log(NN) + log(F[g]) # + s[g]
+      lpc = log(NN) + log(F[g])  + s[g]
       pred.catch[g] = exp(lpc)
    }
    return(pred.catch)
@@ -557,7 +594,7 @@ plot.catch.ts=function(obs.catch,pred.catch,save.graphics=TRUE)
       {
          nice.ts.plot(x,pred.catch[,g],xlab="",ylab="",
                   bcol="darkgreen",fcol="lightgreen",lwd=3)
-         points(x,obs.catch[g,],col= "darkgreen",pch=16)
+         points(x,obs.catch[,g],col= "darkgreen",pch=16)
          title(main=gear.names[g],line=-1)
       }
       else
@@ -565,7 +602,7 @@ plot.catch.ts=function(obs.catch,pred.catch,save.graphics=TRUE)
          y = rowSums(pred.catch)
          nice.ts.plot(x,y,xlab="t",ylab="",
                   bcol="darkgreen",fcol="lightgreen",lwd=3)
-         y = colSums(obs.catch,na.rm=TRUE)
+         y = rowSums(obs.catch,na.rm=TRUE)
          points(x,y,col= "darkgreen",pch=16)
          title(main="Total",line=-1)
       }
