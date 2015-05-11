@@ -778,4 +778,5 @@ REPORT_SECTION
     REPORT(logsdlogYield)
     REPORT(qProp)
     write_status(report);
+    write_status(clogf);
 

@@ -465,25 +465,32 @@ compute.F<-function(obs.catch,plot=TRUE)
 }
 
 xssams.sim=function(r=0.12, K=200000, q=0.54, T12=0.001, T21=0.0002,
-                  dt=0.25, sN=c(0.01,0.01,0.0), fr=2, p=0.9, 
-                  F=NULL, sC=c(1,1,1,1,1), F.mult=0.0025,
-                  do.plot=TRUE, save.graphics=FALSE)
+                  dt=1.0, sN=c(0.0,0.0,0.0), fr=2, p=0.9, 
+                  F=NULL, sC=c(0.1,0.1,0.1,0.1,0.1), F.mult=0.0025,
+                  do.plot=TRUE, save.graphics=FALSE, do.est=FALSE)
 {
    if (dt == 0.25)
    {
       obs.catch = t(read.table(file="../run/five_gears_q_1952_2012.dat"))
-      region.biomass = as.matrix(read.table("../run/total_biomass_q.dat"))
+      biomass.file ="../run/total_biomass_q.dat"
+      region.biomass = as.matrix(read.table(biomass.file))
    }
    else if (dt == 1.0)
    {
       obs.catch = t(read.table(file="../run/five_gears_a_1952_2012.dat"))
-      region.biomass = as.matrix(read.table("../run/total_biomass_a.dat"))
+      biomass.file = "../run/total_biomass_a.dat"
+      region.biomass = as.matrix(read.table(biomass.file))
    }
    else
    {
       print(paste("dt = ",dt," Unknown.",sep=""))
       return(FALSE)
    }
+   print("region.biomass:")
+   print(dim(region.biomass))
+   print(head(t(region.biomass)))
+   immigrant.biomass = T21*region.biomass[fr,]
+
 #  print(head(t(obs.catch)))
 #  if (is.null(F))
 #  {
@@ -498,21 +505,17 @@ xssams.sim=function(r=0.12, K=200000, q=0.54, T12=0.001, T21=0.0002,
    ngear = nrow(F.matrix)
    print(paste(ngear,ntime))
 
-   region.biomass = as.matrix(read.table("../run/total_biomass_q.dat"))
-   immigrant.biomass = T21*region.biomass[fr,]
-
-
    print(sN)
    cov = matrix(nrow=2,ncol=2)
    cov[1,1] = sN[1]
    cov[2,2] = sN[2]
    cov[1,2] = sN[3]*cov[1,1]*cov[2,2]
    cov[2,1] = cov[1,2]
-   print(cov)
+#  print(cov)
    s <- rmvnorm(n=ntime, sigma=cov)
-   print(dim(s))
-   print(colMeans(s))
-   print(var(s))
+#  print(dim(s))
+#  print(colMeans(s))
+#  print(var(s))
 
    pop = matrix(ncol=3,nrow=ntime)
    colnames(pop)=c(" N1"," N2"," N1+N2  ")
@@ -534,22 +537,22 @@ xssams.sim=function(r=0.12, K=200000, q=0.54, T12=0.001, T21=0.0002,
    {
       sC.mat[,g] = rnorm(ntime,mean=0.0,sd = sC[g])
    }
-   print("sC.mat:")
-   print(dim(sC.mat))
-   print(head(sC.mat))
-   print(sC.mat[1,])
+#  print("sC.mat:")
+#  print(dim(sC.mat))
+#  print(head(sC.mat))
+#  print(sC.mat[1,])
 
    pred.catch = matrix(ncol=ngear,nrow=ntime)
    for (t in 1:ntime)
    {
-      pred.catch[t,] = obs(pop[t,3],F.matrix[,t],sC.mat[t,])
+      pred.catch[t,] = round(obs(pop[t,3],F.matrix[,t],sC.mat[t,]))
    }
 
 #  print("pop:")
 #  print(dim(pop))
 #  print(head(pop))
-   print("obs.catch:")
-   print(dim(obs.catch))
+#  print("obs.catch:")
+#  print(dim(obs.catch))
 #  print(head(obs.catch))
    print("pred.catch:")
    print(dim(pred.catch))
@@ -560,6 +563,77 @@ xssams.sim=function(r=0.12, K=200000, q=0.54, T12=0.001, T21=0.0002,
       plot.NN.ts(pop,K,save.graphics)
       plot.catch.ts(obs.catch,pred.catch,save.graphics)
    }
+
+   dfile = "../run/xssams.dat"
+   print(dfile)
+
+   cat.number=function(v)
+   {
+      cat(paste(" ",v,"\n",sep=""),file=dfile,append=TRUE)
+   }
+   cat.string=function(s)
+   {
+      cat(paste(s,"\n",sep=""),file=dfile,append=TRUE)
+   }
+   cat.vector=function(v)
+   {
+      for (i in 1:length(v))
+      {
+         cat(paste(" ",v[i],sep=""),file=dfile,append=TRUE)
+      }
+      cat("\n",file=dfile,append=TRUE)
+   }
+   cat.matrix=function(m)
+   {
+       for (i in 1:nrow(m))
+          cat.vector(m[i,])
+   }
+   cat("# xssams simulation output:\n",file=dfile)
+   cat.string("#")
+   cat.string("# Number of fishing gears")
+   cat.number(ngear)
+   cat.string("# Number of time periods")
+   cat.number(ntime)
+   cat.string("# Time step (years)")
+   cat.number(dt)
+   cat.string("# Catch data")
+   cat.string("# simulated catch:")
+   cat.matrix(t(pred.catch))
+   cat.string(paste("#",biomass.file))
+   cat.matrix(region.biomass)
+   cat.string("# MFCL forcing region number")
+   cat.number(2)
+   cat.string("# use mean forcing")
+   cat.number(0)
+   cat.string("#")
+   cat.string("# T12  phase  initial value")
+   cat.vector(c(1,T12))
+   cat.string("# T21  phase  initial value")
+   cat.vector(c(1,T21))
+   cat.string("# r    phase  initial value")
+   cat.vector(c(-1,r))
+   cat.string("# K    phase  initial value")
+   cat.vector(c(1,K))
+   cat.string("# sdlogF    phase  initial values")
+   cat.vector(c(1,0.3, 0.3, 0.3, 0.3, 0.3))
+   cat.string("# sdlogPop    phase  initial values")
+   cat.vector(c(-1,sN[1]+0.001,sN[2]+0.001))
+   cat.string("# rho phase initial value")
+   cat.vector(c(-1,sN[3]))
+   cat.string("# sdlogYield  phase initial values")
+#  cat.vector(c(1,sC))
+   cat.vector(c(1,rep(1.0,ngear)))
+   cat.string("# meanProportion_Local phase initial value")
+   cat.vector(c(-1,p))
+   cat.string("# sdLproportion_local phase initial value")
+   cat.vector(c(-1,    2.72))
+   cat.string("# qProp phase initial value")
+   cat.vector(c(-1,q))
+   cat.string("# robust yield likelihood")
+   cat.string("# use pfat_phase pfat initial values")
+   cat.vector(c(1,   -1,         0.07, 0.07, 0.07, 0.07, 0.07))
+   
+
 }
 
 obs = function(NN,F,s)
@@ -610,5 +684,4 @@ plot.catch.ts=function(obs.catch,pred.catch,save.graphics=TRUE)
 
    if (save.graphics)
       save.png.plot("catchts",width=width,height=height)
-   par(old.par)
 }
