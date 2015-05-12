@@ -147,7 +147,8 @@ DATA_SECTION
   !! TTRACE(init_K,phase_K)
 
   init_int phase_sdlogF;
-  init_vector init_sdlogF(1,ngear);
+  init_number init_sdlogF;
+  //init_vector init_sdlogF(1,ngear);
   !! TTRACE(init_sdlogF,phase_sdlogF)
 
   init_int phase_sdlogPop;
@@ -254,8 +255,8 @@ PARAMETER_SECTION
   init_number logr(phase_r);
   init_number logK(phase_K);
 
-  init_vector logsdlogF(1,ngear,phase_sdlogF);
-  //init_number logsdlogF(phase_logsdlogF);
+  //init_vector logsdlogF(1,ngear,phase_sdlogF);
+  init_number logsdlogF(phase_sdlogF);
   init_vector logsdlogPop(1,2,phase_sdlogPop);
   //init_number logsdlogPop(phase_logsdlogPop);
   init_bounded_number rho(-0.99,0.99,phase_rho);
@@ -483,7 +484,7 @@ PROCEDURE_SECTION
   //if (1) ad_exit(1);
 
 
-SEPARABLE_FUNCTION void step(const int t, const dvar_vector& f1, const dvar_vector& f2, const dvar_vector& lsdlogF, const dvariable& p11, const dvariable p12, const dvariable& p21, const dvariable p22, const dvar_vector& lsdlogPop, const dvariable& arho, const dvariable& lr, const dvariable& lK, const dvariable& lT12, const dvariable& lT21, const dvariable& LmPropL, const dvariable& lsdLProportion_local, const dvariable& qP)
+SEPARABLE_FUNCTION void step(const int t, const dvar_vector& f1, const dvar_vector& f2, const dvariable& lsdlogF, const dvariable& p11, const dvariable p12, const dvariable& p21, const dvariable p22, const dvar_vector& lsdlogPop, const dvariable& arho, const dvariable& lr, const dvariable& lK, const dvariable& lT12, const dvariable& lT21, const dvariable& LmPropL, const dvariable& lsdLProportion_local, const dvariable& qP)
   //FUNCTION void step(const int t, const dvar_vector& f1, const dvar_vector& f2, const dvar_vector& lsdlogF, const dvariable& p11, const dvariable p12, const dvariable& p21, const dvariable p22, const dvar_vector& lsdlogPop, const dvariable& arho, const dvariable& lr, const dvariable& lK, const dvariable& lT12, const dvariable& lT21, const dvariable& LmPropL, const dvariable& lsdLProportion_local, const dvariable& qP)
   // p11 U(utPop1+t-1) log N1 at start of time step
   // p12 U(utPop1+t)   log N1 at end   of time step
@@ -491,7 +492,8 @@ SEPARABLE_FUNCTION void step(const int t, const dvar_vector& f1, const dvar_vect
   // p22 U(utPop2+t)   log N2 at end   of time step
 
 
-  dvar_vector varlogF = square(mfexp(lsdlogF));
+  //dvar_vector varlogF = square(mfexp(lsdlogF));
+  dvariable varlogF = square(mfexp(lsdlogF));
   dvar_vector varlogPop = square(mfexp(lsdlogPop));
   dvar_matrix cov(1,2,1,2);
   for (int i = 1; i <= 2; i++)
@@ -518,7 +520,8 @@ SEPARABLE_FUNCTION void step(const int t, const dvar_vector& f1, const dvar_vect
   dvariable Fnll = 0.0;
   for (int g = 1; g <= ngear; g++)
   {
-     Fnll += 0.5*(log(TWO_M_PI*varlogF(g)) + square(ft1(g)-ft2(g))/varlogF(g));
+     //Fnll += 0.5*(log(TWO_M_PI*varlogF(g)) + square(ft1(g)-ft2(g))/varlogF(g));
+     Fnll += 0.5*(log(TWO_M_PI*varlogF) + square(ft1(g)-ft2(g))/varlogF);
      if (isnan(value(Fnll)))
      {
         TTRACE(Fnll,varlogF)
@@ -687,6 +690,7 @@ SEPARABLE_FUNCTION void obs(const int t, const dvar_vector& f,const dvariable& p
         }
      }
   }
+
   //clogf << t << " " << Ynll << " " << nll << endl;
   nll += Ynll;
 
@@ -737,6 +741,7 @@ FUNCTION void write_status(ofstream& s)
     s << "#                  prop = " << prop << endl;
     s << "# logsdLProportion_local = " << logsdLProportion_local<< " (" 
                                 << active(logsdLProportion_local) <<")" << endl;
+    s << "#    sdLProportion_local = " << mfexp(logsdLProportion_local) << endl;
     s << "# pfat = " << alogit(value(Lpfat)) << " (" << active(Lpfat) <<")" << endl;
     s << "# qProp = " << qProp << " (" << active(qProp) << ")" << endl;
     s << "# Residuals:" << endl;
