@@ -221,7 +221,7 @@ qcomp.phase=function()
    par(old.par)
 }
 
-plot.NN.ts=function(pop,K,save.graphics=TRUE)
+plot.NN.ts=function(pop,K,ib,save.graphics=TRUE)
 {
    ntime = nrow(pop)
 
@@ -245,6 +245,13 @@ plot.NN.ts=function(pop,K,save.graphics=TRUE)
    axis(4,col="red",ylab="p",col.axis="red")
    abline(v=par("usr")[2],lwd=2,col="red")
    mtext("p",side=4,col="red",line=3)
+
+   par("new"=TRUE)
+   plot(x,ib,type='n',ann=FALSE,axes=FALSE,
+        ylim=c(0.0,max(ib)))
+   double.lines(x,ib,bcol="purple4",fcol="purple1",lwd=5)
+   axis(4,line=-1,outer=FALSE,labels=FALSE,tcl=0.5,col="purple1")
+
    if (save.graphics)
       save.png.plot("NNts",width=width,height=height)
    par(old.par)
@@ -560,7 +567,7 @@ xssams.sim=function(r=0.12, K=200000, q=0.54, T12=0.001, T21=0.0002,
 
    if (do.plot)
    {
-      plot.NN.ts(pop,K,save.graphics)
+      plot.NN.ts(pop,K,immigrant.biomass,save.graphics)
       plot.catch.ts(obs.catch,pred.catch,save.graphics)
    }
 

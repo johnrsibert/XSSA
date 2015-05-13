@@ -135,7 +135,8 @@ log.diagnostics=function(file="xssams_program.log",ntime=244,dt=0.25,ngear=5)
    c = 'n'
    dev.list = vector(mode="numeric",length=3)
    dev.file.names=c("est_pop","est_catch","est_F")
-   while (c != 'q')
+#  while (c != 'q')
+   while ( (c != 'q') && (c != 'x') )
    {
       fc = res[counter]
       for (c in 1:ncol)
@@ -165,7 +166,7 @@ log.diagnostics=function(file="xssams_program.log",ntime=244,dt=0.25,ngear=5)
 
 #     title(main=paste(log[afters[counter]+1],"entries"))
 
-      c = readline("next, back, save or quit? (enter n,b,s,or q):")
+      c = readline("next, back, save, quit or exit? (enter n,b,s,q,x):")
       print(paste(c," entered"))
       if (c == 'n')
          counter = counter + 1
@@ -186,6 +187,8 @@ log.diagnostics=function(file="xssams_program.log",ntime=244,dt=0.25,ngear=5)
          counter = 1
    } #while
    graphics.off()
+   if (c == 'x')
+      q("no")
 #  return(counter)
 }
 
