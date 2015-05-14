@@ -38,14 +38,13 @@
 # K    phase  initial value
         1     144800
 # sdlogF    phase  initial values
-             1     0.3 0.3 0.3 0.3 0.3
+             1     0.3 #0.3 0.3 0.3 0.3
 # sdlogPop    phase  initial values
-              -1     0.1  0.1
-#              1     0.1  0.1
+               1     0.1  0.1
 # rho phase initial value
-       2    0.0
+      -1    0.0
 # sdlogYield  phase initial values
-               1    1.0  1.0  1.0  1.0  1.0
+               1    1.0 # 1.0  1.0  1.0  1.0
 # meanProportion_Local phase initial value
                        -1    0.9
 # sdLproportion_local phase initial value

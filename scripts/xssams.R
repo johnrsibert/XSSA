@@ -571,75 +571,77 @@ xssams.sim=function(r=0.12, K=200000, q=0.54, T12=0.001, T21=0.0002,
       plot.catch.ts(obs.catch,pred.catch,save.graphics)
    }
 
-   dfile = "../run/xssams.dat"
-   print(dfile)
-
-   cat.number=function(v)
+   if (do.est)
    {
-      cat(paste(" ",v,"\n",sep=""),file=dfile,append=TRUE)
-   }
-   cat.string=function(s)
-   {
-      cat(paste(s,"\n",sep=""),file=dfile,append=TRUE)
-   }
-   cat.vector=function(v)
-   {
-      for (i in 1:length(v))
-      {
-         cat(paste(" ",v[i],sep=""),file=dfile,append=TRUE)
-      }
-      cat("\n",file=dfile,append=TRUE)
-   }
-   cat.matrix=function(m)
-   {
-       for (i in 1:nrow(m))
-          cat.vector(m[i,])
-   }
-   cat("# xssams simulation output:\n",file=dfile)
-   cat.string("#")
-   cat.string("# Number of fishing gears")
-   cat.number(ngear)
-   cat.string("# Number of time periods")
-   cat.number(ntime)
-   cat.string("# Time step (years)")
-   cat.number(dt)
-   cat.string("# Catch data")
-   cat.string("# simulated catch:")
-   cat.matrix(t(pred.catch))
-   cat.string(paste("#",biomass.file))
-   cat.matrix(region.biomass)
-   cat.string("# MFCL forcing region number")
-   cat.number(2)
-   cat.string("# use mean forcing")
-   cat.number(0)
-   cat.string("#")
-   cat.string("# T12  phase  initial value")
-   cat.vector(c(-1,T12))
-   cat.string("# T21  phase  initial value")
-   cat.vector(c(-1,T21))
-   cat.string("# r    phase  initial value")
-   cat.vector(c(-1,r))
-   cat.string("# K    phase  initial value")
-   cat.vector(c(-1,K))
-   cat.string("# sdlogF    phase  initial values")
-   cat.vector(c(1,0.3, 0.3, 0.3, 0.3, 0.3))
-   cat.string("# sdlogPop    phase  initial values")
-   cat.vector(c(-1,sN[1]+0.001,sN[2]+0.001))
-   cat.string("# rho phase initial value")
-   cat.vector(c(-1,sN[3]))
-   cat.string("# sdlogYield  phase initial values")
-#  cat.vector(c(-1,sC))
-   cat.vector(c(-1,rep(1.0,ngear)))
-   cat.string("# meanProportion_Local phase initial value")
-   cat.vector(c(-1,p))
-   cat.string("# sdLproportion_local phase initial value")
-   cat.vector(c(-1,    2.72))
-   cat.string("# qProp phase initial value")
-   cat.vector(c(-1,q))
-   cat.string("# robust yield likelihood")
-   cat.string("# use pfat_phase pfat initial values")
-   cat.vector(c(1,   -1,         0.07, 0.07, 0.07, 0.07, 0.07))
+      dfile = "../run/xssams.dat"
+      print(dfile)
    
+      cat.number=function(v)
+      {
+         cat(paste(" ",v,"\n",sep=""),file=dfile,append=TRUE)
+      }
+      cat.string=function(s)
+      {
+         cat(paste(s,"\n",sep=""),file=dfile,append=TRUE)
+      }
+      cat.vector=function(v)
+      {
+         for (i in 1:length(v))
+         {
+            cat(paste(" ",v[i],sep=""),file=dfile,append=TRUE)
+         }
+         cat("\n",file=dfile,append=TRUE)
+      }
+      cat.matrix=function(m)
+      {
+          for (i in 1:nrow(m))
+             cat.vector(m[i,])
+      }
+      cat("# xssams simulation output:\n",file=dfile)
+      cat.string("#")
+      cat.string("# Number of fishing gears")
+      cat.number(ngear)
+      cat.string("# Number of time periods")
+      cat.number(ntime)
+      cat.string("# Time step (years)")
+      cat.number(dt)
+      cat.string("# Catch data")
+      cat.string("# simulated catch:")
+      cat.matrix(t(pred.catch))
+      cat.string(paste("#",biomass.file))
+      cat.matrix(region.biomass)
+      cat.string("# MFCL forcing region number")
+      cat.number(2)
+      cat.string("# use mean forcing")
+      cat.number(0)
+      cat.string("#")
+      cat.string("# T12  phase  initial value")
+      cat.vector(c(-1,T12))
+      cat.string("# T21  phase  initial value")
+      cat.vector(c(-1,T21))
+      cat.string("# r    phase  initial value")
+      cat.vector(c(-1,r))
+      cat.string("# K    phase  initial value")
+      cat.vector(c(-1,K))
+      cat.string("# sdlogF    phase  initial values")
+      cat.vector(c(1,0.3, 0.3, 0.3, 0.3, 0.3))
+      cat.string("# sdlogPop    phase  initial values")
+      cat.vector(c(-1,sN[1]+0.001,sN[2]+0.001))
+      cat.string("# rho phase initial value")
+      cat.vector(c(-1,sN[3]))
+      cat.string("# sdlogYield  phase initial values")
+   #  cat.vector(c(-1,sC))
+      cat.vector(c(-1,rep(1.0,ngear)))
+      cat.string("# meanProportion_Local phase initial value")
+      cat.vector(c(-1,p))
+      cat.string("# sdLproportion_local phase initial value")
+      cat.vector(c(-1,    2.72))
+      cat.string("# qProp phase initial value")
+      cat.vector(c(-1,q))
+      cat.string("# robust yield likelihood")
+      cat.string("# use pfat_phase pfat initial values")
+      cat.vector(c(1,   -1,         0.07, 0.07, 0.07, 0.07, 0.07))
+  } 
 
 }
 
@@ -692,3 +694,93 @@ plot.catch.ts=function(obs.catch,pred.catch,save.graphics=TRUE)
    if (save.graphics)
       save.png.plot("catchts",width=width,height=height)
 }
+
+read.rep=function(file,ntime,ngear,dt)
+{
+   print(paste("Scanning file",file))
+   rep = scan(file,what="character")
+
+   p = grep("logT21:",rep)
+   logT12 = as.numeric(rep[p+1])
+   p = grep("logT12:",rep)
+   logT21 = as.numeric(rep[p+1])
+   p = grep("logr:" ,rep)                 
+   logr = as.numeric(rep[p+1])
+   p = grep("logK:",rep)
+   logK = as.numeric(rep[p+1])
+   p = grep("LmeanProportion_local:" ,rep)
+   Lpropl = as.numeric(rep[p+1])
+   p = grep("logsdLProportion_local:",rep)
+   logsdLpropl = as.numeric(rep[p+1])
+   p = grep("prop:" ,rep)                 
+   prop = as.numeric(rep[p+1])
+   p = grep("logsdlogF:",rep)
+   logsdlogF = as.numeric(rep[p[1]+1])
+   p = grep("logsdlogPop:" ,rep)          
+   logsdlogPop = as.numeric(c(rep[p[1]+1],rep[p[1]+2]))
+   p = grep("logsdlogYield:" ,rep)        
+   logsdlogYield = as.numeric(rep[p[1]+1])
+   p = grep("qProp:",rep)
+   qProp = as.numeric(rep[p+1])
+
+   res = grep("Residuals:",rep)
+   print(res)
+   afters = grep("after",rep)
+   print(afters)
+
+   max.counter = length(res)
+   counter = max.counter
+   print(paste(max.counter, "blocks found:"))
+
+   ncol = (3*ngear+6)
+   diag = matrix(nrow=ntime,ncol=ncol)
+   cnames = vector(length=ncol)
+
+   fc = res
+   for (c in 1:ncol)
+   {
+      fc = fc + 1
+      #  print(paste(fc,log[fc])) 
+      cnames[c] = rep[fc]
+   }
+   print(cnames)
+   for (t in 1:ntime)
+   {
+      for (c in 1:ncol)
+      {
+         fc = fc + 1
+         diag[t,c] = as.numeric(rep[fc],ngear)
+      }
+   }
+   colnames(diag)=cnames
+
+   return(list(logT12=logT12,
+      logT21=logT21,
+      logr=logr,
+      logK=logK,
+      Lpropl=Lpropl,
+      logsdLpropl=logsdLpropl,
+      prop=prop,
+      logsdlogF=logsdlogF,
+      logsdlogPop=logsdlogPop,
+      logsdlogYield=logsdlogYield,
+      qProp=qProp,
+      diag=as.data.frame(diag)))
+
+}
+
+
+xssams.rep.sim=function(rep.file,ntime,ngear,dt)
+#xssams.sim=function(r=0.12, K=200000, q=0.54, T12=0.001, T21=0.0002,
+#                  dt=1.0, sN=c(0.0,0.0,0.0), fr=2, p=0.9, 
+#                  F=NULL, sC=c(0.1,0.1,0.1,0.1,0.1), F.mult=0.0025,
+#                  do.plot=TRUE, save.graphics=FALSE, do.est=FALSE)
+{
+   rep=read.rep(rep.file,ntime,ngear,dt)
+   xssams.sim(r=exp(rep$logr), K=exp(rep$logK), q=rep$qProp,
+               T12=exp(rep$logT12), T21=exp(rep$logT21),
+               dt=dt, sN=c(exp(rep$logsdlogPop),0.0), fr=2, p=0.9, 
+               F=exp(rep$diag[,7:11]), sC=c(0.1,0.1,0.1,0.1,0.1), 
+               F.mult=1.0,do.plot=TRUE, save.graphics=FALSE, do.est=FALSE)
+}
+   
