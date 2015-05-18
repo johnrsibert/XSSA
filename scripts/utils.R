@@ -38,10 +38,10 @@ nice.ts.plot<-function(x,y,label=NULL,legend=NULL,bcol="blue",fcol="lightblue",
 #  print(xrange)
    if (!is.null(legend))
    {
-      print(xrange)
+   #  print(xrange)
    #  print(paste(legend,max(nchar(legend))))
       xrange[2] = xrange[2]+max(nchar(legend))*1.8
-      print(xrange)
+   #  print(xrange)
    }
 
    old.par <- par(no.readonly = TRUE) 

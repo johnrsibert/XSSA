@@ -1,4 +1,9 @@
 require("mvtnorm")
+workspace.junk=ls()
+if (length(workspace.junk==0))
+  source("utils.R")
+if (length(grep("nice.ts.plot",workspace.junk)==0))
+  source("utils.R")
 gear.names = c("TunaHL","Troll","Longline","Bottom/inshore HL","AkuBoat")
 sgn = c("THL","Troll","LL","BHL","Aku")
  
@@ -24,12 +29,36 @@ step=function(pN1,pN2,r, K, F, q, T12, T21, dt, s)
    dLN1 = dLogN1(pN1,pN2,r, K, F, q, T12)
    dLN2 = dLogN2(pN1,pN2,r, K, F, q, T12, T21)
 #  print(paste("d:",dLN1,dLN2))
-
-   nN = vector(length=2)
+   nN = vector(length=2,mode="numeric")
+#  print(paste("s:",s[1],s[2]))
    nN[1] = exp(log(pN1) + dLN1 * dt + s[1])
    nN[2] = exp(log(pN2) + dLN2 * dt + s[2])
-#  print(paste("n:",nN[1],nN[2]))
-   return(nN)
+   print(paste("n:",nN[1],nN[2]))
+
+   nstep = 8
+   sdt = dt/nstep
+   print(paste("dt sdt:",dt,sdt))
+   tnN = vector(length=2,mode="numeric")
+   nextN1 = pN1
+   nextN2 = pN2
+   for (ss in 1:nstep)
+   {
+      prevN1 = nextN1
+      prevN2 = nextN2
+      dLN1 = dLogN1(prevN1,prevN2,r, K, F, q, T12)
+      dLN2 = dLogN2(prevN1,prevN2,r, K, F, q, T12, T21)
+      nextN1 = exp(log(prevN1) + dLN1 * sdt)
+      nextN2 = exp(log(prevN2) + dLN2 * sdt)
+   }
+   tnN[1] = nextN1*exp(s[1])
+   tnN[2] = nextN2*exp(s[2])
+#  print(tnN)
+#  print(paste("s:",s[1],s[2]))
+#  print(tnN+s)
+   print(paste("tnN",tnN[1],tnN[2]))
+   
+#  return(nN)
+   return(c(nN,tnN))
 }
 
 daN1=function(pN1,pN2,r, K, F, q, T12)
@@ -221,7 +250,7 @@ qcomp.phase=function()
    par(old.par)
 }
 
-plot.NN.ts=function(pop,K,ib,save.graphics=TRUE)
+plot.NN.ts=function(pop,r,K,ib,save.graphics=TRUE)
 {
    ntime = nrow(pop)
 
@@ -234,9 +263,12 @@ plot.NN.ts=function(pop,K,ib,save.graphics=TRUE)
    par(mar=c(4,4,0,4)+0.1,las=1)
 
    x = c(1:ntime)
-   nice.ts.plot(x,pop,legend=colnames(pop),xlab="t",ylab="N")
+   nice.ts.plot(x,pop[,1:3],legend=colnames(pop),xlab="t",ylab="N")
    abline(h=K,lwd=2,lty="dotdash",col="blue")
+   lines(x,pop[,4],lwd=3,col="blue",lty="dashed")
+   lines(x,pop[,5],lwd=3,col="blue",lty="dashed")
    text(x[ntime],K,"K",adj=c(0,0),col="blue")
+   title(main=paste("r = ",r,sep=""),line=-1)
 
    par("new"=TRUE)
    plot(x,lprop,lwd=3,type='l',col="red",ylim=c(0,1),
@@ -280,7 +312,7 @@ plotN1N2=function(ntime=100,r=0.3, K=1.0, F = 0.007, q=0.54,
    #  print(pop[t,])
    }
   
-   plot.NN.ts(pop,K)
+   plot.NN.ts(pop,r,K)
 
 }
 
@@ -303,7 +335,7 @@ plotN1N2a=function(ntime=100,r=0.3, K=1.0, F = 0.007, q=0.54,
       pop[t,3] = pop[t,1]+pop[t,2]
    #  print(pop[t,])
    }
-   plot.NN.ts(pop,K)
+   plot.NN.ts(pop,r,K)
 ##   title("Arithmetic")
 }
 
@@ -473,9 +505,10 @@ compute.F<-function(obs.catch,plot=TRUE)
 
 xssams.sim=function(r=0.12, K=200000, q=0.54, T12=0.001, T21=0.0002,
                   dt=1.0, sN=c(0.0,0.0,0.0), fr=2, p=0.9, 
-                  F=NULL, sC=c(0.1,0.1,0.1,0.1,0.1), F.mult=0.0025,
+                  F=NULL, sC=c(0.1,0.1,0.1,0.1,0.1), F.mult=0.015,
                   do.plot=TRUE, save.graphics=FALSE, do.est=FALSE)
 {
+   print(paste("r = ",r,", dt =",dt,sep=""))
    if (dt == 0.25)
    {
       obs.catch = t(read.table(file="../run/five_gears_q_1952_2012.dat"))
@@ -493,26 +526,26 @@ xssams.sim=function(r=0.12, K=200000, q=0.54, T12=0.001, T21=0.0002,
       print(paste("dt = ",dt," Unknown.",sep=""))
       return(FALSE)
    }
-   print("region.biomass:")
-   print(dim(region.biomass))
-   print(head(t(region.biomass)))
+#  print("region.biomass:")
+#  print(dim(region.biomass))
+#  print(head(t(region.biomass)))
    immigrant.biomass = T21*region.biomass[fr,]
 
-#  print(head(t(obs.catch)))
-#  if (is.null(F))
-#  {
-#     F.matrix = compute.F(plot=FALSE) 
-#     F.matrix = 0.01*F.matrix
-#  }
-#  else
-#     F.matrix = F
-   F.matrix = F.mult*compute.F(t(obs.catch),plot=FALSE)
+   if (is.null(F))
+   {
+   #  print("computing F")
+      F.matrix = compute.F(t(obs.catch),plot=FALSE) 
+   }
+   else
+      F.matrix = F
+#  print(paste("F.mult =",F.mult))
+   F.matrix = F.mult*F.matrix
    sum.F = colSums(F.matrix)
    ntime = ncol(F.matrix)
    ngear = nrow(F.matrix)
-   print(paste(ngear,ntime))
+#  print(paste(ngear,ntime))
 
-   print(sN)
+#  print(sN)
    cov = matrix(nrow=2,ncol=2)
    cov[1,1] = sN[1]
    cov[2,2] = sN[2]
@@ -524,18 +557,24 @@ xssams.sim=function(r=0.12, K=200000, q=0.54, T12=0.001, T21=0.0002,
 #  print(colMeans(s))
 #  print(var(s))
 
-   pop = matrix(ncol=3,nrow=ntime)
-   colnames(pop)=c(" N1"," N2"," N1+N2  ")
+   pop = matrix(ncol=5,nrow=ntime)
+   colnames(pop)=c(" N1"," N2"," N1+N2  ","tN1","tN2")
    pop[1,1] = p*K*exp(s[1,1])
    pop[1,2] = (1-p)*K*exp(s[1,2])
    pop[1,3] = pop[1,1]+pop[1,2]
+   pop[1,4] = pop[1,1]
+   pop[1,5] = pop[1,2]
    for (t in 2:ntime)
    {
+      print(paste("t =",t))
       N1 = pop[t-1,1]
       N2 = pop[t-1,2]
       
       tN = step(N1,N2,r,K,sum.F[t],q,T12,immigrant.biomass[t],dt,s[t,])
-      pop[t,1:2] = tN
+      print(tN)
+      pop[t,1:2] = tN[1:2]
+      pop[t,4] = tN[3]
+      pop[t,5] = tN[4]
       pop[t,3] = pop[t,1]+pop[t,2]
    }
   
@@ -561,14 +600,14 @@ xssams.sim=function(r=0.12, K=200000, q=0.54, T12=0.001, T21=0.0002,
 #  print("obs.catch:")
 #  print(dim(obs.catch))
 #  print(head(obs.catch))
-   print("pred.catch:")
-   print(dim(pred.catch))
-   print(head(pred.catch))
+#  print("pred.catch:")
+#  print(dim(pred.catch))
+#  print(head(pred.catch))
 
    if (do.plot)
    {
-      plot.NN.ts(pop,K,immigrant.biomass,save.graphics)
-      plot.catch.ts(obs.catch,pred.catch,save.graphics)
+      plot.NN.ts(pop,r,K,immigrant.biomass,save.graphics)
+   #  plot.catch.ts(obs.catch,pred.catch,save.graphics)
    }
 
    if (do.est)
@@ -783,4 +822,47 @@ xssams.rep.sim=function(rep.file,ntime,ngear,dt)
                F=exp(rep$diag[,7:11]), sC=c(0.1,0.1,0.1,0.1,0.1), 
                F.mult=1.0,do.plot=TRUE, save.graphics=FALSE, do.est=FALSE)
 }
-   
+
+
+b27.test.sim=function(
+# Status block 27
+# nll = -404.11
+# nvar = 427
+# current phase = 2
+#  logT12 = -4.6211 (1)
+   T12 = 0.0098419,
+#  logT21 = -4.8741 (1)
+   T21 = 0.007642,
+# logr = 0.84139 (1)
+#    r = 2.3196,
+     r=2.1,
+# logK = 10.343 (1)
+     K = 31039,
+#     logsdlogF: -0.073259 (1)
+#        sdlogF: 0.92936
+#   logsdlogPop:  -3.3826 -3.6009 (1)
+#      sdlogPop:  0.033958 0.027299
+# rho = 0 (0)
+# logsdlogYield: -2.7842 (1)
+#    sdlogYield: 0.061778
+# LmeanProportion_local = 2.1972 (0)
+#                  prop = 0.9
+# logsdLProportion_local = 1.0006 (0)
+#    sdLProportion_local = 2.72
+# pfat =  0.07 0.07 0.07 0.07 0.07 (0)
+ q = 0.59224,
+                  dt=1.0, 
+                  sN=c(0.033958,0.027299,0),
+                  fr=2, 
+                  p=0.9, 
+                  F=NULL, 
+                  sC=rep(0.061778,5),
+                  F.mult=0.015,
+                  do.plot=TRUE, 
+                  save.graphics=FALSE, 
+                  do.est=FALSE)
+{
+   xssams.sim(r, K, q, T12, T21, dt, sN, fr, p, F, sC, 
+               F.mult, do.plot, save.graphics, do.est)
+
+}

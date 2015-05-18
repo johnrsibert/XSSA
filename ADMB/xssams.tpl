@@ -526,12 +526,32 @@ SEPARABLE_FUNCTION void step(const int t, const dvar_vector& f1, const dvar_vect
   dvariable sumFg = sum(mfexp(ft1)); // total fishing mortality
   dvariable q = qP;
 
-  dvariable prevN1 = mfexp(p11);
-  dvariable prevN2 = mfexp(p21);
-
   // unstable for large r
-  dvariable nextLogN1 = p11 + dt*(r*(1.0 - prevN1/K) - sumFg - T12 - 2.0*(1.0-q)*r*prevN2/K);
-  dvariable nextLogN2 = p21 + dt*(r*(1.0 - prevN2/K) - sumFg - T12 - 2.0*q*r*prevN1/K + T21*immigrant_biomass(t)/prevN2);
+  //dvariable prevN1 = mfexp(p11);
+  //dvariable prevN2 = mfexp(p21);
+  //dvariable nextLogN1 = p11 + dt*(r*(1.0 - prevN1/K) - sumFg - T12 - 2.0*(1.0-q)*r*prevN2/K);
+  //dvariable nextLogN2 = p21 + dt*(r*(1.0 - prevN2/K) - sumFg - T12 - 2.0*q*r*prevN1/K + T21*immigrant_biomass(t)/prevN2);
+
+  dvariable nextLogN1 = p11;
+  dvariable nextLogN2 = p21;
+  dvariable prevN1;
+  dvariable prevN2;
+  dvariable dLogN1;
+  dvariable dLogN2;
+  const int nstep = 2;
+  double sdt = dt/nstep;
+  for (int ss = 1; ss <= nstep; ss++)
+  {
+     prevN1 = mfexp(nextLogN1);
+     prevN2 = mfexp(nextLogN2);
+
+     dLogN1 = r*(1.0 - prevN1/K) - sumFg - T12 - 2.0*(1.0-q)*r*prevN2/K;
+     dLogN2 = r*(1.0 - prevN2/K) - sumFg - T12 - 2.0*q*r*prevN1/K + T21*immigrant_biomass(t)/prevN2;
+
+     nextLogN1 = nextLogN1 + dLogN1*sdt;
+     nextLogN2 = nextLogN2 + dLogN2*sdt;
+  }
+
 
   if ( isnan(value(nextLogN1)) || isnan(value(nextLogN2)) ||
        isinf(value(nextLogN1)) || isinf(value(nextLogN2)) )
