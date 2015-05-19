@@ -526,21 +526,23 @@ SEPARABLE_FUNCTION void step(const int t, const dvar_vector& f1, const dvar_vect
   dvariable sumFg = sum(mfexp(ft1)); // total fishing mortality
   dvariable q = qP;
 
-  // unstable for large r
+  //       unstable for large r
   //dvariable prevN1 = mfexp(p11);
   //dvariable prevN2 = mfexp(p21);
   //dvariable nextLogN1 = p11 + dt*(r*(1.0 - prevN1/K) - sumFg - T12 - 2.0*(1.0-q)*r*prevN2/K);
   //dvariable nextLogN2 = p21 + dt*(r*(1.0 - prevN2/K) - sumFg - T12 - 2.0*q*r*prevN1/K + T21*immigrant_biomass(t)/prevN2);
 
+  //       do multiple iterations per time step
+  // niter = 1 gives idential results to the code above
+  const int niter = 8;
   dvariable nextLogN1 = p11;
   dvariable nextLogN2 = p21;
   dvariable prevN1;
   dvariable prevN2;
   dvariable dLogN1;
   dvariable dLogN2;
-  const int nstep = 2;
-  double sdt = dt/nstep;
-  for (int ss = 1; ss <= nstep; ss++)
+  double sdt = dt/niter;
+  for (int ss = 1; ss <= niter; ss++)
   {
      prevN1 = mfexp(nextLogN1);
      prevN2 = mfexp(nextLogN2);
@@ -752,18 +754,19 @@ FUNCTION void write_status(ofstream& s)
 
 
 REPORT_SECTION
-    double prop = alogit(value(-LmeanProportion_local));
-    REPORT(logT21)
-    REPORT(logT12)
-    REPORT(logr)
-    REPORT(logK)
-    REPORT(LmeanProportion_local)
-    REPORT(logsdLProportion_local)
-    REPORT(prop)
-    REPORT(logsdlogF)
-    REPORT(logsdlogPop)
-    REPORT(logsdlogYield)
-    REPORT(qProp)
-    write_status(report);
+    //double prop = alogit(value(-LmeanProportion_local));
+    //REPORT(logT21)
+    //REPORT(logT12)
+    //REPORT(logr)
+    //REPORT(logK)
+    //REPORT(LmeanProportion_local)
+    //REPORT(logsdLProportion_local)
+    //REPORT(prop)
+    //REPORT(logsdlogF)
+    //REPORT(logsdlogPop)
+    //REPORT(logsdlogYield)
+    //REPORT(qProp)
     write_status(clogf);
+    status_blocks --;
+    write_status(report);
 

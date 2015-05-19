@@ -40,7 +40,7 @@ nice.ts.plot<-function(x,y,label=NULL,legend=NULL,bcol="blue",fcol="lightblue",
    {
    #  print(xrange)
    #  print(paste(legend,max(nchar(legend))))
-      xrange[2] = xrange[2]+max(nchar(legend))*1.8
+      xrange[2] = xrange[2]+max(nchar(legend))*1.2
    #  print(xrange)
    }
 
@@ -85,6 +85,8 @@ nice.ts.plot<-function(x,y,label=NULL,legend=NULL,bcol="blue",fcol="lightblue",
    axis(2,lwd=0,las=1,at=ytic[2:length(ytic)])
    abline(v=par("usr")[1],lwd=3)
    mtext(ylab,side=2,line=3)
+
+   return(xrange)
 #  par(old.par)
 }
 

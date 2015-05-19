@@ -33,32 +33,44 @@ step=function(pN1,pN2,r, K, F, q, T12, T21, dt, s)
 #  print(paste("s:",s[1],s[2]))
    nN[1] = exp(log(pN1) + dLN1 * dt + s[1])
    nN[2] = exp(log(pN2) + dLN2 * dt + s[2])
-   print(paste("n:",nN[1],nN[2]))
+#  print(paste("nN:",nN[1],nN[2]))
 
-   nstep = 8
-   sdt = dt/nstep
-   print(paste("dt sdt:",dt,sdt))
-   tnN = vector(length=2,mode="numeric")
-   nextN1 = pN1
-   nextN2 = pN2
-   for (ss in 1:nstep)
-   {
-      prevN1 = nextN1
-      prevN2 = nextN2
-      dLN1 = dLogN1(prevN1,prevN2,r, K, F, q, T12)
-      dLN2 = dLogN2(prevN1,prevN2,r, K, F, q, T12, T21)
-      nextN1 = exp(log(prevN1) + dLN1 * sdt)
-      nextN2 = exp(log(prevN2) + dLN2 * sdt)
-   }
-   tnN[1] = nextN1*exp(s[1])
-   tnN[2] = nextN2*exp(s[2])
+#  nstep = 8
+#  sdt = dt/nstep
+#  print(paste("dt sdt:",dt,sdt))
+#  tnN = vector(length=2,mode="numeric")
+#  nextN1 = pN1
+#  nextN2 = pN2
+#  for (ss in 1:nstep)
+#  {
+#     prevN1 = nextN1
+#     prevN2 = nextN2
+#     dLN1 = dLogN1(prevN1,prevN2,r, K, F, q, T12)
+#     dLN2 = dLogN2(prevN1,prevN2,r, K, F, q, T12, T21)
+#     nextN1 = exp(log(prevN1) + dLN1 * sdt)
+#     nextN2 = exp(log(prevN2) + dLN2 * sdt)
+#  }
+#  tnN[1] = nextN1*exp(s[1])
+#  tnN[2] = nextN2*exp(s[2])
 #  print(tnN)
 #  print(paste("s:",s[1],s[2]))
 #  print(tnN+s)
-   print(paste("tnN",tnN[1],tnN[2]))
+#  print(paste("tnN",tnN[1],tnN[2]))
    
-#  return(nN)
-   return(c(nN,tnN))
+   return(nN)
+}
+
+imp.step=function(pN1,pN2,r, K, F, q, T12, T21, dt, s)
+{
+   nN = vector(length=2,mode="numeric")
+   nN[1] = pN1*(1.0+dt*r-dt*(F+T12)-dt*(1.0-q)*2.0*r*pN2/K)/
+               (1.0+dt*r*pN1/K)
+   nN[2] = (pN2*(1.0+dt*r-dt*(F+T12)-dt*q*2.0*r*pN1/K)+dt*T21)/
+               (1.0+dt*r*pN2/K)
+   nN = nN*exp(s)
+
+#  print(paste("nN:",nN[1],nN[2]))
+   return(nN)
 }
 
 daN1=function(pN1,pN2,r, K, F, q, T12)
@@ -263,16 +275,17 @@ plot.NN.ts=function(pop,r,K,ib,save.graphics=TRUE)
    par(mar=c(4,4,0,4)+0.1,las=1)
 
    x = c(1:ntime)
-   nice.ts.plot(x,pop[,1:3],legend=colnames(pop),xlab="t",ylab="N")
+   xrange=nice.ts.plot(x,pop[,1:3],legend=colnames(pop),xlab="t",ylab="N")
    abline(h=K,lwd=2,lty="dotdash",col="blue")
    lines(x,pop[,4],lwd=3,col="blue",lty="dashed")
    lines(x,pop[,5],lwd=3,col="blue",lty="dashed")
-   text(x[ntime],K,"K",adj=c(0,0),col="blue")
+   text(x[ntime],K," K",adj=c(0,0),col="blue")
    title(main=paste("r = ",r,sep=""),line=-1)
 
    par("new"=TRUE)
    plot(x,lprop,lwd=3,type='l',col="red",ylim=c(0,1),
-        ann=FALSE,axes=FALSE)
+        ann=FALSE,axes=FALSE,xlim=xrange)
+   text(x[ntime],lprop[ntime]," p",adj=c(0,0),col="red")
    abline(h=0.9,lwd=2,lty="dotdash",col="red")
    axis(4,col="red",ylab="p",col.axis="red")
    abline(v=par("usr")[2],lwd=2,col="red")
@@ -280,8 +293,9 @@ plot.NN.ts=function(pop,r,K,ib,save.graphics=TRUE)
 
    par("new"=TRUE)
    plot(x,ib,type='n',ann=FALSE,axes=FALSE,
-        ylim=c(0.0,max(ib)))
+        ylim=c(0.0,max(ib)),xlim=xrange)
    double.lines(x,ib,bcol="purple4",fcol="purple1",lwd=5)
+   text(x[ntime],ib[ntime]," T21",adj=c(0,0),col="purple1")
    axis(4,line=-1,outer=FALSE,labels=FALSE,tcl=0.5,col="purple1")
 
    if (save.graphics)
@@ -558,7 +572,7 @@ xssams.sim=function(r=0.12, K=200000, q=0.54, T12=0.001, T21=0.0002,
 #  print(var(s))
 
    pop = matrix(ncol=5,nrow=ntime)
-   colnames(pop)=c(" N1"," N2"," N1+N2  ","tN1","tN2")
+   colnames(pop)=c(" N1"," N2"," N1+N2","tN1","tN2")
    pop[1,1] = p*K*exp(s[1,1])
    pop[1,2] = (1-p)*K*exp(s[1,2])
    pop[1,3] = pop[1,1]+pop[1,2]
@@ -566,16 +580,19 @@ xssams.sim=function(r=0.12, K=200000, q=0.54, T12=0.001, T21=0.0002,
    pop[1,5] = pop[1,2]
    for (t in 2:ntime)
    {
-      print(paste("t =",t))
+   #  print(paste("t =",t))
       N1 = pop[t-1,1]
       N2 = pop[t-1,2]
       
       tN = step(N1,N2,r,K,sum.F[t],q,T12,immigrant.biomass[t],dt,s[t,])
-      print(tN)
       pop[t,1:2] = tN[1:2]
-      pop[t,4] = tN[3]
-      pop[t,5] = tN[4]
       pop[t,3] = pop[t,1]+pop[t,2]
+
+      N1 = pop[t-1,4]
+      N2 = pop[t-1,5]
+      tN = imp.step(N1,N2,r,K,sum.F[t],q,T12,immigrant.biomass[t],dt,s[t,])
+      
+      pop[t,4:5] = tN[1:2]
    }
   
    sC.mat = matrix(ncol=ngear,nrow=ntime)
