@@ -151,7 +151,8 @@ DATA_SECTION
   !! TTRACE(init_sdlogF,phase_sdlogF)
 
   init_int phase_sdlogPop;
-  init_vector init_sdlogPop(1,2);
+  //init_vector init_sdlogPop(1,2);
+  init_number init_sdlogPop;
   !! TTRACE(init_sdlogPop,phase_sdlogPop)
 
   init_int phase_rho;
@@ -252,7 +253,8 @@ PARAMETER_SECTION
 
   // random walk standard deviations
   init_number logsdlogF(phase_sdlogF);
-  init_vector logsdlogPop(1,2,phase_sdlogPop);
+  //init_vector logsdlogPop(1,2,phase_sdlogPop);
+  init_number logsdlogPop(phase_sdlogPop);
   init_bounded_number rho(-0.99,0.99,phase_rho);
 
   // observation error standard deviations
@@ -325,8 +327,8 @@ PRELIMINARY_CALCS_SECTION
        TTRACE(log(Pop1),log(Pop2))
 
        dmatrix Ferr(1,ntime,1,ngear); Ferr.fill_randn(77);
-       dmatrix logPop1Err(1,ntime,1,2); logPop1Err.fill_randn(79);
-       dmatrix logPop2Err(1,ntime,1,2); logPop2Err.fill_randn(75);
+       //dmatrix logPop1Err(1,ntime,1,2); logPop1Err.fill_randn(79);
+       //dmatrix logPop2Err(1,ntime,1,2); logPop2Err.fill_randn(75);
        int ut = 0;
        TRACE(ut)
        for (int t = 1; t <= ntime; t++)
@@ -475,7 +477,7 @@ PROCEDURE_SECTION
   }
 
 
-SEPARABLE_FUNCTION void step(const int t, const dvar_vector& f1, const dvar_vector& f2, const dvariable& lsdlogF, const dvariable& p11, const dvariable p12, const dvariable& p21, const dvariable p22, const dvar_vector& lsdlogPop, const dvariable& arho, const dvariable& lr, const dvariable& lK, const dvariable& lT12, const dvariable& lT21, const dvariable& LmPropL, const dvariable& lsdLProportion_local, const dvariable& qP)
+SEPARABLE_FUNCTION void step(const int t, const dvar_vector& f1, const dvar_vector& f2, const dvariable& lsdlogF, const dvariable& p11, const dvariable p12, const dvariable& p21, const dvariable p22, const dvariable& lsdlogPop, const dvariable& arho, const dvariable& lr, const dvariable& lK, const dvariable& lT12, const dvariable& lT21, const dvariable& LmPropL, const dvariable& lsdLProportion_local, const dvariable& qP)
   // f1  U(Fndxl(t-1),Fndxu(t-1)) log F at start of time step
   // f2  U(Fndxl(t),Fndxu(t)      log F at end   of time step)
   // p11 U(utPop1+t-1) log N1 at start of time step
@@ -485,14 +487,14 @@ SEPARABLE_FUNCTION void step(const int t, const dvar_vector& f1, const dvar_vect
 
 
   dvariable varlogF = square(mfexp(lsdlogF));
-  dvar_vector varlogPop = square(mfexp(lsdlogPop));
-  dvar_matrix cov(1,2,1,2);
-  for (int i = 1; i <= 2; i++)
-  {
-     cov(i,i) = varlogPop(i);
-  }
-  cov(1,2) = arho*cov(1,1)*cov(2,2);
-  cov(2,1) = cov(1,2);
+  dvariable varlogPop = square(mfexp(lsdlogPop));
+  //dvar_matrix cov(1,2,1,2);
+  //for (int i = 1; i <= 2; i++)
+  //{
+  //   cov(i,i) = varlogPop(i);
+  //}
+  //cov(1,2) = arho*cov(1,1)*cov(2,2);
+  //cov(2,1) = cov(1,2);
 
   dvariable r = mfexp(lr);
   dvariable K = mfexp(lK);
@@ -533,7 +535,7 @@ SEPARABLE_FUNCTION void step(const int t, const dvar_vector& f1, const dvar_vect
   //dvariable nextLogN2 = p21 + dt*(r*(1.0 - prevN2/K) - sumFg - T12 - 2.0*q*r*prevN1/K + T21*immigrant_biomass(t)/prevN2);
 
   //       do multiple iterations per time step
-  // niter = 1 gives idential results to the code above
+  //       niter = 1 gives idential results to the code above
   const int niter = 8;
   dvariable nextLogN1 = p11;
   dvariable nextLogN2 = p21;
@@ -555,11 +557,26 @@ SEPARABLE_FUNCTION void step(const int t, const dvar_vector& f1, const dvar_vect
   }
 
 
+  //       semi-implicit approximation
+  //       this doesnt work because in the initial RE step
+  //       most variablesl to zero includeind  p11 and p21
+  //       so prevN1 and precN2 = 1
+  //dvariable prevN1 = mfexp(p11);
+  //dvariable prevN2 = mfexp(p21);
+  //dvariable dtr = dt * r;
+  //dvariable nextN1 =  prevN1*(1.0+dtr-dt*(sumFg+T12)-dtr*(1.0-q)*2.0*prevN2/K)/
+  //                         (1.0+dtr*prevN1/K);
+  //dvariable nextN2 = (prevN2*(1.0+dtr-dt*(sumFg+T12)-dtr*q*2.0*prevN1/K)+dt*T21*immigrant_biomass(t))/
+  //                         (1.0+dtr*prevN2/K);
+
+  //dvariable nextLogN1 = log(nextN1);
+  //dvariable nextLogN2 = log(nextN2);
+
   if ( isnan(value(nextLogN1)) || isnan(value(nextLogN2)) ||
        isinf(value(nextLogN1)) || isinf(value(nextLogN2)) )
   {
-     TTRACE(nextLogN1,nextLogN2)
      TTRACE(prevN1,prevN2)
+     TTRACE(nextLogN1,nextLogN2)
      TTRACE(r,K)
      write_status(clogf);
      ad_exit(1);
@@ -568,15 +585,32 @@ SEPARABLE_FUNCTION void step(const int t, const dvar_vector& f1, const dvar_vect
   dvariable Pnll = 0.0;
 
   // combined process error with correlation
-  dvar_vector pred(1,2);
-  pred(1) = nextLogN1;
-  pred(2) = nextLogN2;
-  dvar_vector x2(1,2);
-  x2(1) = p12;
-  x2(2) = p22;
-  dvariable jnll = nLogNormal(pred,x2,cov);
-  Pnll += jnll;
+  //dvar_vector pred(1,2);
+  //pred(1) = nextLogN1;
+  //pred(2) = nextLogN2;
+  //dvar_vector x2(1,2);
+  //x2(1) = p12;
+  //x2(2) = p22;
+  //dvariable jnll = nLogNormal(pred,x2,cov);
+  //Pnll += jnll;
 
+  dvariable varPop = exp(lsdlogPop);
+  //TTRACE(lsdlogPop,varPop)
+  //TTRACE(p12,p22)
+  //dvariable pe = log(mfexp(p12)+mfexp(p22));
+  //dvariable pe = p12+p22;
+  //TTRACE(nextLogN1,nextLogN2)
+  //dvariable ne = log(mfexp(nextLogN1)+mfexp(nextLogN2));
+  //dvariable ne = nextLogN1+nextLogN2;
+  //TTRACE(pe,ne)
+  //Pnll += 0.5*(log(TWO_M_PI*varPop) + square(pe-ne)/varPop);
+
+  Pnll += 0.5*(log(TWO_M_PI*varlogPop) + square(p12-nextLogN1)/varlogPop);
+  Pnll += 0.5*(log(TWO_M_PI*varlogPop) + square(p22-nextLogN2)/varlogPop);
+  //Pnll += 0.5*(log(TWO_M_PI*varlogPop) + (square(p12-nextLogN1)+square(p22-nextLogN2))/varlogPop);
+  //TRACE(Pnll)
+
+ 
   // proportion local prior
   dvariable PLnll = 0.0;
   dvariable LpropL = nextLogN1 - nextLogN2;
