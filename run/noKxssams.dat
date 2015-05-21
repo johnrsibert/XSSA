@@ -28,13 +28,13 @@
  0
 #
 # T12  phase  initial value
-        2     0.01
+        1     0.01
 # T21  phase  initial value
-        2     0.002
+        1     0.002
 # r    phase  initial value
-        1     1.2 
+        2     1.2 
 # sdlogK    phase  initial value
-             1     0.1
+             2     0.1
 # sdlogF    phase  initial values
              1      0.3 #0.3 0.3 0.3 0.3
 # sdlogPop    phase  initial values

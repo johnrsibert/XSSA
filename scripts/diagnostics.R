@@ -88,28 +88,28 @@ plot.diagnostics=function(dat=NULL,file="diagnostics.dat",dt,ngear,devices)
       title(main=paste("Catch,",gear.names[g]),line=title.line)
    }
 
-   width = 9.0
-   height =11.0
-   d = 3
-   if (devices[d] > 0)
-   {
-      s = dev.set(devices[d])
-   }
-   else
-   {
-      x11(width=width,height=height)
-      devices[d] = dev.cur()
-   }
-   par(mar=c(3,4.5,0,0)+0.1)
-   np = ngear
-   lm = layout(matrix(c(1:np),ncol=1,byrow=TRUE))
-   layout.show(lm)
-   for (g in 1:ngear)
-   {
-      nice.ts.plot(dat$t,dat[,(gear.col+g)],bcol="orange4",fcol="orange",lwd=lwd)
-   #  title(main=paste("F mort, gear",g))
-      title(main=paste("F mort,",gear.names[g]),,line=title.line)
-   }
+#  width = 9.0
+#  height =11.0
+#  d = 3
+#  if (devices[d] > 0)
+#  {
+#     s = dev.set(devices[d])
+#  }
+#  else
+#  {
+#     x11(width=width,height=height)
+#     devices[d] = dev.cur()
+#  }
+#  par(mar=c(3,4.5,0,0)+0.1)
+#  np = ngear
+#  lm = layout(matrix(c(1:np),ncol=1,byrow=TRUE))
+#  layout.show(lm)
+#  for (g in 1:ngear)
+#  {
+#     nice.ts.plot(dat$t,dat[,(gear.col+g)],bcol="orange4",fcol="orange",lwd=lwd)
+#  #  title(main=paste("F mort, gear",g))
+#     title(main=paste("F mort,",gear.names[g]),,line=title.line)
+#  }
 
    new.devices = devices
    return(new.devices)
