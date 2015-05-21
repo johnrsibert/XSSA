@@ -461,8 +461,8 @@ PROCEDURE_SECTION
 
   for (int t = 1; t <= ntime; t++)
   {
-     obs(t,U(Fndxl(t),Fndxu(t)),U(utPop1+t-1),
-           U(utPop1+t),U(utPop2+t-1),U(utPop2+t),logsdlogYield,Lpfat);
+     obs(t,U(Fndxl(t),Fndxu(t)),U(utPop1+t-1),U(utPop1+t),
+                                U(utPop2+t-1),U(utPop2+t),logsdlogYield,Lpfat);
   }
 
   //clogf << endl;
@@ -594,16 +594,14 @@ SEPARABLE_FUNCTION void step(const int t, const dvar_vector& f1, const dvar_vect
   //dvariable jnll = nLogNormal(pred,x2,cov);
   //Pnll += jnll;
 
-  dvariable varPop = exp(lsdlogPop);
-  //TTRACE(lsdlogPop,varPop)
+  //TTRACE(lsdlogPop,varlogPop)
   //TTRACE(p12,p22)
   //dvariable pe = log(mfexp(p12)+mfexp(p22));
-  //dvariable pe = p12+p22;
+
   //TTRACE(nextLogN1,nextLogN2)
   //dvariable ne = log(mfexp(nextLogN1)+mfexp(nextLogN2));
-  //dvariable ne = nextLogN1+nextLogN2;
   //TTRACE(pe,ne)
-  //Pnll += 0.5*(log(TWO_M_PI*varPop) + square(pe-ne)/varPop);
+  //Pnll += 0.5*(log(TWO_M_PI*varlogPop) + square(pe-ne)/varlogPop);
 
   Pnll += 0.5*(log(TWO_M_PI*varlogPop) + square(p12-nextLogN1)/varlogPop);
   Pnll += 0.5*(log(TWO_M_PI*varlogPop) + square(p22-nextLogN2)/varlogPop);
