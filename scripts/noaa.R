@@ -228,11 +228,12 @@ LL.join=function(hdar=NULL,noaa=NULL,yr1=1952,yr2=2012)
    np = ncol(adat)
    lm <- layout(matrix(c(1:np),ncol=1,byrow=TRUE))
    layout.show(lm)
+   yrange=c(0,max(adat,na.rm=TRUE))
 
    for (j in 1:ncol(adat))
    {
       nice.ts.plot(ya,adat[,j],lwd=3,label=colnames(dat)[j],
-                   ylab="Catch (mt)")
+                   ylab="Catch (mt)",ylim=yrange)
    }
 
    save.png.plot(paste(ncol(adat),"_gear_catch_history_a",sep=""),width=width,height=height)
