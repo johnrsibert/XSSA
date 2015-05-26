@@ -6,6 +6,7 @@ if (length(grep("nice.ts.plot",workspace.junk)==0))
   source("utils.R")
 gear.names = c("TunaHL","Troll","Longline","Bottom/inshore HL","AkuBoat")
 sgn = c("THL","Troll","LL","BHL","Aku")
+have.xssams.R = TRUE
  
 dLogN1=function(pN1,pN2,r, K, F, q, T12)
 {
@@ -262,7 +263,7 @@ qcomp.phase=function()
    par(old.par)
 }
 
-plot.NN.ts=function(pop,r,K,ib,save.graphics=TRUE)
+plot.NN.ts=function(pop,r=NULL,K,ib,save.graphics=TRUE)
 {
    ntime = nrow(pop)
 
@@ -272,15 +273,16 @@ plot.NN.ts=function(pop,r,K,ib,save.graphics=TRUE)
    height = 9.0
    x11(width=width,height=height)
    old.par = par(no.readonly = TRUE) 
-   par(mar=c(4,4,0,4)+0.1,las=1)
-
+   par(mar=c(4,5,0,4)+0.1)
+   options(scipen=6)
    x = c(1:ntime)
-   xrange=nice.ts.plot(x,pop[,1:3],legend=colnames(pop),xlab="t",ylab="N")
+   xrange=nice.ts.plot(x,pop[,1:3],legend=colnames(pop),xlab="t",ylab="N (mt)")
    abline(h=K,lwd=2,lty="dotdash",col="blue")
    lines(x,pop[,4],lwd=3,col="blue",lty="dashed")
    lines(x,pop[,5],lwd=3,col="blue",lty="dashed")
    text(x[ntime],K," K",adj=c(0,0),col="blue")
-   title(main=paste("r = ",r,sep=""),line=-1)
+   #if (!is.null(r))
+   #   title(main=paste("r = ",r,sep=""),line=-1)
 
    par("new"=TRUE)
    plot(x,lprop,lwd=3,type='l',col="red",ylim=c(0,1),
@@ -288,15 +290,17 @@ plot.NN.ts=function(pop,r,K,ib,save.graphics=TRUE)
    text(x[ntime],lprop[ntime]," p",adj=c(0,0),col="red")
    abline(h=0.9,lwd=2,lty="dotdash",col="red")
    axis(4,col="red",ylab="p",col.axis="red")
-   abline(v=par("usr")[2],lwd=2,col="red")
-   mtext("p",side=4,col="red",line=3)
+   #abline(v=par("usr")[2],lwd=2,col="red")
+   mtext("p",side=4,col="red",line=0.1)
 
    par("new"=TRUE)
-   plot(x,ib,type='n',ann=FALSE,axes=FALSE,
-        ylim=c(0.0,max(ib)),xlim=xrange)
-   double.lines(x,ib,bcol="purple4",fcol="purple1",lwd=5)
+#  plot(x,ib,type='n',ann=FALSE,axes=FALSE,
+#       ylim=c(0.0,max(ib)),xlim=xrange)
+#  double.lines(x,ib,bcol="purple4",fcol="purple1",lwd=5)
+   plot(x,ib,lwd=3,type='l',col="purple1", 
+        ylim=c(0.0,max(ib)), ann=FALSE,axes=FALSE,xlim=xrange)
    text(x[ntime],ib[ntime]," T21",adj=c(0,0),col="purple1")
-   axis(4,line=-1,outer=FALSE,labels=FALSE,tcl=0.5,col="purple1")
+   axis(4,line=-2,col="purple1",col.axis="purple1")
 
    if (save.graphics)
       save.png.plot("NNts",width=width,height=height)
@@ -547,7 +551,7 @@ xssams.sim=function(r=0.12, K=200000, q=0.54, T12=0.001, T21=0.0002,
 
    if (is.null(F))
    {
-   #  print("computing F")
+      print("computing F")
       F.matrix = compute.F(t(obs.catch),plot=FALSE) 
    }
    else
@@ -624,7 +628,7 @@ xssams.sim=function(r=0.12, K=200000, q=0.54, T12=0.001, T21=0.0002,
    if (do.plot)
    {
       plot.NN.ts(pop,r,K,immigrant.biomass,save.graphics)
-   #  plot.catch.ts(obs.catch,pred.catch,save.graphics)
+      plot.catch.ts(obs.catch,pred.catch,save.graphics)
    }
 
    if (do.est)
@@ -723,7 +727,7 @@ plot.catch.ts=function(obs.catch,pred.catch,save.graphics=TRUE)
    height = 11.0
    x11(width=width,height=height)
    old.par = par(no.readonly = TRUE) 
-   par(mar=c(4,4,0,4)+0.1,las=1)
+   par(mar=c(4,5,0,1)+0.1)
    np = ngear+1
    lm = layout(matrix(c(1:np),ncol=1,byrow=TRUE))
    layout.show(lm)
@@ -731,7 +735,7 @@ plot.catch.ts=function(obs.catch,pred.catch,save.graphics=TRUE)
    {
       if (g < np)
       {
-         nice.ts.plot(x,pred.catch[,g],xlab="",ylab="",
+         nice.ts.plot(x,pred.catch[,g],xlab="",ylab="Catch (mt)",
                   bcol="darkgreen",fcol="lightgreen",lwd=3)
          points(x,obs.catch[,g],col= "darkgreen",pch=16)
          title(main=gear.names[g],line=-1)

@@ -1,7 +1,8 @@
 source("/home/jsibert/Projects/xssa/scripts/utils.R")
 
-plot.diagnostics=function(dat=NULL,file="diagnostics.dat",dt,ngear,devices)
+plot.diagnostics=function(dat=NULL,file="diagnostics.dat",dt,ngear,devices,block)
 {
+   print(paste("Block: ",block))
    if (is.null(dat))
      dat = read.table(file=file,header=TRUE)
 
@@ -12,59 +13,98 @@ plot.diagnostics=function(dat=NULL,file="diagnostics.dat",dt,ngear,devices)
    #  print(names(dat))
    }
    ncol = ncol(dat)
+   print("Names of all variables:")
+   print(names(dat))
    gear.col = 6
    dd = c(2:3,(gear.col+1):ncol)
-#  print("Names of log transformed variables:")
-#  print(names(dat)[dd])
+   print("Names of log transformed variables:")
+   print(names(dat)[dd])
    dat[,dd] = exp(dat[,dd])
 
    gear.names = c("TunaHL","Troll","Longline","Bottom/inshore HL","AkuBoat")
    title.line = -1
    lwd = 3
 
-   width = 9.0
-   height = 11.0
-   d = 1
-   if (devices[d] > 0)
+   old.NN.plot = FALSE
+   if(old.NN.plot)
    {
-      s = dev.set(devices[d])
-   }
+      width = 9.0
+      height =11.0
+      x11(width=width,height=height)
+     
+      old.par = par(no.readonly = TRUE) 
+      par(mar=c(3,4.5,0,0)+0.1)
+      np = 3
+      lm = layout(matrix(c(1:np),ncol=1,byrow=TRUE))
+      layout.show(lm)
+    
+      nice.ts.plot(dat$t,dat$pop1,lwd=lwd)
+      title(main="Population 1",line=title.line)
+    
+      nice.ts.plot(dat$t,dat$pop2,lwd=lwd)
+      title(main="Population 2",line=title.line)
+   
+      nice.ts.plot(dat$t,dat$K,bcol="black",fcol="lightgray",lwd=lwd)
+      double.lines(dat$t,(dat$pop1+dat$pop2),bcol="blue",fcol="lightblue",lwd=lwd)
+      title(main="Total Population",line=title.line)
+    
+      par("new"=TRUE)
+      plot(dat$t,dat$forcing,type='n',ann=FALSE,axes=FALSE,
+           ylim=c(0.0,max(dat$forcing)))
+      double.lines(dat$t,dat$forcing,bcol="purple4",fcol="purple1",lwd=lwd)
+      axis(4,line=-1,outer=FALSE,labels=FALSE,tcl=0.5,col="purple1")
+       
+      par("new"=TRUE)
+      plot(dat$t,dat$propL,type='l',ann=FALSE,axes=FALSE,
+           col="red4",lwd=2,lty="solid",ylim=c(0,1))
+      axis(4,line=0,outer=FALSE,tcl=0.5,labels=FALSE,col="red")
+      abline(h=0.9,col="red4",lty="dotdash",lwd=2)
+   } #if(old.NN.plot)
    else
    {
-      x11(width=width,height=height)
-      devices[d] = dev.cur()
+      d = 1
+      if (devices[d] > 0)
+      {
+         s = dev.set(devices[d])
+      }
+      else
+      {
+         width = 9.0
+         height = 9.0
+         x11(width=width,height=height)
+         devices[d] = dev.cur()
+      }
+
+      x = dat$t
+      ntime=length(x)
+      y = matrix(nrow=length(x),ncol=3)
+      y[,1] = dat$pop1
+      y[,2] = dat$pop2
+      y[,3] = dat$pop1 + dat$pop2
+      legend = c(" N1"," N2"," N1+N2")
+      xrange=nice.ts.plot(x,y,legend=legend,lwd=5,ylab="Biomass (mt)")
+      lines(x,dat$K,lwd=2,lty="dotdash",col="blue",xlim=xrange)
+
+      par("new"=TRUE)
+      plot(x,dat$propL,lwd=3,type='l',col="red",ylim=c(0,1),
+           ann=FALSE,axes=FALSE,xlim=xrange)
+      text(x[ntime],dat$propL[ntime]," p",adj=c(0,0),col="red")
+      abline(h=0.9,lwd=2,lty="dotdash",col="red")
+      axis(4,col="red",ylab="p",col.axis="red")
+      mtext("p",side=4,col="red",line=0.1)
+
+      par("new"=TRUE)
+      plot(x,dat$forcing,lwd=3,type='l',col="purple", 
+           ylim=c(0.0,max(dat$forcing)), ann=FALSE,axes=FALSE,xlim=xrange)
+      text(x[ntime],dat$forcing[ntime]," T21",adj=c(0,0),col="purple")
+      axis(4,line=-2,col="purple",col.axis="purple")
+   #  axis(2,col="purple",col.axis="purple",pos=xrange[2])
+      mtext("T21",side=4,col="purple",line=-2.0)
+
+      title(main=paste("Block", block),line=title.line)
+
    }
 
-   old.par = par(no.readonly = TRUE) 
-   par(mar=c(3,4.5,0,0)+0.1)
-   np = 3
-   lm = layout(matrix(c(1:np),ncol=1,byrow=TRUE))
-   layout.show(lm)
-
-   nice.ts.plot(dat$t,dat$pop1,lwd=lwd)
-   title(main="Population 1",line=title.line)
-
-   nice.ts.plot(dat$t,dat$pop2,lwd=lwd)
-   title(main="Population 2",line=title.line)
-
-   nice.ts.plot(dat$t,dat$K,bcol="black",fcol="lightgray",lwd=lwd)
-   double.lines(dat$t,(dat$pop1+dat$pop2),bcol="blue",fcol="lightblue",lwd=lwd)
-   title(main="Total Population",line=title.line)
-
-   par("new"=TRUE)
-   plot(dat$t,dat$forcing,type='n',ann=FALSE,axes=FALSE,
-        ylim=c(0.0,max(dat$forcing)))
-   double.lines(dat$t,dat$forcing,bcol="purple4",fcol="purple1",lwd=lwd)
-   axis(4,line=-1,outer=FALSE,labels=FALSE,tcl=0.5,col="purple1")
-   
-   par("new"=TRUE)
-   plot(dat$t,dat$propL,type='l',ann=FALSE,axes=FALSE,
-        col="red4",lwd=2,lty="solid",ylim=c(0,1))
-   axis(4,line=0,outer=FALSE,tcl=0.5,labels=FALSE,col="red")
-   abline(h=0.9,col="red4",lty="dotdash",lwd=2)
-
-   width = 9.0
-   height =11.0
    d = 2
    if (devices[d] > 0)
    {
@@ -72,6 +112,8 @@ plot.diagnostics=function(dat=NULL,file="diagnostics.dat",dt,ngear,devices)
    }
    else
    {
+     width = 9.0
+     height =11.0
      x11(width=width,height=height)
      devices[d] = dev.cur()
    }
@@ -82,34 +124,43 @@ plot.diagnostics=function(dat=NULL,file="diagnostics.dat",dt,ngear,devices)
    layout.show(lm)
    for (g in 1:ngear)
    {
-      nice.ts.plot(dat$t,dat[,(gear.col+ngear+g)],bcol="darkgreen",fcol="lightgreen",lwd=lwd)
+      nice.ts.plot(dat$t,dat[,(gear.col+ngear+g)],bcol="darkgreen",fcol="lightgreen",lwd=lwd,ylab="Catch (mt)")
       points(dat$t,dat[,(gear.col+2*ngear+g)],col= "darkgreen",pch=16)
-   #  title(main=paste("Catch, gear",g))
-      title(main=paste("Catch,",gear.names[g]),line=title.line)
+      if (g == 1)
+      {
+         title(main=paste("Block", block),line=title.line)
+         title(main=gear.names[g],line=title.line-1.5)
+      }
+      else
+         title(main=gear.names[g],line=title.line)
    }
 
-#  width = 9.0
-#  height =11.0
-#  d = 3
-#  if (devices[d] > 0)
-#  {
-#     s = dev.set(devices[d])
-#  }
-#  else
-#  {
-#     x11(width=width,height=height)
-#     devices[d] = dev.cur()
-#  }
-#  par(mar=c(3,4.5,0,0)+0.1)
-#  np = ngear
-#  lm = layout(matrix(c(1:np),ncol=1,byrow=TRUE))
-#  layout.show(lm)
-#  for (g in 1:ngear)
-#  {
-#     nice.ts.plot(dat$t,dat[,(gear.col+g)],bcol="orange4",fcol="orange",lwd=lwd)
-#  #  title(main=paste("F mort, gear",g))
-#     title(main=paste("F mort,",gear.names[g]),,line=title.line)
-#  }
+   plot.Fmort = FALSE
+   if (plot.Fmort)
+   {
+       width = 9.0
+       height =11.0
+       d = 3
+       if (devices[d] > 0)
+       {
+          s = dev.set(devices[d])
+       }
+       else
+       {
+          x11(width=width,height=height)
+          devices[d] = dev.cur()
+       }
+       par(mar=c(3,4.5,0,0)+0.1)
+       np = ngear
+       lm = layout(matrix(c(1:np),ncol=1,byrow=TRUE))
+       layout.show(lm)
+       for (g in 1:ngear)
+       {
+          nice.ts.plot(dat$t,dat[,(gear.col+g)],bcol="orange4",fcol="orange",lwd=lwd)
+       #  title(main=paste("F mort, gear",g))
+          title(main=paste("F mort,",gear.names[g]),,line=title.line)
+       }
+   } #if (plot.Fmort)
 
    new.devices = devices
    return(new.devices)
@@ -160,7 +211,8 @@ log.diagnostics=function(file="xssams_program.log",ntime=244,dt=0.25,ngear=5)
 #     print(tail(diag))
 
       print(paste("Displaying block ",counter,sep=""))
-      new.devices = plot.diagnostics(as.data.frame(diag),dt=dt,ngear=ngear,devices=dev.list)
+      new.devices = plot.diagnostics(as.data.frame(diag),dt=dt,ngear=ngear,
+                    devices=dev.list,block=counter)
       dev.list=new.devices
      
 
@@ -174,11 +226,20 @@ log.diagnostics=function(file="xssams_program.log",ntime=244,dt=0.25,ngear=5)
          counter = counter - 1
       else if (c == 's')
       {
+         print(dev.list)
          for (d in 1:length(dev.list))
          {
-            dev.set(dev.list[d])
-            din = par("din")
-            save.png.plot(dev.file.names[d],width=din[1],height=din[2])
+            if (dev.list[d] > 0)
+            {
+               tname = paste(dev.file.names[d],"B",counter,sep="")
+               print(paste("Saving device",d,"to file",tname))
+               dev.set(dev.list[d])
+               din = par("din")
+               print(din)
+               save.png.plot(tname,width=din[1],height=din[2])
+            }
+            else
+               print(paste("Skipping device",d))
           }
       }
       if (counter < 1)
@@ -197,48 +258,4 @@ plot.resid.hist=function(dat)
 
 
 }
-
-#plot.diagnostics.1=function(dat=NULL,file="diagnostics.dat")
-#{
-#   if (is.null(dat))
-#     dat = read.table(file=file,header=TRUE)
-#
-#   if (dat$t[1] == 1)
-#   {
-#      dat$t = (1951.875 + dat$t*0.25)
-#   #  print(head(dat))
-#   }
-##  prop = exp(dat$pop1)/(exp(dat$pop1)+exp(dat$pop2))
-##  print(summary(cbind(dat,prop)))
-#   dat$pop1 = exp(dat$pop1)
-##  w = which(dat$pop1 <= 2)
-##  print(w)
-##  is.na(dat$pop1[w])
-#   dat$pop2 = exp(dat$pop2)
-##  print(head(cbind(dat$pop1,dat$pop2))) 
-##  dat$predC1=exp(dat$predC1)
-##  dat$obsC1=exp(dat$obsC1)
-#
-#   width = 6.5
-#   height = 9.0
-#   x11(width=width,height=height)
-#   print(paste("Current device",dev.cur()))
-#   old.par = par(no.readonly = TRUE) 
-#   par(mar=c(3,4.5,0,0)+0.1)
-#   np = 3
-#   lm = layout(matrix(c(1:np),ncol=1,byrow=TRUE))
-#   layout.show(lm)
-#   lwd = 3
-#
-#   nice.ts.plot(dat$t,cbind(dat$pop1,dat$pop2),bcol="blue",fcol="lightblue",lwd=lwd)
-#   par("new"=TRUE)
-#   plot(dat$t,dat$propL,ylim=c(0,1),type='l',col="red",lwd=lwd,axes=FALSE,ann=FALSE)
-#
-#   nice.ts.plot(dat$t,exp(dat$F1),bcol="darkgreen",fcol="lightgreen",lwd=lwd)
-#
-#   nice.ts.plot(dat$t,cbind(dat$predC1,dat$obsC1),bcol="orange4",fcol="orange",lwd=lwd)
-#
-#   return(dat)
-##  return(cbind(dat$pop1,dat$pop2))
-#}
 

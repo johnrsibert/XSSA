@@ -255,11 +255,13 @@ LL.join=function(hdar=NULL,noaa=NULL,yr1=1952,yr2=2012)
    }
    fr = 2
    x11()
-   nice.ts.plot(yy,region.biomass.q[fr,],ylab=paste("Region",fr,"Biomass Q"))
+   nice.ts.plot(yy,1e-3*region.biomass.q[fr,],ylab=paste("Region",fr,"Biomass (1000 mt)"))
    points(yy,region.biomass.q[fr,],pch=16,col="blue")
    x11()
-   nice.ts.plot(ya,region.biomass.a[fr,],ylab=paste("Region",fr,"Biomass A"))
-   points(ya,region.biomass.a[fr,],pch=16,col="blue")
+   options(scipen=6)
+   nice.ts.plot(ya,1e-3*region.biomass.a[fr,],ylab=paste("Region",fr,"Biomass (1000 mt)"))
+#  points(ya,region.biomass.a[fr,],pch=16,col="blue")
+   save.png.plot(paste("annual_region_",fr,"_biomass",sep=""))
 
    bio.file = "../run/total_biomass_a.dat"
    print(paste("writing",bio.file))
