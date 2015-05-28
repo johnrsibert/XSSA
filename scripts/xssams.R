@@ -182,7 +182,7 @@ NNphase=function(r=0.3, K=1.0, FF = 0.007, q=0.54, T12=0.01, T21=0.002, dt = 1.0
 #  plot(pN1,pN2,type='n',xlab="N1",ylab="N2")
    plot(c(0.0,1.1),c(0.0,1.15),type='n',
         xlab=expression("N"[1][,][1]),ylab=expression("N"[2][,][1]))
-   image(iN1,iN2,prop,zlim=c(0,1),col=heat.colors(5),add=TRUE)
+#  image(iN1,iN2,prop,zlim=c(0,1),col=heat.colors(5),add=TRUE)
 
 #  pl = 0.9
 #  p = pN1*(1.0/pl - 1.0)
@@ -399,6 +399,7 @@ plot.propL.prior=function(propL=0.9)
    save.png.plot("propL_prior",width=6.5,height=6.5)
 }
 #dnorm(x, mean = 0, sd = 1, log = FALSE)
+# standard Cauchy density
 dtdist=function(x, mean = 0, sd = 1)
 {
   xx = (x-mean)/sd

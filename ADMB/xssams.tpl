@@ -590,6 +590,7 @@ SEPARABLE_FUNCTION void obs(const int t, const dvar_vector& f,const dvariable& p
 
         dvariable norm_part = 0.5*(log(TWO_M_PI*varlogYield) + z);
 
+        // standard Cauchy density
         dvariable fat_part = 1.0/(M_PI*(1.0 + z));
         dvariable pfat = alogit(Lpf(g));
         Ynll += log((1.0-pfat)*mfexp(norm_part) + pfat*fat_part);
