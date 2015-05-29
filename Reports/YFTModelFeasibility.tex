@@ -72,8 +72,8 @@ hampered by lack of stock assessment results specific to the MHI. The
 feasibility of developing a state-space Schafer model with emigration,
 external forcing, Bayesian constraints, and robust estimation
 specifically for the MHI was investigated. The model is feasible, but
-parameter estimation is hindered by possible lack of information in
-the data.
+parameter estimation is hindered by possible lack of an exploitation
+signal in the data.
 \end{abstract}
 
 \section{Introduction}
@@ -81,8 +81,7 @@ The Main Hawaiian Islands (MHI) yellowfin tuna (YFT) fishery is
 a small, but very important important fishery within the State of
 Hawaii, and sustainable management of this
 fishery is a local issue that deserves scientific support.
-Yellowfin Tuna (YFT) have been an important staple for the people of
-Hawaii for centuries. The documented history of the YFT fishery begins in
+The documented history of the YFT fishery begins in
 1949, predating statehood by 10 years, and is possibly a longer catch
 history than that of the Japanese distant water longline fishery.
 The MHI YFT population is, of course,
@@ -103,7 +102,8 @@ population was spawned and reared in the MHI (Wells et al 2012).
 Contemporary fisheries management often depends on results of stock
 assessment models to establish quantitative fishery reference points
 such as ``acceptable biological catch''.
-It is not clear shere creating stock assessment model
+Such models do not exist for the MHI YFT population, but
+it is not clear that creating stock assessment model
 for a single component of a shared stock is feasible.
 The purpose of the work described in this report is to asses the
 feasibility of developing a stock assessment model for the MHI YFT
@@ -170,6 +170,9 @@ model testing, Figure~\ref{fig:r2biomass}.
 Since the MFCL assessment uses data for the period 1952 through 2012,
 catch data outside of this period were excluded from this analysis.
 
+\vspace{2ex}
+Further properties of the data are presented in Appendix~\ref{sec:data}. 
+
 \subsection{Model}
 An age-aggregated model was developed in preference to a more complex
 age-structured model for examining the feasibility of a MHI YFT
@@ -191,11 +194,11 @@ biomass of the yellowfin population outside of the MHI as estimated by
 some other model, e.g., \MFCL\ (MFCL) or \SD. In the present model,
 MFCL region 2 is assumed to be the source of immigrants (see previous
 paragraph).
-\item The fishery comprises several gear types or fleets. Fishing
-practices have evolved continuously over the 66 year history of the
-fishery making estimation of satisfactory measures of fishing effort
-difficult and contentious. It is assumed that each fleet is
-characterized by a distinct fishing mortality.
+\item The fishery comprises several gear types or fleets, each
+characterized by a distinct fishing mortality time series.
+Fishing practices have evolved continuously over the 66 year history
+of the fishery making estimation of satisfactory measures of fishing
+effort difficult and contentious..
 The evolution of fishing mortality for each fleet over time is
 represented by a random walk,
 i.e., the fishing mortality in the current time step is equal
@@ -239,7 +242,7 @@ The following pair of simultaneous non-linear differential equations
 describe the dynamics of the two subpopulations (see
 Appendix~\ref{sec:models} for details).
 \begin{eqnarray}
-%\label{eqn:coupledschaeferq}
+\label{eqn:coupledschaeferq}
 \frac{d\None}{dt}&=&\None\Big[r\Big(1-\frac{\None}{K}\Big)
 -F - T_{12}\Big] - (1-q)2r\frac{\None\Ntwo}{K}\nonumber\\
 \\
@@ -251,8 +254,9 @@ $K$ is the asymptotic biomass,
 $F$ is the total fishing mortality in region~1, $T_{12}$
 is the emigration rate from region~1 to region~2, and $T_{21}$
 is the rate of immigration of biomass from region~2 to region~1.
-Note the nonlinear mortality term $2r\frac{\None\Ntwo}{K}$ generated
-by two subpopulations constrained by the same logistic process.
+The nonlinear mortality term $2r\frac{\None\Ntwo}{K}$ is a
+consequence of assuming
+two subpopulations constrained by the same logistic process.
 The parameter, $q$, apportions the effects of the nonlinear
 mortality term between the two subpopulation.
 
@@ -285,14 +289,14 @@ respectively.
 \end{figure}
 
 The general behavior of the model system is shown in
-Figure~\ref{fig:simNN}, emphasizing the significance of $q$.. 
+Figure~\ref{fig:simNN}, emphasizing the importance of $q$ in
+maintaining the stability of two subpopulations.
 For values of $q>0.5$, the local population, $\None$ is stable,
 $\Ntwo$ decreases, and the proportion local remains near 0.9.
-For values of $q<0.5$, the local population, $\None$ is decreases,
+For values of $q<0.5$, the local population, $\None$ decreases,
 $\Ntwo$ increases, and the proportion local dips below 0.9.
-This same dependency on $q$ is also illustrated in
+This same dependency on $q$ is also illustrated more generally in
 Figure~\ref{fig:NNphase}.
-
 
 Initial testing of the estimation procedure gave mixed results. 
 The model is sensitive to initial parameter guesses. Some
@@ -386,7 +390,7 @@ The population dynamics parameters,
 $r$, $K$, $T_{12}$, $T^*_{21}$, and $q$, are the most important for 
 stock assessment, but do not change much.
 Of these, $q$, the parameter apportioning 
-the non-linear mortality term between the two subpopulations
+the non-linear mortality term between the two subpopulations,
 changes the most.
 
 The variance parameters are of no particular interest and exist only
@@ -398,7 +402,7 @@ data.
 
 The age-aggregated approach using a logistic model with emigration and
 immigration shows sufficient promise to continue model development.
-The general behavior of the model system (Figures~\ref{fig:NNphase} and
+The general behavior of the model system (Figure~\ref{fig:simNN} and
 ~\ref{fig:NNts}) appropriately describes a small persistent population
 interacting with a much larger one.
 The efficacy of the random walk
@@ -428,6 +432,10 @@ The relationships between of the parameters $q$, $T^*_{21}$,
 and $\bar{p}$ are not clear.
 Estimation of fisheries reference point would be simpler if
 an analytic expression for the equilibrium point were available.
+Finite difference approximations of logistic population models are
+notoriously unstable under certain circumstances. An analytical
+solution of equation~\ref{eqn:coupledschaeferq} would be of great
+help.
 Further mathematical analysis is called for.
 
 \vspace{4ex}
@@ -587,7 +595,7 @@ have not yet been included in this analysis.
 Histograms of first differences of the logarithm of catch time series
 are shown in Figure~\ref{fig:diff1histo}. These differences are
 clearly not normally distributed, indicating that a robust catch
-likelihood would be useful.
+likelihood might be useful.
 
 \begin{figure}
 \begin{center}
@@ -699,10 +707,12 @@ The appearance of
 $\Nsum$ in the numerator of the logistic term reflects the assumption
 that the population dynamics of immigrant fish depends on
 the population dynamics in region 1. This assumption leads to an
-important non-linearity in the model that predicts a potential
-overwhelming of the local stock by a more numerous immigrant stock.
+important non-linearity in the model that predicts potential
+overwhelming of one stock by the other.
 
-The proportion of ``local'' fish $p = \frac{\None}{\Nsum}$ is of potential interest.
+The proportion of ``local'' fish $p = \frac{\None}{\Nsum}$ is an
+important constraint, and it is necessary to model the two
+subpopulations separately.
 Equation~\ref{eqn:logistic} can be expanded and rearranged to become
 \begin{eqnarray}
 \label{eqn:coupledschaefer}
@@ -722,7 +732,7 @@ A new parameter, $q$, is introduced to accomplish the apportionment,
 leading to a set of simultaneous non-linear differential equations for
 the components of the population inhabiting region~1.
 \begin{eqnarray}
-\label{eqn:coupledschaeferq}
+\label{eqn:coupledschaeferqa}
 \frac{d\None}{dt}&=&\None\Big[r\Big(1-\frac{\None}{K}\Big)
 -F - T_{12}\Big] - (1-q)2r\frac{\None\Ntwo}{K}\nonumber\\
 \\
@@ -730,7 +740,7 @@ the components of the population inhabiting region~1.
 -F - T_{12}\Big] - q2r\frac{\None\Ntwo}{K} + T_{21}\nonumber
 \end{eqnarray}
 
-The log transformed equivalent of equation~\ref{eqn:coupledschaeferq} is
+The log transformed equivalent of equation~\ref{eqn:coupledschaeferqa} is
 \begin{eqnarray}
 \label{eqn:coupledlogschaefer}
 \frac{d\log(\None)}{dt}&=&r\Big(1-\frac{\None}{K}\Big) -F - T_{12} -
@@ -826,7 +836,7 @@ follow a random walk with normal increments, i.e.,
 N(0,\sigma^2_\xi) \label{eqn:Fwalk}
 \end{equation}
 where  $\sigma^2_\xi$ is the variance of the fishing
-mortality random walk for gear $g,\; g=1\ldots n$.
+mortality random walk.
 
 %Parameterization of $T_{21}$
 {\bf Population Forcing.}
@@ -848,8 +858,6 @@ where $B_{2,t}$ is biomass in region 2 at time $t$ taken from the MFCL output fi
 {\tt plot-12.par.rep} from the 2014 WCPFC stock assessment
 (Davies et al 2014). $T^*_{21}$ is the proportion on
 $B_{2,t}$ which migrates at each time step.
-Alternatively, $B_{2,t}$ may be assumed to be constant at the average
-of the estimated biomass in region 2, $\widebar{B_{2}}$.
 
 {\bf Asymptotic biomass.}
 $K$ is the asymptotic biomass in a population growing according to
