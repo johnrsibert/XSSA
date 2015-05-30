@@ -522,9 +522,9 @@ compute.F<-function(obs.catch,plot=TRUE)
    return(F)
 }
 
-xssams.sim=function(r=0.12, K=200000, q=0.54, T12=0.001, T21=0.0002,
+xssams.sim=function(r=1.2, K=200000, q=0.54, T12=0.01, T21=0.002,
                   dt=1.0, sN=c(0.0,0.0,0.0), fr=2, p=0.9, 
-                  F=NULL, sC=c(0.1,0.1,0.1,0.1,0.1), F.mult=0.015,
+                  F=NULL, sC=c(0.0,0.0,0.0,0.0,0.0), F.mult=1.0,
                   do.plot=TRUE, save.graphics=FALSE, do.est=FALSE)
 {
    print(paste("r = ",r,", dt =",dt,sep=""))
@@ -553,12 +553,17 @@ xssams.sim=function(r=0.12, K=200000, q=0.54, T12=0.001, T21=0.0002,
    if (is.null(F))
    {
       print("computing F")
-      F.matrix = compute.F(t(obs.catch),plot=FALSE) 
+      F.scale=0.015 # observed and predicted catch similar
+      F.matrix = F.scale*compute.F(t(obs.catch),plot=FALSE) 
    }
    else
       F.matrix = F
 #  print(paste("F.mult =",F.mult))
    F.matrix = F.mult*F.matrix
+   mean.F = mean(F.matrix,na.rm=TRUE)
+   print(paste("mean F = ",mean.F,",log(mean F) = ",log(mean.F),sep=""))
+   log.F = log(F.matrix+1)
+   print(paste("mean log (F+!) =",mean(log.F)))
    sum.F = colSums(F.matrix)
    ntime = ncol(F.matrix)
    ngear = nrow(F.matrix)
@@ -667,7 +672,7 @@ xssams.sim=function(r=0.12, K=200000, q=0.54, T12=0.001, T21=0.0002,
       cat.string("# Time step (years)")
       cat.number(dt)
       cat.string("# Catch data")
-      cat.string("# simulated catch:")
+      cat.string(paste("# simulated catch; F.mult = ",F.mult,sep=""))
       cat.matrix(t(pred.catch))
       cat.string(paste("#",biomass.file))
       cat.matrix(region.biomass)
@@ -677,28 +682,27 @@ xssams.sim=function(r=0.12, K=200000, q=0.54, T12=0.001, T21=0.0002,
       cat.number(0)
       cat.string("#")
       cat.string("# T12  phase  initial value")
-      cat.vector(c(-1,T12))
+      cat.vector(c(2,0.01))
       cat.string("# T21  phase  initial value")
-      cat.vector(c(-1,T21))
+      cat.vector(c(2,0.02))
       cat.string("# r    phase  initial value")
-      cat.vector(c(-1,r))
+      cat.vector(c(2,r))
       cat.string("# K    phase  initial value")
-      cat.vector(c(-1,K))
+      cat.vector(c(2,K))
       cat.string("# sdlogF    phase  initial values")
-      cat.vector(c(1,0.3, 0.3, 0.3, 0.3, 0.3))
+      cat.vector(c(1,0.3)) #, 0.3, 0.3, 0.3, 0.3))
       cat.string("# sdlogPop    phase  initial values")
-      cat.vector(c(-1,sN[1]+0.001,sN[2]+0.001))
-      cat.string("# rho phase initial value")
-      cat.vector(c(-1,sN[3]))
+      cat.vector(c(2,0.1)) #,sN[2]+0.001))
+   #  cat.string("# rho phase initial value")
+   #  cat.vector(c(-1,sN[3]))
       cat.string("# sdlogYield  phase initial values")
-   #  cat.vector(c(-1,sC))
-      cat.vector(c(-1,rep(1.0,ngear)))
+      cat.vector(c(1,1.0))
       cat.string("# meanProportion_Local phase initial value")
       cat.vector(c(-1,p))
       cat.string("# sdLproportion_local phase initial value")
-      cat.vector(c(-1,    2.72))
+      cat.vector(c(-1,    1.3863))
       cat.string("# qProp phase initial value")
-      cat.vector(c(-1,q))
+      cat.vector(c(2,q))
       cat.string("# robust yield likelihood")
       cat.string("# use pfat_phase pfat initial values")
       cat.vector(c(1,   -1,         0.07, 0.07, 0.07, 0.07, 0.07))
