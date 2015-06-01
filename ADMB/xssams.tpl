@@ -281,7 +281,7 @@ PRELIMINARY_CALCS_SECTION
        TTRACE(Pop1,Pop2)
        TTRACE(log(Pop1),log(Pop2))
 
-       dmatrix Ferr(1,ntime,1,ngear); Ferr.fill_randn(77);
+       //dmatrix Ferr(1,ntime,1,ngear); Ferr.fill_randn(77);
        //dmatrix logPop1Err(1,ntime,1,2); logPop1Err.fill_randn(79);
        //dmatrix logPop2Err(1,ntime,1,2); logPop2Err.fill_randn(75);
        int ut = 0;
@@ -290,9 +290,6 @@ PRELIMINARY_CALCS_SECTION
        {   
           for (int g = 1; g <= ngear; g++)
           {
-           //U(++ut) =  -18*mfexp(0.001*Ferr(t,g));
-           //U(++ut) =  0.1*Ferr(t,g);
-             // approximately log mean F
              U(++ut) =  -5.0; //log(0.001);
           }
        }
@@ -427,16 +424,13 @@ PROCEDURE_SECTION
 SEPARABLE_FUNCTION void step0(const dvariable& p11, const dvariable p21, const dvariable& lsdlogPop, const dvariable& lK, const dvariable& LmPropL) 
   // p11 U(utPop1+t-1) log N1 at start of time step
   // p21 U(utPop2+t-1) log N2 at start of time step
+
+  // ensure that starting population size is near K
   dvariable K = mfexp(lK);
-  //TRACE(LmPropL)
   //dvariable PropL = alogit(LmPropL);
   dvariable PropL = 1.0/(1.0+mfexp(-LmPropL));
-  //TTRACE(K,PropL)
   dvariable p10 = PropL*K;
   dvariable p20 = K-p10;
-  //TTRACE(p10,p20)
-  //TTRACE(log(p10),log(p20))
-
   dvariable varlogPop = square(mfexp(lsdlogPop));
   dvariable Pnll = 0.0;
   Pnll += 0.5*(log(TWO_M_PI*varlogPop) + square(log(p10) - p11)/varlogPop);

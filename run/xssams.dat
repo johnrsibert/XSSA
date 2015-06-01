@@ -31,17 +31,17 @@
 # T12  phase  initial value
  1 0.01
 # T21  phase  initial value
- 1 0.02
+ 1 0.01
 # r    phase  initial value
  1 1.2
 # K    phase  initial value
  1 200000
 # sdlogF    phase  initial values
- 1 0.5
+ 2 0.5
 # sdlogPop    phase  initial values
--1 0.05
+ 2 0.05
 # sdlogYield  phase initial values
- 1 0.5
+ 2 0.5
 # meanProportion_Local phase initial value
  -1 0.9
 # sdLproportion_local phase initial value

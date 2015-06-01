@@ -1,6 +1,8 @@
 source("/home/jsibert/Projects/xssa/scripts/utils.R")
 
-plot.diagnostics=function(dat=NULL,file="diagnostics.dat",dt,ngear,devices,block)
+plot.diagnostics=function(dat=NULL,file="diagnostics.dat",dt,ngear,
+                 sdlogPop, sdlogYield, sdlogF,plot.Fmort,
+                 devices,block)
 {
    print(paste("Block: ",block))
    if (is.null(dat))
@@ -13,12 +15,12 @@ plot.diagnostics=function(dat=NULL,file="diagnostics.dat",dt,ngear,devices,block
    #  print(names(dat))
    }
    ncol = ncol(dat)
-   print("Names of all variables:")
-   print(names(dat))
+#  print("Names of all variables:")
+#  print(names(dat))
    gear.col = 6
    dd = c(2:3,(gear.col+1):ncol)
-   print("Names of log transformed variables:")
-   print(names(dat)[dd])
+#  print("Names of log transformed variables:")
+#  print(names(dat)[dd])
    dat[,dd] = exp(dat[,dd])
 
    gear.names = c("TunaHL","Troll","Longline","Bottom/inshore HL","AkuBoat")
@@ -84,6 +86,10 @@ plot.diagnostics=function(dat=NULL,file="diagnostics.dat",dt,ngear,devices,block
       legend = c(" N1"," N2"," N1+N2")
       xrange=nice.ts.plot(x,y,legend=legend,lwd=5,ylab="Biomass (mt)")
       lines(x,dat$K,lwd=2,lty="dotdash",col="blue",xlim=xrange)
+      sdy = exp(log(y[,3])+2.0*sdlogPop)
+      lines(dat$t,sdy,col="blue",lty="dotted")
+      sdy = exp(log(y[,3])-2.0*sdlogPop)
+      lines(dat$t,sdy,col="blue",lty="dotted")
 
       par("new"=TRUE)
       plot(x,dat$propL,lwd=3,type='l',col="red",ylim=c(0,1),
@@ -127,19 +133,18 @@ plot.diagnostics=function(dat=NULL,file="diagnostics.dat",dt,ngear,devices,block
       nice.ts.plot(dat$t,dat[,(gear.col+ngear+g)],bcol="darkgreen",fcol="lightgreen",lwd=lwd,ylab="Catch (mt)")
       points(dat$t,dat[,(gear.col+2*ngear+g)],col= "darkgreen",pch=16)
       if (g == 1)
-      {
-         title(main=paste("Block", block),line=title.line)
-         title(main=gear.names[g],line=title.line-1.5)
-      }
+         title(main=paste(gear.names[g]," (",block,")",sep=""),line=title.line)
       else
          title(main=gear.names[g],line=title.line)
+      sdy = exp(log(dat[,(gear.col+ngear+g)])+2.0*sdlogYield)
+      lines(dat$t,sdy,col="darkgreen",lty="dotted")
+      sdy = exp(log(dat[,(gear.col+ngear+g)])-2.0*sdlogYield)
+      lines(dat$t,sdy,col="darkgreen",lty="dotted")
    }
 
-   plot.Fmort = FALSE
+#  plot.Fmort = TRUE
    if (plot.Fmort)
    {
-       width = 9.0
-       height =11.0
        d = 3
        if (devices[d] > 0)
        {
@@ -147,6 +152,8 @@ plot.diagnostics=function(dat=NULL,file="diagnostics.dat",dt,ngear,devices,block
        }
        else
        {
+          width = 9.0
+          height =11.0
           x11(width=width,height=height)
           devices[d] = dev.cur()
        }
@@ -157,8 +164,14 @@ plot.diagnostics=function(dat=NULL,file="diagnostics.dat",dt,ngear,devices,block
        for (g in 1:ngear)
        {
           nice.ts.plot(dat$t,dat[,(gear.col+g)],bcol="orange4",fcol="orange",lwd=lwd)
-       #  title(main=paste("F mort, gear",g))
-          title(main=paste("F mort,",gear.names[g]),,line=title.line)
+          if (g == 1)
+             title(main=paste(gear.names[g]," (",block,")",sep=""),line=title.line)
+          else
+             title(main=gear.names[g],line=title.line)
+          sdy = exp(log(dat[,(gear.col+g)])+2.0*sdlogF)
+          lines(dat$t,sdy,col="orange4",lty="dotted")
+          sdy = exp(log(dat[,(gear.col+g)])-2.0*sdlogF)
+          lines(dat$t,sdy,col="orange4",lty="dotted")
        }
    } #if (plot.Fmort)
 
@@ -166,14 +179,21 @@ plot.diagnostics=function(dat=NULL,file="diagnostics.dat",dt,ngear,devices,block
    return(new.devices)
 }
 
-log.diagnostics=function(file="xssams_program.log",ntime=244,dt=0.25,ngear=5)
+log.diagnostics=function(file="xssams_program.log",ntime=244,dt=0.25,ngear=5,plot.Fmort=FALSE)
 {
       
    print(paste("Scanning file",file))
    log = scan(file,what="character")
    res = grep("Residuals:",log)
-   afters = grep("after",log)
-
+   logsdlogF = grep("logsdlogF:",log)   
+   sdlogF = exp(as.numeric(log[logsdlogF+1]))
+#  print(sdlogF)
+   logsdlogPop = grep("logsdlogPop:",log)
+   sdlogPop = exp(as.numeric(log[logsdlogPop+1]))
+#  print(sdlogPop)
+   logsdlogYield = grep("logsdlogYield:",log)
+   sdlogYield = exp(as.numeric(log[logsdlogYield+1]))
+#  print(sdlogYield)
    max.counter = length(res)
    counter = max.counter
    print(paste(max.counter, "blocks found:"))
@@ -212,12 +232,13 @@ log.diagnostics=function(file="xssams_program.log",ntime=244,dt=0.25,ngear=5)
 
       print(paste("Displaying block ",counter,sep=""))
       new.devices = plot.diagnostics(as.data.frame(diag),dt=dt,ngear=ngear,
+                    sdlogPop=sdlogPop[counter], 
+                    sdlogYield=sdlogYield[counter], 
+                    sdlogF=sdlogF[counter],
+                    plot.Fmort=plot.Fmort,
                     devices=dev.list,block=counter)
       dev.list=new.devices
      
-
-#     title(main=paste(log[afters[counter]+1],"entries"))
-
       c = readline("next, back, save, quit or exit? (enter n,b,s,q,x):")
       print(paste(c," entered"))
       if (c == 'n')
