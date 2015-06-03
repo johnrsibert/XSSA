@@ -235,7 +235,7 @@ qcomp.ts=function(q)
    }
 }
 
-qcomp.phase=function()
+qcomp.phase.4=function()
 {
    q = c(0.25,0.75)
    T21 = c(0.02,0.0002)
@@ -258,6 +258,30 @@ qcomp.phase=function()
                           line=-1,font.main=1,cex=0.8)
       }
    }
+   save.png.plot(paste("qcomp_",n,sep=""),width=width,height=height)
+
+   par(old.par)
+}
+
+qcomp.phase.2=function(T21=0.001)
+{
+   q = c(0.25,0.75)
+   n = length(q)
+   height = 6.5
+   width = 2 * height
+   x11(width=width,height=height)
+   old.par = par(no.readonly = TRUE) 
+   par(mar=c(4,4,0,0)+0.1)
+
+   lm = layout(matrix(c(1:n),ncol=length(q),nrow=1,byrow=FALSE))
+   
+      for(k in 1:length(q))
+      {
+         NNphase(q=q[k],T21=T21)
+         rat = round(T21/q[k],5)
+         title(main=paste("q=",q[k],", T21=",T21,", T21/q=",rat,sep=""),
+                          line=-1,font.main=1,cex=0.8)
+      }
    save.png.plot(paste("qcomp_",n,sep=""),width=width,height=height)
 
    par(old.par)

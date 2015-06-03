@@ -240,8 +240,8 @@ PRELIMINARY_CALCS_SECTION
     TRACE(pininit)
     if (!pininit)
     {
-       logT12 = log(init_T12);
-       logT21 = log(init_T21);
+       logT12 = log(init_T12+1.0e-20);
+       logT21 = log(init_T21+1.0e-20);
        TTRACE(logT12,logT21)
        logr = log(init_r);
        TTRACE(logr,mfexp(logr))
@@ -665,6 +665,7 @@ SEPARABLE_FUNCTION void obs(const int t, const dvar_vector& f,const dvariable& p
 FUNCTION void write_status(ofstream& s)
     double prop = alogit(value(LmeanProportion_local));
     status_blocks ++;
+    cout << "\n# Status block " << status_blocks << endl;
     s << "\n# Status after "<< userfun_entries << " PROCEDURE_SECTION entries;" << endl;
     s << "# Status block " << status_blocks << endl;
     s << "# nll = " << value(nll) << endl;

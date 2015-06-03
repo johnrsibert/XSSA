@@ -26,44 +26,9 @@ plot.diagnostics=function(dat=NULL,file="diagnostics.dat",dt,ngear,
    gear.names = c("TunaHL","Troll","Longline","Bottom/inshore HL","AkuBoat")
    title.line = -1
    lwd = 3
+   sd.lwd = 3
+   sd.lty = "dotted"
 
-   old.NN.plot = FALSE
-   if(old.NN.plot)
-   {
-      width = 9.0
-      height =11.0
-      x11(width=width,height=height)
-     
-      old.par = par(no.readonly = TRUE) 
-      par(mar=c(3,4.5,0,0)+0.1)
-      np = 3
-      lm = layout(matrix(c(1:np),ncol=1,byrow=TRUE))
-      layout.show(lm)
-    
-      nice.ts.plot(dat$t,dat$pop1,lwd=lwd)
-      title(main="Population 1",line=title.line)
-    
-      nice.ts.plot(dat$t,dat$pop2,lwd=lwd)
-      title(main="Population 2",line=title.line)
-   
-      nice.ts.plot(dat$t,dat$K,bcol="black",fcol="lightgray",lwd=lwd)
-      double.lines(dat$t,(dat$pop1+dat$pop2),bcol="blue",fcol="lightblue",lwd=lwd)
-      title(main="Total Population",line=title.line)
-    
-      par("new"=TRUE)
-      plot(dat$t,dat$forcing,type='n',ann=FALSE,axes=FALSE,
-           ylim=c(0.0,max(dat$forcing)))
-      double.lines(dat$t,dat$forcing,bcol="purple4",fcol="purple1",lwd=lwd)
-      axis(4,line=-1,outer=FALSE,labels=FALSE,tcl=0.5,col="purple1")
-       
-      par("new"=TRUE)
-      plot(dat$t,dat$propL,type='l',ann=FALSE,axes=FALSE,
-           col="red4",lwd=2,lty="solid",ylim=c(0,1))
-      axis(4,line=0,outer=FALSE,tcl=0.5,labels=FALSE,col="red")
-      abline(h=0.9,col="red4",lty="dotdash",lwd=2)
-   } #if(old.NN.plot)
-   else
-   {
       d = 1
       if (devices[d] > 0)
       {
@@ -84,12 +49,13 @@ plot.diagnostics=function(dat=NULL,file="diagnostics.dat",dt,ngear,
       y[,2] = dat$pop2
       y[,3] = dat$pop1 + dat$pop2
       legend = c(" N1"," N2"," N1+N2")
+      options(scipen=6)
       xrange=nice.ts.plot(x,y,legend=legend,lwd=5,ylab="Biomass (mt)")
       lines(x,dat$K,lwd=2,lty="dotdash",col="blue",xlim=xrange)
       sdy = exp(log(y[,3])+2.0*sdlogPop)
-      lines(dat$t,sdy,col="blue",lty="dotted")
+      lines(dat$t,sdy,col="blue",lty=sd.lty,lwd=sd.lwd)
       sdy = exp(log(y[,3])-2.0*sdlogPop)
-      lines(dat$t,sdy,col="blue",lty="dotted")
+      lines(dat$t,sdy,col="blue",lty=sd.lty,lwd=sd.lwd)
 
       par("new"=TRUE)
       plot(x,dat$propL,lwd=3,type='l',col="red",ylim=c(0,1),
@@ -109,7 +75,6 @@ plot.diagnostics=function(dat=NULL,file="diagnostics.dat",dt,ngear,
 
       title(main=paste("Block", block),line=title.line)
 
-   }
 
    d = 2
    if (devices[d] > 0)
@@ -137,9 +102,9 @@ plot.diagnostics=function(dat=NULL,file="diagnostics.dat",dt,ngear,
       else
          title(main=gear.names[g],line=title.line)
       sdy = exp(log(dat[,(gear.col+ngear+g)])+2.0*sdlogYield)
-      lines(dat$t,sdy,col="darkgreen",lty="dotted")
+      lines(dat$t,sdy,col="darkgreen",lty=sd.lty,lwd=sd.lwd)
       sdy = exp(log(dat[,(gear.col+ngear+g)])-2.0*sdlogYield)
-      lines(dat$t,sdy,col="darkgreen",lty="dotted")
+      lines(dat$t,sdy,col="darkgreen",lty=sd.lty,lwd=sd.lwd)
    }
 
 #  plot.Fmort = TRUE
@@ -163,15 +128,18 @@ plot.diagnostics=function(dat=NULL,file="diagnostics.dat",dt,ngear,
        layout.show(lm)
        for (g in 1:ngear)
        {
-          nice.ts.plot(dat$t,dat[,(gear.col+g)],bcol="orange4",fcol="orange",lwd=lwd)
+       #  labelsY=parse(text=paste(seq(50,100,10), "^o ", "*N", sep="")) 
+          Flab = parse(text=paste("F* (","y^-1",")",sep=""))
+          nice.ts.plot(dat$t,dat[,(gear.col+g)], ylab=Flab,
+                bcol="orange4",fcol="orange", lwd=lwd)
           if (g == 1)
              title(main=paste(gear.names[g]," (",block,")",sep=""),line=title.line)
           else
              title(main=gear.names[g],line=title.line)
           sdy = exp(log(dat[,(gear.col+g)])+2.0*sdlogF)
-          lines(dat$t,sdy,col="orange4",lty="dotted")
+          lines(dat$t,sdy,col="orange4",lty=sd.lty,lwd=sd.lwd)
           sdy = exp(log(dat[,(gear.col+g)])-2.0*sdlogF)
-          lines(dat$t,sdy,col="orange4",lty="dotted")
+          lines(dat$t,sdy,col="orange4",lty=sd.lty,lwd=sd.lwd)
        }
    } #if (plot.Fmort)
 
@@ -205,7 +173,7 @@ log.diagnostics=function(file="xssams_program.log",ntime=244,dt=0.25,ngear=5,plo
 
    c = 'n'
    dev.list = vector(mode="numeric",length=3)
-   dev.file.names=c("est_pop","est_catch","est_F")
+   dev.file.names=c("tmp/est_pop","tmp/est_catch","tmp/est_F")
 #  while (c != 'q')
    while ( (c != 'q') && (c != 'x') )
    {
