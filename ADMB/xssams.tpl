@@ -491,10 +491,10 @@ SEPARABLE_FUNCTION void step(const int t, const dvar_vector& f1, const dvar_vect
 
   //       do multiple iterations per time step
   //       niter = 1 gives idential results to the code above
-  int niter = 8;
+  int niter = 16;
   if (dt == 0.25)
   {
-     niter = 2;
+     niter = 4;
   }
   dvariable nextLogN1 = p11;
   dvariable nextLogN2 = p21;

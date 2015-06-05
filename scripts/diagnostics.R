@@ -96,7 +96,7 @@ plot.diagnostics=function(dat=NULL,file="diagnostics.dat",dt,ngear,
    for (g in 1:ngear)
    {
       nice.ts.plot(dat$t,dat[,(gear.col+ngear+g)],bcol="darkgreen",fcol="lightgreen",lwd=lwd,ylab="Catch (mt)")
-      points(dat$t,dat[,(gear.col+2*ngear+g)],col= "darkgreen",pch=16)
+      points(dat$t,dat[,(gear.col+2*ngear+g)],col= "darkgreen",pch=3,cex=3) #16)
       if (g == 1)
          title(main=paste(gear.names[g]," (",block,")",sep=""),line=title.line)
       else

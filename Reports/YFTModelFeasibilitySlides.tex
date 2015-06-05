@@ -190,7 +190,7 @@ $\sigma_{L(p)}$ & standard deviation logit transformed $\bar{p}$\\
 
 \begin{slide}\section{Estimation results: biomass}
 \begin{center}
-\includegraphics[height=0.85\textheight]{./graphics/est_popB9.pdf}
+\includegraphics[height=0.85\textheight]{./graphics/est_popB25.pdf}
 \end{center}
 \end{slide}
 
@@ -198,8 +198,8 @@ $\sigma_{L(p)}$ & standard deviation logit transformed $\bar{p}$\\
 \begin{center}
 \begin{tabular}{cc}
 {\tiny Fishing Mortality} & {\tiny Catch}\\
-\includegraphics[width=0.40\textwidth]{./graphics/est_FB9.pdf}&
-\includegraphics[width=0.40\textwidth]{./graphics/est_catchB9.pdf}\\
+\includegraphics[width=0.40\textwidth]{./graphics/est_FB25.pdf}&
+\includegraphics[width=0.40\textwidth]{./graphics/est_catchB25.pdf}\\
 \end{tabular}
 \end{center}
 \end{slide}
@@ -209,18 +209,17 @@ $\sigma_{L(p)}$ & standard deviation logit transformed $\bar{p}$\\
 \begin{center}
 \begin{tabular}{lrr}
 \hline
-Vatiable & Initial Value & Final Value\\
+Variable & Initial Value & Final Value\\
 \hline
-\hline
-$r$ & 1.20&  1.29\\
-$K$ & 150,000 & 149,000 \\
+$r$ & 1.20&  1.30\\
+$K$ & 150,000 & 151,000 \\
 $T_{12}$ & 0.01 & 0.00999\\
-$T^*_{21}$& 0.002 & 0.00202\\
+$T^*_{21}$& 0.002 & 0.00199\\
 $q$ & 0.54 & 0.525\\
 \hline
-$\sigma_\eta$ & 0.1 & 0.0883\\
-$\sigma_\xi$ & 0.3 & 0.672\\
-$\sigma_\varepsilon$ & 1.0 & 0.0945\\
+$\sigma_\eta$ & 0.1 & 0.0880\\
+$\sigma_\xi$ & 0.3 & 0.700\\
+$\sigma_\varepsilon$ & 1.0 & 0.0913\\
 $a_1$ & 0.07 & ---\\
 $a_2$ & 0.07 & ---\\
 $a_3$ & 0.07 & ---\\
@@ -235,18 +234,73 @@ $\sigma_{\bar{p}}$ & 0.8 & ---\\
 }
 \end{slide}
 
+\begin{slide}\section{Simulation: 100 X Fishing Mortality}
+\begin{center}
+\begin{tabular}{cc}
+\includegraphics[width=0.45\textwidth]{./graphics/sim_F100_NNts.pdf}&
+\includegraphics[width=0.45\textwidth]{./graphics/est_sim_F100_popB19.pdf}
+\end{tabular}
+\end{center}
+\end{slide}
+
+\begin{slide}\section{Estimation: 100 X Fishing Mortality}
+{\renewcommand{\arraystretch}{0.8}
+\begin{center}
+\begin{tabular}{lrr}
+\hline
+Variable & Initial Value & Final Value\\
+\hline
+$r$ & 1.20&  0.190\\
+$K$ & 200,000 & 1,030,000 \\
+$T_{12}$ & 0.01 & 0.00524\\
+$T^*_{21}$& 0.02 & 0.00128\\
+$q$ & 0.54 & 0.511\\
+\hline
+$\sigma_\eta$ & 0.1 & 0.00231\\
+$\sigma_\xi$ & 0.3 & 0.704\\
+$\sigma_\varepsilon$ & 1.0 & 0.367\\
+$a_1$ & 0.07 & ---\\
+$a_2$ & 0.07 & ---\\
+$a_3$ & 0.07 & ---\\
+$a_4$ & 0.07 & ---\\
+$a_5$ & 0.07 & ---\\
+\hline
+$\bar{p}$ & 0.9 & ---\\
+$\sigma_{\bar{p}}$ & 0.8 & ---\\
+\hline
+\end{tabular}
+\end{center}
+}
+\end{slide}
+
+\begin{slide}\section{Conclusions}
+What works:
+\begin{itemize}
+\item Random walk representation of fishing mortality
+\item Bayesian constraint on $\bar{p}$
+\item Off-line coupling 
+\end{itemize}
+Not working:
+\begin{itemize}
+\item Estimation procedure does not terminate normally
+\item Numerical instability in numerical approximation
+\end{itemize}
+\end{slide}
+
 \begin{slide}\section{Issues:}
 \begin{enumerate}
-\item Convergence, or lack thereof
+\item Convergence, or lack thereof.
+\item Is $\bar{p} = 0.9$ since 1952?
 \item Intra annual variability caused by abundance, participation,
-reporting, weather, ...
-\item Recreational data
-\item Size data and age-structured model
-\item Standarzed CPUE --- not on my watch
+reporting, weather, ... ?
+\item Recreational data? How to represent errors in observation
+equation?
+\item Should an age-structured model be developed?
+\item What are appropriate reference points?
 \end{enumerate}
 \end{slide}
 
-\begin{slide}\section{Zzzzzz ... }
+\begin{slide}\section{Back to the drawing board ...}
 \begin{center}
 \includegraphics[width=0.8\textwidth]{./graphics/recumbant.png}
 \end{center}
@@ -313,6 +367,10 @@ t}+\Ntwo_t}{2}\Bigr)\Biggr) + \varepsilon_t
 \end{center}
 \end{slide}
 
-
+\begin{slide}\section{Proportion Local Prior}
+\begin{center}
+\includegraphics[height=0.80\textheight]{./graphics/propL_prior.pdf}
+\end{center}
+\end{slide}
 \end{document}
 

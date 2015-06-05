@@ -549,8 +549,15 @@ compute.F<-function(obs.catch,plot=TRUE)
 xssams.sim=function(r=1.2, K=200000, q=0.54, T12=0.01, T21=0.002,
                   dt=1.0, sN=c(0.0,0.0,0.0), fr=2, p=0.9, 
                   F=NULL, sC=c(0.0,0.0,0.0,0.0,0.0), F.mult=1.0,
-                  do.plot=TRUE, save.graphics=FALSE, do.est=FALSE)
+                  do.plot=TRUE, save.graphics=FALSE, do.est=FALSE,
+                  seed=NULL)
 {
+   if (!is.null(seed))
+   {
+      set.seed(seed)
+      print(paste("random number seed set to",seed))
+   }
+
    print(paste("r = ",r,", dt =",dt,sep=""))
    if (dt == 0.25)
    {
@@ -582,17 +589,29 @@ xssams.sim=function(r=1.2, K=200000, q=0.54, T12=0.01, T21=0.002,
    }
    else
       F.matrix = F
-#  print(paste("F.mult =",F.mult))
-   F.matrix = F.mult*F.matrix
-   mean.F = mean(F.matrix,na.rm=TRUE)
-   print(paste("mean F = ",mean.F,",log(mean F) = ",log(mean.F),sep=""))
-   log.F = log(F.matrix+1)
-   print(paste("mean log (F+!) =",mean(log.F)))
-   sum.F = colSums(F.matrix)
+
    ntime = ncol(F.matrix)
    ngear = nrow(F.matrix)
 #  print(paste(ngear,ntime))
+   print(paste("F.mult =",F.mult))
+   fm = seq(1, F.mult, (F.mult-1)/(ntime-1))
+#  print(length(fm))
+#  print(fm)
+   
+#  mean.F = mean(F.matrix,na.rm=TRUE)
+#  print(paste("mean F = ",mean.F,",log(mean F) = ",log(mean.F),sep=""))
+#  log.F = log(F.matrix+1)
+#  print(paste("mean log (F) =",mean(log.F)))
+   for (g in 1:ngear)
+   {
+      F.matrix[g,] = F.matrix[g,]*fm
+   }
+   mean.F = mean(F.matrix,na.rm=TRUE)
+   print(paste("mean F = ",mean.F,",log(mean F) = ",log(mean.F),sep=""))
+   log.F = log(F.matrix+1)
+   print(paste("mean log (F) =",mean(log.F)))
 
+   sum.F = colSums(F.matrix)
 #  print(sN)
    cov = matrix(nrow=2,ncol=2)
    cov[1,1] = sN[1]
@@ -658,6 +677,11 @@ xssams.sim=function(r=1.2, K=200000, q=0.54, T12=0.01, T21=0.002,
    if (do.plot)
    {
       plot.NN.ts(pop,r,K,immigrant.biomass,save.graphics)
+      title=paste("r=",r,", K=", K, ", Fx", F.mult, ", q=", q,
+                  ", T12=", T12, ",T21=", T21,",sN=(", sN[1],",",sN[2],")",
+                  ", seed=",seed,
+                  sep="")
+      title(main=title,cex.main=0.9,line=2.5)#sub=title)
       plot.catch.ts(obs.catch,pred.catch,save.graphics)
    }
 
