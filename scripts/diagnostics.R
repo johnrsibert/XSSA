@@ -28,53 +28,55 @@ plot.diagnostics=function(dat=NULL,file="diagnostics.dat",dt,ngear,
    lwd = 3
    sd.lwd = 3
    sd.lty = "dotted"
+   #old.par = par(no.readonly = TRUE) 
 
-      d = 1
-      if (devices[d] > 0)
-      {
-         s = dev.set(devices[d])
-      }
-      else
-      {
-         width = 9.0
-         height = 9.0
-         x11(width=width,height=height)
-         devices[d] = dev.cur()
-      }
+   d = 1
+   if (devices[d] > 0)
+   {
+      s = dev.set(devices[d])
+   }
+   else
+   {
+      width = 9.0
+      height = 9.0
+      x11(width=width,height=height)
+      devices[d] = dev.cur()
+   }
 
-      x = dat$t
-      ntime=length(x)
-      y = matrix(nrow=length(x),ncol=3)
-      y[,1] = dat$pop1
-      y[,2] = dat$pop2
-      y[,3] = dat$pop1 + dat$pop2
-      legend = c(" N1"," N2"," N1+N2")
-      options(scipen=6)
-      xrange=nice.ts.plot(x,y,legend=legend,lwd=5,ylab="Biomass (mt)")
-      lines(x,dat$K,lwd=2,lty="dotdash",col="blue",xlim=xrange)
-      sdy = exp(log(y[,3])+2.0*sdlogPop)
-      lines(dat$t,sdy,col="blue",lty=sd.lty,lwd=sd.lwd)
-      sdy = exp(log(y[,3])-2.0*sdlogPop)
-      lines(dat$t,sdy,col="blue",lty=sd.lty,lwd=sd.lwd)
+   par(mar=c(4,5,0,4)+0.1)
+   x = dat$t
+   ntime=length(x)
+   y = matrix(nrow=length(x),ncol=3)
+   y[,1] = dat$pop1
+   y[,2] = dat$pop2
+   y[,3] = dat$pop1 + dat$pop2
+   legend = c(" N1"," N2"," N1+N2")
+   options(scipen=6)
+   xrange=nice.ts.plot(x,y,legend=legend,lwd=5,ylab="Biomass (mt)")
+   lines(x,dat$K,lwd=2,lty="dotdash",col="blue",xlim=xrange)
+   text(x[ntime],dat$K[ntime]," K",adj=c(0,0.5),col="blue")
 
-      par("new"=TRUE)
-      plot(x,dat$propL,lwd=3,type='l',col="red",ylim=c(0,1),
-           ann=FALSE,axes=FALSE,xlim=xrange)
-      text(x[ntime],dat$propL[ntime]," p",adj=c(0,0),col="red")
-      abline(h=0.9,lwd=2,lty="dotdash",col="red")
-      axis(4,col="red",ylab="p",col.axis="red")
-      mtext("p",side=4,col="red",line=0.1)
+   sdy = exp(log(y[,3])+2.0*sdlogPop)
+   lines(dat$t,sdy,col="blue",lty=sd.lty,lwd=sd.lwd)
+   sdy = exp(log(y[,3])-2.0*sdlogPop)
+   lines(dat$t,sdy,col="blue",lty=sd.lty,lwd=sd.lwd)
 
-      par("new"=TRUE)
-      plot(x,dat$forcing,lwd=3,type='l',col="purple", 
-           ylim=c(0.0,max(dat$forcing)), ann=FALSE,axes=FALSE,xlim=xrange)
-      text(x[ntime],dat$forcing[ntime]," T21",adj=c(0,0),col="purple")
-      axis(4,line=-2,col="purple",col.axis="purple")
-   #  axis(2,col="purple",col.axis="purple",pos=xrange[2])
-      mtext("T21",side=4,col="purple",line=-2.0)
+   par("new"=TRUE)
+   plot(x,dat$propL,lwd=3,type='l',col="red",ylim=c(0,1),
+        ann=FALSE,axes=FALSE,xlim=xrange)
+   text(x[ntime],dat$propL[ntime]," p",adj=c(0,0),col="red")
+   abline(h=0.9,lwd=2,lty="dotdash",col="red")
+   axis(4,col="red",ylab="p",col.axis="red")
+   mtext("p",side=4,col="red",line=0.1)
 
-      title(main=paste("Block", block),line=title.line)
-
+   par("new"=TRUE)
+   plot(x,dat$forcing,lwd=3,type='l',col="purple", 
+        ylim=c(0.0,max(dat$forcing)), ann=FALSE,axes=FALSE,xlim=xrange)
+   text(x[ntime],dat$forcing[ntime]," T21",adj=c(0,0),col="purple")
+   axis(4,line=-2,col="purple",col.axis="purple")
+#  axis(2,col="purple",col.axis="purple",pos=xrange[2])
+   mtext("T21",side=4,col="purple",line=-2.0)
+   title(main=paste("Block", block),line=title.line)
 
    d = 2
    if (devices[d] > 0)

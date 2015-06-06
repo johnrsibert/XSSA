@@ -669,6 +669,7 @@ FUNCTION void write_status(ofstream& s)
     s << "\n# Status after "<< userfun_entries << " PROCEDURE_SECTION entries;" << endl;
     s << "# Status block " << status_blocks << endl;
     s << "# nll = " << value(nll) << endl;
+    //s << "# maxG = " << nll.gmax << endl;
     s << "# nvar = " << initial_params::nvarcalc() << endl;
     s << "# current phase = " << current_phase() << endl;
     s << "#  logT12 = " << logT12 << " (" << active(logT12) <<")" << endl;

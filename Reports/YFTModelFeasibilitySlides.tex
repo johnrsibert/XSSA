@@ -64,7 +64,7 @@ Yellowfin Tuna Population}}
 %\orgurl{http://admb-project.org/}
 
 \author{\scalebox{1}[1.3]{John Sibert, Retirement-failure Consulting}} 
-\title{Feasibility of developing a stock assessment model for 
+\title{Developing a stock assessment model for 
 Main Hawaiian Islands Yellowfin Tuna Fishery}
 
 
@@ -95,9 +95,8 @@ MHI (1) and elsewhere (2).
 \item Fish immigrate from region 2 to region 1, and mix completely.
 \item Fish emigrate from region 1 to region 2, but have
 no effect on region 2 dynamics.
-\item Immigration into the MHI is dependent on the
-biomass of the yellowfin population outside of the MHI as estimated by
-some other model, e.g., \MFCL\ (MFCL) or \SD.
+\item Immigration into region 1 is dependent on biomass in region 2 estimated by
+some other model, e.g., \MFCL\ or \SD.
 \item The fishery comprises several gear types or fleets, each
 characterized by a distinct fishing mortality time series.
 \item Ninety percent of the fish resident in region 1 are assumed to
@@ -106,13 +105,19 @@ be locally spawned and reared.% (Wells et al 2012).
 \end{enumerate}
 \end{slide}
 
-\begin{slide}\section{Combined HDAR and NOAA Catch Data}
+\begin{slide}\section{Combined HDAR and NOAA Catch Time Series}
 \begin{center}
 \begin{tabular}{cc}
-Quarterly Time Series & First Differences of log(C)\\
+Quarterly & First Differences of log(C)\\
 \includegraphics[width=0.4\textwidth]{./graphics/5_gear_catch_history_q.pdf}&
 \includegraphics[width=0.4\textwidth]{./graphics/first_difference_histograms.pdf}\\
 \end{tabular}
+\end{center}
+\end{slide}
+
+\begin{slide}\section{MFCL Biomass Estimates for MFCL Region 2}
+\begin{center}
+\includegraphics[width=0.8\textwidth]{./graphics/annual_region_2_biomass.pdf}
 \end{center}
 \end{slide}
 
@@ -127,11 +132,15 @@ x_t &=& O(\alpha_t) + \varepsilon_t
 \item Fishing mortality as random walk:~
 $\log F_{g,t} = \log F_{g,t-1} + \xi_t;\quad \xi_t\sim
 N(0,\sigma^2_\xi)$
-\item Logistic dynamics in transition equation
-\item ``Off-line'' coupling to \MFCL\ region 2 biomass from 2014 assessment %(Davies et al. 2014) 
+\item Transition equation: Coupled logistic simultaneous ordinary
+differential equation (\ref{eqn:coupledschaeferq})
+\item Observation equation: robust likelihood (normal with 7\%
+contamination by Cauchy) 
+\item ``Off-line'' coupling to \MFCL\ region 2 biomass from 2014 assessment
 \item Bayesian prior on proportion local:~$L(p)\sim
 N(L(\bar{p}),\sigma^2_{L(p)})$
-\item Robust likelihood in observation equation
+(\ref{fig:propLprior})
+\item Model states are random effects
 \end{enumerate}
 \end{slide}
 
@@ -155,7 +164,7 @@ $a_g\; g=1\ldots n$ & Observation error contaminated by
 fat-tailed distribution\\
 \hline
 $\bar{p}$ & Mean proportion local\\
-$\sigma_{L(p)}$ & standard deviation logit transformed $\bar{p}$\\
+$\sigma_{L(p)}$ & Standard deviation logit transformed $\bar{p}$\\
 \hline
 \end{tabular}
 \end{center}
@@ -279,6 +288,8 @@ What works:
 \item Random walk representation of fishing mortality
 \item Bayesian constraint on $\bar{p}$
 \item Off-line coupling 
+\item Robust likelihood
+\item State-space framework
 \end{itemize}
 Not working:
 \begin{itemize}
@@ -288,16 +299,18 @@ Not working:
 \end{slide}
 
 \begin{slide}\section{Issues:}
-\begin{enumerate}
+\begin{itemize}
 \item Convergence, or lack thereof.
 \item Is $\bar{p} = 0.9$ since 1952?
+\item If so, are two subpopulations necessary?
 \item Intra annual variability caused by abundance, participation,
 reporting, weather, ... ?
 \item Recreational data? How to represent errors in observation
 equation?
 \item Should an age-structured model be developed?
-\item What are appropriate reference points?
-\end{enumerate}
+\item What are appropriate reference points for a stock segment?
+\item Use MFCL estimates as abundance index?
+\end{itemize}
 \end{slide}
 
 \begin{slide}\section{Back to the drawing board ...}
@@ -369,6 +382,7 @@ t}+\Ntwo_t}{2}\Bigr)\Biggr) + \varepsilon_t
 
 \begin{slide}\section{Proportion Local Prior}
 \begin{center}
+\label{fig:propLprior}
 \includegraphics[height=0.80\textheight]{./graphics/propL_prior.pdf}
 \end{center}
 \end{slide}
