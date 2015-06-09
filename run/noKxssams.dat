@@ -28,26 +28,26 @@
  0
 #
 # T12  phase  initial value
-        1     0.01
+        2     0.01
 # T21  phase  initial value
-        1     0.01
+        2     0.1
 # r    phase  initial value
-        1     1.2 
+        2     1.2 
 # sdlogK    phase  initial value
              1     0.1
 # sdlogF    phase  initial values
-             1      0.5 #0.3 0.3 0.3 0.3
+             1      0.3 #0.3 0.3 0.3 0.3
 # sdlogPop    phase  initial values
-               2     0.05 # 0.1
+               2     0.1 # 0.1
 # sdlogYield  phase initial values
-               2    0.5 # 1.0  1.0  1.0  1.0
+               1    1.0 # 1.0  1.0  1.0  1.0
 # meanProportion_Local phase initial value
                        -1    0.9
 # sdLproportion_local phase initial value
                       -1    1.3863
 #                     -1    2.72
 # qProp phase initial value
-         1    0.54
+         2    0.54
 #        2    0.75
 # robust yield likelihood
 # use pfat_phase pfat initial values

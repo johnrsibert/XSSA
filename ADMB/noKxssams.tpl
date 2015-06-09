@@ -433,8 +433,9 @@ PROCEDURE_SECTION
 
   HERE
   step0(U(utPop1+1), U(utPop2+1), logsdlogPop, LmeanProportion_local,
-        U(utK+1),logsdlogK);
+        U(utK+1),logsdlogK,logT21);
   HERE
+
   for (int t = 2; t <= ntime; t++)
   {
      step(t, U(Fndxl(t-1),Fndxu(t-1)), U(Fndxl(t),Fndxu(t)), logsdlogF,
@@ -460,23 +461,27 @@ PROCEDURE_SECTION
      write_status(clogf);
   }
 
-SEPARABLE_FUNCTION void step0(const dvariable& p11, const dvariable p21, const dvariable& lsdlogPop, const dvariable& LmPropL, const dvariable& logK1, const dvariable& lsdlogK) 
+SEPARABLE_FUNCTION void step0(const dvariable& p11, const dvariable p21, const dvariable& lsdlogPop, const dvariable& LmPropL, const dvariable& logK1, const dvariable& lsdlogK, const dvariable lT21) 
   // p11 U(utPop1+t-1) log N1 at start of time step
   // p21 U(utPop2+t-1) log N2 at start of time step
 
   // insure initial K is near forcing biomass at time 1
   dvariable Knll = 0.0;
+  dvariable T21 =mfexp(lT21);
+  //dvariable PropL = alogit(LmPropL);
+  dvariable PropL = 1.0/(1.0+mfexp(-LmPropL));
+  dvariable p20 = T21*immigrant_biomass(1);
+  dvariable p10 = -p20/(1.0-(1.0/PropL));
+  TTRACE(p10,p20)
+  dvariable K0 = p10 + p20;
+  TRACE(K0)
+
   dvariable varlogK = square(mfexp(lsdlogK));
-  dvariable K0 = immigrant_biomass(1);
   dvariable logK0 = log(K0);
   Knll += 0.5*(log(TWO_M_PI*varlogK) + square(logK0 - logK1)/varlogK);
   nll += Knll;
 
   // ensure that starting population size is near K
-  //dvariable PropL = alogit(LmPropL);
-  dvariable PropL = 1.0/(1.0+mfexp(-LmPropL));
-  dvariable p10 = PropL*K0;
-  dvariable p20 = K0-p10;
   dvariable varlogPop = square(mfexp(lsdlogPop));
   dvariable Pnll = 0.0;
   Pnll += 0.5*(log(TWO_M_PI*varlogPop) + square(log(p10) - p11)/varlogPop);

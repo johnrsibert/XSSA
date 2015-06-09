@@ -115,12 +115,6 @@ Quarterly & First Differences of log(C)\\
 \end{center}
 \end{slide}
 
-\begin{slide}\section{MFCL Biomass Estimates for MFCL Region 2}
-\begin{center}
-\includegraphics[width=0.8\textwidth]{./graphics/annual_region_2_biomass.pdf}
-\end{center}
-\end{slide}
-
 \begin{slide}\section{Model Characteristics}
 \begin{enumerate}
 \item State-space model; separates process error from observation
@@ -134,9 +128,9 @@ $\log F_{g,t} = \log F_{g,t-1} + \xi_t;\quad \xi_t\sim
 N(0,\sigma^2_\xi)$
 \item Transition equation: Coupled logistic simultaneous ordinary
 differential equation (\ref{eqn:coupledschaeferq})
-\item Observation equation: robust likelihood (normal with 7\%
-contamination by Cauchy) 
+\item Observation equation: robust likelihood (\ref{eqn:obs})
 \item ``Off-line'' coupling to \MFCL\ region 2 biomass from 2014 assessment
+(\ref{fig:MFCL2})
 \item Bayesian prior on proportion local:~$L(p)\sim
 N(L(\bar{p}),\sigma^2_{L(p)})$
 (\ref{fig:propLprior})
@@ -155,7 +149,7 @@ $r$ & Instantaneous growth rate $(y^{-1})$\\
 $K$ & Asymptotic biomass (mt) \\
 $T_{12}$ & Emigration rate $(y^{-1})$\\
 $T^*_{21}$& Immigration rate $(y^{-1})$\\
-$q$ & Nonlinear mortality apportionment proportion\\
+$q$ & Nonlinear mortality apportionment factor\\
 \hline
 $\sigma_\eta$ & Population growth standard deviation\\
 $\sigma_\xi$ & Fishing mortality random walk standard deviation\\
@@ -214,11 +208,12 @@ $\sigma_{L(p)}$ & Standard deviation logit transformed $\bar{p}$\\
 \end{slide}
 
 \begin{slide}\section{Estimation results: parameter values}
-{\renewcommand{\arraystretch}{0.8}
+{%\renewcommand{\arraystretch}{0.8}
 \begin{center}
 \begin{tabular}{lrr}
 \hline
 Variable & Initial Value & Final Value\\
+\hline
 \hline
 $r$ & 1.20&  1.30\\
 $K$ & 150,000 & 151,000 \\
@@ -229,11 +224,7 @@ $q$ & 0.54 & 0.525\\
 $\sigma_\eta$ & 0.1 & 0.0880\\
 $\sigma_\xi$ & 0.3 & 0.700\\
 $\sigma_\varepsilon$ & 1.0 & 0.0913\\
-$a_1$ & 0.07 & ---\\
-$a_2$ & 0.07 & ---\\
-$a_3$ & 0.07 & ---\\
-$a_4$ & 0.07 & ---\\
-$a_5$ & 0.07 & ---\\
+$a_g\quad g=1,\dots,5$ & 0.07 & ---\\
 \hline
 $\bar{p}$ & 0.9 & ---\\
 $\sigma_{\bar{p}}$ & 0.8 & ---\\
@@ -246,6 +237,7 @@ $\sigma_{\bar{p}}$ & 0.8 & ---\\
 \begin{slide}\section{Simulation: 100 X Fishing Mortality}
 \begin{center}
 \begin{tabular}{cc}
+Simulated & Estimated\\
 \includegraphics[width=0.45\textwidth]{./graphics/sim_F100_NNts.pdf}&
 \includegraphics[width=0.45\textwidth]{./graphics/est_sim_F100_popB19.pdf}
 \end{tabular}
@@ -253,11 +245,12 @@ $\sigma_{\bar{p}}$ & 0.8 & ---\\
 \end{slide}
 
 \begin{slide}\section{Estimation: 100 X Fishing Mortality}
-{\renewcommand{\arraystretch}{0.8}
+{%\renewcommand{\arraystretch}{0.8}
 \begin{center}
 \begin{tabular}{lrr}
 \hline
 Variable & Initial Value & Final Value\\
+\hline
 \hline
 $r$ & 1.20&  0.190\\
 $K$ & 200,000 & 1,030,000 \\
@@ -268,11 +261,7 @@ $q$ & 0.54 & 0.511\\
 $\sigma_\eta$ & 0.1 & 0.00231\\
 $\sigma_\xi$ & 0.3 & 0.704\\
 $\sigma_\varepsilon$ & 1.0 & 0.367\\
-$a_1$ & 0.07 & ---\\
-$a_2$ & 0.07 & ---\\
-$a_3$ & 0.07 & ---\\
-$a_4$ & 0.07 & ---\\
-$a_5$ & 0.07 & ---\\
+$a_g\quad g=1,\dots,5$ & 0.07 & ---\\
 \hline
 $\bar{p}$ & 0.9 & ---\\
 $\sigma_{\bar{p}}$ & 0.8 & ---\\
@@ -320,6 +309,14 @@ equation?
 \end{slide}
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+
+\begin{slide}\section{Biomass Estimates for MFCL Region 2}
+\label{fig:MFCL2}
+\begin{center}
+\includegraphics[width=0.8\textwidth]{./graphics/annual_region_2_biomass.pdf}
+\end{center}
+\end{slide}
 
 \begin{slide}\section{Logistic Dynamics}
 \begin{center}

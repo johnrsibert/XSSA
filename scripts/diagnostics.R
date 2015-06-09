@@ -250,3 +250,26 @@ plot.resid.hist=function(dat)
 
 }
 
+do.rep.junk=function()
+{
+   rep=read.table("xssams.rep",header=TRUE)
+   head(rep)
+   dim(rep)
+   rep[,1]
+   names(rep)
+   names(rep[12:16])
+   PredC=exp(rep[12:16])
+   rowSums(PredC)->PredCt
+   plot(PredCt)
+   
+   FF=c(7:11)
+   head(rep(FF))
+   head(rep[,FF])
+   expF=exp(rep[,FF])
+   Ft=rowSums(expF)
+   plot(Ft)
+   plot(PredCt/Ft)
+   plot(Ft,PredCt,type='b')
+
+}
+
