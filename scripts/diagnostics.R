@@ -263,7 +263,6 @@ do.rep.junk=function()
    plot(PredCt)
    
    FF=c(7:11)
-   head(rep(FF))
    head(rep[,FF])
    expF=exp(rep[,FF])
    Ft=rowSums(expF)
