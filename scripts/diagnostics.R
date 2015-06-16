@@ -1,3 +1,6 @@
+print("This file is deprecated; look in xssams.R")
+return(1)
+
 source("/home/jsibert/Projects/xssa/scripts/utils.R")
 
 plot.diagnostics=function(dat=NULL,file="diagnostics.dat",dt,ngear,
@@ -242,6 +245,22 @@ log.diagnostics=function(file="xssams_program.log",ntime=244,dt=0.25,ngear=5,plo
    if (c == 'x')
       q("no")
 #  return(counter)
+}
+
+plot.prod.curve=function(file="xssams.rep")
+{
+   rep=read.table(file=file,header=TRUE)
+   pop.ndx=grep("pop",names(rep)) 
+   F.ndx=grep("F",names(rep)) 
+   predC.ndx=grep("predC",names(rep)) 
+   obsC.ndx=grep("obsC",names(rep)) 
+   print(names(rep[,F.ndx]))
+   print(names(rep[,obsC.ndx]))
+
+   Fmort = rowSums(exp(rep[,F.ndx]))
+   obsC = rowSums(exp(rep[,obsC.ndx]))
+   plot(Fmort,obsC)
+   lines(c(0,max(Fmort,na.rm=TRUE)),c(0,max(obsC,na.rm=TRUE)))
 }
 
 plot.resid.hist=function(dat)
