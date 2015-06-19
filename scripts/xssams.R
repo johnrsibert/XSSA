@@ -952,7 +952,8 @@ plot.error=function(x,y,sd,bcol,fcol,mult=2)
 
 
 plot.diagnostics=function(dat=NULL,file="diagnostics.dat",dt,ngear,
-                 sdlogPop, sdlogYield, sdlogF,plot.Fmort,plot.prod,
+                 sdlogPop, sdlogYield, sdlogF, K, r,
+                 plot.Fmort,plot.prod,
                  devices,block)
 {
    print(paste("Block: ",block))
@@ -1101,7 +1102,7 @@ plot.diagnostics=function(dat=NULL,file="diagnostics.dat",dt,ngear,
        for (g in 1:ngear)
        {
        #  labelsY=parse(text=paste(seq(50,100,10), "^o ", "*N", sep="")) 
-          Flab = parse(text=paste("F* (","y^-1",")",sep=""))
+          Flab = parse(text=paste("F~(","y^-1",")",sep=""))
           nice.ts.plot(dat$t,dat[,(gear.col+g)], ylab=Flab,
                 bcol="orange4",fcol="orange", lwd=lwd)
 
@@ -1133,15 +1134,27 @@ plot.diagnostics=function(dat=NULL,file="diagnostics.dat",dt,ngear,
           devices[d] = dev.cur()
        }
        Fmort = rowSums(dat[,F.ndx])
+       Fyield = seq(0,max(r,Fmort),0.01*max(r,Fmort))
+       yield = Fyield*K*(1.0-Fyield/r)
        obsC = rowSums(dat[,obsC.ndx])
-       plot(Fmort,obsC,type='b',lwd=3,col="blue",
-           xlab="Fishing Mortality",ylab="Observed Catch")
-   #   lines(c(0,max(Fmort,na.rm=TRUE)),c(0,max(obsC,na.rm=TRUE)))
-       wmaxC = which(obsC==max(obsC,na.rm=TRUE))
-       lines(c(0,Fmort[wmaxC]),c(0,obsC[wmaxC]),col="red",lty="longdash")
+       predC = rowSums(dat[,predC.ndx])
+       xrange = c(0,max(r,Fmort,na.rm=TRUE))
+       yrange = c(0,max(obsC,predC,yield,na.rm=TRUE))
+       Flab = parse(text=paste("Total~Fishing~Mortality~(","y^-1",")",sep=""))
+       plot(xrange,yrange,type='n', xlab=Flab, ylab="Total Yield (mt)")
+
+       double.lines(Fmort,predC,bcol="darkgreen",fcol="lightgreen",lwd=5) 
+       points(Fmort,obsC,col= "darkgreen",pch=3,cex=2)
+       points(Fmort,predC,col="darkgreen",pch=16)
+   #   wmaxC = which(obsC==max(obsC,na.rm=TRUE))
+   #   lines(c(0,Fmort[wmaxC]),c(0,obsC[wmaxC]),col="red",lty="longdash")
+       lines(Fyield,yield,col="red",lwd=3,lty="longdash")
+
        text(x=Fmort[wy5],y=obsC[wy5],labels=floor(dat$t[wy5]),
              pos=4,offset=0.5,cex=0.8)
-
+       mtext(text=paste("(",block,")",sep=""),side=1,line=4,at=c(0,0),cex=0.8)
+   #   text(x=par("usr")[1],y=par("usr")[3],labels=paste("(",block,")",sep=""),
+   #        adj=c(0.0,0.0))       
    } #if (plot.prod)
    new.devices = devices
    return(new.devices)
@@ -1160,8 +1173,22 @@ log.diagnostics=function(file="xssams_program.log",ntime=244,dt=0.25,ngear=5,plo
    sdlogPop = exp(as.numeric(log[logsdlogPop+1]))
 #  print(sdlogPop)
    logsdlogYield = grep("logsdlogYield:",log)
+   print(length(logsdlogYield))
    sdlogYield = exp(as.numeric(log[logsdlogYield+1]))
 #  print(sdlogYield)
+   K.pos = grep("^K",log)
+   K1 = as.numeric(log[K.pos+2])
+   wK1 = which(!is.na(K1))
+   K = K1[wK1]
+#  print(K)
+   r.pos = grep("^r",log)
+   r1 = as.numeric(log[r.pos+2])
+   wr1 = which(!is.na(r1))
+   r = r1[wr1]
+#  print(r)
+  
+#  if(1)
+#    return(FALSE)
    max.counter = length(res)
    counter = max.counter
    print(paste(max.counter, "blocks found:"))
@@ -1203,6 +1230,7 @@ log.diagnostics=function(file="xssams_program.log",ntime=244,dt=0.25,ngear=5,plo
                     sdlogPop=sdlogPop[counter], 
                     sdlogYield=sdlogYield[counter], 
                     sdlogF=sdlogF[counter],
+                    K=K[counter], r=r[counter],
                     plot.Fmort=plot.Fmort,
                     plot.prod=plot.prod,
                     devices=dev.list,block=counter)
