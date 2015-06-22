@@ -1019,7 +1019,12 @@ plot.diagnostics=function(dat=NULL,file="diagnostics.dat",dt,ngear,
 
    options(scipen=6)
    xrange=nice.ts.plot(x,y,legend=legend,lwd=5,ylab="Biomass (mt)")
-   plot.error(dat$t,y[,3],sdlogPop,
+   sdlogNN = sqrt(4.0*sdlogPop*sdlogPop) # is is probably not correct
+   plot.error(dat$t,y[,3],sdlogNN, 
+                    bcol="blue",fcol="lightblue")
+   plot.error(dat$t,y[,1],sdlogPop,
+                    bcol="blue",fcol="lightblue")
+   plot.error(dat$t,y[,2],sdlogPop,
                     bcol="blue",fcol="lightblue")
    lines(dat$t,y[,1],col="blue",lwd=5)
    lines(dat$t,y[,2],col="blue",lwd=5)
@@ -1134,11 +1139,14 @@ plot.diagnostics=function(dat=NULL,file="diagnostics.dat",dt,ngear,
           devices[d] = dev.cur()
        }
        Fmort = rowSums(dat[,F.ndx])
-       Fyield = seq(0,max(r,Fmort),0.01*max(r,Fmort))
+       F.max=max(Fmort,na.rm=TRUE)
+       if (F.max > r)
+         F.max = max(F.max,r)
+       Fyield = seq(0,F.max,0.01*F.max)
        yield = Fyield*K*(1.0-Fyield/r)
        obsC = rowSums(dat[,obsC.ndx])
        predC = rowSums(dat[,predC.ndx])
-       xrange = c(0,max(r,Fmort,na.rm=TRUE))
+       xrange = c(0,F.max)
        yrange = c(0,max(obsC,predC,yield,na.rm=TRUE))
        Flab = parse(text=paste("Total~Fishing~Mortality~(","y^-1",")",sep=""))
        plot(xrange,yrange,type='n', xlab=Flab, ylab="Total Yield (mt)")
@@ -1152,7 +1160,7 @@ plot.diagnostics=function(dat=NULL,file="diagnostics.dat",dt,ngear,
 
        text(x=Fmort[wy5],y=obsC[wy5],labels=floor(dat$t[wy5]),
              pos=4,offset=0.5,cex=0.8)
-       mtext(text=paste("(",block,")",sep=""),side=1,line=4,at=c(0,0),cex=0.8)
+       mtext(text=paste("(",block,")",sep=""),side=1,line=2,at=c(Fmort[1],0),cex=0.8)
    #   text(x=par("usr")[1],y=par("usr")[3],labels=paste("(",block,")",sep=""),
    #        adj=c(0.0,0.0))       
    } #if (plot.prod)
