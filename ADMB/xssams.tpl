@@ -127,8 +127,8 @@ DATA_SECTION
   !! TTRACE(init_meanProportion_local,phase_meanProportion_local)
 
   init_int phase_sdProportion_local;
-  init_number init_sdLProportion_local;
-  !! TTRACE(init_sdLProportion_local,phase_sdProportion_local)
+  init_number init_sdProportion_local;
+  !! TTRACE(init_sdProportion_local,phase_sdProportion_local)
 
   init_int phase_qProp;
   init_number init_qProp;
@@ -253,8 +253,9 @@ PRELIMINARY_CALCS_SECTION
        logsdlogPop = log(init_sdlogPop);
 
        LmeanProportion_local = logit((double)init_meanProportion_local);
-       logsdLProportion_local = log(init_sdLProportion_local);
+       logsdLProportion_local = log(logit((double)init_sdProportion_local));
        TTRACE(LmeanProportion_local,logsdLProportion_local)
+       TTRACE(init_sdProportion_local,logit((double)init_sdProportion_local))
        //double prop = 1.0/(1.0+mfexp(-value(LmeanProportion_local)));
        double prop = alogit(value(LmeanProportion_local));
        TTRACE(LmeanProportion_local,prop)
@@ -695,6 +696,7 @@ FUNCTION void write_status(ofstream& s)
     s << "# logsdLProportion_local = " << logsdLProportion_local<< " (" 
                                 << active(logsdLProportion_local) <<")" << endl;
     s << "#    sdLProportion_local = " << mfexp(logsdLProportion_local) << endl;
+    s << "#     sdProportion_local = " << alogit(value(mfexp(logsdLProportion_local))) << endl;
     s << "# pfat = " << alogit(value(Lpfat)) << " (" << active(Lpfat) <<")" << endl;
     s << "# qProp = " << qProp << " (" << active(qProp) << ")" << endl;
     s << "# Residuals:" << endl;

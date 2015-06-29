@@ -25,7 +25,8 @@ else
 endif
 
  
-BIN_DIR = ../run
+#BIN_DIR = ../run
+BIN_DIR = ~/bin
 
 xssams: xssams.tpl
 	@echo ------- Translate $<
