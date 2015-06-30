@@ -29,10 +29,13 @@ alogit<-function(alpha)
 }
 
 
-dat.file = "../run/xssams.dat"
+dat.file = "./xssams.dat"
 sca = scan(file=dat.file,comment.char="#",what="raw",quiet=TRUE)
 print(paste("Read",length(sca),"items from ",dat.file))
+
 data = list()
+phases = list()
+print(paste("phases",phases))
 
 data$ngear = get.numeric.field()
 ngear=data$ngear
@@ -89,30 +92,53 @@ if (data$use_mean_forcing)
 #print(data$immigrant.biomass)
 
 data$phase_T12 = get.numeric.field()
+phases = c(phases,data$phase_T12)
+print(paste("phases",phases))
 data$init_T12 = get.numeric.field()
+
 data$phase_T21 = get.numeric.field() 
+phases = c(phases,data$phase_T21)
 data$init_T21 = get.numeric.field()
+print(paste("phases",phases))
+
 data$phase_r = get.numeric.field()
+phases = c(phases,data$phase_r)
 data$init_r = get.numeric.field()
+
 data$phase_K = get.numeric.field()
+phases = c(phases,data$phase_K)
 data$init_K = get.numeric.field()
 
-
 data$phase_sdlogF = get.numeric.field()
+phases = c(phases,data$phase_sdlogF)
 data$init_sdlogF = get.numeric.field()
+
 data$phase_sdlogPop = get.numeric.field()
+phases = c(phases,data$phase_sdlogPop)
 data$init_sdlogPop = get.numeric.field()
+
 data$phase_sdlogYield = get.numeric.field()
+phases = c(phases,data$phase_sdlogYield)
 data$init_sdlogYield = get.numeric.field()
+
 data$phase_meanProportion_local = get.numeric.field()
+phases = c(phases,data$phase_memanProportion_local)
 data$init_meanProportion_local =  get.numeric.field()
+
 data$phase_sdProportion_local = get.numeric.field()
+phases = c(phases,data$phase_sdProportion_local)
 data$init_sdProportion_local = get.numeric.field()
+
 data$phase_qProp = get.numeric.field()
+phases = c(phases,data$phase_qProp)
 data$init_qProp = get.numeric.field()
+
 data$use_robustY = get.numeric.field()
 data$phase_pfat = get.numeric.field()
+phases = c(phases,data$phase_pfat)
 data$init_pfat = vector(length=ngear)
+print(unlist(phases))
+
 for (g in 1:ngear)
 {
 #  print(g)
@@ -138,23 +164,42 @@ parameters = list(
   logsdlogPop = log(data$init_sdlogPop),
   logsdlogYield = log(data$init_sdlogYield),
   LmeanProportion_local = logit(data$init_meanProportion_local),
-  logsdLProportion_local = log(logit(data$init_sdProportion_local))
+  logsdLProportion_local = log(logit(data$init_sdProportion_local)),
+  qProp = data$init_qProp
 )
+print(names(parameters))
 
-
-parameters$qProp = data$init_qProp
 if (!data$use_robustY)
 {
    data$phase_pfat = -1;
    data$init_pfat = 1e-25
 }
 parameters$Lpfat = logit(data$init_pfat)
+print(names(parameters))
 
-parameters$U = vector(length=data$lengthU,mode="numeric")
 
 parameters$U=rep(0.0,data$lengthU)
 
+phases=unlist(phases)
+print(length(phases))
+nphase = max(phases)
+print(paste("nphase",nphase))
+
 obj = MakeADFun(data,parameters,random=c("U"),DLL="xssams")
+pp = NULL
+for (p in 1:nphase)
+{
+   pp=sort(c(pp,which(phases==p)))
+   print(paste("--------Phase",p))
+   print("      active:")
+   print(pp)
+   print(names(parameters[pp]))
+
+   print("      INactive:")
+
+
+
+}
 
 print("names(obj):")
 print(names(obj))
