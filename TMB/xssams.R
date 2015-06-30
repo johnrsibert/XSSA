@@ -1,5 +1,5 @@
 require(TMB)
-compile("xssams.cpp")
+compile("xssams.cpp",flags="-O0 -g",safebounds=TRUE,safeunload=TRUE)
 dyn.load(dynlib("xssams"))
 
 field.counter <<- 0
@@ -42,9 +42,9 @@ data$dt = get.numeric.field()
 data$obs.catch=matrix(nrow=ngear,ncol=ntime)
 for (g in 1:ngear)
 {
-   for (y in 1:ntime)
+   for (t in 1:ntime)
    {
-      data$obs.catch[g,y] = get.numeric.field()
+      data$obs.catch[g,t] = get.numeric.field()
    }
 }
 nzero = ntime;
@@ -67,7 +67,7 @@ while (nzero > 0)
 }
 print(paste("Zero catch bridging instances:", nzero))
 ZeroCatch = 1.0
-data$obs.catch = log(data$obs.catch+ZeroCatch);
+data$obs_catch = log(data$obs.catch+ZeroCatch);
 
 
 forcing.matrix=matrix(nrow=9,ncol=data$ntime)
@@ -79,50 +79,49 @@ for (r in 1:9)
    }
 }
 data$fr = get.numeric.field()
-data$immigrant.biomass = forcing.matrix[data$fr,]
+data$immigrant_biomass = forcing.matrix[data$fr,]
 
-data$use.mean.forcing = get.numeric.field()
+data$use_mean_forcing = get.numeric.field()
 mean.immigrant.biomass = mean(forcing.matrix[data$fr]);
 maximum.immigrant.biomass = max(forcing.matrix[data$fr]);
-if (data$use.mean.forcing)
-   data$immigrant.biomass = mean.immigrant.biomass;
+if (data$use_mean_forcing)
+   data$immigrant_biomass = mean.immigrant.biomass;
 #print(data$immigrant.biomass)
 
-data$phase.T12 = get.numeric.field()
-data$init.T12 = get.numeric.field()
-data$phase.T21 = get.numeric.field() 
-data$init.T21 = get.numeric.field()
-data$phase.r = get.numeric.field()
-data$init.r = get.numeric.field()
-data$phase.K = get.numeric.field()
-data$init.K = get.numeric.field()
+data$phase_T12 = get.numeric.field()
+data$init_T12 = get.numeric.field()
+data$phase_T21 = get.numeric.field() 
+data$init_T21 = get.numeric.field()
+data$phase_r = get.numeric.field()
+data$init_r = get.numeric.field()
+data$phase_K = get.numeric.field()
+data$init_K = get.numeric.field()
 
 
-data$phase.sdlogF = get.numeric.field()
-data$init.sdlogF = get.numeric.field()
-data$phase.sdlogPop = get.numeric.field()
-data$init.sdlogPop = get.numeric.field()
-data$phase.sdlogYield = get.numeric.field()
-data$init.sdlogYield = get.numeric.field()
-data$phase.meanProportion.local = get.numeric.field()
-data$init.meanProportion.local =  get.numeric.field()
-data$phase.sdProportion.local = get.numeric.field()
-data$init.sdProportion.local = get.numeric.field()
-data$phase.qProp = get.numeric.field()
-data$init.qProp = get.numeric.field()
-data$use.robustY = get.numeric.field()
-data$phase.pfat = get.numeric.field()
-data$init.pfat = vector(length=ngear)
+data$phase_sdlogF = get.numeric.field()
+data$init_sdlogF = get.numeric.field()
+data$phase_sdlogPop = get.numeric.field()
+data$init_sdlogPop = get.numeric.field()
+data$phase_sdlogYield = get.numeric.field()
+data$init_sdlogYield = get.numeric.field()
+data$phase_meanProportion_local = get.numeric.field()
+data$init_meanProportion_local =  get.numeric.field()
+data$phase_sdProportion_local = get.numeric.field()
+data$init_sdProportion_local = get.numeric.field()
+data$phase_qProp = get.numeric.field()
+data$init_qProp = get.numeric.field()
+data$use_robustY = get.numeric.field()
+data$phase_pfat = get.numeric.field()
+data$init_pfat = vector(length=ngear)
 for (g in 1:ngear)
 {
 #  print(g)
-   data$init.pfat[g] = get.numeric.field()
+   data$init_pfat[g] = get.numeric.field()
 }
 print(paste(field.counter,"input fields processed"))
 
 data$maxtime = ntime
 data$lengthU = ntime*(ngear+2)
-data$ss = 1.0/data$dt
 # set up U indexing starting at 0
 data$Fndxl = seq(0,(ntime-1)*(ngear),ngear)
 data$Fndxu = data$Fndxl+(ngear-1) 
@@ -130,23 +129,26 @@ data$utPop1 = ngear*ntime - 1
 data$utPop2 = data$utPop1 + ntime
 
 
-parameters = list()
-parameters$logT12 = log(data$init.T12+1e-10)
-parameters$logT21 = log(data$init.T21+1e-10)
-parameters$logr = log(data$init.r)
-parameters$logK = log(data$init.K)
-parameters$logsdlogF = log(data$init.sdlogF)
-parameters$logsdlogYield = log(data$init.sdlogYield)
-parameters$logsdlogPop = log(data$init.sdlogPop)
-parameters$LmeanProportionLocal = logit(data$init.meanProportion.local)
-parameters$logsdLProportionLocal = log(logit(data$init.sdLProportion.local))
-parameters$qProp = data$init.qProp
-if (!data$use.robustY)
+parameters = list(
+  logT12 = log(data$init_T12+1e-10),
+  logT21 = log(data$init_T21+1e-10),
+  logr = log(data$init_r),
+  logK = log(data$init_K),
+  logsdlogF = log(data$init_sdlogF),
+  logsdlogPop = log(data$init_sdlogPop),
+  logsdlogYield = log(data$init_sdlogYield),
+  LmeanProportion_local = logit(data$init_meanProportion_local),
+  logsdLProportion_local = log(logit(data$init_sdProportion_local))
+)
+
+
+parameters$qProp = data$init_qProp
+if (!data$use_robustY)
 {
-   data$phase.pfat = -1;
-   data$init.pfat = 1e-25
+   data$phase_pfat = -1;
+   data$init_pfat = 1e-25
 }
-parameters$Lpfat = logit(data$init.pfat)
+parameters$Lpfat = logit(data$init_pfat)
 
 parameters$U = vector(length=data$lengthU,mode="numeric")
 
@@ -154,9 +156,12 @@ parameters$U=rep(0.0,data$lengthU)
 
 obj = MakeADFun(data,parameters,random=c("U"),DLL="xssams")
 
-#obj <- MakeADFun(data,parameters,random=c("U"),DLL="sam")
+print("names(obj):")
 print(names(obj))
+print("obj$par:")
 print(obj$par)
+print("obj$report():")
+obj$report()
 lower <- obj$par*0-Inf
 upper <- obj$par*0+Inf
 print(paste(lower,upper))
@@ -164,6 +169,5 @@ print(paste(lower,upper))
 #upper["rho"] <- 0.99
 
 system.time(opt<-nlminb(obj$par,obj$fn,obj$gr,lower=lower,upper=upper))
-#system.time(opt<-nlminb(obj$par,obj$fn,obj$gr,lower=lower,upper=upper))
-rep<-sdreport(obj)
-rep
+#rep<-sdreport(obj)
+#rep
