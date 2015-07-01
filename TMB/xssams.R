@@ -174,20 +174,20 @@ parameters$Lpfat = logit(data$init_pfat)
 
 parameters$U=rep(0.0,data$lengthU)
 
-phases=unlist(phases)
-nap = length(phases)
+phases=unlist(phases) # phase flag for each parameter
+nap = length(phases)  # number of parameters
 print(paste("number of parameters:",nap))
-nphase = max(phases)
+nphase = max(phases)  # number of phases
 print(paste("number of phases",nphase))
-opt=vector(length=nphase)
+fit.par=vector(length=nphase) # parameters estimates from each fit
 
-#obj = MakeADFun(data,parameters,random=c("U"),DLL="xssams")
-for (p in 1:nphase)
+for (p in 1:nphase) # loop through phases
 {
-   map = list()
+   map = list() # name list of factors
    nip = 0
-   for (n in 1:nap)
+   for (n in 1:nap) # loop through parameters
    {
+      # check phase flag for this parameter
       if ((phases[n] == -1) || (phases[n] > p))
       {
          map.entry = parameters[n]
@@ -198,18 +198,20 @@ for (p in 1:nphase)
    }
    print(paste("----------phase",p))
 #  print(map)
+#  build model for active parameters, omiting thos in map
    if (p == 1)
    {
       obj = MakeADFun(data,parameters,map=map,random=c("U"),DLL="xssams")
    }
    else
    {
-      obj = MakeADFun(data,opt[p-1],map=map,random=c("U"),DLL="xssams")
+      obj = MakeADFun(data,opt.par[p-1],map=map,random=c("U"),DLL="xssams")
    }
    lower <- obj$par*0-Inf
    upper <- obj$par*0+Inf
-#  print(paste(lower,upper))
-   opt[p] = nlminb(obj$par,obj$fn,obj$gr,lower=lower,upper=upper)
+   opt = nlminb(obj$par,obj$fn,obj$gr,lower=lower,upper=upper)
+   # save parameter estimates for use in next fit
+   opt.par[p] = obj$env$parList(opt$par) 
 }
 
 #system.time(opt<-nlminb(obj$par,obj$fn,obj$gr,lower=lower,upper=upper))
