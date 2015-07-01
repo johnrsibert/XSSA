@@ -35,7 +35,6 @@ print(paste("Read",length(sca),"items from ",dat.file))
 
 data = list()
 phases = list()
-print(paste("phases",phases))
 
 data$ngear = get.numeric.field()
 ngear=data$ngear
@@ -93,13 +92,11 @@ if (data$use_mean_forcing)
 
 data$phase_T12 = get.numeric.field()
 phases = c(phases,data$phase_T12)
-print(paste("phases",phases))
 data$init_T12 = get.numeric.field()
 
 data$phase_T21 = get.numeric.field() 
 phases = c(phases,data$phase_T21)
 data$init_T21 = get.numeric.field()
-print(paste("phases",phases))
 
 data$phase_r = get.numeric.field()
 phases = c(phases,data$phase_r)
@@ -122,7 +119,7 @@ phases = c(phases,data$phase_sdlogYield)
 data$init_sdlogYield = get.numeric.field()
 
 data$phase_meanProportion_local = get.numeric.field()
-phases = c(phases,data$phase_memanProportion_local)
+phases = c(phases,data$phase_meanProportion_local)
 data$init_meanProportion_local =  get.numeric.field()
 
 data$phase_sdProportion_local = get.numeric.field()
@@ -137,7 +134,6 @@ data$use_robustY = get.numeric.field()
 data$phase_pfat = get.numeric.field()
 phases = c(phases,data$phase_pfat)
 data$init_pfat = vector(length=ngear)
-print(unlist(phases))
 
 for (g in 1:ngear)
 {
@@ -167,7 +163,6 @@ parameters = list(
   logsdLProportion_local = log(logit(data$init_sdProportion_local)),
   qProp = data$init_qProp
 )
-print(names(parameters))
 
 if (!data$use_robustY)
 {
@@ -175,44 +170,48 @@ if (!data$use_robustY)
    data$init_pfat = 1e-25
 }
 parameters$Lpfat = logit(data$init_pfat)
-print(names(parameters))
 
 
 parameters$U=rep(0.0,data$lengthU)
 
 phases=unlist(phases)
-print(length(phases))
+nap = length(phases)
+print(paste("number of parameters:",nap))
 nphase = max(phases)
-print(paste("nphase",nphase))
+print(paste("number of phases",nphase))
+opt=vector(length=nphase)
 
-obj = MakeADFun(data,parameters,random=c("U"),DLL="xssams")
-pp = NULL
+#obj = MakeADFun(data,parameters,random=c("U"),DLL="xssams")
 for (p in 1:nphase)
 {
-   pp=sort(c(pp,which(phases==p)))
-   print(paste("--------Phase",p))
-   print("      active:")
-   print(pp)
-   print(names(parameters[pp]))
-
-   print("      INactive:")
-
-
-
+   map = list()
+   nip = 0
+   for (n in 1:nap)
+   {
+      if ((phases[n] == -1) || (phases[n] > p))
+      {
+         map.entry = parameters[n]
+         map = c(map,map.entry)
+         nip = nip+1
+	 map[[nip]]=rep(factor(NA),length(parameters[[n]]))
+      }
+   }
+   print(paste("----------phase",p))
+#  print(map)
+   if (p == 1)
+   {
+      obj = MakeADFun(data,parameters,map=map,random=c("U"),DLL="xssams")
+   }
+   else
+   {
+      obj = MakeADFun(data,opt[p-1],map=map,random=c("U"),DLL="xssams")
+   }
+   lower <- obj$par*0-Inf
+   upper <- obj$par*0+Inf
+#  print(paste(lower,upper))
+   opt[p] = nlminb(obj$par,obj$fn,obj$gr,lower=lower,upper=upper)
 }
 
-print("names(obj):")
-print(names(obj))
-print("obj$par:")
-print(obj$par)
-print("obj$report():")
-obj$report()
-lower <- obj$par*0-Inf
-upper <- obj$par*0+Inf
-print(paste(lower,upper))
-#lower["rho"] <- 0.01
-#upper["rho"] <- 0.99
-
-system.time(opt<-nlminb(obj$par,obj$fn,obj$gr,lower=lower,upper=upper))
-#rep<-sdreport(obj)
-#rep
+#system.time(opt<-nlminb(obj$par,obj$fn,obj$gr,lower=lower,upper=upper))
+rep<-sdreport(obj)
+rep
