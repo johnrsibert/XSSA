@@ -33,9 +33,9 @@
 # T21  phase  initial value
  2 0.02
 # r    phase  initial value
--1 1.2
+ 2 1.2
 # K    phase  initial value
- 2 200000
+-1 200000
 # sdlogF    phase  initial values
  1 0.3
 # sdlogPop    phase  initial values

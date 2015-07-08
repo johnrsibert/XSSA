@@ -28,6 +28,12 @@ endif
 #BIN_DIR = ../run
 BIN_DIR = ~/bin
 
+issams: issams.tpl
+	@echo ------- Translate $<
+	admb  -r $(FLAGS) $<
+	@echo -------- move $@
+	mv -f $@ $(BIN_DIR)
+
 xssams: xssams.tpl
 	@echo ------- Translate $<
 	admb  -r $(FLAGS) $<

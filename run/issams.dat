@@ -27,32 +27,21 @@
 # use mean forcing
  0
 #
-# T12  phase  initial value
-        1     0.01
-# T21  phase  initial value
-        1     0.002
 # r    phase  initial value
         1     0.8 
 # K    phase  initial value
-        2     1500
-#       2     144800
+        1     144800
 # sdlogF    phase  initial values
-             1     0.3 #0.3 0.3 0.3 0.3
+             1     0.3
 # sdlogPop    phase  initial values
-               1     0.1 # 0.1
-# sdlogYield  phase initial values
-               1    1.0 # 1.0  1.0  1.0  1.0
-# meanProportion_Local phase initial value
-                       -1    0.9
-# sdLproportion_local phase initial value
-                      -1    0.7
-#                     -1    1.3863
-#                     -1    2.72
-# qProp phase initial value
-         2    0.54
-#        2    0.75
+               1     0.1 
+# sdlogYield  phase initial value
+               1    1.0
+# logQ        phase initial value
+               1    5
+# sdlogQ      phase initial value
+               1    1
 # robust yield likelihood
 # use pfat_phase pfat initial values
   1   -1         0.07 0.07 0.07 0.07 0.07
-# 1    3         0.07 0.07 0.07 0.07 0.07
 

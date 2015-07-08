@@ -1143,7 +1143,7 @@ plot.diagnostics=function(dat=NULL,file="diagnostics.dat",dt,ngear,
        if (F.max > r)
          F.max = max(F.max,r)
        Fyield = seq(0,F.max,0.01*F.max)
-       yield = Fyield*K*(1.0-Fyield/r)
+       yield = Fyield*K*(1.0-Fyield/r) # equilibirum yield at F
        obsC = rowSums(dat[,obsC.ndx])
        predC = rowSums(dat[,predC.ndx])
        xrange = c(0,F.max)
