@@ -14,7 +14,7 @@ GLOBALS_SECTION;
   const double LOG_TWO_M_PI = log(TWO_M_PI);
   const double LOG_M_PI = log(M_PI);
 
-  // ./xssams -noinit -est -nr 10 -l2 10000000  -l3 10000000 &> xssams.out&
+  // nice issams  -noinit -iprint 1 -est -nr 10 &> issams.out&
 
   int fexists(const adstring& filename)
   {
@@ -229,6 +229,8 @@ PRELIMINARY_CALCS_SECTION
        logsdlogF = log(init_sdlogF);
        logsdlogYield = log(init_sdlogYield);
        logsdlogPop = log(init_sdlogPop);
+       logQ = log(init_Q);
+       logsdlogQ = log(init_sdlogQ);
 
        if (!use_robustY)
        {
@@ -272,6 +274,8 @@ PRELIMINARY_CALCS_SECTION
        PINOUT(logsdlogF)
        PINOUT(logsdlogPop)
        PINOUT(logsdlogYield)
+       PINOUT(logQ)
+       PINOUT(logsdlogQ)
        //PINOUT(U)
        pin << "# U:" << endl;
        pin << "#   F(t,g):" << endl;
@@ -336,7 +340,7 @@ PROCEDURE_SECTION
 
   nll = 0.0;
 
-  step0(U(utPop), logsdlogPop, logK);
+  step0(U(utPop+1), logsdlogPop, logK, logQ, logsdlogQ);
 
   for (int t = 2; t <= ntime; t++)
   {
@@ -360,7 +364,7 @@ PROCEDURE_SECTION
   }
 
 
-SEPARABLE_FUNCTION void step0(const dvariable& p11, const dvariable& lsdlogPop, const dvariable& lK)
+SEPARABLE_FUNCTION void step0(const dvariable& p11, const dvariable& lsdlogPop, const dvariable& lK, const dvariable& lnQ, const dvariable& lsdlogQ)
   // p11 U(utPop+t-1) log N at start of time step
 
   // ensure that starting population size is near K
@@ -370,7 +374,12 @@ SEPARABLE_FUNCTION void step0(const dvariable& p11, const dvariable& lsdlogPop, 
   dvariable Pnll = 0.0;
   Pnll += 0.5*(log(TWO_M_PI*varlogPop) + square(log(p10) - p11)/varlogPop);
 
-  nll += Pnll;
+  dvariable Qnll = 0.0;
+  dvariable varlogQ = square(mfexp(lsdlogQ));
+  dvariable logib = lnQ + log(immigrant_biomass(1));
+  Qnll += 0.5*(log(TWO_M_PI*varlogQ) + square(logib-p11)/varlogQ);
+
+  nll += (Pnll+Qnll);
 
 
 SEPARABLE_FUNCTION void step(const int t, const dvar_vector& f1, const dvar_vector& f2, const dvariable& lsdlogF, const dvariable& p11, const dvariable p12, const dvariable& lsdlogPop, const dvariable& lr, const dvariable& lK, const dvariable lnQ, const dvariable& lsdlogQ)
@@ -383,7 +392,7 @@ SEPARABLE_FUNCTION void step(const int t, const dvar_vector& f1, const dvar_vect
   dvariable varlogF = square(mfexp(lsdlogF));
   dvariable varlogPop = square(mfexp(lsdlogPop));
   dvariable varlogQ = square(mfexp(lsdlogQ));
-
+ 
   dvariable r = mfexp(lr);
   dvariable K = mfexp(lK);
   dvar_vector ft1(1,ngear);
@@ -536,8 +545,8 @@ FUNCTION void write_status(ofstream& s)
     cout << "\n# Status block:" << status_blocks << endl;
     s << "\n# Status after "<< userfun_entries << " PROCEDURE_SECTION entries;" << endl;
     s << "# Status block " << status_blocks << endl;
+    s << "# current phase = " << current_phase() << endl;
     s << "# nll = " << value(nll) << endl;
-    //s << "# maxG = " << nll.gmax << endl;
     s << "# nvar = " << initial_params::nvarcalc() << endl;
     s << "# logr = " << logr << " (" << active(logr) <<")" << endl;
     s << "#    r = " << mfexp(logr) << endl;

@@ -30,17 +30,17 @@
 # r    phase  initial value
         1     0.8 
 # K    phase  initial value
-        1     144800
+        2     600000
 # sdlogF    phase  initial values
              1     0.3
 # sdlogPop    phase  initial values
                1     0.1 
 # sdlogYield  phase initial value
                1    1.0
-# logQ        phase initial value
-               1    5
+# Q           phase initial value
+               1    0.05
 # sdlogQ      phase initial value
-               1    1
+              -1    0.05
 # robust yield likelihood
 # use pfat_phase pfat initial values
   1   -1         0.07 0.07 0.07 0.07 0.07

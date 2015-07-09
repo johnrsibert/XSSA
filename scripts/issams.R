@@ -15,7 +15,7 @@ plot.error=function(x,y,sd,bcol,fcol,mult=2)
 
 
 plot.diagnostics=function(dat=NULL,file="diagnostics.dat",dt,ngear,
-                 sdlogPop, sdlogYield, sdlogF, K, r,
+                 sdlogPop, sdlogYield, sdlogF, sdlogQ, K, r,
                  plot.Fmort,plot.prod,
                  devices,block)
 {
@@ -32,14 +32,14 @@ plot.diagnostics=function(dat=NULL,file="diagnostics.dat",dt,ngear,
 
    wy5 = which((floor(dat$t%%5))==0)
    ncol = ncol(dat)
-   print("Names of all variables:")
-   print(names(dat))
-   print(head(dat))
-   print(tail(dat))
+#  print("Names of all variables:")
+#  print(names(dat))
+#  print(head(dat))
+#  print(tail(dat))
    gear.col = 4
    dd = c(2,(gear.col+1):ncol)
-   print("Names of log transformed variables:")
-   print(names(dat)[dd])
+#  print("Names of log transformed variables:")
+#  print(names(dat)[dd])
    dat[,dd] = exp(dat[,dd])
 #  print(head(dat))
 #  print(tail(dat))
@@ -75,35 +75,23 @@ plot.diagnostics=function(dat=NULL,file="diagnostics.dat",dt,ngear,
    par(mar=c(4,5,0,4)+0.1)
    x = dat$t
    ntime = length(dat$t)
- # ntime=length(x)
- # y = matrix(nrow=length(x),ncol=3)
- # y[,1] = dat$pop1
- # y[,2] = dat$pop2
- # y[,3] = dat$pop1 + dat$pop2
- # legend = c(" N1"," N2"," N1+N2")
- # legend = c(parse(text=paste("N","[1]")),
- #            parse(text=paste("N","[2]")),
- #            parse(text=paste("N","[1]","+N","[2]")))
 
    options(scipen=6)
    xrange=nice.ts.plot(dat$t,dat$pop,legend="N",lwd=5,ylab="Biomass (mt)")
-#  sdlogNN = sqrt(4.0*sdlogPop*sdlogPop) # is is probably not correct
-#  plot.error(dat$t,dat$pop,sdlogNN, 
-#                   bcol="blue",fcol="lightblue")
+#  plot.error(dat$t,dat$pop,sdlogPop,bcol="blue",fcol="lightblue")
    lines(dat$t,dat$pop,col="blue",lwd=5)
 
    lines(x,dat$K,lwd=2,lty="dotdash",col="blue",xlim=xrange)
    text(x[ntime],dat$K[ntime]," K",adj=c(0,0.5),col="blue")
 
    par("new"=TRUE)
-   tT21 = parse(text=paste("T","[21]"))
-   plot(x,dat$forcing,lwd=3,type='l',col="purple", 
-        ylim=c(0.0,max(dat$forcing)), ann=FALSE,axes=FALSE,xlim=xrange)
-   text(x[ntime],dat$forcing[ntime],tT21,adj=c(0,0),col="purple")
-   axis(4,line=-2,col="purple",col.axis="purple")
-#  axis(2,col="purple",col.axis="purple",pos=xrange[2])
-   mtext(tT21, side=4,col="purple",line=-1.5)
-   title(main=paste("Block", block),line=title.line)
+   nice.ts.plot(dat$t,dat$forcing,legend="I",lwd=5,ylab="")
+   plot.error(x,dat$forcing,sdlogQ,bcol="purple4",fcol="purple1")
+   lines(x,dat$forcing,col="purple4",lwd=5) 
+   text(x[ntime],dat$forcing[ntime],adj=c(0,0),col="purple4")
+   axis(4,col="purple4",col.axis="purple4")
+   mtext("Index", side=4,col="purple4",line=0.1)
+   show.block.number(block,dat$t[1])
 
    d = 2
    if (devices[d] > 0)
@@ -131,11 +119,9 @@ plot.diagnostics=function(dat=NULL,file="diagnostics.dat",dt,ngear,
                  bcol="darkgreen",fcol="lightgreen")
       lines(dat$t,dat[,(gear.col+ngear+g)],col="darkgreen",lwd=lwd+2)
       points(dat$t,dat[,(gear.col+2*ngear+g)],col= "darkgreen",pch=3,cex=3) #16)
-      if (g == 1)
-         title(main=paste(gear.names[g]," (",block,")",sep=""),line=title.line)
-      else
-         title(main=gear.names[g],line=title.line)
+      title(main=gear.names[g],line=title.line)
    }
+   show.block.number(block,dat$t[1],line=2)
 
 #  plot.Fmort = TRUE
    if (plot.Fmort)
@@ -168,11 +154,9 @@ plot.diagnostics=function(dat=NULL,file="diagnostics.dat",dt,ngear,
           plot.error(dat$t,dat[,(gear.col+g)],sdlogF,
                     bcol="orange4",fcol="orange")
           lines(dat$t,dat[,(gear.col+g)],col="orange4",lwd=lwd+2)
-          if (g == 1)
-             title(main=paste(gear.names[g]," (",block,")",sep=""),line=title.line)
-          else
-             title(main=gear.names[g],line=title.line)
+          title(main=gear.names[g],line=title.line)
        }
+       show.block.number(block,dat$t[1],line=2)
    } #if (plot.Fmort)
 
    if (plot.prod)
@@ -198,6 +182,8 @@ plot.diagnostics=function(dat=NULL,file="diagnostics.dat",dt,ngear,
          F.max = max(F.max,r)
        Fyield = seq(0,F.max,0.01*F.max)
        yield = Fyield*K*(1.0-Fyield/r) # equilibirum yield at F
+       print(paste(K,r))
+       print(head(cbind(Fyield,yield)))
        obsC = rowSums(dat[,obsC.ndx])
        predC = rowSums(dat[,predC.ndx])
        xrange = c(0,F.max)
@@ -214,10 +200,9 @@ plot.diagnostics=function(dat=NULL,file="diagnostics.dat",dt,ngear,
 
        text(x=Fmort[wy5],y=obsC[wy5],labels=floor(dat$t[wy5]),
              pos=4,offset=0.5,cex=0.8)
-       mtext(text=paste("(",block,")",sep=""),side=1,line=2,at=c(Fmort[1],0),cex=0.8)
-   #   text(x=par("usr")[1],y=par("usr")[3],labels=paste("(",block,")",sep=""),
-   #        adj=c(0.0,0.0))       
+       show.block.number(block,0)
    } #if (plot.prod)
+
    new.devices = devices
    return(new.devices)
 }
@@ -248,6 +233,9 @@ log.diagnostics=function(file="issams_program.log",ntime=61,dt=1,ngear=5,plot.Fm
    wr1 = which(!is.na(r1))
    r = r1[wr1]
 #  print(r)
+   sdlogQ.pos = grep("^sdlogQ:",log)
+   sdlogQ = as.numeric(log[sdlogQ.pos+1])
+#  print(paste("sdlogQ",sdlogQ))
   
    max.counter = length(res)
    counter = max.counter
@@ -292,6 +280,7 @@ log.diagnostics=function(file="issams_program.log",ntime=61,dt=1,ngear=5,plot.Fm
                     sdlogPop=sdlogPop[counter], 
                     sdlogYield=sdlogYield[counter], 
                     sdlogF=sdlogF[counter],
+                    sdlogQ=sdlogQ[counter],
                     K=K[counter], r=r[counter],
                     plot.Fmort=plot.Fmort,
                     plot.prod=plot.prod,
@@ -333,19 +322,8 @@ log.diagnostics=function(file="issams_program.log",ntime=61,dt=1,ngear=5,plot.Fm
 #  return(counter)
 }
 
-plot.prod.curve=function(file="xssams.rep")
+show.block.number=function(block.number,x,line=3)
 {
-   rep=read.table(file=file,header=TRUE)
-   pop.ndx=grep("pop",names(rep)) 
-   F.ndx=grep("F",names(rep)) 
-   predC.ndx=grep("predC",names(rep)) 
-   obsC.ndx=grep("obsC",names(rep)) 
-   print(names(rep[,F.ndx]))
-   print(names(rep[,obsC.ndx]))
-
-   Fmort = rowSums(exp(rep[,F.ndx]))
-   obsC = rowSums(exp(rep[,obsC.ndx]))
-   plot(Fmort,obsC)
-   lines(c(0,max(Fmort,na.rm=TRUE)),c(0,max(obsC,na.rm=TRUE)))
+   mtext(text=paste("(",block.number,")",sep=""),side=1,line=line,
+          at=c(x,0),cex=0.8)
 }
-
