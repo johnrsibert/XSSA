@@ -6,9 +6,17 @@ have.xssams.R = TRUE
 
 plot.error=function(x,y,sd,bcol,fcol,mult=2)
 {
-   sdyu = exp(log(y)+mult*sd)
-   sdyl = exp(log(y)-mult*sd)
-   polygon(c(x,rev(x)),c(sdyl,rev(sdyu)),
+   if (capabilities("cairo"))
+   {
+      sdyu = exp(log(y)+mult*sd)
+      sdyl = exp(log(y)-mult*sd)
+      frgb = col2rgb(fcol)/255
+      polygon(c(x,rev(x)),c(sdyl,rev(sdyu)),
+              border=bcol,lty="dashed",lwd=1,
+              col=rgb(frgb[1],frgb[2],frgb[3],0.5))
+   }
+   else
+      polygon(c(x,rev(x)),c(sdyl,rev(sdyu)),
               border=bcol,lty="dashed",lwd=1,col=fcol)
 
 }
@@ -55,6 +63,7 @@ plot.diagnostics=function(dat=NULL,file="diagnostics.dat",dt,ngear,
    predC.ndx=grep("predC",names(dat)) 
    obsC.ndx=grep("obsC",names(dat)) 
 
+   # biomass plots
    d = 1
    xpos = 0
    ypos = 0
@@ -73,26 +82,28 @@ plot.diagnostics=function(dat=NULL,file="diagnostics.dat",dt,ngear,
    }
 
    par(mar=c(4,5,0,4)+0.1)
-   x = dat$t
    ntime = length(dat$t)
+   x = dat$t
+   y = matrix(nrow=ntime,ncol=2)
+   y[,1]=dat$pop
+   y[,2]=dat$forcing
 
    options(scipen=6)
-   xrange=nice.ts.plot(dat$t,dat$pop,legend="N",lwd=5,ylab="Biomass (mt)")
-#  plot.error(dat$t,dat$pop,sdlogPop,bcol="blue",fcol="lightblue")
-   lines(dat$t,dat$pop,col="blue",lwd=5)
+   xrange=nice.ts.plot(x,y,ylab="Biomass (mt)")
 
    lines(x,dat$K,lwd=2,lty="dotdash",col="blue",xlim=xrange)
-   text(x[ntime],dat$K[ntime]," K",adj=c(0,0.5),col="blue")
+   text(x[ntime],dat$K[ntime],"  K",adj=c(0,0.5),col="blue")
 
-   par("new"=TRUE)
-   nice.ts.plot(dat$t,dat$forcing,legend="I",lwd=5,ylab="")
+   plot.error(dat$t,dat$pop,sdlogPop,bcol="blue",fcol="lightblue")
+   double.lines(dat$t,dat$pop,bcol="blue",fcol="lightblue",lwd=5)
+   text(x[ntime],dat$pop[ntime],adj=c(0,1),col="blue",labels="  N")
+
    plot.error(x,dat$forcing,sdlogQ,bcol="purple4",fcol="purple1")
-   lines(x,dat$forcing,col="purple4",lwd=5) 
-   text(x[ntime],dat$forcing[ntime],adj=c(0,0),col="purple4")
-   axis(4,col="purple4",col.axis="purple4")
-   mtext("Index", side=4,col="purple4",line=0.1)
+   double.lines(x,dat$forcing,bcol="purple4",fcol="purple1",lwd=5) 
+   text(x[ntime],dat$forcing[ntime],adj=c(0,0),col="purple4",labels="  I")
    show.block.number(block,dat$t[1])
 
+   # catch plots
    d = 2
    if (devices[d] > 0)
    {
@@ -182,8 +193,11 @@ plot.diagnostics=function(dat=NULL,file="diagnostics.dat",dt,ngear,
          F.max = max(F.max,r)
        Fyield = seq(0,F.max,0.01*F.max)
        yield = Fyield*K*(1.0-Fyield/r) # equilibirum yield at F
+    #  yield = Fyield*max(dat$forcing,K)*(1.0-Fyield/r) # equilibirum yield at F
+       Myield = Fmort*dat$forcing*(1.0-Fmort/r) # equilibirum yield at F
        print(paste(K,r))
        print(head(cbind(Fyield,yield)))
+       print(tail(cbind(Fyield,yield)))
        obsC = rowSums(dat[,obsC.ndx])
        predC = rowSums(dat[,predC.ndx])
        xrange = c(0,F.max)
@@ -194,6 +208,7 @@ plot.diagnostics=function(dat=NULL,file="diagnostics.dat",dt,ngear,
        double.lines(Fmort,predC,bcol="darkgreen",fcol="lightgreen",lwd=5) 
        points(Fmort,obsC,col= "darkgreen",pch=3,cex=2)
        points(Fmort,predC,col="darkgreen",pch=16)
+       lines(Fmort,Myield,col="purple",lwd=3,lty="longdash")
    #   wmaxC = which(obsC==max(obsC,na.rm=TRUE))
    #   lines(c(0,Fmort[wmaxC]),c(0,obsC[wmaxC]),col="red",lty="longdash")
        lines(Fyield,yield,col="red",lwd=3,lty="longdash")
