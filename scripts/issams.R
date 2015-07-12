@@ -24,7 +24,7 @@ plot.error=function(x,y,sd,bcol,fcol,mult=2)
 
 plot.diagnostics=function(dat=NULL,file="diagnostics.dat",dt,ngear,
                  sdlogPop, sdlogYield, sdlogF, sdlogQ, K, r,
-                 plot.Fmort,plot.prod,
+                 plot.Fmort,plot.prod, plot.impact,
                  devices,block)
 {
    print(paste("Block: ",block))
@@ -218,11 +218,63 @@ plot.diagnostics=function(dat=NULL,file="diagnostics.dat",dt,ngear,
        show.block.number(block,0)
    } #if (plot.prod)
 
+   if (plot.impact)
+   {
+       d = d + 1
+       if (devices[d] > 0)
+       {
+          s = dev.set(devices[d])
+       }
+       else
+       {
+          width = 9.0
+          height =9.0
+          xpos = xpos + 50
+          ypos = ypos + 50
+          x11(width=width,height=height,xpos=xpos,ypos=ypos,
+               title="Impact")
+          devices[d] = dev.cur()
+       }
+       par(mar=c(4,5,0,4)+0.1)
+       ntime = length(dat$t)
+       x = dat$t
+       Fmort = rowSums(dat[,F.ndx])
+       y = matrix(nrow=ntime,ncol=3)
+       y[,3]=dat$pop
+       y[1,1] = y[1,3]
+       y[1,2] = y[1,3]
+       for (t in 2:ntime)
+       {
+          for (p in 1:2)
+          {
+             FF = Fmort[t]
+             if (p == 2)
+                FF = 0.0
+
+             y[t,p]  = (K*(r-FF))/((((K*(r-FF))/y[t-1,p])*exp(-(r-FF))) - r*exp(-(r-FF))  + r) # p5
+          } 
+      }
+
+      legend = c(" F (est)"," F= 0", " B (est)")
+      xrange=nice.ts.plot(x,y[,1:2],ylab="Biomass (mt)",legend=legend[1:2])
+
+   #  impact = 100.0*(1.0 - y[,1]/y[,2]) # PNAS
+   #  impact = (1.0 - y[,1]/y[,2])
+      impact = y[,1]/y[,2]  # WCPFC
+   #  print(impact)
+      par("new"=TRUE)
+      plot(x,impact,type='l',xlim=xrange,lwd=3,lty="dashed",col="red",
+           ann=FALSE,axes=FALSE)
+      axis(4,col="red",ylab="p",col.axis="red")
+      #mtext("p",side=4,col="red",line=0.1)
+
+   } #if (plot.impact)
    new.devices = devices
    return(new.devices)
 }
 
-log.diagnostics=function(file="issams_program.log",ntime=61,dt=1,ngear=5,plot.Fmort=FALSE,plot.prod=FALSE)
+log.diagnostics=function(file="issams_program.log",ntime=61,dt=1,ngear=5,
+                         plot.Fmort=FALSE,plot.prod=FALSE,plot.impact=FALSE)
 {
       
    print(paste("Scanning file",file))
@@ -265,7 +317,7 @@ log.diagnostics=function(file="issams_program.log",ntime=61,dt=1,ngear=5,plot.Fm
    print(cnames)
 
    c = 'n'
-   dev.list = vector(mode="numeric",length=4)
+   dev.list = vector(mode="numeric",length=5)
    dev.file.names=c("tmp/est_pop","tmp/est_catch","tmp/est_F")
 #  while (c != 'q')
    while ( (c != 'q') && (c != 'x') )
@@ -299,6 +351,7 @@ log.diagnostics=function(file="issams_program.log",ntime=61,dt=1,ngear=5,plot.Fm
                     K=K[counter], r=r[counter],
                     plot.Fmort=plot.Fmort,
                     plot.prod=plot.prod,
+                    plot.impact=plot.impact,
                     devices=dev.list,block=counter)
       dev.list=new.devices
      
