@@ -14,7 +14,7 @@ GLOBALS_SECTION;
   const double LOG_TWO_M_PI = log(TWO_M_PI);
   const double LOG_M_PI = log(M_PI);
 
-  // ./xssams -noinit -est -nr 10 -l2 10000000  -l3 10000000 &> xssams.out&
+  // xssams -noinit -est -nr 10 -l2 10000000  -l3 10000000 &> xssams.out&
 
   int fexists(const adstring& filename)
   {
@@ -484,6 +484,9 @@ SEPARABLE_FUNCTION void step(const int t, const dvar_vector& f1, const dvar_vect
   dvariable sumFg = sum(mfexp(ft1)); // total fishing mortality
   dvariable q = qP;
 
+  #undef __FINITE_DIFFERENCE__
+  #ifdef __FINITE_DIFFERENCE__
+  #warning Building finite differnce approximation
   //       unstable for large r
   //dvariable prevN1 = mfexp(p11);
   //dvariable prevN2 = mfexp(p21);
@@ -508,6 +511,8 @@ SEPARABLE_FUNCTION void step(const int t, const dvar_vector& f1, const dvar_vect
   {
      prevN1 = mfexp(nextLogN1);
      prevN2 = mfexp(nextLogN2);
+     if (ss == 1)
+        TTRACE(prevN1,prevN2)
 
      dLogN1 = r*(1.0 - prevN1/K) - sumFg - T12 - 2.0*(1.0-q)*r*prevN2/K;
      dLogN2 = r*(1.0 - prevN2/K) - sumFg - T12 - 2.0*q*r*prevN1/K + T21*immigrant_biomass(t)/prevN2;
@@ -515,6 +520,8 @@ SEPARABLE_FUNCTION void step(const int t, const dvar_vector& f1, const dvar_vect
      nextLogN1 = nextLogN1 + dLogN1*sdt;
      nextLogN2 = nextLogN2 + dLogN2*sdt;
   }
+  //TTRACE(mfexp(nextLogN1),mfexp(nextLogN2))
+  //TTRACE(nextLogN1,nextLogN2)
 
 
   //       semi-implicit approximation
@@ -529,6 +536,33 @@ SEPARABLE_FUNCTION void step(const int t, const dvar_vector& f1, const dvar_vect
   //dvariable nextN2 = (prevN2*(1.0+dtr-dt*(sumFg+T12)-dtr*q*2.0*prevN1/K)+dt*T21*immigrant_biomass(t))/
   //                         (1.0+dtr*prevN2/K);
 
+  #else // #ifdef __FINITE_DIFFERENCE__
+  ///////////////////////////////////
+  //
+  // analytic integral
+  // assumes dt = i
+  // Z evaluated at t-1
+  dvariable prevN1 = mfexp(p11);
+  dvariable prevN2 = mfexp(p21);
+  dvariable Z1 = sumFg + T12 + 2.0*(1.0-q)*(r/K)*prevN2;
+  dvariable Z2 = sumFg + T12 + 2.0*q*(r/K)*prevN1;
+  // S[t,1] =        (K*(r-Z1))/(r+((K*(r-Z1)/S[t-1,1])-r)*exp(-(r-Z1)))
+  dvariable nextN1 = (K*(r-Z1))/(r+((K*(r-Z1)/prevN1)-r)*exp(-(r-Z1)));
+  // S[t,2] = (K*(r-Z2))/(r+((K*(r-Z2)/S[t-1,2])-r)*exp(-(r-Z2)*(1.0-T21)))
+  dvariable nextN2 = (K*(r-Z2))/(r+((K*(r-Z2)/prevN2)-r)*exp(-(r-Z2)*(1.0-T21*immigrant_biomass(t))));
+  dvariable nextLogN1 = log(nextN1);
+  dvariable nextLogN2 = log(nextN2);
+  if ( isnan(value(nextLogN2)) || isinf(value(nextLogN2)) )
+  {
+     TTRACE(t,userfun_entries)
+     TRACE(nextLogN2)
+     dvariable PropL = 1.0/(1.0+mfexp(-LmPropL));
+     nextLogN2 = nextLogN1*(1.0-PropL)/PropL;
+  }
+  //TTRACE(nextLogN1,nextLogN2)
+  #endif // #ifdef __FINITE_DIFFERENCE__
+
+ 
   if ( isnan(value(nextLogN1)) || isnan(value(nextLogN2)) ||
        isinf(value(nextLogN1)) || isinf(value(nextLogN2)) )
   {

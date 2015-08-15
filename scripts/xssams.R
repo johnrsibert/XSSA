@@ -952,8 +952,8 @@ plot.error=function(x,y,sd,bcol,fcol,mult=2)
 
 
 plot.diagnostics=function(dat=NULL,file="diagnostics.dat",dt,ngear,
-                 sdlogPop, sdlogYield, sdlogF, K, r,
-                 plot.Fmort,plot.prod,
+                 sdlogPop, sdlogYield, sdlogF, sdlogQ, K, r,
+                 plot.Fmort,plot.prod, plot.impact,
                  devices,block)
 {
    print(paste("Block: ",block))
@@ -988,6 +988,7 @@ plot.diagnostics=function(dat=NULL,file="diagnostics.dat",dt,ngear,
    predC.ndx=grep("predC",names(dat)) 
    obsC.ndx=grep("obsC",names(dat)) 
 
+   # biomass plots
    d = 1
    xpos = 0
    ypos = 0
@@ -1006,9 +1007,9 @@ plot.diagnostics=function(dat=NULL,file="diagnostics.dat",dt,ngear,
    }
 
    par(mar=c(4,5,0,4)+0.1)
+   ntime = length(dat$t)
    x = dat$t
-   ntime=length(x)
-   y = matrix(nrow=length(x),ncol=3)
+   y = matrix(nrow=ntime,ncol=3)
    y[,1] = dat$pop1
    y[,2] = dat$pop2
    y[,3] = dat$pop1 + dat$pop2
@@ -1018,7 +1019,11 @@ plot.diagnostics=function(dat=NULL,file="diagnostics.dat",dt,ngear,
               parse(text=paste("N","[1]","+N","[2]")))
 
    options(scipen=6)
-   xrange=nice.ts.plot(x,y,legend=legend,lwd=5,ylab="Biomass (mt)")
+   xrange=nice.ts.plot(x,y,ylab="Biomass (mt)")
+
+   lines(x,dat$K,lwd=2,lty="dotdash",col="blue",xlim=xrange)
+   text(x[ntime],dat$K[ntime]," K",adj=c(0,0.5),col="blue")
+
    sdlogNN = sqrt(4.0*sdlogPop*sdlogPop) # is is probably not correct
    plot.error(dat$t,y[,3],sdlogNN, 
                     bcol="blue",fcol="lightblue")
@@ -1029,10 +1034,6 @@ plot.diagnostics=function(dat=NULL,file="diagnostics.dat",dt,ngear,
    lines(dat$t,y[,1],col="blue",lwd=5)
    lines(dat$t,y[,2],col="blue",lwd=5)
    lines(dat$t,y[,3],col="blue",lwd=5)
-
-   lines(x,dat$K,lwd=2,lty="dotdash",col="blue",xlim=xrange)
-   text(x[ntime],dat$K[ntime]," K",adj=c(0,0.5),col="blue")
-
    par("new"=TRUE)
    plot(x,dat$propL,lwd=3,type='l',col="red",ylim=c(0,1),
         ann=FALSE,axes=FALSE,xlim=xrange)
@@ -1049,8 +1050,9 @@ plot.diagnostics=function(dat=NULL,file="diagnostics.dat",dt,ngear,
    axis(4,line=-2,col="purple",col.axis="purple")
 #  axis(2,col="purple",col.axis="purple",pos=xrange[2])
    mtext(tT21, side=4,col="purple",line=-1.5)
-   title(main=paste("Block", block),line=title.line)
+   show.block.number(block,dat$t[1])
 
+   # catch plots
    d = 2
    if (devices[d] > 0)
    {
@@ -1077,11 +1079,9 @@ plot.diagnostics=function(dat=NULL,file="diagnostics.dat",dt,ngear,
                  bcol="darkgreen",fcol="lightgreen")
       lines(dat$t,dat[,(gear.col+ngear+g)],col="darkgreen",lwd=lwd+2)
       points(dat$t,dat[,(gear.col+2*ngear+g)],col= "darkgreen",pch=3,cex=3) #16)
-      if (g == 1)
-         title(main=paste(gear.names[g]," (",block,")",sep=""),line=title.line)
-      else
-         title(main=gear.names[g],line=title.line)
+      title(main=gear.names[g],line=title.line)
    }
+   show.block.number(block,dat$t[1],line=2)
 
 #  plot.Fmort = TRUE
    if (plot.Fmort)
@@ -1119,6 +1119,7 @@ plot.diagnostics=function(dat=NULL,file="diagnostics.dat",dt,ngear,
           else
              title(main=gear.names[g],line=title.line)
        }
+       show.block.number(block,dat$t[1],line=2)
    } #if (plot.Fmort)
 
    if (plot.prod)
@@ -1160,15 +1161,67 @@ plot.diagnostics=function(dat=NULL,file="diagnostics.dat",dt,ngear,
 
        text(x=Fmort[wy5],y=obsC[wy5],labels=floor(dat$t[wy5]),
              pos=4,offset=0.5,cex=0.8)
-       mtext(text=paste("(",block,")",sep=""),side=1,line=2,at=c(Fmort[1],0),cex=0.8)
-   #   text(x=par("usr")[1],y=par("usr")[3],labels=paste("(",block,")",sep=""),
-   #        adj=c(0.0,0.0))       
+       show.block.number(block,dat$t[1],line=3)
    } #if (plot.prod)
+
+   if (plot.impact)
+   {
+       d = d + 1
+       if (devices[d] > 0)
+       {
+          s = dev.set(devices[d])
+       }
+       else
+       {
+          width = 9.0
+          height =9.0
+          xpos = xpos + 50
+          ypos = ypos + 50
+          x11(width=width,height=height,xpos=xpos,ypos=ypos,
+               title="Impact")
+          devices[d] = dev.cur()
+       }
+       par(mar=c(4,5,0,4)+0.1)
+       ntime = length(dat$t)
+       x = dat$t
+       Fmort = rowSums(dat[,F.ndx])
+       y = matrix(nrow=ntime,ncol=3)
+       y[,3] = dat$pop1 + dat$pop2
+       y[1,1] = y[1,3]
+       y[1,2] = y[1,3]
+       for (t in 2:ntime)
+       {
+          for (p in 1:2)
+          {
+             FF = Fmort[t]
+             if (p == 2)
+                FF = 0.0
+
+             y[t,p]  = (K*(r-FF))/((((K*(r-FF))/y[t-1,p])*exp(-(r-FF))) - r*exp(-(r-FF))  + r) # p5
+          } 
+      }
+
+      legend = c(" F (est)"," F= 0", " B (est)")
+      xrange=nice.ts.plot(x,y[,1:2],ylab="Biomass (mt)",legend=legend[1:2])
+
+   #  impact = 100.0*(1.0 - y[,1]/y[,2]) # PNAS
+   #  impact = (1.0 - y[,1]/y[,2])
+      impact = y[,1]/y[,2]  # WCPFC
+   #  print(impact)
+      par("new"=TRUE)
+      plot(x,impact,type='l',xlim=xrange,ylim=c(0,1),lwd=3,lty="dashed",col="red",
+           ann=FALSE,axes=FALSE)
+      axis(4,col="red",ylab="p",col.axis="red")
+      #mtext("p",side=4,col="red",line=0.1)
+      show.block.number(block,dat$t[1],line=3)
+
+   } #if (plot.impact)
    new.devices = devices
    return(new.devices)
 }
 
-log.diagnostics=function(file="xssams_program.log",ntime=244,dt=0.25,ngear=5,plot.Fmort=FALSE,plot.prod=FALSE)
+log.diagnostics=function(file="xssams_program.log",ntime=61,dt=1,ngear=5,
+                         plot.Fmort=FALSE,plot.prod=FALSE,plot.impact=FALSE)
 {
       
    print(paste("Scanning file",file))
@@ -1194,6 +1247,9 @@ log.diagnostics=function(file="xssams_program.log",ntime=244,dt=0.25,ngear=5,plo
    wr1 = which(!is.na(r1))
    r = r1[wr1]
 #  print(r)
+   sdlogQ.pos = grep("^sdlogQ:",log)
+   sdlogQ = as.numeric(log[sdlogQ.pos+1])
+#  print(paste("sdlogQ",sdlogQ))
   
 #  if(1)
 #    return(FALSE)
@@ -1207,7 +1263,7 @@ log.diagnostics=function(file="xssams_program.log",ntime=244,dt=0.25,ngear=5,plo
    cnames = vector(length=ncol)
 
    c = 'n'
-   dev.list = vector(mode="numeric",length=4)
+   dev.list = vector(mode="numeric",length=5)
    dev.file.names=c("tmp/est_pop","tmp/est_catch","tmp/est_F")
 #  while (c != 'q')
    while ( (c != 'q') && (c != 'x') )
@@ -1232,15 +1288,16 @@ log.diagnostics=function(file="xssams_program.log",ntime=244,dt=0.25,ngear=5,plo
 #     print(paste("Block:",counter))
 #     print(head(diag))
 #     print(tail(diag))
-
       print(paste("Displaying block ",counter,sep=""))
       new.devices = plot.diagnostics(as.data.frame(diag),dt=dt,ngear=ngear,
                     sdlogPop=sdlogPop[counter], 
                     sdlogYield=sdlogYield[counter], 
                     sdlogF=sdlogF[counter],
+                    sdlogQ=sdlogQ[counter],
                     K=K[counter], r=r[counter],
                     plot.Fmort=plot.Fmort,
                     plot.prod=plot.prod,
+                    plot.impact=plot.impact,
                     devices=dev.list,block=counter)
       dev.list=new.devices
      
@@ -1277,6 +1334,12 @@ log.diagnostics=function(file="xssams_program.log",ntime=244,dt=0.25,ngear=5,plo
    if (c == 'x')
       q("no")
 #  return(counter)
+}
+
+show.block.number=function(block.number,x,line=3)
+{
+   mtext(text=paste("(",block.number,")",sep=""),side=1,line=line,
+          at=c(x,0),cex=0.8)
 }
 
 plot.prod.curve=function(file="xssams.rep")

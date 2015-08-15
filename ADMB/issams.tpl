@@ -426,7 +426,7 @@ SEPARABLE_FUNCTION void step(const int t, const dvar_vector& f1, const dvar_vect
   dvariable ermF = mfexp(-1.0*rmF);
   dvariable Krmf = K*rmF;
   //    S[t] = (K*(r-Fmort))/((((K*(r-Fmort))/S[t-1])*exp(-(r-Fmort))) - r*exp(-(r-Fmort))  + r) # p5
-  dvariable nextN = Krmf/(((Krmf/prevN)*ermF) - r*ermF +r);
+  dvariable nextN = Krmf/(((Krmf/prevN)*ermF) - r*ermF +r); // 5
   dvariable nextLogN = log(nextN);
 
   if ( isnan(value(nextLogN)) )
