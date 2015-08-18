@@ -11,7 +11,7 @@ GLOBALS_SECTION;
 
   ofstream clogf;
   const double TWO_M_PI = 2.0*M_PI;
-  const double LOG_TWO_M_PI = log(TWO_M_PI);
+  //const double LOG_TWO_M_PI = log(TWO_M_PI);
   const double LOG_M_PI = log(M_PI);
 
   // nice issams  -noinit -iprint 1 -est -nr 10 &> issams.out&
@@ -78,6 +78,7 @@ DATA_SECTION
   init_matrix tcatch(1,ngear,1,ntime);
   matrix obs_catch(1,ntime,1,ngear);
   !! obs_catch = trans(tcatch);
+  number logZeroCatch;
 
   init_matrix forcing_matrix(1,9,1,ntime);
   init_int fr;
@@ -150,26 +151,45 @@ DATA_SECTION
     residuals.allocate(1,ntime,1,3*ngear+3);
     residuals.initialize();
     double ZeroCatch = 1.0; //1.0e-8;
-    double logZeroCatch = log(ZeroCatch);
+    logZeroCatch = log(ZeroCatch);
     TTRACE(ZeroCatch,logZeroCatch)
     int nzero = ntime;
-    int ziter = 0;
-    while (nzero > 0)
+    //if (use_robustY != 3)
     {
-       ziter ++;
-       nzero = 0;
-       for (int g = 1; g <= ngear; g++)
-         for (int t = 2; t <= ntime; t++)
-            if ( (obs_catch(t,g) <= 0.0) 
-              && (obs_catch(t-1,g) > 0.0) && (obs_catch(t+1,g) > 0.0) )
-            {
-               clogf << ++nzero << " " << ziter << endl;
-               obs_catch(t,g) = 0.5*(obs_catch(t-1,g) + obs_catch(t+1,g));
-               clogf << nzero<< " catch for gear " << g << " at time " << t
-                  << " set to " << obs_catch(t,g)  << endl;
-            }
+       int ziter = 0;
+       while (nzero > 0)
+       {
+          ziter ++;
+          nzero = 0;
+          for (int g = 1; g <= ngear; g++)
+            for (int t = 2; t <= ntime; t++)
+               if ( (obs_catch(t,g) <= 0.0) 
+                 && (obs_catch(t-1,g) > 0.0) && (obs_catch(t+1,g) > 0.0) )
+               {
+                  clogf << ++nzero << " " << ziter << endl;
+                  obs_catch(t,g) = 0.5*(obs_catch(t-1,g) + obs_catch(t+1,g));
+                  clogf << nzero<< " catch for gear " << g << " at time " << t
+                     << " set to " << obs_catch(t,g)  << endl;
+               }
+       }
     }
     clogf << "Zero catch bridging instances: " << nzero << endl;
+
+    ivector count_zero(1,ngear);
+    count_zero.initialize();
+    for (int t = 1; t<= ntime; t++)
+    {
+       for (int g = 1; g <= ngear; g++)
+       {
+          if (obs_catch(t,g) <= 0.0)
+            count_zero(g) ++;
+       }
+    }
+    TRACE(count_zero)
+    dvector prop_zero(1,ngear);
+    prop_zero = count_zero/double(ntime);
+    TRACE(prop_zero)
+
     obs_catch = log(obs_catch+ZeroCatch);
   
     // set up U indexing
@@ -513,7 +533,21 @@ SEPARABLE_FUNCTION void obs(const int t, const dvar_vector& f,const dvariable& p
         dvariable fat_part =  b/(1.+pow(diff2/(width2*a2*v_hat),2));
         Ynll += norm_part + fat_part;
      }
-     else // default log-normal likelihood
+
+     else if (use_robustY == 3) // zero inflated normal
+     {
+        dvariable pzero = alogit(Lpf(g));
+        if (obs_catch(t,g) > logZeroCatch)
+        {
+           Ynll += pzero*0.5*(log(TWO_M_PI*varlogYield));
+        }
+        else
+        {
+           Ynll += (1.0-pzero)*0.5*(log(TWO_M_PI*varlogYield) + square(obs_catch(t,g)-log_pred_yield(g))/varlogYield);
+        }
+     }
+
+     else // default normal likelihood
      {
         Ynll += 0.5*(log(TWO_M_PI*varlogYield) + square(obs_catch(t,g)-log_pred_yield(g))/varlogYield);
 
