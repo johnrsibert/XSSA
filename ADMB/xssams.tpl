@@ -414,8 +414,9 @@ PROCEDURE_SECTION
 
   ++userfun_entries;
   int status_print = ntime;
-  if (userfun_entries > lengthU)
+  //if (userfun_entries > lengthU)
      status_print = lengthU;
+  TTRACE(userfun_entries,status_print)
   if (userfun_entries % status_print == 0)
   {
      write_status(clogf);
@@ -544,34 +545,37 @@ SEPARABLE_FUNCTION void step(const int t, const dvar_vector& f1, const dvar_vect
   // Z evaluated at t-1
   dvariable prevN1 = mfexp(p11);
   dvariable prevN2 = mfexp(p21);
+     TTRACE(prevN1,prevN2)
+     TTRACE(r,K)
+     TTRACE(sumFg,T12)
   dvariable Z1 = sumFg + T12 + 2.0*(1.0-q)*(r/K)*prevN2;
   dvariable Z2 = sumFg + T12 + 2.0*q*(r/K)*prevN1;
+  TTRACE(Z1,Z2)
   // S[t,1] =        (K*(r-Z1))/(r+((K*(r-Z1)/S[t-1,1])-r)*exp(-(r-Z1)))
-  dvariable nextN1 = (K*(r-Z1))/(r+((K*(r-Z1)/prevN1)-r)*exp(-(r-Z1)));
+  dvariable nextN1 = (K*(r-Z1))/(r+((K*(r-Z1)/prevN1)-r)*mfexp(-(r-Z1)));
   // S[t,2] = (K*(r-Z2))/(r+((K*(r-Z2)/S[t-1,2])-r)*exp(-(r-Z2)*(1.0-T21)))
-  dvariable nextN2 = (K*(r-Z2))/(r+((K*(r-Z2)/prevN2)-r)*exp(-(r-Z2)*(1.0-T21*immigrant_biomass(t))));
+  dvariable nextN2 = (K*(r-Z2))/(r+((K*(r-Z2)/prevN2)-r)*mfexp(-(r-Z2)*(1.0-T21*immigrant_biomass(t))));
   dvariable nextLogN1 = log(nextN1);
   dvariable nextLogN2 = log(nextN2);
-  if ( isnan(value(nextLogN2)) || isinf(value(nextLogN2)) )
-  {
-     TTRACE(t,userfun_entries)
-     TRACE(nextLogN2)
-     dvariable PropL = 1.0/(1.0+mfexp(-LmPropL));
-     nextLogN2 = nextLogN1*(1.0-PropL)/PropL;
-  }
-  //TTRACE(nextLogN1,nextLogN2)
-  #endif // #ifdef __FINITE_DIFFERENCE__
-
  
   if ( isnan(value(nextLogN1)) || isnan(value(nextLogN2)) ||
        isinf(value(nextLogN1)) || isinf(value(nextLogN2)) )
   {
+     TTRACE(t,userfun_entries)
      TTRACE(prevN1,prevN2)
-     TTRACE(nextLogN1,nextLogN2)
      TTRACE(r,K)
+     TTRACE(sumFg,T12)
+     TRACE(q)
+     TTRACE(Z1,Z2)
+     TRACE(K*(r-Z1))
+     TRACE(r+((K*(r-Z2)/prevN2)-r)*mfexp(-(r-Z2)*(1.0-T21*immigrant_biomass(t))))
+     TTRACE(nextN1,nextN2)
+     TTRACE(nextLogN1,nextLogN2)
      write_status(clogf);
-     ad_exit(1);
+     if(userfun_entries>0)
+        ad_exit(1);
   }
+  #endif // #ifdef __FINITE_DIFFERENCE__
 
   dvariable Pnll = 0.0;
   Pnll += 0.5*(log(TWO_M_PI*varlogPop) + square(p12-nextLogN1)/varlogPop);
@@ -592,7 +596,8 @@ SEPARABLE_FUNCTION void step(const int t, const dvar_vector& f1, const dvar_vect
      TTRACE(LpropL,LmeanPropL)
      TRACE(varLPropL)
      write_status(clogf);
-     ad_exit(1);
+     if(userfun_entries>0)
+        ad_exit(1);
   }
 
   //clogf << t << " " << Fnll << " " <<Pnll << " " <<PLnll << " " << nll << endl;
@@ -700,7 +705,7 @@ SEPARABLE_FUNCTION void obs(const int t, const dvar_vector& f,const dvariable& p
 FUNCTION void write_status(ofstream& s)
     double prop = alogit(value(LmeanProportion_local));
     status_blocks ++;
-    cout << "\n# Status block " << status_blocks << endl;
+    cout << "\n# Status block:" << status_blocks << endl;
     s << "\n# Status after "<< userfun_entries << " PROCEDURE_SECTION entries;" << endl;
     s << "# Status block " << status_blocks << endl;
     s << "# nll = " << value(nll) << endl;

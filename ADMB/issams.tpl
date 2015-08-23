@@ -154,7 +154,7 @@ DATA_SECTION
     logZeroCatch = log(ZeroCatch);
     TTRACE(ZeroCatch,logZeroCatch)
     int nzero = ntime;
-    //if (use_robustY != 3)
+    if (use_robustY != 3)
     {
        int ziter = 0;
        while (nzero > 0)
@@ -539,11 +539,11 @@ SEPARABLE_FUNCTION void obs(const int t, const dvar_vector& f,const dvariable& p
         dvariable pzero = alogit(Lpf(g));
         if (obs_catch(t,g) > logZeroCatch)
         {
-           Ynll += pzero*0.5*(log(TWO_M_PI*varlogYield));
+           Ynll += (1.0-pzero)*0.5*(log(TWO_M_PI*varlogYield) + square(obs_catch(t,g)-log_pred_yield(g))/varlogYield);
         }
         else
         {
-           Ynll += (1.0-pzero)*0.5*(log(TWO_M_PI*varlogYield) + square(obs_catch(t,g)-log_pred_yield(g))/varlogYield);
+           Ynll += pzero*0.5*(log(TWO_M_PI*varlogYield));
         }
      }
 
