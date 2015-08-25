@@ -11,7 +11,6 @@ GLOBALS_SECTION;
 
   ofstream clogf;
   const double TWO_M_PI = 2.0*M_PI;
-  //const double LOG_TWO_M_PI = log(TWO_M_PI);
   const double LOG_M_PI = log(M_PI);
 
   // nice issams  -noinit -iprint 1 -est -nr 10 &> issams.out&
@@ -32,7 +31,7 @@ GLOBALS_SECTION;
      return a;
   }
   template double logit<double>(const double& p);
-  //template dvariable logit<dvariable>(const dvariable& p);
+  template dvariable logit<dvariable>(const dvariable& p);
   //template df1b2variable logit(const df1b2variable& p); 
 
   template <typename SCALAR> SCALAR alogit(const SCALAR& a)
@@ -41,8 +40,8 @@ GLOBALS_SECTION;
      return p;
   }
   template double alogit<double>(const double& a);
-  //template dvariable alogit<dvariable>(const dvariable& a);
-  //template df1b2variable alogit(const df1b2variable& a); 
+  template dvariable alogit<dvariable>(const dvariable& a);
+  template df1b2variable alogit(const df1b2variable& a); 
 
   dvector alogit(const dvector& a)
   {
@@ -124,9 +123,9 @@ DATA_SECTION
   !! TTRACE(init_sdlogQ,phase_sdlogQ)
 
   init_int use_robustY;
-  init_int phase_pfat;
-  init_vector init_pfat(1,ngear);
-  !! TTRACE(init_pfat,phase_pfat)
+  init_int phase_pcon;
+  init_number init_pcon;
+  !! TTRACE(init_pcon,phase_pcon)
 
   int pininit;
   int lengthU;
@@ -188,7 +187,8 @@ DATA_SECTION
     TRACE(count_zero)
     dvector prop_zero(1,ngear);
     prop_zero = count_zero/double(ntime);
-    TRACE(prop_zero)
+    double tprop_zero = (double)sum(count_zero)/(double)(ngear*ntime);
+    TTRACE(prop_zero,tprop_zero)
 
     obs_catch = log(obs_catch+ZeroCatch);
   
@@ -222,11 +222,15 @@ PARAMETER_SECTION
   // abundance index proportionality constant
   init_number logQ(phase_Q);
 
+  sdreport_number ar;
+  sdreport_number aK;
+  sdreport_number aQ;
+
   // abundance index proportionality constant standard deviation
   init_number logsdlogQ(phase_sdlogQ);
 
   // robust yield likelihood proprtion contamination
-  init_vector Lpfat(1,ngear,phase_pfat);
+  init_number Lpcon(phase_pcon);
 
   random_effects_vector U(1,lengthU);
   //vector U(1,lengthU);
@@ -254,15 +258,10 @@ PRELIMINARY_CALCS_SECTION
 
        if (!use_robustY)
        {
-          phase_pfat = -1;
-          init_pfat = 1e-25;
+          phase_pcon = -1;
+          init_pcon = 1e-25;
        }
-       for (int g = 1; g <= ngear; g++)
-       {
-          Lpfat(g) = logit(init_pfat(g));
-       }
-       TRACE(init_pfat)
-       TRACE(Lpfat)
+       Lpcon = logit((const double&)init_pcon);
 
        double K = mfexp(value(logK));
        //double K = immigrant_biomass[1];
@@ -329,7 +328,7 @@ PRELIMINARY_CALCS_SECTION
     TRACE(logsdlogF)
     TRACE(logsdlogPop)
     TRACE(logsdlogYield)
-    TRACE(alogit(value(Lpfat)))
+    TRACE(alogit(value(Lpcon)))
     TRACE(U)
     TRACE(U(utPop+1))
     TRACE (trace_init_pars)
@@ -371,8 +370,12 @@ PROCEDURE_SECTION
 
   for (int t = 1; t <= ntime; t++)
   {
-     obs(t,U(Fndxl(t),Fndxu(t)),U(utPop+t-1),U(utPop+t), logsdlogYield,Lpfat);
+     obs(t,U(Fndxl(t),Fndxu(t)),U(utPop+t-1),U(utPop+t), logsdlogYield,Lpcon);
   }
+
+  ar = mfexp(logr);
+  aK = mfexp(logK);
+  aQ = mfexp(logQ);
 
   ++userfun_entries;
   int status_print = ntime;
@@ -470,7 +473,7 @@ SEPARABLE_FUNCTION void step(const int t, const dvar_vector& f1, const dvar_vect
   //      << nll << endl;
   
 
-SEPARABLE_FUNCTION void obs(const int t, const dvar_vector& f,const dvariable& pop11, const dvariable& pop21, const dvariable& logsdlogYield, const dvar_vector& Lpf)
+SEPARABLE_FUNCTION void obs(const int t, const dvar_vector& f,const dvariable& pop11, const dvariable& pop21, const dvariable& logsdlogYield, const dvariable& Lpc)
   // f2  U(Fndxl(t),Fndxu(t)) 
   // pop11 U(utPop1+t-1)
   // pop21 U(utPop1+t)
@@ -507,7 +510,8 @@ SEPARABLE_FUNCTION void obs(const int t, const dvar_vector& f,const dvariable& p
 
         // standard Cauchy density
         dvariable fat_part = 1.0/(M_PI*(1.0 + z));
-        dvariable pfat = alogit(Lpf(g));
+        //dvariable pfat = alogit(Lpc(g));
+        dvariable pfat = alogit(Lpc);
         Ynll += log((1.0-pfat)*mfexp(norm_part) + pfat*fat_part);
      }
 
@@ -525,7 +529,8 @@ SEPARABLE_FUNCTION void obs(const int t, const dvar_vector& f,const dvariable& p
         dvariable diff2 = square(obs_catch(t,g)-log_pred_yield(g));
         dvariable v_hat = diff2+1.0e-80;
 
-        dvariable pcon = alogit(Lpf(g));
+        //dvariable pcon = alogit(Lpc(g));
+        dvariable pcon = alogit(Lpc);
         dvariable b=2.*pcon/(width*sqrt(PI));  // This is the weight for the "robustifying" term
 
         dvariable norm_part = log(1.0-pcon)*mfexp(-diff2/(2.0*a2*v_hat));
@@ -536,7 +541,8 @@ SEPARABLE_FUNCTION void obs(const int t, const dvar_vector& f,const dvariable& p
 
      else if (use_robustY == 3) // zero inflated normal
      {
-        dvariable pzero = alogit(Lpf(g));
+        //dvariable pzero = alogit(Lpc(g));
+        dvariable pzero = alogit((dvariable&)Lpc);
         if (obs_catch(t,g) > logZeroCatch)
         {
            Ynll += (1.0-pzero)*0.5*(log(TWO_M_PI*varlogYield) + square(obs_catch(t,g)-log_pred_yield(g))/varlogYield);
@@ -599,7 +605,7 @@ FUNCTION void write_status(ofstream& s)
     s << "#             Q: " << mfexp(logQ) << endl;
     s << "#     logsdlogQ: " << logsdlogQ <<  " (" << active(logsdlogQ) <<")" << endl;
     s << "#        sdlogQ: " << mfexp(logsdlogQ) << endl;
-    s << "# pfat = " << alogit(value(Lpfat)) << " (" << active(Lpfat) <<")" << endl;
+    s << "# pcon = " << alogit(value(Lpcon)) << " (" << active(Lpcon) <<")" << endl;
     s << "# Residuals:" << endl;
     s << "  t    pop   K  forcing";
     for (int g = 1; g <= ngear; g++)
