@@ -318,7 +318,7 @@ log.diagnostics=function(file="issams_program.log",ntime=61,dt=1,ngear=5,
 
    c = 'n'
    dev.list = vector(mode="numeric",length=5)
-   dev.file.names=c("tmp/est_pop","tmp/est_catch","tmp/est_F")
+   dev.file.names=c("tmp/est_pop","tmp/est_catch","tmp/est_F","tmp/prod")
 #  while (c != 'q')
    while ( (c != 'q') && (c != 'x') )
    {
