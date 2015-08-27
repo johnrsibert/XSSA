@@ -36,12 +36,12 @@ GLOBALS_SECTION;
 
   template <typename SCALAR> SCALAR alogit(const SCALAR& a)
   {
-     SCALAR p = 1.0/(1.0+mfexp(-a));
+     SCALAR p = 1.0/(1.0+(mfexp(-a))+1e-20);
      return p;
   }
   template double alogit<double>(const double& a);
   template dvariable alogit<dvariable>(const dvariable& a);
-  template df1b2variable alogit(const df1b2variable& a); 
+  //template df1b2variable alogit<df1b2variable>(const df1b2variable& a); 
 
   dvector alogit(const dvector& a)
   {
@@ -251,11 +251,8 @@ PARAMETER_SECTION
   init_number logsdlogYield(phase_sdlogYield);
 
   // abundance index proportionality constant
-  init_number logQ(phase_Q);
-
-  sdreport_number ar;
-  sdreport_number aK;
-  sdreport_number aQ;
+  //init_number logQ(phase_Q);
+  init_number LQ(phase_Q);
 
   // abundance index proportionality constant standard deviation
   init_number logsdlogQ(phase_sdlogQ);
@@ -265,6 +262,10 @@ PARAMETER_SECTION
 
   random_effects_vector U(1,lengthU);
   //vector U(1,lengthU);
+
+  sdreport_number ar;
+  sdreport_number aK;
+  sdreport_number aQ;
 
   objective_function_value nll;
 
@@ -284,8 +285,13 @@ PRELIMINARY_CALCS_SECTION
        logsdlogF = log(init_sdlogF);
        logsdlogYield = log(init_sdlogYield);
        logsdlogPop = log(init_sdlogPop);
-       logQ = log(init_Q);
+       //logQ = log(init_Q);
+       LQ = logit((double)init_Q);
+       TTRACE(LQ,init_Q);
+       TTRACE((1.0/(1.0+mfexp(-LQ))),(1.0/((1.0+mfexp(-LQ))+1e-20)))
+
        logsdlogQ = log(init_sdlogQ);
+       TTRACE(logsdlogQ,init_sdlogQ)
 
        if (!use_robustY)
        {
@@ -324,7 +330,7 @@ PRELIMINARY_CALCS_SECTION
        PINOUT(logsdlogF)
        PINOUT(logsdlogPop)
        PINOUT(logsdlogYield)
-       PINOUT(logQ)
+       PINOUT(LQ)
        PINOUT(logsdlogQ)
        //PINOUT(U)
        pin << "# U:" << endl;
@@ -389,14 +395,13 @@ PROCEDURE_SECTION
   }
 
   nll = 0.0;
-
-  step0(U(utPop+1), logsdlogPop, logK, logQ, logsdlogQ);
-
+  step0(U(utPop+1), logsdlogPop, logK, LQ, logsdlogQ);
+ 
   for (int t = 2; t <= ntime; t++)
   {
      step(t, U(Fndxl(t-1),Fndxu(t-1)), U(Fndxl(t),Fndxu(t)), logsdlogF,
              U(utPop+t-1), U(utPop+t), logsdlogPop,
-             logr, logK, logQ, logsdlogQ);
+             logr, logK, LQ, logsdlogQ);
   }
 
   for (int t = 1; t <= ntime; t++)
@@ -406,7 +411,7 @@ PROCEDURE_SECTION
 
   ar = mfexp(logr);
   aK = mfexp(logK);
-  aQ = mfexp(logQ);
+  aQ = alogit((dvariable&)LQ);
 
   ++userfun_entries;
   int status_print = ntime;
@@ -418,7 +423,7 @@ PROCEDURE_SECTION
   }
 
 
-SEPARABLE_FUNCTION void step0(const dvariable& p11, const dvariable& lsdlogPop, const dvariable& lK, const dvariable& lnQ, const dvariable& lsdlogQ)
+SEPARABLE_FUNCTION void step0(const dvariable& p11, const dvariable& lsdlogPop, const dvariable& lK, const dvariable& tLQ, const dvariable& lsdlogQ)
   // p11 U(utPop+t-1) log N at start of time step
 
   // ensure that starting population size is near K
@@ -430,6 +435,8 @@ SEPARABLE_FUNCTION void step0(const dvariable& p11, const dvariable& lsdlogPop, 
 
   dvariable Qnll = 0.0;
   dvariable varlogQ = square(mfexp(lsdlogQ));
+  dvariable tQ = 1.0/((1.0+mfexp(-tLQ))+1e-20);
+  dvariable lnQ=log(tQ);
   dvariable logib = lnQ + log(immigrant_biomass(1));
   Qnll += 0.5*(log(TWO_M_PI*varlogQ) + square(logib-p11)/varlogQ);
 
@@ -604,7 +611,7 @@ SEPARABLE_FUNCTION void obs(const int t, const dvar_vector& f,const dvariable& p
   int rc = 0; // residuals column counter
   residuals(t,++rc) = value(pop21);
   residuals(t,++rc) = mfexp(value(logK));
-  residuals(t,++rc) = mfexp(value(logQ))*immigrant_biomass(t);
+  residuals(t,++rc) = alogit(value(LQ))*immigrant_biomass(t);
 
   for (int g = 1; g <= ngear; g++)
     residuals(t, ++rc) = value(ft(g));
@@ -632,8 +639,8 @@ FUNCTION void write_status(ofstream& s)
     s << "# logsdlogYield: " << logsdlogYield
              <<  " (" << active(logsdlogYield) <<")" << endl;
     s << "#    sdlogYield: " << mfexp(logsdlogYield) << endl;
-    s << "#          logQ: " << logQ <<  " (" << active(logQ) <<")" << endl;
-    s << "#             Q: " << mfexp(logQ) << endl;
+    s << "#            LQ: " << LQ <<  " (" << active(LQ) <<")" << endl;
+    s << "#             Q: " << alogit(value(LQ)) << endl;
     s << "#     logsdlogQ: " << logsdlogQ <<  " (" << active(logsdlogQ) <<")" << endl;
     s << "#        sdlogQ: " << mfexp(logsdlogQ) << endl;
     s << "# pcon = " << alogit(value(Lpcon)) << " (" << active(Lpcon) <<")" << endl;
