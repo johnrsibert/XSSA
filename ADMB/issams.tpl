@@ -69,14 +69,45 @@ TOP_OF_MAIN_SECTION
 
 
 DATA_SECTION
-  init_int ngear;
+  init_int nobs_gear;
+  int ngear;
   init_int ntime;
   init_number dt;
   number logdt;
   !!  logdt = log(dt);
-  init_matrix tcatch(1,ngear,1,ntime);
-  matrix obs_catch(1,ntime,1,ngear);
-  !! obs_catch = trans(tcatch);
+  init_matrix tcatch(1,nobs_gear,1,ntime);
+  !!  TRACE(trans(tcatch))
+  matrix obs_catch;
+
+  init_int use_klingons;
+  init_number klingon_multiplier;
+  !! TTRACE(use_klingons,klingon_multiplier)
+
+  !!  if (use_klingons)
+  !!  {
+  !!     ngear = nobs_gear + 1;
+  !!     TTRACE(nobs_gear,ngear)
+  !!     obs_catch.allocate(1,ntime,1,ngear);
+  !!     for (int t = 1; t <= ntime; t++)
+  !!     {
+  !!        double tsum = 0.0;
+  !!        for (int g = 1; g <= nobs_gear; g++) 
+  !!        {
+  !!           tsum += tcatch(g,t);
+  !!           obs_catch(t,g) = tcatch(g,t);
+  !!        }
+  !!        obs_catch(t,ngear) = klingon_multiplier*tsum;
+  !!    }
+  !!  }
+  !!  else
+  !!  {
+  !!     ngear = nobs_gear;
+  !!     obs_catch = trans(tcatch);
+  !!  }
+  !!  TRACE(obs_catch)
+  !! //if (1) exit(1);
+
+
   number logZeroCatch;
 
   init_matrix forcing_matrix(1,9,1,ntime);

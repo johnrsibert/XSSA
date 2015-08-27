@@ -1,6 +1,7 @@
 #require("mvtnorm")
-gear.names = c("TunaHL","Troll","Longline","Bottom/inshore HL","AkuBoat")
-sgn = c("THL","Troll","LL","BHL","Aku")
+gear.names = c("TunaHL","Troll","Longline","Bottom/inshore HL","AkuBoat",
+                "Klingon")
+sgn = c("THL","Troll","LL","BHL","Aku","K")
 have.xssams.R = FALSE
 have.xssams.R = TRUE
 
@@ -52,7 +53,7 @@ plot.diagnostics=function(dat=NULL,file="diagnostics.dat",dt,ngear,
 #  print(head(dat))
 #  print(tail(dat))
 
-   gear.names = c("TunaHL","Troll","Longline","Bottom/inshore HL","AkuBoat")
+   #gear.names = c("TunaHL","Troll","Longline","Bottom/inshore HL","AkuBoat")
    title.line = -1
    lwd = 3
    #sd.lwd = 3
