@@ -13,8 +13,12 @@ GLOBALS_SECTION;
   const double TWO_M_PI = 2.0*M_PI;
   const double LOG_TWO_M_PI = log(TWO_M_PI);
   const double LOG_M_PI = log(M_PI);
-
+  
+  // for finite differences, run
   // xssams -noinit -est -nr 10 -l2 10000000  -l3 10000000 &> xssams.out&
+  // to avoid writing buffers; otherwise, run
+  // xssams -noinit -est -nr 10 &> xssams.out&
+  // seems to work without writing burrers
 
   int fexists(const adstring& filename)
   {
@@ -37,12 +41,12 @@ GLOBALS_SECTION;
 
   template <typename SCALAR> SCALAR alogit(const SCALAR& a)
   {
-     SCALAR p = 1.0/(1.0+mfexp(-a));
+     SCALAR p = 1.0/(1.0+(mfexp(-a))+1e-20);
      return p;
   }
   template double alogit<double>(const double& a);
   //template dvariable alogit<dvariable>(const dvariable& a);
-  //template df1b2variable alogit(const df1b2variable& a); 
+  //template df1b2variable alogit<df1b2variable>(const df1b2variable& a); 
 
   dvector alogit(const dvector& a)
   {
@@ -70,14 +74,46 @@ TOP_OF_MAIN_SECTION
 
 
 DATA_SECTION
-  init_int ngear;
+  init_int nobs_gear;
+  int ngear;
   init_int ntime;
   init_number dt;
   number logdt;
   !!  logdt = log(dt);
-  init_matrix tcatch(1,ngear,1,ntime);
-  matrix obs_catch(1,ntime,1,ngear);
-  !! obs_catch = trans(tcatch);
+  init_matrix tcatch(1,nobs_gear,1,ntime);
+  !!  TRACE(trans(tcatch))
+  matrix obs_catch;
+
+  init_int use_klingons;
+  init_number klingon_multiplier;
+  !! TTRACE(use_klingons,klingon_multiplier)
+
+  !!  if (use_klingons)
+  !!  {
+  !!     ngear = nobs_gear + 1;
+  !!     TTRACE(nobs_gear,ngear)
+  !!     obs_catch.allocate(1,ntime,1,ngear);
+  !!     for (int t = 1; t <= ntime; t++)
+  !!     {
+  !!        double tsum = 0.0;
+  !!        for (int g = 1; g <= nobs_gear; g++) 
+  !!        {
+  !!           tsum += tcatch(g,t);
+  !!           obs_catch(t,g) = tcatch(g,t);
+  !!        }
+  !!        obs_catch(t,ngear) = klingon_multiplier*tsum;
+  !!    }
+  !!  }
+  !!  else
+  !!  {
+  !!     ngear = nobs_gear;
+  !!     obs_catch = trans(tcatch);
+  !!  }
+  !!  TRACE(obs_catch)
+  !! //if (1) exit(1);
+
+
+  number logZeroCatch;
 
   init_matrix forcing_matrix(1,9,1,ntime);
   init_int fr;
@@ -135,9 +171,9 @@ DATA_SECTION
   !! TTRACE(init_qProp,phase_qProp)
 
   init_int use_robustY;
-  init_int phase_pfat;
-  init_vector init_pfat(1,ngear);
-  !! TTRACE(init_pfat,phase_pfat)
+  init_int phase_pcon;
+  init_number init_pcon;
+  !! TTRACE(init_pcon,phase_pcon)
 
   int pininit;
   int lengthU;
@@ -163,26 +199,46 @@ DATA_SECTION
     residuals.allocate(1,ntime,1,2*ngear+5);
     residuals.initialize();
     double ZeroCatch = 1.0; //1.0e-8;
-    double logZeroCatch = log(ZeroCatch);
+    logZeroCatch = log(ZeroCatch);
     TTRACE(ZeroCatch,logZeroCatch)
     int nzero = ntime;
-    int ziter = 0;
-    while (nzero > 0)
+    if (use_robustY != 3)
     {
-       ziter ++;
-       nzero = 0;
-       for (int g = 1; g <= ngear; g++)
-         for (int t = 2; t <= ntime; t++)
-            if ( (obs_catch(t,g) <= 0.0) 
-              && (obs_catch(t-1,g) > 0.0) && (obs_catch(t+1,g) > 0.0) )
-            {
-               clogf << ++nzero << " " << ziter << endl;
-               obs_catch(t,g) = 0.5*(obs_catch(t-1,g) + obs_catch(t+1,g));
-               clogf << nzero<< " catch for gear " << g << " at time " << t
-                  << " set to " << obs_catch(t,g)  << endl;
-            }
+       int ziter = 0;
+       while (nzero > 0)
+       {
+          ziter ++;
+          nzero = 0;
+          for (int g = 1; g <= ngear; g++)
+            for (int t = 2; t <= ntime; t++)
+               if ( (obs_catch(t,g) <= 0.0) 
+                 && (obs_catch(t-1,g) > 0.0) && (obs_catch(t+1,g) > 0.0) )
+               {
+                  clogf << ++nzero << " " << ziter << endl;
+                  obs_catch(t,g) = 0.5*(obs_catch(t-1,g) + obs_catch(t+1,g));
+                  clogf << nzero<< " catch for gear " << g << " at time " << t
+                     << " set to " << obs_catch(t,g)  << endl;
+               }
+       }
     }
     clogf << "Zero catch bridging instances: " << nzero << endl;
+
+    ivector count_zero(1,ngear);
+    count_zero.initialize();
+    for (int t = 1; t<= ntime; t++)
+    {
+       for (int g = 1; g <= ngear; g++)
+       {
+          if (obs_catch(t,g) <= 0.0)
+            count_zero(g) ++;
+       }
+    }
+    TRACE(count_zero)
+    dvector prop_zero(1,ngear);
+    prop_zero = count_zero/double(ntime);
+    double tprop_zero = (double)sum(count_zero)/(double)(ngear*ntime);
+    TTRACE(prop_zero,tprop_zero)
+
     obs_catch = log(obs_catch+ZeroCatch);
   
     // set up U indexing
@@ -225,7 +281,7 @@ PARAMETER_SECTION
   init_bounded_number qProp(0.0,1.0,phase_qProp);
 
   // robust yield likelihood proprtion contamination
-  init_vector Lpfat(1,ngear,phase_pfat);
+  init_number Lpcon(phase_pcon);
 
   random_effects_vector U(1,lengthU);
   //vector U(1,lengthU);
@@ -265,15 +321,10 @@ PRELIMINARY_CALCS_SECTION
 
        if (!use_robustY)
        {
-          phase_pfat = -1;
-          init_pfat = 1e-25;
+          phase_pcon = -1;
+          init_pcon = 1e-25;
        }
-       for (int g = 1; g <= ngear; g++)
-       {
-          Lpfat(g) = logit(init_pfat(g));
-       }
-       TRACE(init_pfat)
-       TRACE(Lpfat)
+       Lpcon = logit((const double&)init_pcon);
 
        double K = mfexp(value(logK));
        //double K = immigrant_biomass[1];
@@ -321,7 +372,7 @@ PRELIMINARY_CALCS_SECTION
        PINOUT(logsdlogYield)
        PINOUT(LmeanProportion_local)
        PINOUT(logsdLProportion_local)
-       PINOUT(alogit(value(Lpfat)))
+       PINOUT(alogit(value(Lpcon)))
        //PINOUT(U)
        pin << "# U:" << endl;
        pin << "#   F(t,g):" << endl;
@@ -362,7 +413,7 @@ PRELIMINARY_CALCS_SECTION
     TRACE(logsdlogYield)
     TRACE(LmeanProportion_local)
     TRACE(logsdLProportion_local)
-    TRACE(alogit(value(Lpfat)))
+    TRACE(alogit(value(Lpcon)))
     TRACE(U)
     TTRACE(U(utPop1+1),U(utPop2+1))
     TRACE (trace_init_pars)
@@ -370,6 +421,7 @@ PRELIMINARY_CALCS_SECTION
     //if (1) ad_exit(1);
 
 PROCEDURE_SECTION
+    TRACE(userfun_entries)
   if (trace_init_pars)
   {
     clogf << "\nInitial step in to PROCEDURE_SECTION:" << endl;
@@ -409,15 +461,17 @@ PROCEDURE_SECTION
   for (int t = 1; t <= ntime; t++)
   {
      obs(t,U(Fndxl(t),Fndxu(t)),U(utPop1+t-1),U(utPop1+t),
-                                U(utPop2+t-1),U(utPop2+t),logsdlogYield,Lpfat);
+                                U(utPop2+t-1),U(utPop2+t),logsdlogYield,Lpcon);
   }
 
   ++userfun_entries;
   int status_print = ntime;
-  //if (userfun_entries > lengthU)
+  TTRACE(ntime,status_print)
+  if (userfun_entries > lengthU)
      status_print = lengthU;
   TTRACE(userfun_entries,status_print)
-  if (userfun_entries % status_print == 0)
+  //if (userfun_entries % status_print == 0)
+  if (userfun_entries % lengthU == 0)
   {
      write_status(clogf);
   }
@@ -433,6 +487,9 @@ SEPARABLE_FUNCTION void step0(const dvariable& p11, const dvariable p21, const d
   dvariable PropL = 1.0/(1.0+mfexp(-LmPropL));
   dvariable p10 = PropL*K;
   dvariable p20 = K-p10;
+  TTRACE(p10,p20)
+  TTRACE(log(p10),log(p20))
+  TTRACE(p11,p21)
   dvariable varlogPop = square(mfexp(lsdlogPop));
   dvariable Pnll = 0.0;
   Pnll += 0.5*(log(TWO_M_PI*varlogPop) + square(log(p10) - p11)/varlogPop);
@@ -472,7 +529,7 @@ SEPARABLE_FUNCTION void step(const int t, const dvar_vector& f1, const dvar_vect
   {
      Fnll += 0.5*(log(TWO_M_PI*varlogF) + square(ft1(g)-ft2(g))/varlogF);
 
-     if (isnan(value(Fnll)))
+     if (isnan(value(Fnll)) && (userfun_entries > 0))
      {
         TTRACE(Fnll,varlogF)
         TTRACE(ft1(g),ft2(g))
@@ -537,43 +594,49 @@ SEPARABLE_FUNCTION void step(const int t, const dvar_vector& f1, const dvar_vect
   //dvariable nextN2 = (prevN2*(1.0+dtr-dt*(sumFg+T12)-dtr*q*2.0*prevN1/K)+dt*T21*immigrant_biomass(t))/
   //                         (1.0+dtr*prevN2/K);
 
-  #else // #ifdef __FINITE_DIFFERENCE__
+  // #ifdef __FINITE_DIFFERENCE__
+  #else 
   ///////////////////////////////////
   //
   // analytic integral
-  // assumes dt = i
+  // assumes dt = 1
   // Z evaluated at t-1
-  dvariable prevN1 = mfexp(p11);
-  dvariable prevN2 = mfexp(p21);
-     TTRACE(prevN1,prevN2)
-     TTRACE(r,K)
-     TTRACE(sumFg,T12)
+  dvariable prevN1 = mfexp(p11+1e-8);
+  dvariable prevN2 = mfexp(p21+1e-8);
   dvariable Z1 = sumFg + T12 + 2.0*(1.0-q)*(r/K)*prevN2;
   dvariable Z2 = sumFg + T12 + 2.0*q*(r/K)*prevN1;
   TTRACE(Z1,Z2)
+  TTRACE(sumFg,T12)
+  TTRACE(prevN1,prevN2)
   // S[t,1] =        (K*(r-Z1))/(r+((K*(r-Z1)/S[t-1,1])-r)*exp(-(r-Z1)))
   dvariable nextN1 = (K*(r-Z1))/(r+((K*(r-Z1)/prevN1)-r)*mfexp(-(r-Z1)));
   // S[t,2] = (K*(r-Z2))/(r+((K*(r-Z2)/S[t-1,2])-r)*exp(-(r-Z2)*(1.0-T21)))
-  dvariable nextN2 = (K*(r-Z2))/(r+((K*(r-Z2)/prevN2)-r)*mfexp(-(r-Z2)*(1.0-T21*immigrant_biomass(t))));
+  dvariable num = (K*(r-Z2));
+  dvariable den = (r+((K*(r-Z2)/prevN2)-r)*mfexp(-(r-Z2)*(1.0-T21*immigrant_biomass(t))));
+  dvariable nextN2 = num/den;
+  //dvariable nextN2 = (K*(r-Z2))/(r+((K*(r-Z2)/prevN2)-r)*mfexp(-(r-Z2)*(1.0-T21*immigrant_biomass(t))));
   dvariable nextLogN1 = log(nextN1);
   dvariable nextLogN2 = log(nextN2);
  
-  if ( isnan(value(nextLogN1)) || isnan(value(nextLogN2)) ||
-       isinf(value(nextLogN1)) || isinf(value(nextLogN2)) )
+  if(userfun_entries>0)
   {
-     TTRACE(t,userfun_entries)
-     TTRACE(prevN1,prevN2)
-     TTRACE(r,K)
-     TTRACE(sumFg,T12)
-     TRACE(q)
-     TTRACE(Z1,Z2)
-     TRACE(K*(r-Z1))
-     TRACE(r+((K*(r-Z2)/prevN2)-r)*mfexp(-(r-Z2)*(1.0-T21*immigrant_biomass(t))))
-     TTRACE(nextN1,nextN2)
-     TTRACE(nextLogN1,nextLogN2)
-     write_status(clogf);
-     if(userfun_entries>0)
+     if ( isnan(value(nextLogN1)) || isnan(value(nextLogN2)) ||
+          isinf(value(nextLogN1)) || isinf(value(nextLogN2)) )
+     {
+        TTRACE(t,userfun_entries)
+        TTRACE(prevN1,prevN2)
+        TTRACE(r,K)
+        TTRACE(sumFg,T12)
+        TRACE(q)
+        TTRACE(Z1,Z2)
+        TTRACE(num,den)
+        TRACE(K*(r-Z1))
+        TRACE(r+((K*(r-Z2)/prevN2)-r)*mfexp(-(r-Z2)*(1.0-T21*immigrant_biomass(t))))
+        TTRACE(nextN1,nextN2)
+        TTRACE(nextLogN1,nextLogN2)
+        write_status(clogf);
         ad_exit(1);
+     }
   }
   #endif // #ifdef __FINITE_DIFFERENCE__
 
@@ -587,7 +650,7 @@ SEPARABLE_FUNCTION void step(const int t, const dvar_vector& f1, const dvar_vect
   dvariable LpropL = nextLogN1 - nextLogN2;
   PLnll += 0.5*(log(TWO_M_PI*varLPropL) + square(LpropL - LmeanPropL)/varLPropL);
 
-  if (isnan(value(PLnll)))
+  if (isnan(value(PLnll)) && (userfun_entries>0))
   {
      TRACE(PLnll)
      TTRACE(nextLogN1,nextLogN2)
@@ -596,8 +659,7 @@ SEPARABLE_FUNCTION void step(const int t, const dvar_vector& f1, const dvar_vect
      TTRACE(LpropL,LmeanPropL)
      TRACE(varLPropL)
      write_status(clogf);
-     if(userfun_entries>0)
-        ad_exit(1);
+     ad_exit(1);
   }
 
   //clogf << t << " " << Fnll << " " <<Pnll << " " <<PLnll << " " << nll << endl;
@@ -605,7 +667,7 @@ SEPARABLE_FUNCTION void step(const int t, const dvar_vector& f1, const dvar_vect
 
   
 
-SEPARABLE_FUNCTION void obs(const int t, const dvar_vector& f,const dvariable& pop11, const dvariable& pop21,  const dvariable& pop12, const dvariable& pop22, const dvariable& logsdlogYield, const dvar_vector& Lpf)
+SEPARABLE_FUNCTION void obs(const int t, const dvar_vector& f,const dvariable& pop11, const dvariable& pop21,  const dvariable& pop12, const dvariable& pop22, const dvariable& logsdlogYield, const dvariable& Lpc)
   // f2  U(Fndxl(t),Fndxu(t)) 
   // pop11 U(utPop1+t-1)
   // pop21 U(utPop1+t)
@@ -646,7 +708,7 @@ SEPARABLE_FUNCTION void obs(const int t, const dvar_vector& f,const dvariable& p
 
         // standard Cauchy density
         dvariable fat_part = 1.0/(M_PI*(1.0 + z));
-        dvariable pfat = alogit(Lpf(g));
+        dvariable pfat = alogit(Lpc);
         Ynll += log((1.0-pfat)*mfexp(norm_part) + pfat*fat_part);
      }
 
@@ -664,7 +726,7 @@ SEPARABLE_FUNCTION void obs(const int t, const dvar_vector& f,const dvariable& p
         dvariable diff2 = square(obs_catch(t,g)-log_pred_yield(g));
         dvariable v_hat = diff2+1.0e-80;
 
-        dvariable pcon = alogit(Lpf(g));
+        dvariable pcon = alogit(Lpc);
         dvariable b=2.*pcon/(width*sqrt(PI));  // This is the weight for the "robustifying" term
 
         dvariable norm_part = log(1.0-pcon)*mfexp(-diff2/(2.0*a2*v_hat));
@@ -672,11 +734,26 @@ SEPARABLE_FUNCTION void obs(const int t, const dvar_vector& f,const dvariable& p
         dvariable fat_part =  b/(1.+pow(diff2/(width2*a2*v_hat),2));
         Ynll += norm_part + fat_part;
      }
+
+     else if (use_robustY == 3) // zero inflated normal
+     {
+        //dvariable pzero = alogit(Lpc(g));
+        dvariable pzero = alogit((dvariable&)Lpc);
+        if (obs_catch(t,g) > logZeroCatch)
+        {
+           Ynll += (1.0-pzero)*0.5*(log(TWO_M_PI*varlogYield) + square(obs_catch(t,g)-log_pred_yield(g))/varlogYield);
+        }
+        else
+        {
+           Ynll += pzero*0.5*(log(TWO_M_PI*varlogYield));
+        }
+     }
+
      else // default log-normal likelihood
      {
         Ynll += 0.5*(log(TWO_M_PI*varlogYield) + square(obs_catch(t,g)-log_pred_yield(g))/varlogYield);
 
-        if (isnan(value(Ynll)))
+        if (isnan(value(Ynll)) && (userfun_entries>0))
         {
            TRACE(Ynll)
            TTRACE(t,g)
@@ -736,7 +813,7 @@ FUNCTION void write_status(ofstream& s)
                                 << active(logsdLProportion_local) <<")" << endl;
     s << "#    sdLProportion_local = " << mfexp(logsdLProportion_local) << endl;
     s << "#     sdProportion_local = " << alogit(value(mfexp(logsdLProportion_local))) << endl;
-    s << "# pfat = " << alogit(value(Lpfat)) << " (" << active(Lpfat) <<")" << endl;
+    s << "# pfat = " << alogit(value(Lpcon)) << " (" << active(Lpcon) <<")" << endl;
     s << "# qProp = " << qProp << " (" << active(qProp) << ")" << endl;
     s << "# Residuals:" << endl;
     s << "  t    pop1   pop2      K  forcing  propL";
