@@ -31,7 +31,7 @@
  0
 #
 # r    phase  initial value
-        1     0.8 
+        2     0.8 
 # K    phase  initial value
         1     600000
 # sdlogF    phase  initial values

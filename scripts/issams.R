@@ -194,22 +194,24 @@ plot.diagnostics=function(dat=NULL,file="diagnostics.dat",dt,ngear,
          F.max = max(F.max,r)
        Fyield = seq(0,F.max,0.01*F.max)
        yield = Fyield*K*(1.0-Fyield/r) # equilibirum yield at F
-    #  yield = Fyield*max(dat$forcing,K)*(1.0-Fyield/r) # equilibirum yield at F
-       Myield = Fmort*dat$forcing*(1.0-Fmort/r) # equilibirum yield at F
+    #  yield = Fyield*max(dat$forcing,K)*(1.0-Fyield/r) # 
+    #  Syield = Fmort*(dat$forcing+K*(1.0-Fmort/r)) # 
+       Syield = Fyield*(dat$forcing+K*(1.0-Fyield/r)) # 
        print(paste(K,r))
        print(head(cbind(Fyield,yield)))
        print(tail(cbind(Fyield,yield)))
        obsC = rowSums(dat[,obsC.ndx])
        predC = rowSums(dat[,predC.ndx])
        xrange = c(0,F.max)
-       yrange = c(0,max(obsC,predC,yield,na.rm=TRUE))
+       yrange = c(0,2*max(obsC,predC,yield,na.rm=TRUE))
        Flab = parse(text=paste("Total~Fishing~Mortality~(","y^-1",")",sep=""))
        plot(xrange,yrange,type='n', xlab=Flab, ylab="Total Yield (mt)")
 
        double.lines(Fmort,predC,bcol="darkgreen",fcol="lightgreen",lwd=5) 
        points(Fmort,obsC,col= "darkgreen",pch=3,cex=2)
        points(Fmort,predC,col="darkgreen",pch=16)
-       lines(Fmort,Myield,col="purple",lwd=3,lty="longdash")
+   #   lines(Fmort,Syield,col="purple",lwd=3,lty="longdash")
+       lines(Fyield,Syield,col="purple",lwd=3,lty="longdash")
    #   wmaxC = which(obsC==max(obsC,na.rm=TRUE))
    #   lines(c(0,Fmort[wmaxC]),c(0,obsC[wmaxC]),col="red",lty="longdash")
        lines(Fyield,yield,col="red",lwd=3,lty="longdash")

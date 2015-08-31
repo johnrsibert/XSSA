@@ -421,7 +421,6 @@ PRELIMINARY_CALCS_SECTION
     //if (1) ad_exit(1);
 
 PROCEDURE_SECTION
-    TRACE(userfun_entries)
   if (trace_init_pars)
   {
     clogf << "\nInitial step in to PROCEDURE_SECTION:" << endl;
@@ -466,10 +465,8 @@ PROCEDURE_SECTION
 
   ++userfun_entries;
   int status_print = ntime;
-  TTRACE(ntime,status_print)
   if (userfun_entries > lengthU)
      status_print = lengthU;
-  TTRACE(userfun_entries,status_print)
   //if (userfun_entries % status_print == 0)
   if (userfun_entries % lengthU == 0)
   {
@@ -487,9 +484,9 @@ SEPARABLE_FUNCTION void step0(const dvariable& p11, const dvariable p21, const d
   dvariable PropL = 1.0/(1.0+mfexp(-LmPropL));
   dvariable p10 = PropL*K;
   dvariable p20 = K-p10;
-  TTRACE(p10,p20)
-  TTRACE(log(p10),log(p20))
-  TTRACE(p11,p21)
+  //TTRACE(p10,p20)
+  //TTRACE(log(p10),log(p20))
+  //TTRACE(p11,p21)
   dvariable varlogPop = square(mfexp(lsdlogPop));
   dvariable Pnll = 0.0;
   Pnll += 0.5*(log(TWO_M_PI*varlogPop) + square(log(p10) - p11)/varlogPop);
@@ -605,9 +602,12 @@ SEPARABLE_FUNCTION void step(const int t, const dvar_vector& f1, const dvar_vect
   dvariable prevN2 = mfexp(p21+1e-8);
   dvariable Z1 = sumFg + T12 + 2.0*(1.0-q)*(r/K)*prevN2;
   dvariable Z2 = sumFg + T12 + 2.0*q*(r/K)*prevN1;
-  TTRACE(Z1,Z2)
-  TTRACE(sumFg,T12)
-  TTRACE(prevN1,prevN2)
+  const double epsN = 1.0e-3;
+  dvariable penN1 = 0.0;
+  dvariable penN2 = 0.0;
+  //TTRACE(Z1,Z2)
+  //TTRACE(sumFg,T12)
+  //TTRACE(prevN1,prevN2)
   // S[t,1] =        (K*(r-Z1))/(r+((K*(r-Z1)/S[t-1,1])-r)*exp(-(r-Z1)))
   dvariable nextN1 = (K*(r-Z1))/(r+((K*(r-Z1)/prevN1)-r)*mfexp(-(r-Z1)));
   // S[t,2] = (K*(r-Z2))/(r+((K*(r-Z2)/S[t-1,2])-r)*exp(-(r-Z2)*(1.0-T21)))
@@ -615,8 +615,12 @@ SEPARABLE_FUNCTION void step(const int t, const dvar_vector& f1, const dvar_vect
   dvariable den = (r+((K*(r-Z2)/prevN2)-r)*mfexp(-(r-Z2)*(1.0-T21*immigrant_biomass(t))));
   dvariable nextN2 = num/den;
   //dvariable nextN2 = (K*(r-Z2))/(r+((K*(r-Z2)/prevN2)-r)*mfexp(-(r-Z2)*(1.0-T21*immigrant_biomass(t))));
-  dvariable nextLogN1 = log(nextN1);
-  dvariable nextLogN2 = log(nextN2);
+  dvariable nextLogN1 = log(posfun(nextN1,epsN,penN1));
+  if (value(penN1) > 1.0e-8)
+    TTRACE(nextN1,penN1)
+  dvariable nextLogN2 = log(posfun(nextN2,epsN,penN2));
+  if (value(penN2) > 1.0e-8)
+    TTRACE(nextN2,penN2)
  
   if(userfun_entries>0)
   {
@@ -642,7 +646,9 @@ SEPARABLE_FUNCTION void step(const int t, const dvar_vector& f1, const dvar_vect
 
   dvariable Pnll = 0.0;
   Pnll += 0.5*(log(TWO_M_PI*varlogPop) + square(p12-nextLogN1)/varlogPop);
+  Pnll += penN1;
   Pnll += 0.5*(log(TWO_M_PI*varlogPop) + square(p22-nextLogN2)/varlogPop);
+  Pnll += penN2;
 
  
   // proportion local prior
@@ -813,7 +819,7 @@ FUNCTION void write_status(ofstream& s)
                                 << active(logsdLProportion_local) <<")" << endl;
     s << "#    sdLProportion_local = " << mfexp(logsdLProportion_local) << endl;
     s << "#     sdProportion_local = " << alogit(value(mfexp(logsdLProportion_local))) << endl;
-    s << "# pfat = " << alogit(value(Lpcon)) << " (" << active(Lpcon) <<")" << endl;
+    s << "# pcon = " << alogit(value(Lpcon)) << " (" << active(Lpcon) <<")" << endl;
     s << "# qProp = " << qProp << " (" << active(qProp) << ")" << endl;
     s << "# Residuals:" << endl;
     s << "  t    pop1   pop2      K  forcing  propL";

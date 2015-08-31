@@ -943,9 +943,17 @@ b27.test.sim=function(
 
 plot.error=function(x,y,sd,bcol,fcol,mult=2)
 {
-   sdyu = exp(log(y)+mult*sd)
-   sdyl = exp(log(y)-mult*sd)
-   polygon(c(x,rev(x)),c(sdyl,rev(sdyu)),
+   if (capabilities("cairo"))
+   {
+      sdyu = exp(log(y)+mult*sd)
+      sdyl = exp(log(y)-mult*sd)
+      frgb = col2rgb(fcol)/255
+      polygon(c(x,rev(x)),c(sdyl,rev(sdyu)),
+              border=bcol,lty="dashed",lwd=1,
+              col=rgb(frgb[1],frgb[2],frgb[3],0.5))
+   }
+   else
+      polygon(c(x,rev(x)),c(sdyl,rev(sdyu)),
               border=bcol,lty="dashed",lwd=1,col=fcol)
 
 }
@@ -977,7 +985,7 @@ plot.diagnostics=function(dat=NULL,file="diagnostics.dat",dt,ngear,
 #  print(names(dat)[dd])
    dat[,dd] = exp(dat[,dd])
 
-   gear.names = c("TunaHL","Troll","Longline","Bottom/inshore HL","AkuBoat")
+   #gear.names = c("TunaHL","Troll","Longline","Bottom/inshore HL","AkuBoat")
    title.line = -1
    lwd = 3
    #sd.lwd = 3
@@ -1032,7 +1040,9 @@ plot.diagnostics=function(dat=NULL,file="diagnostics.dat",dt,ngear,
    plot.error(dat$t,y[,2],sdlogPop,
                     bcol="blue",fcol="lightblue")
    lines(dat$t,y[,1],col="blue",lwd=5)
+   text(x[ntime],y[ntime,1],parse(text=paste("N","[1]")),adj=c(0,0),col="blue")
    lines(dat$t,y[,2],col="blue",lwd=5)
+   text(x[ntime],y[ntime,2],parse(text=paste("N","[2]")),adj=c(0,0),col="blue")
    lines(dat$t,y[,3],col="blue",lwd=5)
    par("new"=TRUE)
    plot(x,dat$propL,lwd=3,type='l',col="red",ylim=c(0,1),
