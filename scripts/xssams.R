@@ -960,8 +960,8 @@ plot.error=function(x,y,sd,bcol,fcol,mult=2)
 
 
 plot.diagnostics=function(dat=NULL,file="diagnostics.dat",dt,ngear,
-                 sdlogPop, sdlogYield, sdlogF, sdlogQ, K, r,
-                 plot.Fmort,plot.prod, plot.impact,
+                 sdlogPop, sdlogYield, sdlogF, sdlogQ, K, r, T12, q,
+                 plot.Fmort,plot.prod, plot.impact, plot.Discr,
                  devices,block)
 {
    print(paste("Block: ",block))
@@ -1226,12 +1226,53 @@ plot.diagnostics=function(dat=NULL,file="diagnostics.dat",dt,ngear,
       show.block.number(block,dat$t[1],line=3)
 
    } #if (plot.impact)
+
+   if (plot.Discr)
+   {
+       d = d + 1
+       if (devices[d] > 0)
+       {
+          s = dev.set(devices[d])
+       }
+       else
+       {
+          width = 9.0
+          height =11.0
+          xpos = xpos + 50
+          ypos = ypos + 50
+          x11(width=width,height=height,xpos=xpos,ypos=ypos,title="Discriminant")
+          devices[d] = dev.cur()
+       }
+
+       ntime = length(dat$t)
+       gg = c((gear.col+1):(gear.col+ngear))
+       print(gg)
+       Fmort = rowSums(dat[,gg])
+       print(Fmort)
+       x = dat$t
+       a = -4.0*dat$K #-4.0*r*K
+       print("a:")
+       print(a)
+       b = r - Fmort - T12 - 2.0*q*r*dat$pop1/dat$K  # r - F - T12 - 2.0*q*r*N1/K
+       print("b:")
+       print(b)
+       c = dat$forcing/dat$K #T21/K 
+       print("c:")
+       print(c)
+       Discr = b^2 - 4.0*a*c
+       print("Discr:")
+       print(Discr)
+       plot(x,Discr,type='l')
+
+   } # if (plot.Discr)
+
    new.devices = devices
    return(new.devices)
 }
 
 log.diagnostics=function(file="xssams_program.log",ntime=61,dt=1,ngear=5,
-                         plot.Fmort=FALSE,plot.prod=FALSE,plot.impact=FALSE)
+                         plot.Fmort=FALSE,plot.prod=FALSE,plot.impact=FALSE,
+                         plot.Discr=FALSE)
 {
       
    print(paste("Scanning file",file))
@@ -1244,14 +1285,29 @@ log.diagnostics=function(file="xssams_program.log",ntime=61,dt=1,ngear=5,
    sdlogPop = exp(as.numeric(log[logsdlogPop+1]))
 #  print(sdlogPop)
    logsdlogYield = grep("logsdlogYield:",log)
-   print(length(logsdlogYield))
+#  print(length(logsdlogYield))
    sdlogYield = exp(as.numeric(log[logsdlogYield+1]))
 #  print(sdlogYield)
+
+   T12.pos = grep("^T12",log)
+#  print(T12.pos)
+   T12 = as.numeric(log[T12.pos+2])
+   wT12 = which(!is.na(T12))
+   T12 = T12[wT12]
+#  print(T12)
+
    K.pos = grep("^K",log)
    K1 = as.numeric(log[K.pos+2])
    wK1 = which(!is.na(K1))
    K = K1[wK1]
 #  print(K)
+
+   qProp.pos = grep("^qProp",log)
+   qProp1 = as.numeric(log[qProp.pos+2])
+   wqProp1 = which(!is.na(qProp1))
+   qProp = qProp1[wqProp1]
+#  print(qProp)
+
    r.pos = grep("^r",log)
    r1 = as.numeric(log[r.pos+2])
    wr1 = which(!is.na(r1))
@@ -1273,7 +1329,7 @@ log.diagnostics=function(file="xssams_program.log",ntime=61,dt=1,ngear=5,
    cnames = vector(length=ncol)
 
    c = 'n'
-   dev.list = vector(mode="numeric",length=5)
+   dev.list = vector(mode="numeric",length=6)
    dev.file.names=c("tmp/est_pop","tmp/est_catch","tmp/est_F")
 #  while (c != 'q')
    while ( (c != 'q') && (c != 'x') )
@@ -1304,10 +1360,12 @@ log.diagnostics=function(file="xssams_program.log",ntime=61,dt=1,ngear=5,
                     sdlogYield=sdlogYield[counter], 
                     sdlogF=sdlogF[counter],
                     sdlogQ=sdlogQ[counter],
-                    K=K[counter], r=r[counter],
+                    K=K[counter], r=r[counter],T12=T12[counter],
+                    q=qProp[counter],
                     plot.Fmort=plot.Fmort,
                     plot.prod=plot.prod,
                     plot.impact=plot.impact,
+                    plot.Discr=plot.Discr,
                     devices=dev.list,block=counter)
       dev.list=new.devices
      
