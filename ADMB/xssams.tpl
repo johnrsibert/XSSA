@@ -18,7 +18,7 @@ GLOBALS_SECTION;
   // xssams -noinit -est -nr 10 -l2 10000000  -l3 10000000 &> xssams.out&
   // to avoid writing buffers; otherwise, run
   // xssams -noinit -est -nr 10 &> xssams.out&
-  // seems to work without writing burrers
+  // seems to work without writing buffers
 
   int fexists(const adstring& filename)
   {
@@ -538,8 +538,10 @@ SEPARABLE_FUNCTION void step(const int t, const dvar_vector& f1, const dvar_vect
 
   dvariable sumFg = sum(mfexp(ft1)); // total fishing mortality
   dvariable q = qP;
+  dvariable penN1 = 0.0;
+  dvariable penN2 = 0.0;
 
-  #undef __FINITE_DIFFERENCE__
+  #define __FINITE_DIFFERENCE__
   #ifdef __FINITE_DIFFERENCE__
   #warning Building finite differnce approximation
   //       unstable for large r
@@ -566,9 +568,6 @@ SEPARABLE_FUNCTION void step(const int t, const dvar_vector& f1, const dvar_vect
   {
      prevN1 = mfexp(nextLogN1);
      prevN2 = mfexp(nextLogN2);
-     if (ss == 1)
-        TTRACE(prevN1,prevN2)
-
      dLogN1 = r*(1.0 - prevN1/K) - sumFg - T12 - 2.0*(1.0-q)*r*prevN2/K;
      dLogN2 = r*(1.0 - prevN2/K) - sumFg - T12 - 2.0*q*r*prevN1/K + T21*immigrant_biomass(t)/prevN2;
 
@@ -603,8 +602,6 @@ SEPARABLE_FUNCTION void step(const int t, const dvar_vector& f1, const dvar_vect
   dvariable Z1 = sumFg + T12 + 2.0*(1.0-q)*(r/K)*prevN2;
   dvariable Z2 = sumFg + T12 + 2.0*q*(r/K)*prevN1;
   const double epsN = 1.0e-3;
-  dvariable penN1 = 0.0;
-  dvariable penN2 = 0.0;
   //TTRACE(Z1,Z2)
   //TTRACE(sumFg,T12)
   //TTRACE(prevN1,prevN2)

@@ -1,0 +1,63 @@
+\documentclass[12pt,letterpaper,twoside]{article}
+\usepackage{amsmath}
+\usepackage{amsfonts}
+\usepackage{appendix}
+\usepackage[figurewithin=section,tablewithin=section]{caption}
+\usepackage[usenames,dvipsnames]{color}
+\usepackage{graphicx}
+\usepackage{longtable}
+\usepackage{rotating}
+%\usepackage{verbatim}
+\usepackage[pdftex,bookmarksopen=false]{hyperref}
+%\usepackage[pdftex]{hyperref}
+\hypersetup{pdfauthor={John Sibert}}
+\hypersetup{pdfsubject={Assessment Model of MHI YFT Stocks}}
+\hypersetup{pdftitle={Assessment model of Main Hawaiian Islands
+Yellowfin Tuna Population}}
+\hypersetup{pdfkeywords={yellowfin,state space, biomass transfer, model,Hawaii}}
+
+\newcommand\doublespacing{\baselineskip=1.6\normalbaselineskip}
+\newcommand\singlespacing{\baselineskip=1.0\normalbaselineskip}
+\renewcommand\deg[1]{$^\circ$#1}
+\newcommand\SD{SEAPODYM}
+\newcommand\MFCL{MULTIFAN-CL}
+\newcommand\ADMB{ADModel Builder}
+\newcommand\SPC{Secretariat of the Pacific Community}
+\newcommand\WCPO{Western Central Pacific Ocean}
+\newcommand\SSAP{Skipjack Survey and Assessment Programme}
+\newcommand\RTTP{Regional Tuna Tagging Programme}
+\newcommand\PTTP{Pacific Tuna Tagging Programme}
+\newcommand\FAD{fish aggregating device}
+\newcommand\ADRM{advection-diffusion-reaction model}
+\newcommand\help[1]{\color{Magenta}{\it #1 }\normalcolor}
+\newcommand\widebar[1]{\overline{#1}}
+\newcommand\EEZ{Exclusive Economic Zone}
+
+\newcommand\None{{N_1}}
+\newcommand\Ntwo{{N_2}}
+\newcommand\Nsum{{N_1+N_2}}
+\newcommand\peryr{yr$^{-1}$}
+\newcommand\prevN[1]{{#1_{t-\Delta t}}}
+\newcommand\nextN[1]{{#1_t}}
+
+
+\title{Integrating the Schaefer Model Differential Equation}
+
+\author{
+John Sibert\thanks{sibert@hawaii.edu}\\
+Joint Institute of Marine and Atmospheric Research\\
+University of Hawai'i at Manoa\\
+Honolulu, HI  96822 U.S.A.\\[0.125in]
+\date{\today}
+}
+
+\pagestyle{myheadings}
+\markboth{John Sibert\hfil Schaefer ODE Solution}
+{Schaefer ODE Solution\hfil John Sibert}
+
+\begin{document}
+\maketitle
+
+\input{schaefer_section}
+
+\end{document}

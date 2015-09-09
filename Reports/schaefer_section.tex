@@ -1,0 +1,149 @@
+\section{Integrating Schaefer Models}
+\label{sec:schaefer}
+The widely used Schaefer (1954) fisheries stock assessment model 
+is a simple
+extension of the logistic population model with a term added to
+represent removals from the population due to fishing.
+\begin{equation}
+\label{eqn:sschaefer}
+\frac{dN}{dt} = rN(1-\frac{N}{K}) - FN = N(r-F-\frac{r}{K}N)
+\end{equation}
+where $N$ is the population size,
+$r$ is the instantaneous growth rate ($t^{-1}$),
+$K$ is the asymptotic population size in the same units as $N$,
+and $F$, is the instantaneous rate of removal due to fishing ($t^{-1}$).
+Equation (\ref{eqn:sschaefer}) reduces to the logistic model
+if $F$ is assumed to be zero.
+These models are usually integrated numerically with
+``explict'' finite difference methods to compute an approximation 
+of the value of $N$ at some time. 
+Such approximations are often unstable for 
+values of $r$ large relative to the time step used in the finite
+difference solution.
+The performance of estimation methods in which logistic models
+are embedded in a statistical procedure depending on numerical function
+minimizers, i.e, models build using ADMB, TMB and BUGS,
+is greatly improved in accuracy, speed and use of
+computing resources if analytical solutions are used in preference
+to finite difference approximations. 
+
+\subsection{Single population}
+Quinn and Deriso (1999) show the integral of the logistic ODE and
+point out that it can be obtained using integration by partial fractions.
+Numerous mathematics tutorials can be found on the World Wide Web use
+integration of the logistic ODE to illustrate the technique of
+integration by partial fractions.
+The same procedure can be used to integrate the Schaefer ODE.
+Equation~(\ref{eqn:sschaefer}) is rearranged slightly and variables
+separated to become
+\begin{equation}
+\frac{K}{N(K(r-F)-rN)}dN=dt.
+\end{equation}
+The fraction in the left hand side can be factored into two parts,
+\begin{equation}
+\frac{K}{N(K(r-F)-rN)}=\frac{A}{N}+\frac{B}{(K(r-F)-rN)}.
+\end{equation}
+$A$ and $B$ are constants that can be found by solving
+$K=A(K(r-f)-rn))+BN$
+setting $N=K$ and $N=0$; 
+$A=\frac{1}{r-F}$ and $B=1+\frac{F}{r-F}$.
+The desired integral becomes
+\[\int\frac{K}{N(K(r-F)-rN)}dN   = \int dt\]
+\[\int\frac{A}{N}dN + \int\frac{B}{K(r-F)-rN}dN  = \int dt\]
+\[\frac{1}{r-F}\int\frac{1}{N}dN + (1+\frac{F}{r-F})\int\frac{1}{K(r-F)-rN}dN  = \int dt\] 
+\[\frac{1}{r-F}\log |N| + \frac{1}{r}(1+\frac{F}{r-F})\log |K(r-f)-rN| +log C  = t\] \[\log |N| - \log |K(r-F)-rN| + log C  = t(r-F)\]
+\[\frac{|N|}{|K(r-F)-rN|}\cdot C  =  e^{t(r-F)}\]
+\[\frac{|K(r-F)-rN|}{C|N|} =  e^{-t(r-F)}\]
+where $C$ is the constant of integration.
+Setting $|N| = N_t$, the population size at time $t$, yields
+\begin{equation}
+\label{eqn:NtC}
+N_t=\frac{K(r-F)}{Ce^{-t(r-F)}+r}
+\end{equation}
+A formula suitable for computing population size at successive
+time steps can be found by setting $N_t = N_{t-\Delta t}$ at time
+$t=t-\Delta t$ in equation (\ref{eqn:NtC}).
+The integration constant, $C$, becomes
+\begin{equation}
+C=\Bigg(\frac{K(r-f)}{N_{t-\Delta t}}-r\Bigg)e^{(t-\Delta t)(r-F)},
+\end{equation}
+and finally
+\begin{equation}
+\label{eqn:intschaefer}
+N_t = \frac{K(r-F)}{\frac{K(r-F)}{N_{t-\Delta t}}e^{-\Delta t(r-F)}-re^{-\Delta t(r-F)} -r}
+\end{equation}
+\help{
+Further simplification of this equation may be possible, but I have
+not found it. In any case, equation (\ref{eqn:intschaefer}) is the
+only general solution of the Schaefer ODE that I have seen, and it appears
+to work well in numerical applications.
+}
+
+\subsection{Two populations with exchange}
+The motivation for the two popultion Schaefer model with exchange is
+developed fully in Appendix~\ref{sec:models}.
+
+The basic equations can be written
+\begin{eqnarray}
+\label{eqn:xschaefer1}
+\frac{d\None}{dt}&=&\None\Big(r-F-T_{12}-2(1-q)\frac{r}{K}\Ntwo-\frac{r}{K}\None\Big)\\
+\nonumber\\
+\label{eqn:xschaefer2}
+\frac{d\Ntwo}{dt}&=&\Ntwo\Big(r-F-T_{12}-2q\frac{r}{K}\None-\frac{r}{K}\Ntwo\Big)+T_{21}
+\end{eqnarray}
+where $\None$ the biomass of fish originating in region~1
+and residing in region~1,
+and $\Ntwo$ is the biomass of fish originating in region~2
+but residing in region~1.
+The parameters $r$, $K$ and $F$ are unchanged from
+equation~(\ref{eqn:sschaefer}), and
+$T_{12}$ is the emigration rate from region~1 ($t^{-1}$), 
+$T_{21}$ is the rate of immigration of biomass from region~2 to
+region~1 in units of biomass per time,
+and $q;\; (0 < q < 1)$ partitions the mortality caused by ``competition''
+between the two subpopulations.
+Substitute
+\begin{eqnarray}
+\label{eqn:Zdef}
+Z_1&=&F+T_{12}+2(1-q)\frac{r}{K}\Ntwo\\
+\nonumber\\
+Z_2&=&F+T_{12}+2q\frac{r}{K}\None
+\end{eqnarray}
+into equations~(\ref{eqn:xschaefer1}) and~(\ref{eqn:xschaefer2})
+respectively to produce model equations in a similar form to
+equation~(\ref{eqn:sschaefer})
+\begin{eqnarray}
+\label{eqn:xschaeferZ1}
+\frac{d\None}{dt}&=&\None(r-Z_1-\frac{r}{K}\None)\\
+\nonumber\\
+\label{eqn:xschaeferZ2}
+\frac{d\Ntwo}{dt}&=&\Ntwo(r-Z_2-\frac{r}{K}\Ntwo)+T_{21}.
+\end{eqnarray}
+Equation~(\ref{eqn:xschaeferZ1}) can be integrated in the same manner as
+equation~(\ref{eqn:sschaefer}) to yield
+\begin{equation}
+\label{eqn:N1tC}
+\None_t=\frac{K(r-Z_1)}{C_1e^{-t(r-Z_1)}+r}.
+\end{equation}
+
+\help{All that remains is to find an equivalent integral for
+equation~(\ref{eqn:xschaeferZ2}) and a means to simultaneously solve
+for $C_1$ and $C_2$. }
+
+%\begin{equation*}
+%{{2\,\log \Big|{{2\,a\,x-\sqrt{b^2-4\,a\,c}+b}\over{2\,a\,x+
+% \sqrt{b^2-4\,a\,c}+b}}\Big|}\over{\sqrt{b^2-4\,a\,c}}}+C=t
+%\end{equation*}
+%
+%\begin{equation*}
+%x=-{{\sqrt{b^2-4\,a\,c}\,\left(e^{{{\sqrt{b^2-4\,a\,c}\,t
+% }\over{2}}-{{\sqrt{b^2-4\,a\,c}\,C}\over{2}}}+1\right)+b\,\left(e^{
+% {{\sqrt{b^2-4\,a\,c}\,t}\over{2}}-{{\sqrt{b^2-4\,a\,c}\,C}\over{2}}}
+% -1\right)}\over{a\,\left(2\,e^{{{\sqrt{b^2-4\,a\,c}\,t}\over{2}}-{{
+% \sqrt{b^2-4\,a\,c}\,C}\over{2}}}-2\right)}}
+%\end{equation*}
+%
+%
+\clearpage
+%\input{N1}
+\input{N2}
