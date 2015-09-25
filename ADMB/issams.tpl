@@ -643,7 +643,9 @@ FUNCTION void write_status(ofstream& s)
     s << "#             Q: " << alogit(value(LQ)) << endl;
     s << "#     logsdlogQ: " << logsdlogQ <<  " (" << active(logsdlogQ) <<")" << endl;
     s << "#        sdlogQ: " << mfexp(logsdlogQ) << endl;
-    s << "# pcon = " << alogit(value(Lpcon)) << " (" << active(Lpcon) <<")" << endl;
+    s << "# Lpcon = " << value(Lpcon) << " (" << active(Lpcon) <<")" << endl;
+    s << "# pcon = " << alogit(value(Lpcon)) << endl;
+    s << "# klingon_multiplier = " << klingon_multiplier << endl;
     s << "# Residuals:" << endl;
     s << "  t    pop   K  forcing";
     for (int g = 1; g <= ngear; g++)

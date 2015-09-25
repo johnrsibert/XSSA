@@ -398,3 +398,111 @@ show.block.number=function(block.number,x,line=3)
    mtext(text=paste("(",block.number,")",sep=""),side=1,line=line,
           at=c(x,0),cex=0.8)
 }
+
+extract.value=function(text,text.list)
+{
+   name = paste("^",text,sep="")
+#  print(paste(text,name))
+   ndx = grep(name,text.list)[1]
+#  print(paste("ndx",ndx))
+#  print(paste("nchar",nchar(name)))
+   colon = grep(":",name)
+#  if (text=="K")
+#  {
+#     print(paste("ndx",ndx))
+#     print(paste("colon",colon,length(colon),is.numeric(colon),as.numeric(colon),sep="|"))
+#  }
+   offset = 2
+   if(length(colon)>0)
+      offset = 1
+#  print(paste("offset",offset))
+#  print(text.list[ndx])
+#  print(text.list[ndx+offset])
+   x = as.numeric(text.list[ndx+offset])
+#  print(paste(text,x))
+   return(x)
+}
+
+
+read.rep=function(file="issams.rep",ntime=61,dt=1,ngear=5)
+
+{
+#  print(paste("Scanning file",file))
+   rep = scan(file,what="character",quiet=TRUE)
+   ret = list()
+   ret$nll = extract.value("nll",rep)
+   ret$nvar = extract.value("nvar",rep)
+   ret$logr = extract.value("logr",rep)
+   ret$r = extract.value("r",rep)
+   ret$logK = extract.value("logK",rep)
+   ret$K = extract.value("K",rep)
+   ret$logsdlogF = extract.value("logsdlogF:",rep)
+   ret$sdlogF = extract.value("sdlogF:",rep)
+   ret$logsdlogPop = extract.value("logsdlogPop:",rep)
+   ret$sdlogPop = extract.value("sdlogPop:",rep)
+   ret$logsdlogYield = extract.value("logsdlogYield:",rep)
+   ret$sdlogYield = extract.value("sdlogYield:",rep)
+   ret$LQ = extract.value("LQ:",rep)
+   ret$Q = extract.value("Q:",rep)
+   ret$logsdlogQ = extract.value("logsdlogQ:",rep)
+   ret$sdlogQ = extract.value("sdlogQ:",rep)
+   ret$Lpcon = extract.value("Lpcon",rep)
+   ret$pcon = extract.value("pcon",rep)
+   ret$KF = extract.value("klingon_multiplier",rep)
+   return(ret)
+}
+
+read.rep.files=function(path.list=dir(pattern="CV0*"))
+#read.rep.files=function(path.list=c("CVruns/CV0.05", "CVruns/CV0.1", "CVruns/CV0.15", 
+#                                    "CVruns/CV0.2",  "CVruns/CV0.3",  
+#                                    "CVruns/CV0.4", "CVruns/CV0.5"))
+{
+   print(path.list)
+   have.names=FALSE
+   csv = "rep_summary.csv"
+   nvar = 0
+   rep.list=list() 
+   r = 0
+   for (p in path.list)
+   {
+      path = paste(".",p,"issams.rep",sep="/")
+   #  print(path)
+      rep = read.rep(file=path)
+      if (nvar <= 0)
+         nvar = length(rep)
+   #  print(rep)
+      r = r+1
+      rep.list = c(rep.list,rep)
+      if (!have.names)
+      {
+         cat(paste(names(rep)[1],", ",sep=""),file=csv,append=FALSE)
+         for (i in 2:nvar)
+         {
+            print(paste(i,names(rep)[i]))
+         #  cat(names(rep)[i],sep=",",file=csv,append=TRUE)
+            cat(names(rep)[i],file=csv,append=TRUE)
+            if (i < nvar)
+               cat(", ",file=csv,append=TRUE)
+         }
+         cat("\n",file=csv,append=TRUE)
+         have.names=TRUE
+      }
+
+      for (i in 1:nvar)
+      {
+      #  print(paste(i,rep[i]))
+      #  cat(paste(rep[i],", ",sep=""),file=csv,append=TRUE)
+         cat(rep[[i]],file=csv,append=TRUE)
+         if (i < nvar)
+            cat(", ",file=csv,append=TRUE)
+      }
+      cat("\n",file=csv,append=TRUE)
+   }
+   
+   rep.matrix = matrix(unlist(rep.list),nrow=length(path.list),byrow=TRUE)
+   colnames(rep.matrix)=names(rep)
+   return(as.data.frame(rep.matrix))
+
+}
+
+
