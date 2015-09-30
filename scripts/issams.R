@@ -508,67 +508,75 @@ read.rep.files=function(path.list) #=dir(pattern="CV0*"))
 
 read.fit.files=function(path.list)
 {
+   nfit = length(path.list)
+   print(nfit)
    print(path.list)
-   have.names=FALSE
    csv = "std_summary.csv"
    nvar = 0
    fit.list=list() 
    all.pnames=c("ar", "aK", "asdlogF", "asdlogPop", "asdlogYield", "aQ", "asdlogQ", "apcon")
    pnames=c("ar", "aK", "asdlogYield", "aQ")
 
-   fit.names = c("km", "nlogl", "r","s(r)","cv(r)", "K","s(K)","cv(K)",
-                         "sY","s(sY)","cv(sY)", "Q","s(Q)","cv(Q)")
-   nvar=length(fit.names)
-   print(fit.names)
+   var.names = c("mult", "nlogl", "r","s.r","cv.r", "K","s.K","cv.K",
+                         "sY","s.sY","cv.sY", "Q","s.Q","cv.Q")
+   nvar=length(var.names)
+   print(var.names)
    print(nvar)
-   for (p in path.list)
+   est.mat = matrix(nrow=nfit,ncol=nvar)
+   colnames(est.mat) = var.names 
+#  for (p in path.list)
+   for (j in 1:nfit)
    {
-      print(p)
-      print(strsplit(p,"KF"))
-      print(strsplit(p,"KF")[[1]][2])
+      p = path.list[j]
       path = paste(".",p,"issams",sep="/")
       fit = read.fit(file=path)
-   #  print(names(fit))
       pndx = which(match(fit$names,pnames,nomatch=0)>0)
-   #  print(pndx)
-   #  print(fit$names[pndx])
-   #  print(fit$est[pndx])
-   #  print(fit$std[pndx])
       cv =fit$std[pndx]/fit$est[pndx]
-   #  print(cv)
 
-      
-      if (!have.names)
+      est.mat[j,1] = as.numeric(strsplit(p,"KF")[[1]][2])
+      est.mat[j,2] = fit$nlogl
+      c = 2
+      for (v in 1:4)
       {
-         cat(paste(fit.names[1],", ",sep=""),file=csv,append=FALSE)
-         for (i in 2:nvar)
-         {
-            cat(fit.names[i],file=csv,append=TRUE)
-            if (i < nvar)
-               cat(", ",file=csv,append=TRUE)
-         }
-         cat("\n",file=csv,append=TRUE)
-         have.names=TRUE
+         c = c + 1
+         est.mat[j,c] = fit$est[pndx[v]]
+         c = c + 1
+         est.mat[j,c] = fit$std[pndx[v]]
+         c = c + 1
+         est.mat[j,c] = cv[v]
       }
-
-     cat(paste(strsplit(p,"KF")[[1]][2],",",sep=""),file=csv,append=TRUE)
-     cat(paste(fit$nlogl,",",sep=""),file=csv,append=TRUE)
-
-     for (i in 1:4)
-     {
-        cat(paste(fit$est[pndx[i]],","),file=csv,append=TRUE)
-        cat(paste(fit$std[pndx[i]],","),file=csv,append=TRUE)
-        cat(cv[i],file=csv,append=TRUE)
-        if (i < 4)
-           cat(", ",file=csv,append=TRUE)
-     }
-     cat("\n",file=csv,append=TRUE)
    }
-   
-#  rep.matrix = matrix(unlist(rep.list),nrow=length(path.list),byrow=TRUE)
-#  colnames(rep.matrix)=names(rep)
-#  return(as.data.frame(rep.matrix))
+   est.mat = as.data.frame(est.mat)
+   return(est.mat[order(est.mat$mult),])
 
 }
 
 
+   #  if (!have.names)
+   #  {
+   #     cat(paste(fit.names[1],", ",sep=""),file=csv,append=FALSE)
+   #     for (i in 2:nvar)
+   #     {
+   #        cat(fit.names[i],file=csv,append=TRUE)
+   #        if (i < nvar)
+   #           cat(", ",file=csv,append=TRUE)
+   #     }
+   #     cat("\n",file=csv,append=TRUE)
+   #     have.names=TRUE
+   #  }
+
+   # cat(paste(strsplit(p,"KF")[[1]][2],",",sep=""),file=csv,append=TRUE)
+   # cat(paste(fit$nlogl,",",sep=""),file=csv,append=TRUE)
+
+   # for (i in 1:4)
+   # {
+   #    cat(paste(fit$est[pndx[i]],","),file=csv,append=TRUE)
+   #    cat(paste(fit$std[pndx[i]],","),file=csv,append=TRUE)
+   #    cat(cv[i],file=csv,append=TRUE)
+   #    if (i < 4)
+   #       cat(", ",file=csv,append=TRUE)
+   # }
+   # cat("\n",file=csv,append=TRUE)
+   
+#  rep.matrix = matrix(unlist(rep.list),nrow=length(path.list),byrow=TRUE)
+#  colnames(rep.matrix)=names(rep)
