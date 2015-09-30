@@ -265,7 +265,12 @@ PARAMETER_SECTION
 
   sdreport_number ar;
   sdreport_number aK;
+  sdreport_number asdlogF;
+  sdreport_number asdlogPop;
+  sdreport_number asdlogYield;
   sdreport_number aQ;
+  sdreport_number asdlogQ;
+  sdreport_number apcon;
 
   objective_function_value nll;
 
@@ -411,7 +416,12 @@ PROCEDURE_SECTION
 
   ar = mfexp(logr);
   aK = mfexp(logK);
+  asdlogF = mfexp(logsdlogF);
+  asdlogPop = mfexp(logsdlogPop);
+  asdlogYield = mfexp(logsdlogYield);
   aQ = alogit((dvariable&)LQ);
+  asdlogQ = mfexp(logsdlogQ);
+  apcon = alogit((dvariable&)Lpcon);
 
   ++userfun_entries;
   int status_print = ntime;

@@ -39,7 +39,7 @@
 # sdlogPop    phase  initial values
               -1     0.2 
 # sdlogYield  phase initial value
-              -1    0.2
+               1    0.2
 # Q           phase initial value
                1    0.05
 # sdlogQ      phase initial value

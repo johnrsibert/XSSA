@@ -452,7 +452,7 @@ read.rep=function(file="issams.rep",ntime=61,dt=1,ngear=5)
    return(ret)
 }
 
-read.rep.files=function(path.list=dir(pattern="CV0*"))
+read.rep.files=function(path.list) #=dir(pattern="CV0*"))
 #read.rep.files=function(path.list=c("CVruns/CV0.05", "CVruns/CV0.1", "CVruns/CV0.15", 
 #                                    "CVruns/CV0.2",  "CVruns/CV0.3",  
 #                                    "CVruns/CV0.4", "CVruns/CV0.5"))
@@ -502,6 +502,72 @@ read.rep.files=function(path.list=dir(pattern="CV0*"))
    rep.matrix = matrix(unlist(rep.list),nrow=length(path.list),byrow=TRUE)
    colnames(rep.matrix)=names(rep)
    return(as.data.frame(rep.matrix))
+
+}
+
+
+read.fit.files=function(path.list)
+{
+   print(path.list)
+   have.names=FALSE
+   csv = "std_summary.csv"
+   nvar = 0
+   fit.list=list() 
+   all.pnames=c("ar", "aK", "asdlogF", "asdlogPop", "asdlogYield", "aQ", "asdlogQ", "apcon")
+   pnames=c("ar", "aK", "asdlogYield", "aQ")
+
+   fit.names = c("km", "nlogl", "r","s(r)","cv(r)", "K","s(K)","cv(K)",
+                         "sY","s(sY)","cv(sY)", "Q","s(Q)","cv(Q)")
+   nvar=length(fit.names)
+   print(fit.names)
+   print(nvar)
+   for (p in path.list)
+   {
+      print(p)
+      print(strsplit(p,"KF"))
+      print(strsplit(p,"KF")[[1]][2])
+      path = paste(".",p,"issams",sep="/")
+      fit = read.fit(file=path)
+   #  print(names(fit))
+      pndx = which(match(fit$names,pnames,nomatch=0)>0)
+   #  print(pndx)
+   #  print(fit$names[pndx])
+   #  print(fit$est[pndx])
+   #  print(fit$std[pndx])
+      cv =fit$std[pndx]/fit$est[pndx]
+   #  print(cv)
+
+      
+      if (!have.names)
+      {
+         cat(paste(fit.names[1],", ",sep=""),file=csv,append=FALSE)
+         for (i in 2:nvar)
+         {
+            cat(fit.names[i],file=csv,append=TRUE)
+            if (i < nvar)
+               cat(", ",file=csv,append=TRUE)
+         }
+         cat("\n",file=csv,append=TRUE)
+         have.names=TRUE
+      }
+
+     cat(paste(strsplit(p,"KF")[[1]][2],",",sep=""),file=csv,append=TRUE)
+     cat(paste(fit$nlogl,",",sep=""),file=csv,append=TRUE)
+
+     for (i in 1:4)
+     {
+        cat(paste(fit$est[pndx[i]],","),file=csv,append=TRUE)
+        cat(paste(fit$std[pndx[i]],","),file=csv,append=TRUE)
+        cat(cv[i],file=csv,append=TRUE)
+        if (i < 4)
+           cat(", ",file=csv,append=TRUE)
+     }
+     cat("\n",file=csv,append=TRUE)
+   }
+   
+#  rep.matrix = matrix(unlist(rep.list),nrow=length(path.list),byrow=TRUE)
+#  colnames(rep.matrix)=names(rep)
+#  return(as.data.frame(rep.matrix))
 
 }
 

@@ -41,8 +41,8 @@ Yellowfin Tuna Population}}
 \newcommand\nextN[1]{{#1_t}}
 
 
-\title{Feasibility of developing a stock assessment model for Main Hawaiian Islands Yellowfin Tuna
-Fishery}
+\title{Feasibility of developing stock assessment models for the
+Main Hawaiian Islands Yellowfin Tuna Fishery}
 
 \author{
 John Sibert\thanks{sibert@hawaii.edu}\\
@@ -67,17 +67,19 @@ Honolulu, HI  96822 U.S.A.\\[0.125in]
 \begin{abstract}
 The yellowfin tuna fishery in the Main Hawaiian Islands (MHI)
 is an important commercial and recreational fishery and
-has a documented 65 year history. Management of this fishery is
+has a documented 65 year history. Local management of this fishery is
 hampered by lack of stock assessment results specific to the MHI. The
-feasibility of developing a state-space Schafer model with emigration,
+feasibility of developing state-space Schafer model with ties to the
+larger Pacific yellowfin population,
 external forcing, Bayesian constraints, and robust estimation
-specifically for the MHI was investigated. The model is feasible, but
+specifically for the MHI was investigated. The models are feasible, but
 parameter estimation is hindered by possible lack of an exploitation
 signal in the data.
 \end{abstract}
 
 \section{Introduction}
-The Main Hawaiian Islands (MHI) yellowfin tuna (YFT) fishery is 
+The Main Hawaiian Islands (MHI) yellowfin tuna,
+{\it Thunnus albacares}, (YFT) fishery is 
 a small, but very important important fishery within the State of
 Hawaii, and sustainable management of this
 fishery is a local issue that deserves scientific support.
@@ -102,17 +104,15 @@ population was spawned and reared in the MHI (Wells et al 2012).
 Contemporary fisheries management often depends on results of stock
 assessment models to establish quantitative fishery reference points
 such as ``acceptable biological catch''.
-Such models do not exist for the MHI YFT population, but
+Such models do not exist for the MHI YFT population, and
 it is not clear that creating stock assessment model
 for a single component of a shared stock is feasible.
 The purpose of the work described in this report is to asses the
-feasibility of developing a stock assessment model for the MHI YFT
-population that includes emigration and immigration of biomass and a
-constraint on the proportion of ``resident'' biomass.
+feasibility of developing stock assessment models for the MHI YFT
+that link the MHI population to the larger Pacific population.
 
 
-\section{Methods}
-\subsection{Data}
+\section{Data}
 \begin{figure}
 \begin{center}
 %\includegraphics[height=0.5\textheight]{./graphics/5_gear_catch_history_a.pdf}
@@ -130,7 +130,8 @@ Hawaii Department of Aquatic Resources (HDAR) for several fishing
 gears from 1949 to 2014 and (2)
 to the National Oceanic and Atmospheric Administration (NOAA), National
 Marine Fisheries Service for the Hawaii-based longline fleet
-from 1995 through 2013 under the federally mandated log book program.  The quarterly data from HDAR show clear seasonal variation and include
+from 1995 through 2013 under the federally mandated log book program.  
+The quarterly data from HDAR show clear seasonal variation and include
 occasional zero observations between quarters with substantial
 reported catch (Figure~\ref{fig:hdarTS}).
 Whether these seasonal fluctuations and zero
@@ -145,6 +146,7 @@ Statistical properties of the catch data and the method of joining the
 HDAR and NOAA longline time series are elaborated in
 Appendix~\ref{sec:data}. 
 
+
 \begin{figure}[t]
 \begin{center}
 \includegraphics[width=1.0\textwidth]{./graphics/annual_region_2_biomass.pdf}
@@ -154,11 +156,10 @@ stock assessment, Davies et al. 2014.
 }
 \end{center}
 \end{figure}
-A biomass exchange model presupposes a source and sink for biomass
-exchange.
+A biomass exchange model presupposes a source source of biomass.
 Model estimates of yellowfin biomass by \MFCL\ (MFCL)
 from the most recent WCPFC stock assessment (Davies et al 2014) 
-provide the most convenient estimates of immigrant biomass. 
+provide convenient estimates of immigrant biomass. 
 The MHI straddle the boundary between MFCL regions 2 and 4.
 Region 2 is arguably
 more similar ecologically to the MHI than the more equatorial region
@@ -170,13 +171,49 @@ model testing, Figure~\ref{fig:r2biomass}.
 Since the MFCL assessment uses data for the period 1952 through 2012,
 catch data outside of this period were excluded from this analysis.
 
-\vspace{2ex}
+\help{More background and discussion of data deficiencies needed here.}
 Further properties of the data are presented in Appendix~\ref{sec:data}. 
 
-\subsection{Model}
-An age-aggregated model was developed in preference to a more complex
+\section{Models}
+Two similar state-space models, both derived from a basic
+Schaefer biomass dynamics model (Schaefer, 1954), were tested.
+State-space models separate variability in the biological
+processes in the system (transition model)
+from errors in observing features of interest
+in the system (observation model). 
+The general form of the transition equation is
+\begin{equation}
+\alpha_t=T(\alpha_{t-1}) + \eta_t
+\end{equation}
+where the function $T$ embodies the stock dynamics mediating the
+development of the state at time $t$ from the state at the previous
+time with random process error, $\eta$.
+The general form of the observation equation is
+\begin{equation}
+x_t = O(\alpha_t) + \varepsilon_t
+\end{equation}
+where the function $O$ describes the measurement process with
+error $\varepsilon$ in observing the population.
+Age-aggregated models were developed in preference to a more complex
 age-structured model for examining the feasibility of a MHI YFT
 assessment model.
+
+Fishing mortality in both models is treated explicitly as a random walk
+without recourse to effort standardization,
+estimation of catchability coefficients, or creation of an
+index of abundance based on catch per unit of effort (CPUE). 
+The logarithm of fishing
+mortality is assumed to
+follow a random walk with normal increments, i.e.,
+\begin{equation}
+\log F_{g,t} = \log F_{g,t-1} + \xi_t;\quad \xi_t\sim
+N(0,\sigma^2_F) \label{eqn:Fwalk}
+\end{equation}
+where  $\sigma^2_F$ is the variance of the fishing
+mortality random walk.
+
+
+\subsection{Two populations with explicit exchange}
 The principle model assumptions are:
 \begin{enumerate}
 \item The Pacific Ocean is divided into two regions:
@@ -216,31 +253,12 @@ Full derivations of and all model equations arising from these
 assumptions are presented in Appendix~\ref{sec:models}. The resulting
 model is something like a state-space Schafer model with emigration,
 external forcing, Bayesian constraints, and robust estimation.
-State-space models separate variability in the biological
-processes in the system (transition model)
-from errors in observing features of interest
-in the system (observation model). 
-The general form of the transition equation is
-\begin{equation}
-\alpha_t=T(\alpha_{t-1}) + \eta_t
-\end{equation}
-where the function $T$ embodies the stock dynamics mediating the
-development of the state at time $t$ from the state at the previous
-time with random process error, $\eta$.
-The general form of the observation equation is
-\begin{equation}
-x_t = O(\alpha_t) + \varepsilon_t
-\end{equation}
-where the function $O$ describes the measurement process with
-error $\varepsilon$ in observing the population.
-
 Let $\None$ equal the biomass of fish originating in region~1
 and residing in region~1
 and $\Ntwo$ equal the biomass of fish originating in region~2
 but residing in region~1.
 The following pair of simultaneous non-linear differential equations
-describe the dynamics of the two subpopulations (see
-Appendix~\ref{sec:models} for details).
+describe the dynamics of the two subpopulations.
 \begin{eqnarray}
 \label{eqn:coupledschaeferq}
 \frac{d\None}{dt}&=&\None\Big[r\Big(1-\frac{\None}{K}\Big)
@@ -260,7 +278,30 @@ two subpopulations constrained by the same logistic process.
 The parameter, $q$, apportions the effects of the nonlinear
 mortality term between the two subpopulation.
 
+\subsection{Single population with indexed abundance}
+The principle model assumptions are:
+\begin{enumerate}
+\item The dynamics of the population of YFT in the MHI follows a
+simple Schaefer model is MHI-specific growth parameters.
+\item The local dynamics are ```forced'' by assuming that the local
+abundance is proportional to the abundance of the larger Pacific
+population.
+\item Fishing mortality is represented by a random walk (as in the
+two-population model).
+\end{enumerate}
+
+Thus the local dynamics follow the classic Schaefer form:
+\begin{equation}
+\label{eqn:ischaefer}
+\frac{dN}{dt} = rN(1-\frac{N}{K}) - FN
+\end{equation}
+where $N$ is the biomass of YFT in the MHI, 
+$r$ is the logistic growth rate per year,
+$K$ is the asymptotic biomass, and
+$F$ is the total fishing mortality per year in the MHI.
+
 \section{Results}
+\subsection{Two populations with explicit exchange}
 \begin{figure}
 \begin{center}
 \begin{tabular}{ll}
@@ -398,6 +439,8 @@ to represent variability in population dynamics and errors in
 observation. These ``nuisance'' appear to be reasonably sensitive to the
 data.
 
+\subsection{Single population with indexed abundance}
+
 \section{Discussion}
 
 The age-aggregated approach using a logistic model with emigration and
@@ -436,7 +479,6 @@ Finite difference approximations of logistic population models are
 notoriously unstable under certain circumstances. An analytical
 solution of equation~\ref{eqn:coupledschaeferq} would be of great
 help.
-Further mathematical analysis is called for.
 
 \vspace{4ex}
 %\clearpage
@@ -493,6 +535,10 @@ in stock assessments using state-space models. Fisheries Research
 
 Quinn, T, R. Deriso. 1999. Quantitative fish dynamics. Oxford
 University Press, New York.
+
+Schaefer, M. B. 1954. Some aspects of the dynamics of populations
+important to the management of the commercial marine fisheries. IATTC
+Bull. 1(2):27-56.
 
 Skaug, H., Fournier, D., 2006. Automatic approximation of the marginal
 likelihood in non-Gaussian hierarchical models. Computational
@@ -674,6 +720,7 @@ Quarterly biomass trends estimated in MFCL Regions 2 and 4 from the
 \end{figure}
 
 
+\clearpage
 \section{Model development}
 \label{sec:models}
 Let $\None$ equal the biomass of fish originating in region 1
@@ -823,20 +870,6 @@ Other parameter values: $q=0.54, r=0.3, K=200000, T12=0.01, T21=0.002$.
 }
 \end{center}
 \end{figure}
-
-{\bf Fishing Mortality.}
-Fishing mortality is
-modeled explicitly as a random walk
-without recourse to effort standardization or
-estimation of catchability coefficients. The logarithm of fishing
-mortality is assumed to
-follow a random walk with normal increments, i.e.,
-\begin{equation}
-\log F_{g,t} = \log F_{g,t-1} + \xi_t;\quad \xi_t\sim
-N(0,\sigma^2_\xi) \label{eqn:Fwalk}
-\end{equation}
-where  $\sigma^2_\xi$ is the variance of the fishing
-mortality random walk.
 
 %Parameterization of $T_{21}$
 {\bf Population Forcing.}

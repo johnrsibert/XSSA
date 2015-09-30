@@ -12,7 +12,7 @@ do
    mkdir -v $run_dir
    sed {s/XXX/$s/} issams.xxx > $run_dir/issams.dat
    cd $run_dir
-   issams  -noinit -iprint 1 -nr 10 &> issams.out
+   nice issams  -noinit -iprint 1 -nr 10 &> issams.out
    echo "iasams exit code = "$?" for CV = "$s
    cd $start_dir
 done
