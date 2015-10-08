@@ -171,7 +171,10 @@ model testing, Figure~\ref{fig:r2biomass}.
 Since the MFCL assessment uses data for the period 1952 through 2012,
 catch data outside of this period were excluded from this analysis.
 
-\help{More background and discussion of data deficiencies needed here.}
+\help{More background and discussion of data deficiencies is needed
+here, e. g.  the ``ahi'' problem, HDAR reporting requirements, changes
+in the database, and ``recreational'' data.}
+
 Further properties of the data are presented in Appendix~\ref{sec:data}. 
 
 \section{Models}
@@ -284,8 +287,8 @@ The principle model assumptions are:
 \item The dynamics of the population of YFT in the MHI follows a
 simple Schaefer model is MHI-specific growth parameters.
 \item The local dynamics are ```forced'' by assuming that the local
-abundance is proportional to the abundance of the larger Pacific
-population.
+abundance is approximately proportional to the abundance of the larger
+Pacific population.
 \item Fishing mortality is represented by a random walk (as in the
 two-population model).
 \end{enumerate}
@@ -302,183 +305,50 @@ $F$ is the total fishing mortality per year in the MHI.
 
 \section{Results}
 \subsection{Two populations with explicit exchange}
-\begin{figure}
-\begin{center}
-\begin{tabular}{ll}
-~~~~~~~~~A &~~~~~~~~~B\\
-\includegraphics[width=0.5\textwidth]{./graphics/sim_q48_NNts.pdf}&
-\includegraphics[width=0.5\textwidth]{./graphics/sim_q52_NNts.pdf}\\
-~~~~~~~~~C &~~~~~~~~~D\\
-\includegraphics[width=0.5\textwidth]{./graphics/sim_q48r_NNts.pdf}&
-\includegraphics[width=0.5\textwidth]{./graphics/sim_q52r_NNts.pdf}\\
-\end{tabular}
-\caption{\label{fig:simNN}
-Simulated biomass trends with two values of the parameter $q$ and two
-levels of process error.
-Light blue lines indicate estimated $\None$, $\Ntwo$, and $\Nsum$
-biomass in metric tonnes.
-The dashed blue line is the estimated equilibrium biomass, $K$.
-Purple line is the estimated immigrant biomass $T_{21}$, 
-Red line indicates estimated proportion local, $\bar{p}$; 
-dashed red line indicates $\bar{p}=0.9$. 
-Panels A and C, $q=0.48$; panels B and D, $q=0.52$.
-Panels C and D repeat panels A and B with a random normal errors on
-$\None$ and $\Ntwo$ with standard deviations of 0.01 and 0.05
-respectively.
-}
-\end{center}
-\end{figure}
-
-The general behavior of the model system is shown in
-Figure~\ref{fig:simNN}, emphasizing the importance of $q$ in
-maintaining the stability of two subpopulations.
-For values of $q>0.5$, the local population, $\None$ is stable,
-$\Ntwo$ decreases, and the proportion local remains near 0.9.
-For values of $q<0.5$, the local population, $\None$ decreases,
-$\Ntwo$ increases, and the proportion local dips below 0.9.
-This same dependency on $q$ is also illustrated more generally in
-Figure~\ref{fig:NNphase}.
-
-Initial testing of the estimation procedure gave mixed results. 
-The model is sensitive to initial parameter guesses. Some
-combinations of initial values cause the numerical estimation
-procedure to terminate abnormally with the infamous ADMB error message 
-{\tt ``Matrix not positive definite in Ln\_det\_choleski''.}
-Nevertheless, the procedure arrives at a
-``solution'' for some combinations of initial estimates.
-
-\begin{figure}
-\begin{center}
-\includegraphics[width=\textwidth]{./graphics/est_catchB29.pdf}
-\caption{\label{fig:estC29}
-Estimated catch by fleet in metric tons. 
-The dark green dots indicate observed catch
-and light green lines indicate predicted catch,
-}
-\end{center}
-\end{figure}
-Observed and predicted catches are shown in Figure~\ref{fig:estC29}.
-The random-walk representation of fishing mortality
-produces a credible time series predicting catches very accurately for
-all fleets, except for the Aku Boat fleet.
-
-\begin{figure}[h!]
-\begin{center}
-\includegraphics[width=\textwidth]{./graphics/est_popB29.pdf}
-\caption{\label{fig:estB}
-Estimated biomass trends.
-Light blue lines indicate estimated $\None$, $\Ntwo$, and $\Nsum$
-biomass in metric tonnes.
-The dashed blue line is the estimated equilibrium biomass, $K$.
-Purple line is the estimated immigrant biomass $T_{21}$, 
-Red line indicates estimated proportion local, $\bar{p}$; 
-dashed red line indicates $\bar{p}=0.9$. 
-}
-\end{center}
-\end{figure}
-Predicted biomass trajectories are shown in
-Figure~\ref{fig:estB}. The population appears to begin above
-equilibrium and to decline to near equilibrium within two years.
-The size of the $\Ntwo$ population drops to near zero over the 61 year
-estimation period.
-In consequence, the proportion local begins slightly below 0.9,
-subsequently fluctuates around 0.9 and then increases.
-The increase in $q$ appears to coincide with the steep decline in the
-immigration rate of biomass into the MHI ($T_{21}$) in the late 1990s.
-
-\begin{table}
-\caption{\label{tab:testrun}
-Model ``estimates''. Initial values of model parameters and
-final values just prior to program exit with 
-{\tt ``Function minimizer: Step size  too small -- ialph=1''}. 
-Dashes (---) indicate that the variable was constrained to be constant at
-its initial value, i.e., not estimated.
-}
-\begin{center}
-\begin{tabular}{lrr}
-\hline
-Vatiable & Initial Value & Final Value\\
-\hline
-\hline
-$r$ & 1.20&  1.29\\
-$K$ & 150,000 & 149,000 \\
-$T_{12}$ & 0.01 & 0.00999\\
-$T^*_{21}$& 0.002 & 0.00202\\
-$q$ & 0.54 & 0.525\\
-\hline
-$\sigma_\eta$ & 0.1 & 0.0883\\
-$\sigma_\xi$ & 0.3 & 0.672\\
-$\sigma_\varepsilon$ & 1.0 & 0.0945\\
-$a_1$ & 0.07 & ---\\
-$a_2$ & 0.07 & ---\\
-$a_3$ & 0.07 & ---\\
-$a_4$ & 0.07 & ---\\
-$a_5$ & 0.07 & ---\\
-\hline
-$\bar{p}$ & 0.9 & ---\\
-$\sigma_{\bar{p}}$ & 0.8 & ---\\
-\hline
-\end{tabular}
-\end{center}
-\end{table}
-
-Values of the model parameters just prior to termination of the
-program are compared to their initial values in
-Table~\ref{tab:testrun}.
-Some model parameters do not change substantially from their initial
-values during the estimation procedure.
-The population dynamics parameters, 
-$r$, $K$, $T_{12}$, $T^*_{21}$, and $q$, are the most important for 
-stock assessment, but do not change much.
-Of these, $q$, the parameter apportioning 
-the non-linear mortality term between the two subpopulations,
-changes the most.
-
-The variance parameters are of no particular interest and exist only
-to represent variability in population dynamics and errors in
-observation. These ``nuisance'' appear to be reasonably sensitive to the
-data.
+\help{Preliminary results of the two population model were presented
+in a previous report. More work has been done on model interpretation
+and these previous results need revision.}
 
 \subsection{Single population with indexed abundance}
 
 \section{Discussion}
 
-The age-aggregated approach using a logistic model with emigration and
-immigration shows sufficient promise to continue model development.
-The general behavior of the model system (Figure~\ref{fig:simNN} and
-~\ref{fig:NNts}) appropriately describes a small persistent population
-interacting with a much larger one.
-The efficacy of the random walk
-representation of fishing mortality is particularly encouraging, and
-avoids debates about changes in catchability associated with
-changes in fishing efficiency.
-The proportion of local fish in the system is sensitive to model
-parameters and can effectively be constrained to be near the empirically
-determined value of 0.9. Coupling immigration to the output of
-some other model is relatively trivial to implement and is
-sufficiently flexible to use output from alternative models.
-
-Unfortunately, population dynamics parameters, with the possible
-exception of $q$, do not appear to be estimatable. Lack of
-sensitivity could be due to several causes: the model is completely
-ill-posed, the code is incorrect, there is no signal in data, or some
-combination of these. Inspection of catch trends
-(Figure~\ref{fig:annualTS}) does not reveal any obvious signs of stock
-depletion and recovery. Estimation of population dynamics parameters
-in a lightly exploited stock is a well-known problem in stock
-assessment.
-
-Figure~\ref{fig:NNphase} suggests that the model equations
-(\ref{eqn:coupledschaeferq}) have non-trivial equilibria for certain
-parameter values.
-The relationships between of the parameters $q$, $T^*_{21}$,
-and $\bar{p}$ are not clear.
-Estimation of fisheries reference point would be simpler if
-an analytic expression for the equilibrium point were available.
-Finite difference approximations of logistic population models are
-notoriously unstable under certain circumstances. An analytical
-solution of equation~\ref{eqn:coupledschaeferq} would be of great
-help.
+%The age-aggregated approach using a logistic model with emigration and
+%immigration shows sufficient promise to continue model development.
+%The general behavior of the model system (Figure~\ref{fig:simNN} and
+%~\ref{fig:NNts}) appropriately describes a small persistent population
+%interacting with a much larger one.
+%The efficacy of the random walk
+%representation of fishing mortality is particularly encouraging, and
+%avoids debates about changes in catchability associated with
+%changes in fishing efficiency.
+%The proportion of local fish in the system is sensitive to model
+%parameters and can effectively be constrained to be near the empirically
+%determined value of 0.9. Coupling immigration to the output of
+%some other model is relatively trivial to implement and is
+%sufficiently flexible to use output from alternative models.
+%
+%Unfortunately, population dynamics parameters, with the possible
+%exception of $q$, do not appear to be estimatable. Lack of
+%sensitivity could be due to several causes: the model is completely
+%ill-posed, the code is incorrect, there is no signal in data, or some
+%combination of these. Inspection of catch trends
+%(Figure~\ref{fig:annualTS}) does not reveal any obvious signs of stock
+%depletion and recovery. Estimation of population dynamics parameters
+%in a lightly exploited stock is a well-known problem in stock
+%assessment.
+%
+%Figure~\ref{fig:NNphase} suggests that the model equations
+%(\ref{eqn:coupledschaeferq}) have non-trivial equilibria for certain
+%parameter values.
+%The relationships between of the parameters $q$, $T^*_{21}$,
+%and $\bar{p}$ are not clear.
+%Estimation of fisheries reference point would be simpler if
+%an analytic expression for the equilibrium point were available.
+%Finite difference approximations of logistic population models are
+%notoriously unstable under certain circumstances. An analytical
+%solution of equation~\ref{eqn:coupledschaeferq} would be of great
+%help.
 
 \vspace{4ex}
 %\clearpage
@@ -723,6 +593,8 @@ Quarterly biomass trends estimated in MFCL Regions 2 and 4 from the
 \clearpage
 \section{Model development}
 \label{sec:models}
+\subsection{Two populations with explicit exchange}
+%https://github.com/johnrsibert/XSSA/blob/master/ADMB/xssams.tpl
 Let $\None$ equal the biomass of fish originating in region 1
 and residing in region 1
 and $\Ntwo$ equal the biomass of fish originating in region 2
@@ -814,13 +686,13 @@ t}}{K}\bigg)+\eta_t\nonumber\\
 -\sum_{g=1}^n F_{g,t-\Delta t} - T_{12} - q2r\frac{\None_{t-\Delta t}}{K}
      +\frac{T_{{21}_{t-\Delta t}}}{\Ntwo_{t-\Delta t}}\bigg)+\eta_t\nonumber
 \end{eqnarray}
-where $\eta_t \sim N(0,\sigma_\eta)$
+where $\eta_t \sim N(0,\sigma_N)$
 expresses process errors for both populations.
 
 {\bf Behavior of model system.}
 Efforts to derive an analytical expression to determine 
 a meaningful equilibrium for equations~\ref{eqn:coupledlogschaefer}
-have not been fruitful.
+have not been completely fruitful (Section \ref{sec:schaefer}).
 Figure~\ref{fig:NNphase} shows phase plane diagrams for several
 combinations of model parameters assuming constant $K$ and
 $T_{21}$. Apparently the system tends towards
@@ -922,7 +794,7 @@ under this model is
 \log C_{g,t} = \log \Biggl(F_{g,t}\cdot\Bigl(\frac{\None_{t-\Delta t}+\None_t}{2}
                            +\frac{\Ntwo_{t-\Delta
 t}+\Ntwo_t}{2}\Bigr)\Biggr) + \varepsilon_t
-\label{eqn:obs}
+\label{eqn:obs2}
 \end{equation}
 where the total population in region 1 is the sum of the average
 population over the time step (Quinn and Deriso, 1999), and
@@ -962,19 +834,20 @@ L(\theta,\alpha,x)=
 \end{equation}
 Here, $m$ is the number of time steps in the catch time series and
 $\theta$ is a vector of model parameters. A complete list of
-parameters is found in Table~\ref{tab:allvars}. 
+parameters is found in Table~\ref{tab:allvars2}. 
 The model is implemented in ADMB-RE (Fournier et al 2012).
 The actual number of
 parameters to be estimated depends on the model configuration,
 specified by phase flags in the input file. 
-All computer code, data files, and draft reports in support of this
-analysis can be found at Github:\linebreak
-\url{https://github.com/johnrsibert/XSSA.git}.
+%All computer code, data files, and draft reports in support of this
+%analysis can be found at Github:\linebreak
+%\url{https://github.com/johnrsibert/XSSA.git}.
 
 
 \begin{table}
-\caption{Complete list of model variables and parameters.
-\label{tab:allvars}}
+\caption{Complete list of variables and parameters for the two
+population model
+\label{tab:allvars2}}
 \begin{center}
 \begin{tabular}{ll}
 \hline
@@ -991,11 +864,10 @@ $T_{12}$ & Emigration rate $(y^{-1})$\\
 $T^*_{21}$& Immigration rate $(y^{-1})$\\
 $q$ & Nonlinear mortality apportionment proportion\\
 \hline
-$\sigma_\eta$ & Population growth SD\\
-$\sigma_\xi$ & Fishing mortality random walk SD\\
-$\sigma_\varepsilon$ & Observation error SD \\
-$a_g\; g=1\ldots n$ & Observation error contaminated by 
-fat-tailed distribution\\
+$\sigma_N$ & Population growth SD\\
+$\sigma_F$ & Fishing mortality random walk SD\\
+$\sigma_Y$ & Observation error SD \\
+$a$ & Likelihood contribution from fat-tailed distribution\\
 \hline
 $\bar{p}$ & Mean proportion local\\
 $\sigma_{L(p)}$ & SD logit transformed $\bar{p}$\\
@@ -1004,6 +876,97 @@ $\sigma_{L(p)}$ & SD logit transformed $\bar{p}$\\
 \end{center}
 \end{table}
 
+\clearpage
+\subsection{Single population with indexed abundance}
+The indexed abundance model\footnote{https://github.com/johnrsibert/XSSA/blob/master/ADMB/issams.tpl}
+assumes that the biomass of YFT in the MHI
+is proportional to the biomass of an ``index'' population.
+Let $I_t$ equal the biomass of the index population and $Q$ the
+constant of proportionality between the MHI population and the index
+population, thus
+\begin{equation}
+\label{eqn:Qprop}
+\varphi_t \sim N(QI_t-N_t,\sigma_Q)
+\end{equation}
+becomes a component of the total likelihood due to differences between
+the MHI biomass and the index population biomass.
+
+
+{\bf Transition Equation $T(\alpha_{t-1})$.}
+The state space transition equation for the single population model is
+developed by solving \ref{eqn:ischaefer} analytically from one time to
+the next (see Section \ref{sec:schaefer}).
+\begin{equation}
+%\label{eqn:intschaefer}
+N_t = \frac{K(r-\bar{F}_t)}{\frac{K(r-\bar{F}_t)}{N_{t-\Delta t}}e^{-\Delta
+t(r-\bar{F}_t)}-re^{-\Delta t(r-\bar{F}_t)} -r} + \eta_t
+\end{equation}
+where 
+$\bar{F}_t$ is the total fishing mortality, i. e.,
+$$
+\bar{F}_t =\sum_{g=1}^n F_{g,t-\Delta t}.
+$$
+$\eta_t \sim N(0,\sigma_N)$ is the process error expressing
+variability in population dynamics.
+
+
+{\bf Observation Equation, $O(\alpha)$.}
+Predicted catch, $\widehat{C}_{g,t}$, for each gear is the product of
+estimated fishing mortality and the total biomass.
+\begin{equation}
+\log \widehat{C}_{g,t} = \log\bigg(F_{g,t}\cdot\Bigl(\frac{N_{t-\Delta
+t}+N_t}{2}\Bigr)\bigg) + \varepsilon_t
+\label{eqn:obs1}
+\end{equation}
+where the total biomass is  the average
+biomass over the time step (Quinn and Deriso, 1999), and
+$\varepsilon_t$ is a ``zero-inflated'' normal likelihood given by
+\begin{equation}
+  \log \varepsilon_t = \left\{
+    \begin{array}{r@{\;:\quad}l}
+       C_{g,t} > 0 &
+(1-p_0)\cdot\bigg(\log\frac{1}{\sqrt{2\pi\sigma^2_Y}}
+          -\Bigl(\frac{\log
+C_{g,t}-\log\widehat{C}_{g,t}}{\sigma_Y}\Bigr)^2\bigg)\\
+       C_{g,t} = 0 & p_0 \cdot\log \frac{1}{\sqrt{2\pi\sigma^2_Y}}\\
+    \end{array}
+  \right.
+\end{equation}
+$p_0$ is the proportion of observed catch observations equal to 0.0.
+This proportion may be estimated or fixed at a constant value. For
+current analysis, it is fixed at $p_0 = 0.15738$ as computed from the data.
+% line 186, file issams.cpp, prop_zero =  0.4918 0 0 0.098361 0.19672, tprop_zero = 0.15738
+
+
+
+\begin{table}
+\caption{Complete list of variables and parameters for the single
+population model.
+\label{tab:allvars1}}
+\begin{center}
+\begin{tabular}{ll}
+\hline
+Variable & Definition\\
+\hline
+\hline
+$m$ & Number of quarterly time steps\\
+$n$ & Number of fishing gears\\
+\hline
+\hline
+$r$ & Instantaneous growth rate $(y^{-1})$\\
+$K$ & Asymptotic biomass (mt) \\
+$Q$ & Abundance index proportionality constant\\
+$p_0$ & Proportion of zero catch observations;\\
+      & fixed at $p_0 = 0.15738$\\
+\hline
+$\sigma_N$ & Population growth SD\\
+$\sigma_F$ & Fishing mortality random walk SD\\
+$\sigma_Q$ & Abundance index proportionality SD\\
+$\sigma_Y$ & Observation error SD \\
+\hline
+\end{tabular}
+\end{center}
+\end{table}
 \clearpage
 \input{schaefer_section}
 

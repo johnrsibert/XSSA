@@ -115,7 +115,8 @@ sd.bars = function(x,y,s,col="orange",lwd=3,lty="dashed")
 
 save.png.plot<-function(root,width=6.5,height=4.5)
 {
-  graphics.root <-paste("../Reports/graphics/",root,sep="")
+# graphics.root <-paste("../Reports/graphics/",root,sep="")
+  graphics.root <-paste("./",root,sep="")
   file.png <-paste(graphics.root,".png",sep="")
   file.pdf <-paste(graphics.root,".pdf",sep="")
   dev.copy2pdf(file=file.pdf,width=width,height=height)

@@ -196,14 +196,14 @@ plot.diagnostics=function(dat=NULL,file="diagnostics.dat",dt,ngear,
        yield = Fyield*K*(1.0-Fyield/r) # equilibirum yield at F
     #  yield = Fyield*max(dat$forcing,K)*(1.0-Fyield/r) # 
     #  Syield = Fmort*(dat$forcing+K*(1.0-Fmort/r)) # 
-       Syield = Fyield*(dat$forcing+K*(1.0-Fyield/r)) # 
+    #  Syield = Fyield*((dat$forcing+K)*(1.0-Fyield/r)) # 
        print(paste(K,r))
        print(head(cbind(Fyield,yield)))
        print(tail(cbind(Fyield,yield)))
        obsC = rowSums(dat[,obsC.ndx])
        predC = rowSums(dat[,predC.ndx])
        xrange = c(0,F.max)
-       yrange = c(0,2*max(obsC,predC,yield,na.rm=TRUE))
+       yrange = c(0,1.2*max(obsC,predC,yield,na.rm=TRUE))
        Flab = parse(text=paste("Total~Fishing~Mortality~(","y^-1",")",sep=""))
        plot(xrange,yrange,type='n', xlab=Flab, ylab="Total Yield (mt)")
 
@@ -211,7 +211,7 @@ plot.diagnostics=function(dat=NULL,file="diagnostics.dat",dt,ngear,
        points(Fmort,obsC,col= "darkgreen",pch=3,cex=2)
        points(Fmort,predC,col="darkgreen",pch=16)
    #   lines(Fmort,Syield,col="purple",lwd=3,lty="longdash")
-       lines(Fyield,Syield,col="purple",lwd=3,lty="longdash")
+   #   lines(Fyield,Syield,col="purple",lwd=3,lty="longdash")
    #   wmaxC = which(obsC==max(obsC,na.rm=TRUE))
    #   lines(c(0,Fmort[wmaxC]),c(0,obsC[wmaxC]),col="red",lty="longdash")
        lines(Fyield,yield,col="red",lwd=3,lty="longdash")
@@ -321,7 +321,8 @@ log.diagnostics=function(file="issams_program.log",ntime=61,dt=1,ngear=5,
 
    c = 'n'
    dev.list = vector(mode="numeric",length=5)
-   dev.file.names=c("tmp/est_pop","tmp/est_catch","tmp/est_F","tmp/prod")
+#  dev.file.names=c("tmp/est_pop","tmp/est_catch","tmp/est_F","tmp/prod")
+   dev.file.names=c("est_pop","est_catch","est_F","prod")
 #  while (c != 'q')
    while ( (c != 'q') && (c != 'x') )
    {

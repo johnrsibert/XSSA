@@ -257,7 +257,7 @@ PARAMETER_SECTION
   // abundance index proportionality constant standard deviation
   init_number logsdlogQ(phase_sdlogQ);
 
-  // robust yield likelihood proprtion contamination
+  // robust yield likelihood proportion contamination
   init_number Lpcon(phase_pcon);
 
   random_effects_vector U(1,lengthU);
