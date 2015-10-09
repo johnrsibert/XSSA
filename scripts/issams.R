@@ -453,10 +453,7 @@ read.rep=function(file="issams.rep",ntime=61,dt=1,ngear=5)
    return(ret)
 }
 
-read.rep.files=function(path.list) #=dir(pattern="CV0*"))
-#read.rep.files=function(path.list=c("CVruns/CV0.05", "CVruns/CV0.1", "CVruns/CV0.15", 
-#                                    "CVruns/CV0.2",  "CVruns/CV0.3",  
-#                                    "CVruns/CV0.4", "CVruns/CV0.5"))
+read.rep.files=function(path.list)
 {
    print(path.list)
    have.names=FALSE
@@ -506,6 +503,43 @@ read.rep.files=function(path.list) #=dir(pattern="CV0*"))
 
 }
 
+nice.xrange=function(x,nchar=3)
+{
+   xr = c(min(x,na.rm=TRUE),max(x,na.rm=TRUE))
+   if (nchar > 0)
+      xr[2] = xr[2]*1.05 #*nchar
+
+   return(xr)
+}
+
+plot.nll.K=function(path.list)
+{
+   rep = read.rep.files(path.list)
+   width = 9.0
+   height = 6.0
+   x11(width=width,height=height)
+   par(mar=c(4,4,0,4)+0.1)
+   xrange = nice.xrange(rep$sdlogF,5)
+   nx = length(rep$sdlogF)
+#  plot(rep$sdlogF,rep$nll,type='n',xlab="Process Error SD",ylab="Negative Log Likelihood")
+   plot(xrange,range(rep$nll),type='n',xlab="Process Error SD",ylab="Negative Log Likelihood")
+   double.lines(rep$sdlogF,rep$nll,bcol="blue",fcol="lightblue",lwd=5)
+   points(rep$sdlogF,rep$nll,col="blue",pch=16)
+   text(rep$sdlogF[nx],rep$nll[nx]," NLL",pos=4,offset=0.25,cex=1.0)
+
+   par("new"=TRUE)
+#  plot(rep$sdlogF,rep$K,type='n',axes=FALSE,ann=FALSE)
+   plot(xrange,range(rep$K),type='n',axes=FALSE,ann=FALSE)
+   double.lines(rep$sdlogF,rep$K,bcol="orange4",fcol="orange",lwd=5)
+   points(rep$sdlogF,rep$K,col="orange4",pch=16)
+   text(rep$sdlogF[nx],rep$K[nx]," K",pos=4,offset=0.25,cex=1.0)
+   axis(4) # ,col="orange4",col.axis="orange4")
+   mtext("K",side=4,line=3) #,col="orange")
+
+   save.png.plot("NLL-K",width=width,height=height)
+   
+
+}
 
 read.fit.files=function(path.list)
 {

@@ -3,7 +3,7 @@ rm -rfv CV*
 start_dir=$(pwd)
 echo "Starting directory: "$start_dir
 #std="0.2"
-std="0.05 0.1 0.15 0.2 0.3 0.4 0.5"
+std="0.05 0.1 0.15 0.201 0.3 0.4 0.5"
 
 for s in $std
 do
