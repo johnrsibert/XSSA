@@ -12,8 +12,8 @@
 %\usepackage[pdftex]{hyperref}
 \hypersetup{pdfauthor={John Sibert}}
 \hypersetup{pdfsubject={Assessment Model of MHI YFT Stocks}}
-\hypersetup{pdftitle={Assessment model of Main Hawaiian Islands
-Yellowfin Tuna Population}}
+\hypersetup{pdftitle={Assessment Models for Hawaiian Islands
+Yellowfin Tuna Fishery}}
 \hypersetup{pdfkeywords={yellowfin,state space, biomass transfer, model,Hawaii}}
 
 \newcommand\doublespacing{\baselineskip=1.6\normalbaselineskip}
@@ -41,7 +41,7 @@ Yellowfin Tuna Population}}
 \newcommand\nextN[1]{{#1_t}}
 
 
-\title{Feasibility of developing stock assessment models for the
+\title{Stock Assessment Models for the
 Main Hawaiian Islands Yellowfin Tuna Fishery}
 
 \author{
@@ -118,7 +118,7 @@ that link the MHI population to the larger Pacific population.
 %\includegraphics[height=0.5\textheight]{./graphics/5_gear_catch_history_a.pdf}
 \includegraphics[width=1.0\textwidth]{./graphics/5_gear_catch_history_a.pdf}
 \caption{\label{fig:annualTS}
-Annual yellowfin catch in metric tonnes by fisheries
+Reported annual yellowfin catch in metric tonnes by fisheries
 operating in the Main Hawaiian Islands from combined HDAR and NOAA data.
 }
 \end{center}
@@ -146,6 +146,9 @@ Statistical properties of the catch data and the method of joining the
 HDAR and NOAA longline time series are elaborated in
 Appendix~\ref{sec:data}. 
 
+\help{More background and discussion of data deficiencies is needed
+here, e. g.  the ``ahi'' problem, HDAR reporting requirements, changes
+in the database, and ``recreational'' data.}
 
 \begin{figure}[t]
 \begin{center}
@@ -171,9 +174,6 @@ model testing, Figure~\ref{fig:r2biomass}.
 Since the MFCL assessment uses data for the period 1952 through 2012,
 catch data outside of this period were excluded from this analysis.
 
-\help{More background and discussion of data deficiencies is needed
-here, e. g.  the ``ahi'' problem, HDAR reporting requirements, changes
-in the database, and ``recreational'' data.}
 
 Further properties of the data are presented in Appendix~\ref{sec:data}. 
 
@@ -286,7 +286,7 @@ The principle model assumptions are:
 \begin{enumerate}
 \item The dynamics of the population of YFT in the MHI follows a
 simple Schaefer model is MHI-specific growth parameters.
-\item The local dynamics are ```forced'' by assuming that the local
+\item The local dynamics are ``forced'' by assuming that the local
 abundance is approximately proportional to the abundance of the larger
 Pacific population.
 \item Fishing mortality is represented by a random walk (as in the
@@ -310,6 +310,56 @@ in a previous report. More work has been done on model interpretation
 and these previous results need revision.}
 
 \subsection{Single population with indexed abundance}
+The complete list of paramters to be estimated in this model are
+presented in Table~\ref{tab:allvars1}. Thre of these parameters are
+standard deviations of the state space transition equation process
+errors, $\sigma_N$, $\sigma_F$, and $\sigma_Q$. It proved impossible
+to estimate all three of these standard deviations simultaneously.
+Therefor estimations were carried out for a range of fixed values of
+these parameters. The results are shown in Figure
+
+\begin{figure}
+\begin{center}
+\includegraphics[width=\textwidth]{../run/CVruns/CV0.3/NLL-K.pdf}
+\caption{\label{fig:nll-K-CV}
+catches.}
+\end{center}
+\end{figure}
+
+
+
+
+%$\sigma_Y$ & Observation error SD & 0.0452 \\
+
+%  370   ar             4.0000e-01 0.0000e+00
+%  371   aK             1.2543e+04 6.7347e+03
+%  372   asdlogF        3.0000e-01 0.0000e+00
+%  373   asdlogPop      3.0000e-01 0.0000e+00
+%  374   asdlogYield    4.5292e-01 3.2282e-02
+%  375   aQ             3.2906e-02 1.9229e-02
+%  376   asdlogQ        3.0000e-01 0.0000e+00
+%  377   apcon          1.5738e-01 0.0000e+00
+\begin{table}
+\caption{Parameter estimates from the single population model.
+\label{tab:allvars1}}
+\begin{center}
+\begin{tabular}{lll}
+\hline
+Variable & Definition\\
+\hline
+$r$ & Instantaneous growth rate & $0.4 y^{-1}$ (fixed)\\
+$K$ & Asymptotic biomass & 12500 mt \\
+$Q$ & Abundance index proportionality constant & 0.00329\\
+$p_0$ & Proportion of zero catch observations & $p_0 = 0.15738$ (fixed)\\
+\hline
+$\sigma_N$ & Population growth SD & 0.3 (fixed)\\
+$\sigma_F$ & Fishing mortality random walk SD & 0.3 (fixed)\\
+$\sigma_Q$ & Abundance index proportionality SD & 0.3 (fixed)\\
+$\sigma_Y$ & Observation error SD & 0.0452 \\
+\hline
+\end{tabular}
+\end{center}
+\end{table}
 
 \section{Discussion}
 
