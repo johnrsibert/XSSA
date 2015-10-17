@@ -310,19 +310,25 @@ in a previous report. More work has been done on model interpretation
 and these previous results need revision.}
 
 \subsection{Single population with indexed abundance}
+Preliminary results are not encouraging.
 The complete list of paramters to be estimated in this model are
-presented in Table~\ref{tab:allvars1}. Thre of these parameters are
+presented in Table~\ref{tab:allvars1}. Three of these parameters are
 standard deviations of the state space transition equation process
-errors, $\sigma_N$, $\sigma_F$, and $\sigma_Q$. It proved impossible
-to estimate all three of these standard deviations simultaneously.
-Therefor estimations were carried out for a range of fixed values of
-these parameters. The results are shown in Figure
+errors, $\sigma_N$, $\sigma_F$, and $\sigma_Q$. 
+The model fails to converge to a solution if 
+all three of these standard deviations are estimated simultaneously.
+Estimations were carried out for a range of fixed values of
+these parameters. The results are shown in
+Figure~\ref{fig:nll-K-r.CV}.
 
 \begin{figure}
 \begin{center}
-\includegraphics[width=\textwidth]{../run/CVruns/CV0.3/NLL-K.pdf}
-\caption{\label{fig:nll-K-CV}
-catches.}
+%\includegraphics[width=\textwidth]{../run/CVruns-r0.4/CV0.3/NLL-K.pdf}
+\includegraphics[height=0.9\textheight]{./graphics/nll-K-r-comp.pdf}
+\caption{\label{fig:nll-K-r.CV}
+Likelihood values and estimates of $r$ and $K$ for values of 
+$\sigma_N$, $\sigma_F$, and $\sigma_Q$ fixed at a range of values. 
+}
 \end{center}
 \end{figure}
 

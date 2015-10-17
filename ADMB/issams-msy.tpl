@@ -240,8 +240,13 @@ DATA_SECTION
 
 PARAMETER_SECTION
   // logistic parameters
-  init_number logr(phase_r);
-  init_number logK(phase_K);
+  //init_number logr(phase_r);
+  number logr;
+  //init_number logK(phase_K);
+  number logK;
+
+  init_number logFmsy(phase_r);
+  init_number logMSY(phase_K);
 
   // random walk standard deviations
   init_number logsdlogF(phase_sdlogF);
@@ -280,21 +285,21 @@ PRELIMINARY_CALCS_SECTION
     userfun_entries = 0;
     status_blocks = 0;
     pininit = fexists(adstring(argv[0])+".pin");
-
-
     // set initial parameter value from data file
     TRACE(pininit)
     if (!pininit)
     {
        logr = log(init_r);
        TTRACE(logr,mfexp(logr))
+       logFmsy = logr - log(2.0);
        logK = log(init_K);
+       logMSY = logr + logK - log(4.0);
        TTRACE(logK,mfexp(logK))
+       TTRACE(logFmsy,logMSY)
 
        logsdlogF = log(init_sdlogF);
        logsdlogYield = log(init_sdlogYield);
        logsdlogPop = log(init_sdlogPop);
-       //logQ = log(init_Q);
        LQ = logit((double)init_Q);
        TTRACE(LQ,init_Q);
        TTRACE((1.0/(1.0+mfexp(-LQ))),(1.0/((1.0+mfexp(-LQ))+1e-20)))
@@ -334,8 +339,10 @@ PRELIMINARY_CALCS_SECTION
           cerr << "Error creating " << pinname << endl;
           ad_exit(1);
        }
-       PINOUT(logr)
-       PINOUT(logK)
+       //PINOUT(logr)
+       //PINOUT(logK)
+       PINOUT(logFmsy)
+       PINOUT(logMSY)
        PINOUT(logsdlogF)
        PINOUT(logsdlogPop)
        PINOUT(logsdlogYield)
@@ -404,6 +411,8 @@ PROCEDURE_SECTION
   }
 
   nll = 0.0;
+  logr = logFmsy + log(2.0);
+  logK = logMSY - logr + log(4.0);
   step0(U(utPop+1), logsdlogPop, logK, LQ, logsdlogQ);
  
   for (int t = 2; t <= ntime; t++)
@@ -420,8 +429,8 @@ PROCEDURE_SECTION
 
   ar = mfexp(logr);
   aK = mfexp(logK);
-  aFmsy = ar/2.0;
-  aMSY = ar*aK/4.0;
+  aFmsy = mfexp(logFmsy);
+  aMSY = mfexp(logMSY);
   asdlogF = mfexp(logsdlogF);
   asdlogPop = mfexp(logsdlogPop);
   asdlogYield = mfexp(logsdlogYield);
@@ -642,9 +651,13 @@ FUNCTION void write_status(ofstream& s)
     s << "# current phase = " << current_phase() << endl;
     s << "# nll = " << value(nll) << endl;
     s << "# nvar = " << initial_params::nvarcalc() << endl;
-    s << "# logr = " << logr << " (" << active(logr) <<")" << endl;
+    s << "# logFmsy = " << logFmsy << " (" << active(logFmsy) <<")" << endl;
+    s << "#    Fmsy = " << mfexp(logFmsy) << endl;
+    s << "# logr = " << logr << endl;
     s << "#    r = " << mfexp(logr) << endl;
-    s << "# logK = " << logK << " (" << active(logK) <<")" << endl;
+    s << "# logMSY = " << logMSY << " (" << active(logMSY) <<")" << endl;
+    s << "#    MSY = " << mfexp(logMSY) << endl;
+    s << "# logK = " << logK << endl;
     s << "#    K = " << mfexp(logK) << endl;
     s << "#     logsdlogF: " << logsdlogF 
              <<  " (" << active(logsdlogF) <<")" << endl;

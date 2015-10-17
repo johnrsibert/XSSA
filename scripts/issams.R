@@ -4,6 +4,7 @@ gear.names = c("TunaHL","Troll","Longline","Bottom/inshore HL","AkuBoat",
 sgn = c("THL","Troll","LL","BHL","Aku","K")
 have.xssams.R = FALSE
 have.xssams.R = TRUE
+start.year = 1952
 
 plot.error=function(x,y,sd,bcol,fcol,mult=2)
 {
@@ -32,7 +33,6 @@ plot.diagnostics=function(dat=NULL,file="diagnostics.dat",dt,ngear,
    if (is.null(dat))
      dat = read.table(file=file,header=TRUE)
 
-   start.year = 1952
    if (dat$t[1] == 1)
    {
       dat$t = (start.year-0.4*dt +  dat$t*dt)
@@ -452,8 +452,7 @@ read.rep=function(file="issams.rep",ntime=61,dt=1,ngear=5)
    ret$KF = extract.value("klingon_multiplier",rep)
    return(ret)
 }
-
-read.rep.files=function(path.list)
+read.rep.files=function(path.list)# read.rep.files(dir(path=".",pattern="CV*"))
 {
    print(path.list)
    have.names=FALSE
@@ -541,6 +540,61 @@ plot.nll.K=function(path.list)
 
 }
 
+comp.nll.K.r=function()
+{ 
+   path.0.4 = "CVruns-r0.4"
+   dirs.0.4 = dir(path=path.0.4,pattern="CV*")
+#  print(dirs.0.4)
+   rep.0.4 = read.rep.files(paste(path.0.4,dirs.0.4,sep="/"))
+#  print(rep.0.4)
+
+   path.est = "CVruns-rest"
+   dirs.est = dir(path=path.est,pattern="CV*")
+#  print(path.est)
+   rep.est = read.rep.files(paste(path.est,dirs.est,sep="/"))
+#  print(rep.est)
+
+   width = 6.5
+   height = 9.0
+   x11(width=width,height=height)
+   par(mar=c(4,4,0,0)+0.1)
+   lm = layout(matrix(c(1:3),ncol=1,byrow=TRUE))
+   layout.show(lm)
+   xrange = nice.xrange(rep.0.4$sdlogF,5)
+   nx = length(rep.0.4$sdlogF)
+
+   yrange = range(c(rep.0.4$nll,rep.est$nll))
+   plot(xrange,yrange,type='n',xlab="",ylab="Negative Log Likelihood")
+   double.lines(rep.0.4$sdlogF,rep.0.4$nll,bcol="blue",fcol="lightblue",lwd=5)
+   points(rep.0.4$sdlogF,rep.0.4$nll,col="blue",pch=16)
+   text(rep.0.4$sdlogF[1],rep.0.4$nll[1]," r=0.4",pos=4,offset=0.25,cex=1.0)
+   double.lines(rep.est$sdlogF,rep.est$nll,bcol="darkgreen",fcol="lightgreen",lwd=5)
+   points(rep.est$sdlogF,rep.est$nll,col="darkgreen",pch=16)
+   text(rep.est$sdlogF[1],rep.est$nll[1]," est r",pos=4,offset=0.25,cex=1.0)
+
+   yrange = range(c(rep.0.4$r,rep.est$r))
+   plot(xrange,yrange,type='n',xlab="",ylab="Growth rate, r")
+   double.lines(rep.0.4$sdlogF,rep.0.4$r,bcol="blue",fcol="lightblue",lwd=5)
+   points(rep.0.4$sdlogF,rep.0.4$r,col="blue",pch=16)
+   text(rep.0.4$sdlogF[nx],rep.0.4$r[nx]," r=0.4",pos=4,offset=0.25,cex=1.0)
+   double.lines(rep.est$sdlogF,rep.est$r,bcol="darkgreen",fcol="lightgreen",lwd=5)
+   points(rep.est$sdlogF,rep.est$r,col="darkgreen",pch=16)
+   text(rep.est$sdlogF[nx],rep.est$r[nx]," est r",pos=4,offset=0.25,cex=1.0)
+   
+   yrange = range(c(rep.0.4$K,rep.est$K))
+   plot(xrange,yrange,type='n',xlab="Process Error SD",ylab="Asymptotic Size, K")
+   double.lines(rep.0.4$sdlogF,rep.0.4$K,bcol="blue",fcol="lightblue",lwd=5)
+   points(rep.0.4$sdlogF,rep.0.4$K,col="blue",pch=16)
+   text(rep.0.4$sdlogF[nx],rep.0.4$K[nx]," r=0.4",pos=4,offset=0.25,cex=1.0)
+   double.lines(rep.est$sdlogF,rep.est$K,bcol="darkgreen",fcol="lightgreen",lwd=5)
+   points(rep.est$sdlogF,rep.est$K,col="darkgreen",pch=16)
+   text(rep.est$sdlogF[nx],rep.est$K[nx]," est r",pos=4,offset=0.25,cex=1.0)
+   
+
+   save.png.plot("nll-K-r-comp",width=width,height=height)
+}
+
+
 read.fit.files=function(path.list)
 {
    nfit = length(path.list)
@@ -586,32 +640,72 @@ read.fit.files=function(path.list)
 
 }
 
-
-   #  if (!have.names)
-   #  {
-   #     cat(paste(fit.names[1],", ",sep=""),file=csv,append=FALSE)
-   #     for (i in 2:nvar)
-   #     {
-   #        cat(fit.names[i],file=csv,append=TRUE)
-   #        if (i < nvar)
-   #           cat(", ",file=csv,append=TRUE)
-   #     }
-   #     cat("\n",file=csv,append=TRUE)
-   #     have.names=TRUE
-   #  }
-
-   # cat(paste(strsplit(p,"KF")[[1]][2],",",sep=""),file=csv,append=TRUE)
-   # cat(paste(fit$nlogl,",",sep=""),file=csv,append=TRUE)
-
-   # for (i in 1:4)
-   # {
-   #    cat(paste(fit$est[pndx[i]],","),file=csv,append=TRUE)
-   #    cat(paste(fit$std[pndx[i]],","),file=csv,append=TRUE)
-   #    cat(cv[i],file=csv,append=TRUE)
-   #    if (i < 4)
-   #       cat(", ",file=csv,append=TRUE)
-   # }
-   # cat("\n",file=csv,append=TRUE)
+get.cor.table=function(file)
+{
+   fit = read.fit(file)
+   fixed = which(fit$names!="U")
+   cor.mat = fit$cor[fixed,fixed]
+   colnames(cor.mat) = fit$names[fixed]
+   rownames(cor.mat) = fit$names[fixed]
+   print(cor.mat)
+   csv = paste(file,"-cor.csv",sep="")
+   cat(paste("#",file,"\n",sep=" "),file=csv,append=FALSE)
+#  cat(", ",file=csv,append=TRUE)
+   cat("Name, Est., S.D., ",file=csv,append=TRUE)
+   n = length(fixed)
+   for (i in 1:n)
+   {
+      cat(colnames(cor.mat)[i],file=csv,append=TRUE)
+   #  cat(paste(colnames(cor.mat)[i],fit$est[fixed[i]],fit$std[fixed[i]],
+   #            sep=", "),file=csv,append=TRUE)
+      if (i < n)
+         cat(", ",file=csv,append=TRUE)
+      else
+         cat("\n",file=csv,append=TRUE)
+   }       
    
-#  rep.matrix = matrix(unlist(rep.list),nrow=length(path.list),byrow=TRUE)
-#  colnames(rep.matrix)=names(rep)
+   for (i in 1:n)
+   {
+   #  cat(paste(rownames(cor.mat)[i],", ",sep=""),file=csv,append=TRUE)
+      cat(paste(rownames(cor.mat)[i],", ",fit$est[fixed[i]],", ",fit$std[fixed[i]],", ",
+                sep=""),file=csv,append=TRUE)
+      for (j in 1:n)
+      {
+      #  print(paste(i,j))
+         if (j <= i)
+            cat(cor.mat[i,j],file=csv,append=TRUE)
+         else
+            cor.mat[i,j] = NA
+
+         if (j <= i)
+            cat(", ",file=csv,append=TRUE)
+
+      }
+      cat("\n",file=csv,append=TRUE)
+   }
+   print(cor.mat)
+
+}
+
+plot.U=function(file,ntime=61,dt=1,ngear=5)
+{
+   fit = read.fit(file)
+   uu = which(fit$names=="U")
+   utPop = ngear*ntime
+   est = fit$est[uu]
+   std = fit$std[uu]
+   tt = seq(1,ntime,dt)
+   #  dat$t = (start.year-0.4*dt +  dat$t*dt)
+   t = (start.year-0.4*dt +  tt*dt)
+   P = exp(est[tt+utPop])
+   sdP = std[tt+utPop]
+
+   options(scipen=6)
+   nice.ts.plot(t,P)
+   plot.error(t,P,sdP,bcol="blue",fcol="lightblue",mult=1)
+#  return(std[tt+utPop])
+}
+
+
+
+
