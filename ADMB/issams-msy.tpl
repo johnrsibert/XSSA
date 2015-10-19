@@ -125,13 +125,13 @@ DATA_SECTION
   !!    immigrant_biomass = mean_immigrant_biomass;
   !! TRACE(immigrant_biomass)
 
-  init_int phase_r;
-  init_number init_r;
-  !! TTRACE(init_r,phase_r)
+  init_int phase_Fmsy;
+  init_number init_Fmsy;
+  !! TTRACE(init_Fmsy,phase_Fmsy)
 
-  init_int phase_K;
-  init_number init_K;
-  !! TTRACE(init_K,phase_K)
+  init_int phase_MSY;
+  init_number init_MSY;
+  !! TTRACE(init_MSY,phase_MSY)
 
   init_int phase_sdlogF;
   init_number init_sdlogF;
@@ -240,13 +240,11 @@ DATA_SECTION
 
 PARAMETER_SECTION
   // logistic parameters
-  //init_number logr(phase_r);
-  number logr;
-  //init_number logK(phase_K);
-  number logK;
+  //number logr;
+  //number logK;
 
-  init_number logFmsy(phase_r);
-  init_number logMSY(phase_K);
+  init_number logFmsy(phase_Fmsy);
+  init_number logMSY(phase_MSY);
 
   // random walk standard deviations
   init_number logsdlogF(phase_sdlogF);
@@ -289,12 +287,12 @@ PRELIMINARY_CALCS_SECTION
     TRACE(pininit)
     if (!pininit)
     {
-       logr = log(init_r);
-       TTRACE(logr,mfexp(logr))
-       logFmsy = logr - log(2.0);
-       logK = log(init_K);
-       logMSY = logr + logK - log(4.0);
-       TTRACE(logK,mfexp(logK))
+       logFmsy = log(init_Fmsy);
+       TTRACE(logFmsy,init_Fmsy)
+       //logr = logFmsy + log(2);
+
+       logMSY = log(init_MSY);
+       //logK = logMSY -logr + log(4.0);
        TTRACE(logFmsy,logMSY)
 
        logsdlogF = log(init_sdlogF);
@@ -314,7 +312,8 @@ PRELIMINARY_CALCS_SECTION
        }
        Lpcon = logit((const double&)init_pcon);
 
-       double K = mfexp(value(logK));
+       double r = 2.0*exp(value(logFmsy));
+       double K = 4.0*exp(value(logMSY))/(1.0e-20+r);
        //double K = immigrant_biomass[1];
 
        int ut = 0;
@@ -376,8 +375,8 @@ PRELIMINARY_CALCS_SECTION
     TRACE(Fndxl)
     TRACE(Fndxu)
     TRACE(lengthU)
-    TRACE(logr)
-    TRACE(logK)
+    //TRACE(logr)
+    //TRACE(logK)
     TRACE(logsdlogF)
     TRACE(logsdlogPop)
     TRACE(logsdlogYield)
@@ -397,8 +396,8 @@ PROCEDURE_SECTION
     TRACE(Fndxl)
     TRACE(Fndxu)
     TRACE(lengthU)
-    TRACE(logr)
-    TRACE(logK)
+    //TRACE(logr)
+    //TRACE(logK)
     TRACE(logsdlogF)
     TRACE(logsdlogPop)
     TRACE(logsdlogYield)
@@ -411,15 +410,15 @@ PROCEDURE_SECTION
   }
 
   nll = 0.0;
-  logr = logFmsy + log(2.0);
-  logK = logMSY - logr + log(4.0);
-  step0(U(utPop+1), logsdlogPop, logK, LQ, logsdlogQ);
+  //logr = logFmsy + log(2.0);
+  //logK = logMSY - logr + log(4.0);
+  step0(U(utPop+1), logsdlogPop, logFmsy, logMSY, LQ, logsdlogQ);
  
   for (int t = 2; t <= ntime; t++)
   {
      step(t, U(Fndxl(t-1),Fndxu(t-1)), U(Fndxl(t),Fndxu(t)), logsdlogF,
              U(utPop+t-1), U(utPop+t), logsdlogPop,
-             logr, logK, LQ, logsdlogQ);
+             logFmsy, logMSY, LQ, logsdlogQ);
   }
 
   for (int t = 1; t <= ntime; t++)
@@ -427,8 +426,8 @@ PROCEDURE_SECTION
      obs(t,U(Fndxl(t),Fndxu(t)),U(utPop+t-1),U(utPop+t), logsdlogYield,Lpcon);
   }
 
-  ar = mfexp(logr);
-  aK = mfexp(logK);
+  ar = 2.0*exp(logFmsy);
+  aK = 4.0*exp(logMSY)/(1.0e-20+ar);
   aFmsy = mfexp(logFmsy);
   aMSY = mfexp(logMSY);
   asdlogF = mfexp(logsdlogF);
@@ -448,11 +447,13 @@ PROCEDURE_SECTION
   }
 
 
-SEPARABLE_FUNCTION void step0(const dvariable& p11, const dvariable& lsdlogPop, const dvariable& lK, const dvariable& tLQ, const dvariable& lsdlogQ)
+SEPARABLE_FUNCTION void step0(const dvariable& p11, const dvariable& lsdlogPop, const dvariable& lFmsy, const dvariable& lMSY, const dvariable& tLQ, const dvariable& lsdlogQ)
   // p11 U(utPop+t-1) log N at start of time step
 
   // ensure that starting population size is near K
-  dvariable K = mfexp(lK);
+  //dvariable K = mfexp(lK);
+  dvariable r = 2.0*exp(lFmsy);
+  dvariable K = 4.0*exp(lMSY)/(1.0e-20+r);
   dvariable p10 = K;
   dvariable varlogPop = square(mfexp(lsdlogPop));
   dvariable Pnll = 0.0;
@@ -468,7 +469,7 @@ SEPARABLE_FUNCTION void step0(const dvariable& p11, const dvariable& lsdlogPop, 
   nll += (Pnll+Qnll);
 
 
-SEPARABLE_FUNCTION void step(const int t, const dvar_vector& f1, const dvar_vector& f2, const dvariable& lsdlogF, const dvariable& p11, const dvariable p12, const dvariable& lsdlogPop, const dvariable& lr, const dvariable& lK, const dvariable lnQ, const dvariable& lsdlogQ)
+SEPARABLE_FUNCTION void step(const int t, const dvar_vector& f1, const dvar_vector& f2, const dvariable& lsdlogF, const dvariable& p11, const dvariable p12, const dvariable& lsdlogPop, const dvariable& lFmsy, const dvariable& lMSY, const dvariable lnQ, const dvariable& lsdlogQ)
   // f1  U(Fndxl(t-1),Fndxu(t-1)) log F at start of time step
   // f2  U(Fndxl(t),Fndxu(t)      log F at end   of time step)
   // p11 U(utPop+t-1) log N at start of time step
@@ -479,8 +480,10 @@ SEPARABLE_FUNCTION void step(const int t, const dvar_vector& f1, const dvar_vect
   dvariable varlogPop = square(mfexp(lsdlogPop));
   dvariable varlogQ = square(mfexp(lsdlogQ));
  
-  dvariable r = mfexp(lr);
-  dvariable K = mfexp(lK);
+  //dvariable r = mfexp(lr);
+  //dvariable K = mfexp(lK);
+  dvariable r = 2.0*exp(lFmsy);
+  dvariable K = 4.0*exp(lMSY)/(1.0e-20+r);
   dvar_vector ft1(1,ngear);
   dvar_vector ft2(1,ngear);
   for (int g = 1; g <= ngear; g++)
@@ -634,8 +637,10 @@ SEPARABLE_FUNCTION void obs(const int t, const dvar_vector& f,const dvariable& p
 
   // dump stuff in "residual" matrix
   int rc = 0; // residuals column counter
+  double r = 2.0*exp(value(logFmsy));
+  double K = 4.0*exp(value(logMSY))/(1.0e-20+r);
   residuals(t,++rc) = value(pop21);
-  residuals(t,++rc) = mfexp(value(logK));
+  residuals(t,++rc) = K;
   residuals(t,++rc) = alogit(value(LQ))*immigrant_biomass(t);
 
   for (int g = 1; g <= ngear; g++)
@@ -645,6 +650,8 @@ SEPARABLE_FUNCTION void obs(const int t, const dvar_vector& f,const dvariable& p
 
 FUNCTION void write_status(ofstream& s)
     status_blocks ++;
+    double r = 2.0*exp(value(logFmsy));
+    double K = 4.0*exp(value(logMSY))/(1.0e-20+r);
     cout << "\n# Status block:" << status_blocks << endl;
     s << "\n# Status after "<< userfun_entries << " PROCEDURE_SECTION entries;" << endl;
     s << "# Status block " << status_blocks << endl;
@@ -653,12 +660,12 @@ FUNCTION void write_status(ofstream& s)
     s << "# nvar = " << initial_params::nvarcalc() << endl;
     s << "# logFmsy = " << logFmsy << " (" << active(logFmsy) <<")" << endl;
     s << "#    Fmsy = " << mfexp(logFmsy) << endl;
-    s << "# logr = " << logr << endl;
-    s << "#    r = " << mfexp(logr) << endl;
+    //s << "# logr = " << logr << endl;
+    s << "#    r = " << r << endl;
     s << "# logMSY = " << logMSY << " (" << active(logMSY) <<")" << endl;
     s << "#    MSY = " << mfexp(logMSY) << endl;
-    s << "# logK = " << logK << endl;
-    s << "#    K = " << mfexp(logK) << endl;
+    //s << "# logK = " << logK << endl;
+    s << "#    K = " << K << endl;
     s << "#     logsdlogF: " << logsdlogF 
              <<  " (" << active(logsdlogF) <<")" << endl;
     s << "#        sdlogF: " << mfexp(logsdlogF) << endl;
