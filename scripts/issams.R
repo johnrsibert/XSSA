@@ -99,7 +99,7 @@ plot.diagnostics=function(dat=NULL,file="diagnostics.dat",dt,ngear,
    double.lines(dat$t,dat$pop,bcol="blue",fcol="lightblue",lwd=5)
    text(x[ntime],dat$pop[ntime],adj=c(0,1),col="blue",labels="  N")
 
-#  plot.error(x,dat$forcing,sdlogQ,bcol="purple4",fcol="purple1")
+   plot.error(x,dat$forcing,sdlogQ,bcol="purple4",fcol="purple1")
    double.lines(x,dat$forcing,bcol="purple4",fcol="purple1",lwd=5) 
    text(x[ntime],dat$forcing[ntime],adj=c(0,0),col="purple4",labels="  I")
    show.block.number(block,dat$t[1])
@@ -647,9 +647,10 @@ get.cor.table=function(file)
    cor.mat = fit$cor[fixed,fixed]
    colnames(cor.mat) = fit$names[fixed]
    rownames(cor.mat) = fit$names[fixed]
-   print(cor.mat)
+#  print(cor.mat)
    csv = paste(file,"-cor.csv",sep="")
    cat(paste("#",file,"\n",sep=" "),file=csv,append=FALSE)
+   cat(paste("#","nll =",fit$nlogl,"\n",sep=" "),file=csv,append=TRUE)
 #  cat(", ",file=csv,append=TRUE)
    cat("Name, Est., S.D., ",file=csv,append=TRUE)
    n = length(fixed)
@@ -683,7 +684,8 @@ get.cor.table=function(file)
       }
       cat("\n",file=csv,append=TRUE)
    }
-   print(cor.mat)
+#  print(cor.mat)
+   return(fit)
 
 }
 

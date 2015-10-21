@@ -129,6 +129,16 @@ DATA_SECTION
   init_number init_Fmsy;
   !! TTRACE(init_Fmsy,phase_Fmsy)
 
+  init_int use_Fmsy_prior;
+  init_number Fmsy_prior;
+  init_number sdFmsy_prior;
+  number logFmsy_prior;
+  !! logFmsy_prior = log(Fmsy_prior);
+  !! TRACE(use_Fmsy_prior)
+  !! TTRACE(Fmsy_prior,sdFmsy_prior)
+  number varFmsy_prior;
+  !! varFmsy_prior = square(sdFmsy_prior);
+
   init_int phase_MSY;
   init_number init_MSY;
   !! TTRACE(init_MSY,phase_MSY)
@@ -426,6 +436,12 @@ PROCEDURE_SECTION
      obs(t,U(Fndxl(t),Fndxu(t)),U(utPop+t-1),U(utPop+t), logsdlogYield,Lpcon);
   }
 
+  if ((use_Fmsy_prior) && active(logFmsy) )
+  {
+     dvariable nll_Fmsy = 0.5*(log(TWO_M_PI*varFmsy_prior) + square(logFmsy - logFmsy_prior)/varFmsy_prior);
+     nll += nll_Fmsy;
+  }
+
   ar = 2.0*exp(logFmsy);
   aK = 4.0*exp(logMSY)/(1.0e-20+ar);
   aFmsy = mfexp(logFmsy);
@@ -660,6 +676,8 @@ FUNCTION void write_status(ofstream& s)
     s << "# nvar = " << initial_params::nvarcalc() << endl;
     s << "# logFmsy = " << logFmsy << " (" << active(logFmsy) <<")" << endl;
     s << "#    Fmsy = " << mfexp(logFmsy) << endl;
+    s << "#   Fmsy_prior = " << Fmsy_prior << " (" << (use_Fmsy_prior>0) << ")" << endl;
+    s << "# sfFmsy_prior = " << sdFmsy_prior << endl;
     //s << "# logr = " << logr << endl;
     s << "#    r = " << r << endl;
     s << "# logMSY = " << logMSY << " (" << active(logMSY) <<")" << endl;
