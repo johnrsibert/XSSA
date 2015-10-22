@@ -11,7 +11,7 @@ GLOBALS_SECTION;
 
   ofstream clogf;
   const double TWO_M_PI = 2.0*M_PI;
-  const double LOG_TWO_M_PI = log(TWO_M_PI);
+  //const double LOG_TWO_M_PI = log(TWO_M_PI);
   const double LOG_M_PI = log(M_PI);
   
   // for finite differences, run
@@ -36,7 +36,7 @@ GLOBALS_SECTION;
      return a;
   }
   template double logit<double>(const double& p);
-  //template dvariable logit<dvariable>(const dvariable& p);
+  template dvariable logit<dvariable>(const dvariable& p);
   //template df1b2variable logit(const df1b2variable& p); 
 
   template <typename SCALAR> SCALAR alogit(const SCALAR& a)
@@ -45,7 +45,7 @@ GLOBALS_SECTION;
      return p;
   }
   template double alogit<double>(const double& a);
-  //template dvariable alogit<dvariable>(const dvariable& a);
+  template dvariable alogit<dvariable>(const dvariable& a);
   //template df1b2variable alogit<df1b2variable>(const df1b2variable& a); 
 
   dvector alogit(const dvector& a)
@@ -87,7 +87,6 @@ DATA_SECTION
   init_int use_klingons;
   init_number klingon_multiplier;
   !! TTRACE(use_klingons,klingon_multiplier)
-
   !!  if (use_klingons)
   !!  {
   !!     ngear = nobs_gear + 1;
@@ -138,13 +137,23 @@ DATA_SECTION
   init_number init_T21;
   !! TTRACE(init_T21,phase_T21)
 
-  init_int phase_r;
-  init_number init_r;
-  !! TTRACE(init_r,phase_r)
+  init_int phase_Fmsy;
+  init_number init_Fmsy;
+  !! TTRACE(init_Fmsy,phase_Fmsy)
+  init_int use_Fmsy_prior;
+  init_number Fmsy_prior;
+  init_number sdFmsy_prior;
+  number logFmsy_prior;
+  !! logFmsy_prior = log(Fmsy_prior);
+  !! TRACE(use_Fmsy_prior)
+  !! TTRACE(Fmsy_prior,sdFmsy_prior)
+  number varFmsy_prior;
+  !! varFmsy_prior = square(sdFmsy_prior);
 
-  init_int phase_K;
-  init_number init_K;
-  !! TTRACE(init_K,phase_K)
+  init_int phase_MSY;
+  init_number init_MSY;
+  !! TTRACE(init_MSY,phase_MSY)
+
 
   init_int phase_sdlogF;
   init_number init_sdlogF;
@@ -186,6 +195,8 @@ DATA_SECTION
   int trace_init_pars;
   matrix residuals;
   ivector UU;
+  ivector first_year;
+  ivector last_year;
 
  LOCAL_CALCS;
     TRACE(ntime);
@@ -223,17 +234,40 @@ DATA_SECTION
     }
     clogf << "Zero catch bridging instances: " << nzero << endl;
 
+    first_year.allocate(1,ngear);
+    first_year = ntime;
+    last_year.allocate(1,ngear);
+    last_year.initialize();
     ivector count_zero(1,ngear);
     count_zero.initialize();
     for (int t = 1; t<= ntime; t++)
     {
        for (int g = 1; g <= ngear; g++)
        {
+          if ( (obs_catch(t,g) > 0.0) && (t < first_year(g)) )
+             first_year(g) = t;
+          if ( (obs_catch(t,g) > 0.0) && (t > last_year(g)) )
+             last_year(g) = t;
+       }
+    }
+    TRACE(first_year)
+    TRACE(last_year)
+    // dont't do this
+    first_year = 1;
+    last_year = ntime;
+    TRACE(first_year)
+    TRACE(last_year)
+
+    for (int g = 1; g <= ngear; g++)
+    {
+       for (int t = first_year(g); t<= last_year(g); t++)
+       {
           if (obs_catch(t,g) <= 0.0)
             count_zero(g) ++;
        }
     }
     TRACE(count_zero)
+
     dvector prop_zero(1,ngear);
     prop_zero = count_zero/double(ntime);
     double tprop_zero = (double)sum(count_zero)/(double)(ngear*ntime);
@@ -263,8 +297,11 @@ PARAMETER_SECTION
   init_number logT21(phase_T21);
 
   // logistic parameters
-  init_number logr(phase_r);
-  init_number logK(phase_K);
+  //init_number logr(phase_r);
+  //init_number logK(phase_K);
+
+  init_number logFmsy(phase_Fmsy);
+  init_number logMSY(phase_MSY);
 
   // random walk standard deviations
   init_number logsdlogF(phase_sdlogF);
@@ -286,6 +323,17 @@ PARAMETER_SECTION
   random_effects_vector U(1,lengthU);
   //vector U(1,lengthU);
 
+  sdreport_number aMSY;
+  sdreport_number aFmsy;
+  sdreport_number ar;
+  sdreport_number aK;
+  sdreport_number asdlogF;
+  sdreport_number asdlogPop;
+  sdreport_number asdlogYield;
+  sdreport_number aQ;
+  sdreport_number asdlogQ;
+  sdreport_number apcon;
+
   objective_function_value nll;
 
 PRELIMINARY_CALCS_SECTION
@@ -299,10 +347,15 @@ PRELIMINARY_CALCS_SECTION
        logT12 = log(init_T12+1.0e-20);
        logT21 = log(init_T21+1.0e-20);
        TTRACE(logT12,logT21)
-       logr = log(init_r);
-       TTRACE(logr,mfexp(logr))
-       logK = log(init_K);
-       TTRACE(logK,mfexp(logK))
+
+       logFmsy = log(init_Fmsy);
+       TTRACE(logFmsy,init_Fmsy)
+       //logr = logFmsy + log(2);
+
+       logMSY = log(init_MSY);
+       //logK = logMSY -logr + log(4.0);
+       TTRACE(logFmsy,logMSY)
+
 
        logsdlogF = log(init_sdlogF);
        logsdlogYield = log(init_sdlogYield);
@@ -325,8 +378,10 @@ PRELIMINARY_CALCS_SECTION
           init_pcon = 1e-25;
        }
        Lpcon = logit((const double&)init_pcon);
+       TTRACE(init_pcon,Lpcon)
 
-       double K = mfexp(value(logK));
+       double r = 2.0*exp(value(logFmsy));
+       double K = 4.0*exp(value(logMSY))/(1.0e-20+r);
        //double K = immigrant_biomass[1];
        double Pop1 = prop*K;
        double Pop2 = K-Pop1;
@@ -365,8 +420,10 @@ PRELIMINARY_CALCS_SECTION
        }
        PINOUT(logT12)
        PINOUT(logT21)
-       PINOUT(logr)
-       PINOUT(logK)
+       //PINOUT(logr)
+       //PINOUT(logK)
+       PINOUT(logFmsy)
+       PINOUT(logMSY)
        PINOUT(logsdlogF)
        PINOUT(logsdlogPop)
        PINOUT(logsdlogYield)
@@ -404,10 +461,11 @@ PRELIMINARY_CALCS_SECTION
     TRACE(Fndxl)
     TRACE(Fndxu)
     TRACE(lengthU)
-    TRACE(logT12)
-    TRACE(logT21)
-    TRACE(logr)
-    TRACE(logK)
+    //TRACE(logT12)
+    //TRACE(logT21)
+    TRACE(logsdlogF)
+    TRACE(logsdlogPop)
+    TRACE(logsdlogYield)
     TRACE(logsdlogF)
     TRACE(logsdlogPop)
     TRACE(logsdlogYield)
@@ -431,8 +489,8 @@ PROCEDURE_SECTION
     TRACE(lengthU)
     TRACE(logT12)
     TRACE(logT21)
-    TRACE(logr)
-    TRACE(logK)
+    //TRACE(logr)
+    //TRACE(logK)
     TRACE(logsdlogF)
     TRACE(logsdlogPop)
     TRACE(logsdlogYield)
@@ -448,40 +506,61 @@ PROCEDURE_SECTION
 
   nll = 0.0;
 
-  step0(U(utPop1+1), U(utPop2+1), logsdlogPop, logK, LmeanProportion_local);
+  HERE
+  step0(U(utPop1+1), U(utPop2+1), logsdlogPop, logFmsy, logMSY, LmeanProportion_local);
 
   for (int t = 2; t <= ntime; t++)
   {
+     TRACE(t)
      step(t, U(Fndxl(t-1),Fndxu(t-1)), U(Fndxl(t),Fndxu(t)), logsdlogF,
              U(utPop1+t-1), U(utPop1+t), U(utPop2+t-1), U(utPop2+t), logsdlogPop,
-             logr,logK,logT12,logT21,LmeanProportion_local,logsdLProportion_local,qProp);
+             logFmsy, logMSY, logT12,logT21,LmeanProportion_local,logsdLProportion_local,qProp);
   }
 
   for (int t = 1; t <= ntime; t++)
   {
+     TRACE(t)
      obs(t,U(Fndxl(t),Fndxu(t)),U(utPop1+t-1),U(utPop1+t),
                                 U(utPop2+t-1),U(utPop2+t),logsdlogYield,Lpcon);
   }
 
+  if ((use_Fmsy_prior) && active(logFmsy) )
+  {
+     HERE
+     dvariable nll_Fmsy = 0.5*(log(TWO_M_PI*varFmsy_prior) + square(logFmsy - logFmsy_prior)/varFmsy_prior);
+     nll += nll_Fmsy;
+     TRACE(nll_Fmsy)
+  }
+
+  ar = 2.0*exp(logFmsy);
+  aK = 4.0*exp(logMSY)/(1.0e-20+ar);
+  aFmsy = mfexp(logFmsy);
+  aMSY = mfexp(logMSY);
+  asdlogF = mfexp(logsdlogF);
+  asdlogPop = mfexp(logsdlogPop);
+  asdlogYield = mfexp(logsdlogYield);
+  apcon = alogit((dvariable&)Lpcon);
   ++userfun_entries;
   int status_print = ntime;
   if (userfun_entries > lengthU)
      status_print = lengthU;
-  //if (userfun_entries % status_print == 0)
-  if (userfun_entries % lengthU == 0)
+  if (userfun_entries % status_print == 0)
+  //if (userfun_entries % lengthU == 0)
   {
      write_status(clogf);
   }
 
 
-SEPARABLE_FUNCTION void step0(const dvariable& p11, const dvariable p21, const dvariable& lsdlogPop, const dvariable& lK, const dvariable& LmPropL) 
+SEPARABLE_FUNCTION void step0(const dvariable& p11, const dvariable p21, const dvariable& lsdlogPop, const dvariable& lFmsy, const dvariable& lMSY, const dvariable& LmPropL) 
   // p11 U(utPop1+t-1) log N1 at start of time step
   // p21 U(utPop2+t-1) log N2 at start of time step
 
   // ensure that starting population size is near K
-  dvariable K = mfexp(lK);
-  //dvariable PropL = alogit(LmPropL);
-  dvariable PropL = 1.0/(1.0+mfexp(-LmPropL));
+  //dvariable K = mfexp(lK);
+  dvariable r = 2.0*exp(lFmsy);
+  dvariable K = 4.0*exp(lMSY)/(1.0e-20+r);
+  dvariable PropL = alogit((dvariable&)LmPropL);
+  //dvariable PropL = 1.0/(1.0+mfexp(-LmPropL));
   dvariable p10 = PropL*K;
   dvariable p20 = K-p10;
   //TTRACE(p10,p20)
@@ -495,7 +574,7 @@ SEPARABLE_FUNCTION void step0(const dvariable& p11, const dvariable p21, const d
   nll += Pnll;
 
 
-SEPARABLE_FUNCTION void step(const int t, const dvar_vector& f1, const dvar_vector& f2, const dvariable& lsdlogF, const dvariable& p11, const dvariable p12, const dvariable& p21, const dvariable p22, const dvariable& lsdlogPop, const dvariable& lr, const dvariable& lK, const dvariable& lT12, const dvariable& lT21, const dvariable& LmPropL, const dvariable& lsdLProportion_local, const dvariable& qP)
+SEPARABLE_FUNCTION void step(const int t, const dvar_vector& f1, const dvar_vector& f2, const dvariable& lsdlogF, const dvariable& p11, const dvariable p12, const dvariable& p21, const dvariable p22, const dvariable& lsdlogPop, const dvariable& lFmsy, const dvariable& lMSY, const dvariable& lT12, const dvariable& lT21, const dvariable& LmPropL, const dvariable& lsdLProportion_local, const dvariable& qP)
   // f1  U(Fndxl(t-1),Fndxu(t-1)) log F at start of time step
   // f2  U(Fndxl(t),Fndxu(t)      log F at end   of time step)
   // p11 U(utPop1+t-1) log N1 at start of time step
@@ -507,8 +586,10 @@ SEPARABLE_FUNCTION void step(const int t, const dvar_vector& f1, const dvar_vect
   dvariable varlogF = square(mfexp(lsdlogF));
   dvariable varlogPop = square(mfexp(lsdlogPop));
 
-  dvariable r = mfexp(lr);
-  dvariable K = mfexp(lK);
+  //dvariable r = mfexp(lr);
+  //dvariable K = mfexp(lK);
+  dvariable r = 2.0*exp(lFmsy);
+  dvariable K = 4.0*exp(lMSY)/(1.0e-20+r);
   dvariable T12 =mfexp(lT12);
   dvariable T21 =mfexp(lT21);
   dvariable LmeanPropL = LmPropL;
@@ -706,12 +787,17 @@ SEPARABLE_FUNCTION void obs(const int t, const dvar_vector& f,const dvariable& p
      if (use_robustY == 1)  // normal + t distribution
      {
         dvariable z = square(obs_catch(t,g)-log_pred_yield(g))/varlogYield;
+        TRACE(z)
 
         dvariable norm_part = 0.5*(log(TWO_M_PI*varlogYield) + z);
+        TRACE(norm_part)
 
         // standard Cauchy density
         dvariable fat_part = 1.0/(M_PI*(1.0 + z));
-        dvariable pfat = alogit(Lpc);
+        TRACE(fat_part)
+        TRACE(Lpc)
+        dvariable pfat = alogit((dvariable&)Lpc);
+        TRACE(pfat)
         Ynll += log((1.0-pfat)*mfexp(norm_part) + pfat*fat_part);
      }
 
@@ -770,9 +856,11 @@ SEPARABLE_FUNCTION void obs(const int t, const dvar_vector& f,const dvariable& p
 
   // dump stuff in "residual" matrix
   int rc = 0; // residuals column counter
+  double r = 2.0*exp(value(logFmsy));
+  double K = 4.0*exp(value(logMSY))/(1.0e-20+r);
   residuals(t,++rc) = value(pop21);
   residuals(t,++rc) = value(pop22);
-  residuals(t,++rc) = mfexp(value(logK));
+  residuals(t,++rc) = K;
   residuals(t,++rc) = mfexp(value(logT21))*immigrant_biomass(t);
   double propLa = value(pop21) - value(pop22);
   residuals(t,++rc) = alogit(propLa);
@@ -785,6 +873,8 @@ SEPARABLE_FUNCTION void obs(const int t, const dvar_vector& f,const dvariable& p
 FUNCTION void write_status(ofstream& s)
     double prop = alogit(value(LmeanProportion_local));
     status_blocks ++;
+    double r = 2.0*exp(value(logFmsy));
+    double K = 4.0*exp(value(logMSY))/(1.0e-20+r);
     cout << "\n# Status block:" << status_blocks << endl;
     s << "\n# Status after "<< userfun_entries << " PROCEDURE_SECTION entries;" << endl;
     s << "# Status block " << status_blocks << endl;
@@ -796,10 +886,16 @@ FUNCTION void write_status(ofstream& s)
     s << "#  T12 = " << mfexp(logT12) << endl;
     s << "#  logT21 = " << logT21 << " (" << active(logT21) <<")" << endl;
     s << "#  T21 = " << mfexp(logT21) << endl;
-    s << "# logr = " << logr << " (" << active(logr) <<")" << endl;
-    s << "#    r = " << mfexp(logr) << endl;
-    s << "# logK = " << logK << " (" << active(logK) <<")" << endl;
-    s << "#    K = " << mfexp(logK) << endl;
+    s << "# logFmsy = " << logFmsy << " (" << active(logFmsy) <<")" << endl;
+    s << "#    Fmsy = " << mfexp(logFmsy) << endl;
+    s << "#   Fmsy_prior = " << Fmsy_prior << " (" << (use_Fmsy_prior>0) << ")" << endl;
+    s << "# sdFmsy_prior = " << sdFmsy_prior << endl;
+    //s << "# logr = " << logr << " (" << active(logr) <<")" << endl;
+    s << "#    r = " << r << endl;
+    s << "# logMSY = " << logMSY << " (" << active(logMSY) <<")" << endl;
+    s << "#    MSY = " << mfexp(logMSY) << endl;
+    //s << "# logK = " << logK << " (" << active(logK) <<")" << endl;
+    s << "#    K = " << K << endl;
     s << "#     logsdlogF: " << logsdlogF 
              <<  " (" << active(logsdlogF) <<")" << endl;
     s << "#        sdlogF: " << mfexp(logsdlogF) << endl;

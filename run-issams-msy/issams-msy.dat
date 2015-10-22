@@ -33,13 +33,13 @@
 # Fmsy    phase  initial value
            2         0.25 
 # Fmsy_prior  use  value  sd
-               1     0.25  0.2 
+               1     0.25  0.8 
 # MSY     phase  initial value
            1     10000
 # sdlogF    phase  initial values
              1     0.3
 # sdlogPop    phase  initial values
-              -1     0.3 
+               1     0.3 
 # sdlogYield  phase initial value
                1    0.3
 # Q           phase initial value
@@ -51,3 +51,4 @@
 # 1   -1         0.07 0.07 0.07 0.07 0.07
 # use phase proportion 0
   3   -1         0.15738
+# 0   -1         0.15738
