@@ -178,6 +178,8 @@ DATA_SECTION
   int trace_init_pars;
   matrix residuals;
   ivector UU;
+  ivector first_year;
+  ivector last_year;
 
  LOCAL_CALCS;
     TRACE(ntime);
@@ -215,17 +217,40 @@ DATA_SECTION
     }
     clogf << "Zero catch bridging instances: " << nzero << endl;
 
+    first_year.allocate(1,ngear);
+    first_year = ntime;
+    last_year.allocate(1,ngear);
+    last_year.initialize();
     ivector count_zero(1,ngear);
     count_zero.initialize();
     for (int t = 1; t<= ntime; t++)
     {
        for (int g = 1; g <= ngear; g++)
        {
+          if ( (obs_catch(t,g) > 0.0) && (t < first_year(g)) )
+             first_year(g) = t;
+          if ( (obs_catch(t,g) > 0.0) && (t > last_year(g)) )
+             last_year(g) = t;
+       }
+    }
+    TRACE(first_year)
+    TRACE(last_year)
+    // dont't do this
+    first_year = 1;
+    last_year = ntime;
+    TRACE(first_year)
+    TRACE(last_year)
+
+    for (int g = 1; g <= ngear; g++)
+    {
+       for (int t = first_year(g); t<= last_year(g); t++)
+       {
           if (obs_catch(t,g) <= 0.0)
             count_zero(g) ++;
        }
     }
     TRACE(count_zero)
+
     dvector prop_zero(1,ngear);
     prop_zero = count_zero/double(ntime);
     double tprop_zero = (double)sum(count_zero)/(double)(ngear*ntime);
@@ -574,78 +599,87 @@ SEPARABLE_FUNCTION void obs(const int t, const dvar_vector& f,const dvariable& p
      log_total_mean_pop = log( 0.5*(mfexp(pop11) + mfexp(pop21)) );
 
   dvar_vector log_pred_yield(1,ngear);
-  for (int g = 1; g <= ngear; g++)
-  {
-     log_pred_yield(g) = logdt + ft(g) + log_total_mean_pop;
-  }
+  //for (int g = 1; g <= ngear; g++)
+  //{
+     //log_pred_yield(g) = logdt + ft(g) + log_total_mean_pop;
+  //}
 
-  dvariable varlogYield = square(mfexp(logsdlogYield));
   dvariable Ynll = 0.0;
   for (int g = 1; g <= ngear; g++)
   {
      // observation error
-     if (use_robustY == 1)  // normal + t distribution
+     if ( (t >= first_year(g)) && (t <= last_year(g)) )
      {
-        dvariable z = square(obs_catch(t,g)-log_pred_yield(g))/varlogYield;
+        log_pred_yield(g) = logdt + ft(g) + log_total_mean_pop;
 
-        dvariable norm_part = 0.5*(log(TWO_M_PI*varlogYield) + z);
-
-        // standard Cauchy density
-        dvariable fat_part = 1.0/(M_PI*(1.0 + z));
-        //dvariable pfat = alogit(Lpc(g));
-        dvariable pfat = alogit(Lpc);
-        Ynll += log((1.0-pfat)*mfexp(norm_part) + pfat*fat_part);
-     }
-
-     // this block is incorrect and should not be used
-     else if (use_robustY == 2) 
-     {
-        cerr << "Unsupported robustifation option: " << use_robustY << endl;
-        if (1)
-           ad_exit(1);
-        // based on a misreading of newreg2.cpp 
-        double width=3.0;
-        double width2=width*width;
-        const double alpha = 0.7;
-        const double a2 = square(alpha);
-        dvariable diff2 = square(obs_catch(t,g)-log_pred_yield(g));
-        dvariable v_hat = diff2+1.0e-80;
-
-        //dvariable pcon = alogit(Lpc(g));
-        dvariable pcon = alogit(Lpc);
-        dvariable b=2.*pcon/(width*sqrt(PI));  // This is the weight for the "robustifying" term
-
-        dvariable norm_part = log(1.0-pcon)*mfexp(-diff2/(2.0*a2*v_hat));
+        dvariable varlogYield = square(mfexp(logsdlogYield));
+        if (use_robustY == 1)  // normal + t distribution
+        {
+           dvariable z = square(obs_catch(t,g)-log_pred_yield(g))/varlogYield;
    
-        dvariable fat_part =  b/(1.+pow(diff2/(width2*a2*v_hat),2));
-        Ynll += norm_part + fat_part;
+           dvariable norm_part = 0.5*(log(TWO_M_PI*varlogYield) + z);
+   
+           // standard Cauchy density
+           dvariable fat_part = 1.0/(M_PI*(1.0 + z));
+           //dvariable pfat = alogit(Lpc(g));
+           dvariable pfat = alogit(Lpc);
+           Ynll += log((1.0-pfat)*mfexp(norm_part) + pfat*fat_part);
+        }
+   
+        // this block is incorrect and should not be used
+        else if (use_robustY == 2) 
+        {
+           cerr << "Unsupported robustifation option: " << use_robustY << endl;
+           if (1)
+              ad_exit(1);
+           // based on a misreading of newreg2.cpp 
+           double width=3.0;
+           double width2=width*width;
+           const double alpha = 0.7;
+           const double a2 = square(alpha);
+           dvariable diff2 = square(obs_catch(t,g)-log_pred_yield(g));
+           dvariable v_hat = diff2+1.0e-80;
+   
+           //dvariable pcon = alogit(Lpc(g));
+           dvariable pcon = alogit(Lpc);
+           dvariable b=2.*pcon/(width*sqrt(PI));  // This is the weight for the "robustifying" term
+   
+           dvariable norm_part = log(1.0-pcon)*mfexp(-diff2/(2.0*a2*v_hat));
+      
+           dvariable fat_part =  b/(1.+pow(diff2/(width2*a2*v_hat),2));
+           Ynll += norm_part + fat_part;
+        }
+   
+        else if (use_robustY == 3) // zero inflated normal
+        {
+           //dvariable pzero = alogit(Lpc(g));
+           dvariable pzero = alogit((dvariable&)Lpc);
+           if (obs_catch(t,g) > logZeroCatch)
+           {
+              Ynll += (1.0-pzero)*0.5*(log(TWO_M_PI*varlogYield) + square(obs_catch(t,g)-log_pred_yield(g))/varlogYield);
+           }
+           else
+           {
+              Ynll += pzero*0.5*(log(TWO_M_PI*varlogYield));
+           }
+        }
+   
+        else // default normal likelihood
+        {
+           Ynll += 0.5*(log(TWO_M_PI*varlogYield) + square(obs_catch(t,g)-log_pred_yield(g))/varlogYield);
+   
+           if (isnan(value(Ynll)))
+           {
+              TRACE(Ynll)
+              TTRACE(t,g)
+              write_status(clogf);
+              ad_exit(1);
+           }
+        }
      }
-
-     else if (use_robustY == 3) // zero inflated normal
+     else
      {
-        //dvariable pzero = alogit(Lpc(g));
-        dvariable pzero = alogit((dvariable&)Lpc);
-        if (obs_catch(t,g) > logZeroCatch)
-        {
-           Ynll += (1.0-pzero)*0.5*(log(TWO_M_PI*varlogYield) + square(obs_catch(t,g)-log_pred_yield(g))/varlogYield);
-        }
-        else
-        {
-           Ynll += pzero*0.5*(log(TWO_M_PI*varlogYield));
-        }
-     }
-
-     else // default normal likelihood
-     {
-        Ynll += 0.5*(log(TWO_M_PI*varlogYield) + square(obs_catch(t,g)-log_pred_yield(g))/varlogYield);
-
-        if (isnan(value(Ynll)))
-        {
-           TRACE(Ynll)
-           TTRACE(t,g)
-           write_status(clogf);
-           ad_exit(1);
-        }
+        log_pred_yield(g) = logZeroCatch;
      }
   }
 
@@ -677,7 +711,7 @@ FUNCTION void write_status(ofstream& s)
     s << "# logFmsy = " << logFmsy << " (" << active(logFmsy) <<")" << endl;
     s << "#    Fmsy = " << mfexp(logFmsy) << endl;
     s << "#   Fmsy_prior = " << Fmsy_prior << " (" << (use_Fmsy_prior>0) << ")" << endl;
-    s << "# sfFmsy_prior = " << sdFmsy_prior << endl;
+    s << "# sdFmsy_prior = " << sdFmsy_prior << endl;
     //s << "# logr = " << logr << endl;
     s << "#    r = " << r << endl;
     s << "# logMSY = " << logMSY << " (" << active(logMSY) <<")" << endl;
