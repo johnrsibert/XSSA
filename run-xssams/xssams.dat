@@ -31,7 +31,7 @@
  0
 #
 # T12  phase  initial value
-        1     0.01
+        1     0.001
 # T21  phase  initial value
         1     1e-4
 # Fmsy    phase  initial value
@@ -39,15 +39,15 @@
 # Fmsy_prior  use  value  sd
                1     0.25  0.8 
 # MSY     phase  initial value
-          -1     10000
+           1     10000
 # sdlogF    phase  initial values
              1     0.3
 # sdlogPop    phase  initial values
               -1     0.3
 # sdlogYield  phase initial values
-              -1    0.3
+               1    0.3
 # meanProportion_Local phase initial value
-                       -1    0.9
+                        3    0.9
 # sdLproportion_local phase initial value
                       -1    0.8
 # qProp phase initial value
@@ -55,7 +55,7 @@
 #        1    0.75
 # robust yield likelihood
 # use pfat_phase pfat initial values
-  1   -1         0.07 #0.07 0.07 0.07 0.07
+# 1   -1         0.07 
 # use phase proportion 0
-# 3   -1         0.15738
+  3   -1         0.15738
 # 0   -1         0.15738

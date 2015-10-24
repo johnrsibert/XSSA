@@ -66,6 +66,7 @@ TOP_OF_MAIN_SECTION
     ad_exit(1);
   }
   cout << "Opened program log: " << logname << endl;
+  pad();
 
 
 DATA_SECTION
@@ -82,7 +83,6 @@ DATA_SECTION
   init_int use_klingons;
   init_number klingon_multiplier;
   !! TTRACE(use_klingons,klingon_multiplier)
-
   !!  if (use_klingons)
   !!  {
   !!     ngear = nobs_gear + 1;
@@ -324,9 +324,9 @@ PRELIMINARY_CALCS_SECTION
     {
        logFmsy = log(init_Fmsy);
        TTRACE(logFmsy,init_Fmsy)
-       //logr = logFmsy + log(2);
 
        logMSY = log(init_MSY);
+       TTRACE(logMSY,init_MSY)
        //logK = logMSY -logr + log(4.0);
        TTRACE(logFmsy,logMSY)
 
@@ -347,8 +347,8 @@ PRELIMINARY_CALCS_SECTION
        }
        Lpcon = logit((const double&)init_pcon);
 
-       double r = 2.0*exp(value(logFmsy));
-       double K = 4.0*exp(value(logMSY))/(1.0e-20+r);
+       double r = 2.0*mfexp(value(logFmsy));
+       double K = 4.0*mfexp(value(logMSY))/(1.0e-20+r);
        //double K = immigrant_biomass[1];
 
        int ut = 0;
@@ -410,8 +410,10 @@ PRELIMINARY_CALCS_SECTION
     TRACE(Fndxl)
     TRACE(Fndxu)
     TRACE(lengthU)
-    //TRACE(logr)
-    //TRACE(logK)
+
+
+    TRACE(logFmsy)
+    TRACE(logMSY)
     TRACE(logsdlogF)
     TRACE(logsdlogPop)
     TRACE(logsdlogYield)
@@ -445,8 +447,7 @@ PROCEDURE_SECTION
   }
 
   nll = 0.0;
-  //logr = logFmsy + log(2.0);
-  //logK = logMSY - logr + log(4.0);
+
   step0(U(utPop+1), logsdlogPop, logFmsy, logMSY, LQ, logsdlogQ);
  
   for (int t = 2; t <= ntime; t++)
@@ -467,8 +468,8 @@ PROCEDURE_SECTION
      nll += nll_Fmsy;
   }
 
-  ar = 2.0*exp(logFmsy);
-  aK = 4.0*exp(logMSY)/(1.0e-20+ar);
+  ar = 2.0*mfexp(logFmsy);
+  aK = 4.0*mfexp(logMSY)/(1.0e-20+ar);
   aFmsy = mfexp(logFmsy);
   aMSY = mfexp(logMSY);
   asdlogF = mfexp(logsdlogF);
@@ -492,9 +493,8 @@ SEPARABLE_FUNCTION void step0(const dvariable& p11, const dvariable& lsdlogPop, 
   // p11 U(utPop+t-1) log N at start of time step
 
   // ensure that starting population size is near K
-  //dvariable K = mfexp(lK);
-  dvariable r = 2.0*exp(lFmsy);
-  dvariable K = 4.0*exp(lMSY)/(1.0e-20+r);
+  dvariable r = 2.0*mfexp(lFmsy);
+  dvariable K = 4.0*mfexp(lMSY)/(1.0e-20+r);
   dvariable p10 = K;
   dvariable varlogPop = square(mfexp(lsdlogPop));
   dvariable Pnll = 0.0;
@@ -687,8 +687,8 @@ SEPARABLE_FUNCTION void obs(const int t, const dvar_vector& f,const dvariable& p
 
   // dump stuff in "residual" matrix
   int rc = 0; // residuals column counter
-  double r = 2.0*exp(value(logFmsy));
-  double K = 4.0*exp(value(logMSY))/(1.0e-20+r);
+  double r = 2.0*mfexp(value(logFmsy));
+  double K = 4.0*mfexp(value(logMSY))/(1.0e-20+r);
   residuals(t,++rc) = value(pop21);
   residuals(t,++rc) = K;
   residuals(t,++rc) = alogit(value(LQ))*immigrant_biomass(t);

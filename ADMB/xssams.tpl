@@ -71,6 +71,7 @@ TOP_OF_MAIN_SECTION
     ad_exit(1);
   }
   cout << "Opened program log: " << logname << endl;
+  pad();
 
 
 DATA_SECTION
@@ -350,12 +351,9 @@ PRELIMINARY_CALCS_SECTION
 
        logFmsy = log(init_Fmsy);
        TTRACE(logFmsy,init_Fmsy)
-       //logr = logFmsy + log(2);
 
        logMSY = log(init_MSY);
-       //logK = logMSY -logr + log(4.0);
-       TTRACE(logFmsy,logMSY)
-
+       TTRACE(logMSY,init_MSY)
 
        logsdlogF = log(init_sdlogF);
        logsdlogYield = log(init_sdlogYield);
@@ -378,15 +376,12 @@ PRELIMINARY_CALCS_SECTION
           init_pcon = 1e-25;
        }
        Lpcon = logit((const double&)init_pcon);
-       TTRACE(init_pcon,Lpcon)
 
-       double r = 2.0*exp(value(logFmsy));
-       double K = 4.0*exp(value(logMSY))/(1.0e-20+r);
+       double r = 2.0*mfexp(value(logFmsy));
+       double K = 4.0*mfexp(value(logMSY))/(1.0e-20+r);
        //double K = immigrant_biomass[1];
        double Pop1 = prop*K;
        double Pop2 = K-Pop1;
-       TTRACE(Pop1,Pop2)
-       TTRACE(log(Pop1),log(Pop2))
 
        //dmatrix Ferr(1,ntime,1,ngear); Ferr.fill_randn(77);
        //dmatrix logPop1Err(1,ntime,1,2); logPop1Err.fill_randn(79);
@@ -461,8 +456,10 @@ PRELIMINARY_CALCS_SECTION
     TRACE(Fndxl)
     TRACE(Fndxu)
     TRACE(lengthU)
-    //TRACE(logT12)
-    //TRACE(logT21)
+    TRACE(logT12)
+    TRACE(logT21)
+    TRACE(logFmsy)
+    TRACE(logMSY)
     TRACE(logsdlogF)
     TRACE(logsdlogPop)
     TRACE(logsdlogYield)
@@ -506,12 +503,10 @@ PROCEDURE_SECTION
 
   nll = 0.0;
 
-  HERE
   step0(U(utPop1+1), U(utPop2+1), logsdlogPop, logFmsy, logMSY, LmeanProportion_local);
 
   for (int t = 2; t <= ntime; t++)
   {
-     TRACE(t)
      step(t, U(Fndxl(t-1),Fndxu(t-1)), U(Fndxl(t),Fndxu(t)), logsdlogF,
              U(utPop1+t-1), U(utPop1+t), U(utPop2+t-1), U(utPop2+t), logsdlogPop,
              logFmsy, logMSY, logT12,logT21,LmeanProportion_local,logsdLProportion_local,qProp);
@@ -519,21 +514,18 @@ PROCEDURE_SECTION
 
   for (int t = 1; t <= ntime; t++)
   {
-     TRACE(t)
      obs(t,U(Fndxl(t),Fndxu(t)),U(utPop1+t-1),U(utPop1+t),
                                 U(utPop2+t-1),U(utPop2+t),logsdlogYield,Lpcon);
   }
 
   if ((use_Fmsy_prior) && active(logFmsy) )
   {
-     HERE
      dvariable nll_Fmsy = 0.5*(log(TWO_M_PI*varFmsy_prior) + square(logFmsy - logFmsy_prior)/varFmsy_prior);
      nll += nll_Fmsy;
-     TRACE(nll_Fmsy)
   }
 
-  ar = 2.0*exp(logFmsy);
-  aK = 4.0*exp(logMSY)/(1.0e-20+ar);
+  ar = 2.0*mfexp(logFmsy);
+  aK = 4.0*mfexp(logMSY)/(1.0e-20+ar);
   aFmsy = mfexp(logFmsy);
   aMSY = mfexp(logMSY);
   asdlogF = mfexp(logsdlogF);
@@ -556,9 +548,8 @@ SEPARABLE_FUNCTION void step0(const dvariable& p11, const dvariable p21, const d
   // p21 U(utPop2+t-1) log N2 at start of time step
 
   // ensure that starting population size is near K
-  //dvariable K = mfexp(lK);
-  dvariable r = 2.0*exp(lFmsy);
-  dvariable K = 4.0*exp(lMSY)/(1.0e-20+r);
+  dvariable r = 2.0*mfexp(lFmsy);
+  dvariable K = 4.0*mfexp(lMSY)/(1.0e-20+r);
   dvariable PropL = alogit((dvariable&)LmPropL);
   //dvariable PropL = 1.0/(1.0+mfexp(-LmPropL));
   dvariable p10 = PropL*K;
@@ -588,8 +579,8 @@ SEPARABLE_FUNCTION void step(const int t, const dvar_vector& f1, const dvar_vect
 
   //dvariable r = mfexp(lr);
   //dvariable K = mfexp(lK);
-  dvariable r = 2.0*exp(lFmsy);
-  dvariable K = 4.0*exp(lMSY)/(1.0e-20+r);
+  dvariable r = 2.0*mfexp(lFmsy);
+  dvariable K = 4.0*mfexp(lMSY)/(1.0e-20+r);
   dvariable T12 =mfexp(lT12);
   dvariable T21 =mfexp(lT21);
   dvariable LmeanPropL = LmPropL;
@@ -606,6 +597,7 @@ SEPARABLE_FUNCTION void step(const int t, const dvar_vector& f1, const dvar_vect
   for (int g = 1; g <= ngear; g++)
   {
      Fnll += 0.5*(log(TWO_M_PI*varlogF) + square(ft1(g)-ft2(g))/varlogF);
+     //TTRACE(g,Fnll)
 
      if (isnan(value(Fnll)) && (userfun_entries > 0))
      {
@@ -621,6 +613,7 @@ SEPARABLE_FUNCTION void step(const int t, const dvar_vector& f1, const dvar_vect
   dvariable q = qP;
   dvariable penN1 = 0.0;
   dvariable penN2 = 0.0;
+  const double epsN = 1.0e-3;
 
   #define __FINITE_DIFFERENCE__
   #ifdef __FINITE_DIFFERENCE__
@@ -640,11 +633,13 @@ SEPARABLE_FUNCTION void step(const int t, const dvar_vector& f1, const dvar_vect
   }
   dvariable nextLogN1 = p11;
   dvariable nextLogN2 = p21;
+  //TTRACE(nextLogN1,nextLogN2)
   dvariable prevN1;
   dvariable prevN2;
   dvariable dLogN1;
   dvariable dLogN2;
   double sdt = dt/niter;
+  //TTRACE(niter,sdt)
   for (int ss = 1; ss <= niter; ss++)
   {
      prevN1 = mfexp(nextLogN1);
@@ -652,8 +647,12 @@ SEPARABLE_FUNCTION void step(const int t, const dvar_vector& f1, const dvar_vect
      dLogN1 = r*(1.0 - prevN1/K) - sumFg - T12 - 2.0*(1.0-q)*r*prevN2/K;
      dLogN2 = r*(1.0 - prevN2/K) - sumFg - T12 - 2.0*q*r*prevN1/K + T21*immigrant_biomass(t)/prevN2;
 
-     nextLogN1 = nextLogN1 + dLogN1*sdt;
-     nextLogN2 = nextLogN2 + dLogN2*sdt;
+  ///dvariable nextLogN1 = log(posfun(nextN1,epsN,penN1));
+     //nextLogN1 = nextLogN1 + dLogN1*sdt;
+     //nextLogN2 = nextLogN2 + dLogN2*sdt;
+     nextLogN1 = nextLogN1 + posfun(dLogN1,epsN,penN1)*sdt;
+     nextLogN2 = nextLogN2 + posfun(dLogN2,epsN,penN2)*sdt;
+     //TTRACE(nextLogN1,nextLogN2)
   }
   //TTRACE(mfexp(nextLogN1),mfexp(nextLogN2))
   //TTRACE(nextLogN1,nextLogN2)
@@ -678,11 +677,12 @@ SEPARABLE_FUNCTION void step(const int t, const dvar_vector& f1, const dvar_vect
   // analytic integral
   // assumes dt = 1
   // Z evaluated at t-1
+  //
+  ///////////////////////////////////
   dvariable prevN1 = mfexp(p11+1e-8);
   dvariable prevN2 = mfexp(p21+1e-8);
   dvariable Z1 = sumFg + T12 + 2.0*(1.0-q)*(r/K)*prevN2;
   dvariable Z2 = sumFg + T12 + 2.0*q*(r/K)*prevN1;
-  const double epsN = 1.0e-3;
   //TTRACE(Z1,Z2)
   //TTRACE(sumFg,T12)
   //TTRACE(prevN1,prevN2)
@@ -787,17 +787,13 @@ SEPARABLE_FUNCTION void obs(const int t, const dvar_vector& f,const dvariable& p
      if (use_robustY == 1)  // normal + t distribution
      {
         dvariable z = square(obs_catch(t,g)-log_pred_yield(g))/varlogYield;
-        TRACE(z)
 
         dvariable norm_part = 0.5*(log(TWO_M_PI*varlogYield) + z);
-        TRACE(norm_part)
 
         // standard Cauchy density
         dvariable fat_part = 1.0/(M_PI*(1.0 + z));
-        TRACE(fat_part)
-        TRACE(Lpc)
-        dvariable pfat = alogit((dvariable&)Lpc);
-        TRACE(pfat)
+
+        dvariable pfat = alogit(Lpc);
         Ynll += log((1.0-pfat)*mfexp(norm_part) + pfat*fat_part);
      }
 
@@ -856,8 +852,8 @@ SEPARABLE_FUNCTION void obs(const int t, const dvar_vector& f,const dvariable& p
 
   // dump stuff in "residual" matrix
   int rc = 0; // residuals column counter
-  double r = 2.0*exp(value(logFmsy));
-  double K = 4.0*exp(value(logMSY))/(1.0e-20+r);
+  double r = 2.0*mfexp(value(logFmsy));
+  double K = 4.0*mfexp(value(logMSY))/(1.0e-20+r);
   residuals(t,++rc) = value(pop21);
   residuals(t,++rc) = value(pop22);
   residuals(t,++rc) = K;
