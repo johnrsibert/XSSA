@@ -324,16 +324,33 @@ PARAMETER_SECTION
   random_effects_vector U(1,lengthU);
   //vector U(1,lengthU);
 
-  sdreport_number aMSY;
-  sdreport_number aFmsy;
+  //sdreport_number aT12;
+  //sdreport_number aT21;
+  //sdreport_number aFmsy;
+  //sdreport_number aMSY;
+  //sdreport_number asdlogF;
+  //sdreport_number asdlogPop;
+  //sdreport_number asdlogYield;
+  //sdreport_number aQ;
+  ////sdreport_number asdlogQ;
+  ////sdreport_number apcon;
+  //sdreport_number aBmsy;
   sdreport_number ar;
-  sdreport_number aK;
-  sdreport_number asdlogF;
-  sdreport_number asdlogPop;
-  sdreport_number asdlogYield;
-  sdreport_number aQ;
-  sdreport_number asdlogQ;
-  sdreport_number apcon;
+  //sdreport_number aK;
+
+  number aT12;
+  number aT21;
+  number aFmsy;
+  number aMSY;
+  number asdlogF;
+  number asdlogPop;
+  number asdlogYield;
+  number aQ;
+  //number asdlogQ;
+  //number apcon;
+  number aBmsy;
+  //number ar;
+  number aK;
 
   objective_function_value nll;
 
@@ -528,10 +545,14 @@ PROCEDURE_SECTION
   aK = 4.0*mfexp(logMSY)/(1.0e-20+ar);
   aFmsy = mfexp(logFmsy);
   aMSY = mfexp(logMSY);
+  aBmsy = aK*(1.0-aFmsy/ar);
   asdlogF = mfexp(logsdlogF);
   asdlogPop = mfexp(logsdlogPop);
   asdlogYield = mfexp(logsdlogYield);
-  apcon = alogit((dvariable&)Lpcon);
+  aQ = qProp;
+  aT12 = mfexp(logT12);
+  aT21 = mfexp(logT21);
+  //apcon = alogit((dvariable&)Lpcon);
   ++userfun_entries;
   int status_print = ntime;
   if (userfun_entries > lengthU)
@@ -890,6 +911,7 @@ FUNCTION void write_status(ofstream& s)
     s << "#    r = " << r << endl;
     s << "# logMSY = " << logMSY << " (" << active(logMSY) <<")" << endl;
     s << "#    MSY = " << mfexp(logMSY) << endl;
+    s << "#    Bmsy = " << aBmsy << endl;
     //s << "# logK = " << logK << " (" << active(logK) <<")" << endl;
     s << "#    K = " << K << endl;
     s << "#     logsdlogF: " << logsdlogF 

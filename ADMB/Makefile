@@ -6,7 +6,7 @@
 
 # make some special PHONY targets
 .PHONY: all help rules clean dox
-
+# ADMB_HOME=/home/jsibert/Projects/admb-11.1/build/dist
 ifndef ADMB_HOME
   ADMB_HOME=/usr/local/admb
 endif
@@ -30,7 +30,7 @@ BIN_DIR = ~/bin
 
 issams-msy: issams-msy.tpl
 	@echo ------- Translate $<
-	admb  -r $(FLAGS) $<
+	$(ADMB_HOME)/bin/admb  -r $(FLAGS) $<
 	@echo -------- move $@
 	mv -f $@ $(BIN_DIR)
 

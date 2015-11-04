@@ -25,6 +25,10 @@ rm -fv nf1b2list1
 rm -fv f1b2list13
 rm -fv f1b2list12
 rm -fv f1b2list1
+rm -fv cmpdiff.tmp
+rm -fv gradfil1.tmp
+rm -fv gradfil2.tmp
+rm -fv varssave.tmp
 rm -fv hessian.bin
 rm -fv hesscheck
 rm -fv admodel.hes

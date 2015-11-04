@@ -66,7 +66,7 @@ TOP_OF_MAIN_SECTION
     ad_exit(1);
   }
   cout << "Opened program log: " << logname << endl;
-  pad();
+  //pad();
 
 
 DATA_SECTION
@@ -480,12 +480,15 @@ PROCEDURE_SECTION
   apcon = alogit((dvariable&)Lpcon);
 
   ++userfun_entries;
-  int status_print = ntime;
-  if (userfun_entries > lengthU)
-     status_print = lengthU;
-  if (userfun_entries % status_print == 0)
+  if (!mc_phase())
   {
-     write_status(clogf);
+    int status_print = ntime;
+    if (userfun_entries > lengthU)
+       status_print = lengthU;
+    if (userfun_entries % status_print == 0)
+    {
+       write_status(clogf);
+    }
   }
 
 

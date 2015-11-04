@@ -35,21 +35,21 @@
 # T21  phase  initial value
         1     1e-4
 # Fmsy    phase  initial value
-           2         0.25 
+           2         0.2
 # Fmsy_prior  use  value  sd
-               1     0.25  0.8 
+               1     0.243  0.1 
 # MSY     phase  initial value
            1     10000
 # sdlogF    phase  initial values
              1     0.3
 # sdlogPop    phase  initial values
-              -1     0.3
+               3     0.3
 # sdlogYield  phase initial values
                1    0.3
 # meanProportion_Local phase initial value
-                        3    0.9
+                       -1    0.9
 # sdLproportion_local phase initial value
-                      -1    0.8
+                      -1    0.9
 # qProp phase initial value
          2    0.54
 #        1    0.75
