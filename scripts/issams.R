@@ -745,12 +745,12 @@ hst.plot=function(model="issams-msy")
    #  x1 = fit$est[w]-3.0*fit$std[w]
    #  x2 = fit$est[w]+3.0*fit$std[w]
       dist = awkread(hst.file,hst.names[v])
-      dist$p = dist$p/sum(dist$p,na.rm=TRUE)
+   #  dist$p = dist$p/sum(dist$p,na.rm=TRUE)
       x1 = min(dist$x,na.rm=TRUE)
       x2 = max(dist$x,na.rm=TRUE)
       xx = seq(x1,x2,(x2-x1)/100.0)
       yy = dnorm(xx,mean=fit$est[w],sd=fit$std[w])
-      yy = yy/sum(yy,na.rm=TRUE)
+   #  yy = yy/sum(yy,na.rm=TRUE)
    #  print(cbind(xx,yy))
       if (nrow(dist) > 4)
       {
