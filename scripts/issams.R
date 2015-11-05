@@ -709,5 +709,62 @@ plot.U=function(file,ntime=61,dt=1,ngear=5)
 }
 
 
+#con <- pipe(paste0("cut -f1,2,3,4,5 -d, ","/home/test/Test.csv"))
+#x <- matrix(scan(con,skip=1,sep=","),ncol=5)
+#close(con)
+awkread = function(file,name) 
+{
+   tname = paste("#a",name,sep="")
+   awk = paste("awk '(x)&&(NF==0){exit}",
+         "(!x)&&(/^",tname,"/){x=1;next}",
+         "(x){print}' ",file,sep="")
+#  dat = as.data.frame(matrix(scan(pipe(awk),quiet=TRUE),byrow=TRUE,ncol=2))
+   con = pipe(awk)
+   dat = as.data.frame(matrix(scan(con,quiet=TRUE),byrow=TRUE,ncol=2))
+   close(con)
+   names(dat) <- c("x","p")
+   return(dat)
+}  
 
 
+#  fit = read.fit(file)
+hst.plot=function(model="issams-msy")
+{
+   hst.names=c("MSY","Fmsy","r","K","sdlogF","sdlogPop",
+               "sdlogYield","Q","sdlogQ","pcon")
+   nvar = length(hst.names)
+   xpos = 0
+   ypos = 50
+   incr = 50
+   hst.file = paste(model,".hst",sep="")
+   fit = read.fit(model)
+   for (v in 1:nvar)
+   {
+      w = which(fit$names==paste("a",hst.names[v],sep=""))
+      print(paste(fit$names[w],fit$est[w],fit$std[w]))
+   #  x1 = fit$est[w]-3.0*fit$std[w]
+   #  x2 = fit$est[w]+3.0*fit$std[w]
+      dist = awkread(hst.file,hst.names[v])
+      dist$p = dist$p/sum(dist$p,na.rm=TRUE)
+      x1 = min(dist$x,na.rm=TRUE)
+      x2 = max(dist$x,na.rm=TRUE)
+      xx = seq(x1,x2,(x2-x1)/100.0)
+      yy = dnorm(xx,mean=fit$est[w],sd=fit$std[w])
+      yy = yy/sum(yy,na.rm=TRUE)
+   #  print(cbind(xx,yy))
+      if (nrow(dist) > 4)
+      {
+         x11(xpos=xpos,ypos=ypos,title=hst.names[v])
+         xrange = range(xx,dist$x)
+         yrange = range(yy,dist$p)
+         ylab=paste("p(",hst.names[v],")",sep="") 
+         plot(xrange,yrange,xlab=hst.names[v],ylab=ylab,type='n')
+         lines(dist$x,dist$p,type='b')
+         abline(v=fit$est[w],col="red")
+         lines(xx,yy,col="blue")
+         xpos = xpos + incr
+         ypos = ypos + incr
+      }
+   }
+
+}
