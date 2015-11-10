@@ -11,7 +11,8 @@ rm -fv $1.eva
 rm -fv $1.log
 rm -fv $1.luu
 rm -fv $1.out
-rm -fv $1.p??
+rm -fv $1.par
+rm -fv $1.p0?
 rm -fv $1.b??
 rm -fv $1.r??
 rm -fv $1.rhes

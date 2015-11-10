@@ -732,6 +732,13 @@ hst.plot=function(model="issams-msy")
 {
    hst.names=c("MSY","Fmsy","r","K","sdlogF","sdlogPop",
                "sdlogYield","Q","sdlogQ","pcon")
+   dat = scan(paste(model,".dat",sep=""),what="character")
+   wp = which(dat == "Fmsy_prior")
+   Fmsy.prior.use = as.numeric(dat[wp+4])
+   Fmsy.prior = as.numeric(dat[wp+5])
+   sdFmsy.prior = as.numeric(dat[wp+6])
+#  print(paste(wp,Fmsy.prior.use,Fmsy.prior,sdFmsy.prior))
+
    nvar = length(hst.names)
    xpos = 0
    ypos = 50
@@ -761,7 +768,15 @@ hst.plot=function(model="issams-msy")
          plot(xrange,yrange,xlab=hst.names[v],ylab=ylab,type='n')
          lines(dist$x,dist$p,type='b')
          abline(v=fit$est[w],col="red")
+         abline(v=fit$est[w]-2.0*fit$std[w],lty="dashed",col="red")
+         abline(v=fit$est[w]+2.0*fit$std[w],lty="dashed",col="red")
          lines(xx,yy,col="blue")
+         if (hst.names[v] == "Fmsy" && Fmsy.prior.use > 0)
+         {
+            pyy = dnorm(xx,mean=Fmsy.prior,sd=sdFmsy.prior)
+            lines(xx,pyy,col="green")
+            abline(v=Fmsy.prior,col="green")
+         }
          xpos = xpos + incr
          ypos = ypos + incr
       }
