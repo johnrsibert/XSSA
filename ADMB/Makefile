@@ -6,7 +6,16 @@
 
 # make some special PHONY targets
 .PHONY: all help rules clean dox
-# ADMB_HOME=/home/jsibert/Projects/admb-11.1/build/dist
+
+ifeq ($(VER),11.1)
+   ADMB_HOME=/home/jsibert/Projects/admb-11.1/build/dist
+   OFLAGS = -O
+else
+   OFLAGS = -f
+endif
+  
+
+#ADMB_HOME=/home/jsibert/Projects/admb-11.1/build/dist
 ifndef ADMB_HOME
   ADMB_HOME=/usr/local/admb
 endif
@@ -18,7 +27,7 @@ VPATH=$(TPL_DIR):$(SRC_DIR):$(ADMB_XML)
 # make the "safe" version by default
 # to make "the optimized" version, type  `make OPT=TRUE
 ifeq ($(OPT),TRUE)
-  FLAGS = -f -g
+  FLAGS = -g $(OFLAGS)
 else
   FLAGS = -g
   OPT = FALSE
@@ -28,11 +37,17 @@ endif
 #BIN_DIR = ../run
 BIN_DIR = ~/bin
 
+issams-proc: issams-proc.tpl
+	@echo ------- Translate $<
+	$(ADMB_HOME)/bin/admb ${FLAGS} -r $<
+	@echo -------- move $@
+	mv -f $@ $(BIN_DIR)/$@$(VER)
+
 issams-msy: issams-msy.tpl
 	@echo ------- Translate $<
-	$(ADMB_HOME)/bin/admb  -r $(FLAGS) $<
+	$(ADMB_HOME)/bin/admb ${FLAGS} -r $<
 	@echo -------- move $@
-	mv -f $@ $(BIN_DIR)
+	mv -f $@ $(BIN_DIR)/$@$(VER)
 
 issams: issams.tpl
 	@echo ------- Translate $<
