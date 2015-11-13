@@ -465,7 +465,9 @@ PROCEDURE_SECTION
   ar = 2.0*mfexp(logFmsy);
   aK = 4.0*mfexp(logMSY)/(1.0e-20+ar);
   aFmsy = mfexp(logFmsy);
+  alogFmsy = logFmsy;
   aMSY = mfexp(logMSY);
+  alogMSY = logMSY;
   asdlogProc = mfexp(logsdlogProc);
   asdlogYield = mfexp(logsdlogYield);
   aQ = alogit((dvariable&)LQ);

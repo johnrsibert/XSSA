@@ -33,7 +33,7 @@
 # Fmsy    phase  initial value
            1         0.1 
 # Fmsy_prior  use  value  sd
-               0     0.243  0.8
+               1     0.243  0.8
 # MSY     phase  initial value
            1     10000
 # sdlogProc    phase  initial values

@@ -17,6 +17,13 @@ rm -fv $1.b??
 rm -fv $1.r??
 rm -fv $1.rhes
 rm -fv $1.std
+rm -fv $1.shess
+rm -fv $1.mcm
+rm -fv $1.mc2
+rm -fv $1.hst
+rm -fv $1.psv
+rm -fv $1.ecm
+rm -fv sims
 rm -fv hessian.diag
 rm -fv admodel.cov
 rm -fv fmin.log
