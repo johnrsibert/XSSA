@@ -42,17 +42,6 @@ GLOBALS_SECTION;
   template dvariable alogit<dvariable>(const dvariable& a);
   //template df1b2variable alogit<df1b2variable>(const df1b2variable& a); 
 
-  /*
-  dvector alogit(const dvector& a)
-  {
-     int n1 = a.indexmin();
-     int n2 = a.indexmax();
-     dvector p(n1,n2);
-     for (int i = n1; i <= n2; i++)
-        p(i) = alogit(a(i));
-     return p;
-  }
-  */
 
 TOP_OF_MAIN_SECTION
   arrmblsize = 50000000;
@@ -156,11 +145,12 @@ DATA_SECTION
   init_number init_Q;
   !! TTRACE(init_Q,phase_Q)
 
-  init_int phase_sdlogQ;
-  init_number init_sdlogQ;
-  !! TTRACE(init_sdlogQ,phase_sdlogQ)
+  //init_int phase_sdlogQ;
+  //init_number init_sdlogQ;
+  //!! TTRACE(init_sdlogQ,phase_sdlogQ)
 
   init_int use_robustY;
+  !! TRACE(use_robustY)
   init_int phase_pcon;
   init_number init_pcon;
   !! TTRACE(init_pcon,phase_pcon)
@@ -290,7 +280,7 @@ PARAMETER_SECTION
   init_number logQ(phase_Q);
 
   // abundance index proportionality constant standard deviation
-  init_number logsdlogQ(phase_sdlogQ);
+  //init_number logsdlogQ(phase_sdlogQ);
 
   // robust yield likelihood proportion contamination
   init_number Lpcon(phase_pcon);
@@ -307,8 +297,9 @@ PARAMETER_SECTION
   sdreport_number asdlogProc;
   sdreport_number asdlogYield;
   sdreport_number aQ;
-  sdreport_number asdlogQ;
-  sdreport_number alogsdlogQ;
+  sdreport_number alogQ;
+  //sdreport_number asdlogQ;
+  //sdreport_number alogsdlogQ;
   sdreport_number apcon;
 
   objective_function_value nll;
@@ -334,8 +325,8 @@ PRELIMINARY_CALCS_SECTION
        logQ = log(init_Q);
        TTRACE(logQ,init_Q);
 
-       logsdlogQ = log(init_sdlogQ);
-       TTRACE(logsdlogQ,init_sdlogQ)
+       //logsdlogQ = log(init_sdlogQ);
+       //TTRACE(logsdlogQ,init_sdlogQ)
 
        if (!use_robustY)
        {
@@ -377,7 +368,7 @@ PRELIMINARY_CALCS_SECTION
        PINOUT(logsdlogProc)
        PINOUT(logsdlogYield)
        PINOUT(logQ)
-       PINOUT(logsdlogQ)
+       //PINOUT(logsdlogQ)
        //PINOUT(U)
        pin << "# U:" << endl;
        pin << "#   F(t,g):" << endl;
@@ -442,13 +433,13 @@ PROCEDURE_SECTION
 
   nll = 0.0;
 
-  step0(U(utPop+1), logsdlogProc, logFmsy, logMSY, logQ, logsdlogQ);
+  step0(U(utPop+1), logsdlogProc, logFmsy, logMSY, logQ);
  
   for (int t = 2; t <= ntime; t++)
   {
      step(t, U(Fndxl(t-1),Fndxu(t-1)), U(Fndxl(t),Fndxu(t)),
              U(utPop+t-1), U(utPop+t), logsdlogProc,
-             logFmsy, logMSY, logQ, logsdlogQ);
+             logFmsy, logMSY, logQ);
   }
 
   for (int t = 1; t <= ntime; t++)
@@ -471,8 +462,9 @@ PROCEDURE_SECTION
   asdlogProc = mfexp(logsdlogProc);
   asdlogYield = mfexp(logsdlogYield);
   aQ = mfexp(logQ);
-  alogsdlogQ = logsdlogQ;
-  asdlogQ = mfexp(logsdlogQ);
+  alogQ = logQ;
+  //alogsdlogQ = logsdlogQ;
+  //asdlogQ = mfexp(logsdlogQ);
   apcon = alogit((dvariable&)Lpcon);
 
   ++userfun_entries;
@@ -488,7 +480,7 @@ PROCEDURE_SECTION
   }
 
 
-SEPARABLE_FUNCTION void step0(const dvariable& p11, const dvariable& lsdlogProc, const dvariable& lFmsy, const dvariable& lMSY, const dvariable& tlogQ, const dvariable& lsdlogQ)
+SEPARABLE_FUNCTION void step0(const dvariable& p11, const dvariable& lsdlogProc, const dvariable& lFmsy, const dvariable& lMSY, const dvariable& tlogQ)
   // p11 U(utPop+t-1) log N at start of time step
 
   // ensure that starting population size is near K
@@ -501,7 +493,7 @@ SEPARABLE_FUNCTION void step0(const dvariable& p11, const dvariable& lsdlogProc,
   Pnll += 0.5*(log(TWO_M_PI*varlogPop) + square(log(p10) - p11)/varlogPop);
 
   dvariable Qnll = 0.0;
-  dvariable varlogQ = square(mfexp(lsdlogQ));
+  dvariable varlogQ = square(mfexp(lsdlogProc));
   dvariable tQ = mfexp(tlogQ);
   dvariable lnQ=tlogQ;
   dvariable logib = lnQ + log(immigrant_biomass(1));
@@ -510,7 +502,7 @@ SEPARABLE_FUNCTION void step0(const dvariable& p11, const dvariable& lsdlogProc,
   nll += (Pnll+Qnll);
 
 
-SEPARABLE_FUNCTION void step(const int t, const dvar_vector& f1, const dvar_vector& f2, const dvariable& p11, const dvariable p12, const dvariable& lsdlogProc, const dvariable& lFmsy, const dvariable& lMSY, const dvariable lnQ, const dvariable& lsdlogQ)
+SEPARABLE_FUNCTION void step(const int t, const dvar_vector& f1, const dvar_vector& f2, const dvariable& p11, const dvariable p12, const dvariable& lsdlogProc, const dvariable& lFmsy, const dvariable& lMSY, const dvariable lnQ)
   // f1  U(Fndxl(t-1),Fndxu(t-1)) log F at start of time step
   // f2  U(Fndxl(t),Fndxu(t)      log F at end   of time step)
   // p11 U(utPop+t-1) log N at start of time step
@@ -521,7 +513,7 @@ SEPARABLE_FUNCTION void step(const int t, const dvar_vector& f1, const dvar_vect
   dvariable varlogF = square(mfexp(lsdlogF));
   dvariable lsdlogPop = lsdlogProc;
   dvariable varlogPop = square(mfexp(lsdlogPop));
-  dvariable varlogQ = square(mfexp(lsdlogQ));
+  dvariable varlogQ = square(mfexp(lsdlogProc));
  
   //dvariable r = mfexp(lr);
   //dvariable K = mfexp(lK);
@@ -728,8 +720,8 @@ FUNCTION void write_status(ofstream& s)
     s << "#    sdlogYield: " << mfexp(logsdlogYield) << endl;
     s << "#          logQ: " << logQ <<  " (" << active(logQ) <<")" << endl;
     s << "#             Q: " << mfexp(logQ) << endl;
-    s << "#     logsdlogQ: " << logsdlogQ <<  " (" << active(logsdlogQ) <<")" << endl;
-    s << "#        sdlogQ: " << mfexp(logsdlogQ) << endl;
+    //s << "#     logsdlogQ: " << logsdlogQ <<  " (" << active(logsdlogQ) <<")" << endl;
+    //s << "#        sdlogQ: " << mfexp(logsdlogQ) << endl;
     s << "# Lpcon = " << value(Lpcon) << " (" << active(Lpcon) <<")" << endl;
     s << "# pcon = " << alogit(value(Lpcon)) << endl;
     s << "# klingon_multiplier = " << klingon_multiplier << endl;
