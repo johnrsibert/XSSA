@@ -413,9 +413,11 @@ plot.propL.prior=function(propL=0.9)
    plot(c(0.0,1.0),c(0.0,1.0),type='n',xlab="x",ylab="p(L(x))")
    abline(v=propL,col="red",lty="dotdash")
    for (sd in c(0.6,0.7,0.8,0.9,0.95,0.99,0.999,0.9999))
-#  sd = 0.9
+#  sd = 0.4
    {
       pp = dnorm(logit(p),mean=logit(propL),sd=logit(sd))
+   #  print(paste("sd",sd,logit(sd)))
+   #  print(pp)
       double.lines(p,pp,lwd=5,fcol="lightblue",bcol="blue")
       text(propL,pp[wp],sd,col="blue")
    }

@@ -789,3 +789,36 @@ hst.plot=function(model="issams-msy")
    }
 
 }
+
+# logit(N1/(N1+N2)) = log(N1)-log(N2)
+logit<-function(p)
+{
+   return(log(p/(1-p)))
+}
+
+alogit=function(alpha)
+{
+   return(1/(1+exp(-alpha)))
+}
+
+
+plot.Qprop.prior=function(propL=0.01)
+{
+   p = seq(0.01,0.99,0.01)
+   p = c(0.0001,p,0.9999)
+   wp = which(p == propL)
+   
+   plot(c(0.0,1.0),c(0.0,1.0),type='n',xlab="x",ylab="p(L(x))")
+   abline(v=propL,col="red",lty="dotdash")
+   for (sd in c(0.1,0.2,0.3,0.4,5,0.6,0.7,0.8,0.9,0.95,0.99,0.999,0.9999))
+#  sd = 0.4
+   {
+      pp = dnorm(logit(p),mean=logit(propL),sd=logit(sd))
+   #  print(paste("sd",sd,logit(sd)))
+   #  print(pp)
+      double.lines(p,pp,lwd=5,fcol="lightblue",bcol="blue")
+      text(propL,pp[wp],sd,col="blue")
+   }
+
+   save.png.plot("Qprop_prior",width=6.5,height=6.5)
+}
