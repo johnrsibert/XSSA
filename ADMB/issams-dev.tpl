@@ -13,11 +13,11 @@ GLOBALS_SECTION;
   const double TWO_M_PI = 2.0*M_PI;
   const double LOG_M_PI = log(M_PI);
 
-  //   issams -noinit -iprint 1 &> issams.out&
-  //   issams -ainp issams.ainp -noinit -iprint 1 -mcmc 50000 -mcsave 20 -shess -noest &> issams.out 
-   //  issams -ainp issams.ainp -noinit -iprint 1 -mcmc 1000000 -mcsave 200 -shess -noest &> issams.out 
-   //  issams -ainp issams.ainp -noinit -iprint 1 -mcmc 1000000 -mcsave 200 -shess -noest -mcpin issams.ainp &> issams.out 
-   //  issams -ainp issams.ainp -iprint 1 -mcmc 1000000 -mcsave 200 -shess -noest -mcpin issams.ainp &> issams.out 
+  // nice issams-proc -noinit -iprint 1 &> issams-proc.out&
+  //  issams-proc -ainp issams-proc.ainp -noinit -iprint 1 -mcmc 50000 -mcsave 20 -shess -noest &> issams-proc.out 
+   //  issams-proc -ainp issams-proc.ainp -noinit -iprint 1 -mcmc 1000000 -mcsave 200 -shess -noest &> issams-proc.out 
+   //  issams-proc -ainp issams-proc.ainp -noinit -iprint 1 -mcmc 1000000 -mcsave 200 -shess -noest -mcpin issams-proc.ainp &> issams-proc.out 
+   //  issams-proc -ainp issams-proc.ainp -iprint 1 -mcmc 1000000 -mcsave 200 -shess -noest -mcpin issams-proc.ainp &> issams-proc.out 
 
   int fexists(const adstring& filename)
   {
@@ -290,6 +290,8 @@ PARAMETER_SECTION
   sdreport_number asdlogYield;
   sdreport_number aQ;
   sdreport_number alogQ;
+  //sdreport_number asdlogQ;
+  //sdreport_number alogsdlogQ;
   sdreport_number apcon;
 
   objective_function_value nll;

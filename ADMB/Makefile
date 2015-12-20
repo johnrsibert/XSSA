@@ -83,7 +83,7 @@ rules:
 
 clean:
 	@rm -vf $(BIN_DIR)/xssams
-	@rm -vf $(BIN_DIR)/issams
+	@rm -vf $(BIN_DIR)/issams*
 	@rm -vf *.o
 	@rm -vf *.obj
 	@rm -vf *.cpp
