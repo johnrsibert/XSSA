@@ -732,7 +732,7 @@ hst.plot=function(model="issams-msy")
 {
 #  hst.names=c("MSY","Fmsy","r","K","sdlogF","sdlogPop",
    hst.names=c("logMSY","MSY","logFmsy","Fmsy","r","K","sdlogProc",
-               "sdlogYield","Q","sdLQ","pcon")
+               "sdlogYield","logQ","Q")
    dat = scan(paste(model,".dat",sep=""),what="character")
    wp = which(dat == "Fmsy_prior")
    Fmsy.prior.use = as.numeric(dat[wp+4])
@@ -741,37 +741,48 @@ hst.plot=function(model="issams-msy")
    print(paste(wp,Fmsy.prior.use,Fmsy.prior,sdFmsy.prior))
 
    nvar = length(hst.names)
+   nrc = ceiling(sqrt(nvar))
+   print(paste(nvar,nrc))
+#  lm = layout(matrix(c(1:(nrc*nrc)),ncol=nrc,nrow=nrc,byrow=TRUE))
+#  print(lm)
+#  layout.show(lm)
    xpos = 0
    ypos = 50
    incr = 50
    hst.file = paste(model,".hst",sep="")
    fit = read.fit(model)
+#  print(fit)
    for (v in 1:nvar)
    {
       w = which(fit$names==paste("a",hst.names[v],sep=""))
-      print(paste(fit$names[w],fit$est[w],fit$std[w]))
    #  x1 = fit$est[w]-3.0*fit$std[w]
    #  x2 = fit$est[w]+3.0*fit$std[w]
       dist = awkread(hst.file,hst.names[v])
    #  dist$p = dist$p/sum(dist$p,na.rm=TRUE)
-   #  x1 = min(dist$x,na.rm=TRUE)
-   #  x2 = max(dist$x,na.rm=TRUE)
-      x1 = fit$est[w]-4.0*fit$std[w]
-      x2 = fit$est[w]+4.0*fit$std[w]
+      x1 = min(dist$x,na.rm=TRUE)
+      x2 = max(dist$x,na.rm=TRUE)
+      x1 = fit$est[w]-5*fit$std[w]
+      x2 = fit$est[w]+5*fit$std[w]
+      print(" ")
+      print(paste(v,fit$names[w],fit$est[w],fit$std[w],x1,x2))
       xx = seq(x1,x2,(x2-x1)/100.0)
       yy = dnorm(xx,mean=fit$est[w],sd=fit$std[w])
+      pp = dist$p
+      print(paste(sum(pp),sum(yy)))
    #  yy = yy/sum(yy,na.rm=TRUE)
+   #  pp = pp/(sum(pp,na.rm=TRUE))
+   #  print(paste(sum(pp),sum(yy)))
    #  print(cbind(xx,yy))
       if (nrow(dist) > 4)
       {
          x11(xpos=xpos,ypos=ypos,title=hst.names[v])
-      #  xrange = c(max(min(xx),min(dist$x)),min(max(xx),max(dist$x))) #range(xx,dist$x)
-         xrange = range(dist$x)
-         yrange = range(dist$p) #range(yy,dist$p)
-         print(yrange)
+         xrange = c(max(min(xx),min(dist$x)),min(max(xx),max(dist$x))) #range(xx,dist$x)
+         xrange = c(x1,x2) #range(dist$x)
+         print(paste(range(pp),range(yy)))
+         yrange = range(pp,yy) #range(yy,dist$p)
          ylab=paste("p(",hst.names[v],")",sep="") 
          plot(xrange,yrange,xlab=hst.names[v],ylab=ylab,type='n')
-         lines(dist$x,dist$p,type='b')
+         lines(dist$x,pp,type='b')
          abline(v=fit$est[w],lty="dotdash",col="blue")
          abline(v=fit$est[w]-2.0*fit$std[w],lty="dotted",col="blue")
          abline(v=fit$est[w]+2.0*fit$std[w],lty="dotted",col="blue")
@@ -780,6 +791,7 @@ hst.plot=function(model="issams-msy")
              && Fmsy.prior.use > 0)
          {
             pyy = dnorm(xx,mean=Fmsy.prior,sd=sdFmsy.prior)
+         #  pyy = pyy/sum(pyy,na.rm=TRUE)
             lines(xx,pyy,col="orange")
             abline(v=Fmsy.prior,lty="dotdash",col="orange")
          }

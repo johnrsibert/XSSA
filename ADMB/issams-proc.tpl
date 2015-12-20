@@ -14,6 +14,10 @@ GLOBALS_SECTION;
   const double LOG_M_PI = log(M_PI);
 
   // nice issams-proc -noinit -iprint 1 &> issams-proc.out&
+  //  issams-proc -ainp issams-proc.ainp -noinit -iprint 1 -mcmc 50000 -mcsave 20 -shess -noest &> issams-proc.out 
+   //  issams-proc -ainp issams-proc.ainp -noinit -iprint 1 -mcmc 1000000 -mcsave 200 -shess -noest &> issams-proc.out 
+   //  issams-proc -ainp issams-proc.ainp -noinit -iprint 1 -mcmc 1000000 -mcsave 200 -shess -noest -mcpin issams-proc.ainp &> issams-proc.out 
+   //  issams-proc -ainp issams-proc.ainp -iprint 1 -mcmc 1000000 -mcsave 200 -shess -noest -mcpin issams-proc.ainp &> issams-proc.out 
 
   int fexists(const adstring& filename)
   {
@@ -145,10 +149,6 @@ DATA_SECTION
   init_number init_Q;
   !! TTRACE(init_Q,phase_Q)
 
-  //init_int phase_sdlogQ;
-  //init_number init_sdlogQ;
-  //!! TTRACE(init_sdlogQ,phase_sdlogQ)
-
   init_int use_robustY;
   !! TRACE(use_robustY)
   init_int phase_pcon;
@@ -262,15 +262,10 @@ DATA_SECTION
 
 PARAMETER_SECTION
   // logistic parameters
-  //number logr;
-  //number logK;
-
   init_number logFmsy(phase_Fmsy);
   init_number logMSY(phase_MSY);
 
-  // random walk standard deviations
-  //init_number logsdlogF(phase_sdlogF);
-  //init_number logsdlogPop(phase_sdlogPop);
+  // general process error standard deviations
   init_number logsdlogProc(phase_sdlogProc);
 
   // observation error standard deviations
@@ -278,9 +273,6 @@ PARAMETER_SECTION
 
   // abundance index proportionality constant
   init_number logQ(phase_Q);
-
-  // abundance index proportionality constant standard deviation
-  //init_number logsdlogQ(phase_sdlogQ);
 
   // robust yield likelihood proportion contamination
   init_number Lpcon(phase_pcon);
@@ -325,8 +317,6 @@ PRELIMINARY_CALCS_SECTION
        logQ = log(init_Q);
        TTRACE(logQ,init_Q);
 
-       //logsdlogQ = log(init_sdlogQ);
-       //TTRACE(logsdlogQ,init_sdlogQ)
 
        if (!use_robustY)
        {
@@ -361,14 +351,11 @@ PRELIMINARY_CALCS_SECTION
           cerr << "Error creating " << pinname << endl;
           ad_exit(1);
        }
-       //PINOUT(logr)
-       //PINOUT(logK)
        PINOUT(logFmsy)
        PINOUT(logMSY)
        PINOUT(logsdlogProc)
        PINOUT(logsdlogYield)
        PINOUT(logQ)
-       //PINOUT(logsdlogQ)
        //PINOUT(U)
        pin << "# U:" << endl;
        pin << "#   F(t,g):" << endl;
@@ -419,8 +406,6 @@ PROCEDURE_SECTION
     TRACE(Fndxl)
     TRACE(Fndxu)
     TRACE(lengthU)
-    //TRACE(logr)
-    //TRACE(logK)
     TRACE(logsdlogProc)
     TRACE(logsdlogYield)
     TRACE(U)
@@ -463,8 +448,6 @@ PROCEDURE_SECTION
   asdlogYield = mfexp(logsdlogYield);
   aQ = mfexp(logQ);
   alogQ = logQ;
-  //alogsdlogQ = logsdlogQ;
-  //asdlogQ = mfexp(logsdlogQ);
   apcon = alogit((dvariable&)Lpcon);
 
   ++userfun_entries;
@@ -515,8 +498,6 @@ SEPARABLE_FUNCTION void step(const int t, const dvar_vector& f1, const dvar_vect
   dvariable varlogPop = square(mfexp(lsdlogPop));
   dvariable varlogQ = square(mfexp(lsdlogProc));
  
-  //dvariable r = mfexp(lr);
-  //dvariable K = mfexp(lK);
   dvariable r = 2.0*exp(lFmsy);
   dvariable K = 4.0*exp(lMSY)/(1.0e-20+r);
   dvar_vector ft1(1,ngear);
@@ -706,11 +687,9 @@ FUNCTION void write_status(ofstream& s)
     s << "#    Fmsy = " << mfexp(logFmsy) << endl;
     s << "#   Fmsy_prior = " << Fmsy_prior << " (" << (use_Fmsy_prior>0) << ")" << endl;
     s << "# sdFmsy_prior = " << sdFmsy_prior << endl;
-    //s << "# logr = " << logr << endl;
     s << "#    r = " << r << endl;
     s << "# logMSY = " << logMSY << " (" << active(logMSY) <<")" << endl;
     s << "#    MSY = " << mfexp(logMSY) << endl;
-    //s << "# logK = " << logK << endl;
     s << "#    K = " << K << endl;
     s << "#   logsdlogProc: " << logsdlogProc
              <<  " (" << active(logsdlogProc) <<")" << endl;
@@ -720,8 +699,6 @@ FUNCTION void write_status(ofstream& s)
     s << "#    sdlogYield: " << mfexp(logsdlogYield) << endl;
     s << "#          logQ: " << logQ <<  " (" << active(logQ) <<")" << endl;
     s << "#             Q: " << mfexp(logQ) << endl;
-    //s << "#     logsdlogQ: " << logsdlogQ <<  " (" << active(logsdlogQ) <<")" << endl;
-    //s << "#        sdlogQ: " << mfexp(logsdlogQ) << endl;
     s << "# Lpcon = " << value(Lpcon) << " (" << active(Lpcon) <<")" << endl;
     s << "# pcon = " << alogit(value(Lpcon)) << endl;
     s << "# klingon_multiplier = " << klingon_multiplier << endl;
