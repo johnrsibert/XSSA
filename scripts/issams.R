@@ -728,7 +728,7 @@ awkread = function(file,name)
 
 
 #  fit = read.fit(file)
-hst.plot=function(model="issams-msy")
+hst.plot=function(model="issams")
 {
 #  hst.names=c("MSY","Fmsy","r","K","sdlogF","sdlogPop",
    hst.names=c("logMSY","MSY","logFmsy","Fmsy","r","K","sdlogProc",

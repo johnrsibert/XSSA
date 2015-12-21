@@ -297,6 +297,7 @@ PARAMETER_SECTION
 PRELIMINARY_CALCS_SECTION
     userfun_entries = 0;
     status_blocks = 0;
+    /*
     pininit = fexists(adstring(argv[0])+".pin");
     // set initial parameter value from data file
     TRACE(pininit)
@@ -375,7 +376,7 @@ PRELIMINARY_CALCS_SECTION
        }
     }
     trace_init_pars = 1;
-
+    */
     clogf << "\nAt end of PRELIMINARY_CALCS_SECTION:"<<endl;
     TRACE(userfun_entries)
     TRACE(utPop)

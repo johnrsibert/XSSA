@@ -37,13 +37,7 @@ endif
 #BIN_DIR = ../run
 BIN_DIR = ~/bin
 
-issams-proc: issams-proc.tpl
-	@echo ------- Translate $<
-	$(ADMB_HOME)/bin/admb ${FLAGS} -r $<
-	@echo -------- move $@
-	mv -f $@ $(BIN_DIR)/$@$(VER)
-
-issams-msy: issams-msy.tpl
+issams-dev: issams-dev.tpl
 	@echo ------- Translate $<
 	$(ADMB_HOME)/bin/admb ${FLAGS} -r $<
 	@echo -------- move $@

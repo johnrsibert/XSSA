@@ -30,12 +30,14 @@
 # use mean forcing
  0
 #
-# Fmsy    phase  initial value
-           1         0.1 
-# Fmsy_prior  use  value  sd
-               1     0.243  0.8
-# MSY     phase  initial value
+#    r    phase  initial value
+           1         0.5 
+# r_prior  use  value  sd
+           1     0.486  0.4
+# B1     phase  initial value
            1     10000
+# dB1K     phase  initial value
+           1       1.0
 # sdlogProc    phase  initial values
              1     0.3
 # sdlogYield  phase initial value
