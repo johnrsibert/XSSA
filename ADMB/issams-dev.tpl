@@ -283,14 +283,17 @@ PARAMETER_SECTION
   random_effects_vector U(1,lengthU);
   //vector U(1,lengthU);
 
-  //sdreport_number alogMSY;
-  //sdreport_number aMSY;
-  //sdreport_number alogFmsy;
-  //sdreport_number aFmsy;
-  //sdreport_number ar;
-  //sdreport_number aK;
-  //sdreport_number asdlogProc;
-  //sdreport_number asdlogYield;
+  sdreport_number alogB1;
+  sdreport_number alogdB1K;
+  sdreport_number aB1;
+  sdreport_number adB1K;
+  sdreport_number aMSY;
+  sdreport_number aFmsy;
+  sdreport_number alogr;
+  sdreport_number ar;
+  sdreport_number aK;
+  sdreport_number asdlogProc;
+  sdreport_number asdlogYield;
   //sdreport_number aQ;
   //sdreport_number alogQ;
   //sdreport_number apcon;
@@ -437,14 +440,17 @@ PROCEDURE_SECTION
      nll += nll_r;
   }
 
-  //ar = 2.0*mfexp(logFmsy);
-  //aK = 4.0*mfexp(logMSY)/(1.0e-20+ar);
-  //aFmsy = mfexp(logFmsy);
-  //alogFmsy = logFmsy;
-  //aMSY = mfexp(logMSY);
-  //alogMSY = logMSY;
-  //asdlogProc = mfexp(logsdlogProc);
-  //asdlogYield = mfexp(logsdlogYield);
+  alogB1 = logB1;
+  alogdB1K = logdB1K;
+  aB1 = mfexp(logB1);
+  adB1K = mfexp(logdB1K);
+  alogr = logr;
+  ar = mfexp(logr);
+  aK = mfexp(logdB1K+logB1);
+  aFmsy = 0.5*mfexp(logr);
+  aMSY = 0.25*ar*aK;
+  asdlogProc = mfexp(logsdlogProc);
+  asdlogYield = mfexp(logsdlogYield);
   //aQ = mfexp(logQ);
   //alogQ = logQ;
   //apcon = alogit((dvariable&)Lpcon);
@@ -465,23 +471,22 @@ PROCEDURE_SECTION
 SEPARABLE_FUNCTION void step0(const dvariable& p11, const dvariable& lsdlogProc, const dvariable& lB1, const dvariable& ldB1K, const dvariable& tlogQ)
   // p11 U(utPop+t-1) log N at start of time step
 
-  dvariable Pnll = 0.0;
-  /*
-  // ensure that starting population size is near K
-  dvariable logK = ldB1K+lB1;
-  dvariable p10 = logK;
+  // ensure that starting population size is near B1
+  dvariable p10 = lB1;
   dvariable lsdlogPop = lsdlogProc;
   dvariable varlogPop = square(mfexp(lsdlogPop));
+  dvariable Pnll = 0.0;
   Pnll += 0.5*(log(TWO_M_PI*varlogPop) + square(p10 - p11)/varlogPop);
-  */
-  dvariable Qnll = 0.0;
+  nll += Pnll;
+  /*
+  // ensure that starting population size is near forcing biomass
   dvariable varlogQ = square(mfexp(lsdlogProc));
-  //dvariable lnQ=tlogQ;
-  //dvariable logib = lnQ + log(immigrant_biomass(1));
-  //Qnll += 0.5*(log(TWO_M_PI*varlogQ) + square(logib-p11)/varlogQ);
-  Qnll += 0.5*(log(TWO_M_PI*varlogQ) + square(lB1-p11)/varlogQ);
-
-  nll += (Pnll +Qnll);
+  dvariable lnQ=tlogQ;
+  dvariable logib = lnQ + log(immigrant_biomass(1));
+  dvariable Qnll = 0.0;
+  Qnll += 0.5*(log(TWO_M_PI*varlogQ) + square(logib-p11)/varlogQ);
+  nll += Qnll;
+  */
 
 
 SEPARABLE_FUNCTION void step(const int t, const dvar_vector& f1, const dvar_vector& f2, const dvariable& p11, const dvariable p12, const dvariable& lsdlogProc, const dvariable& lr, const dvariable& lB1, const dvariable& ldB1K, const dvariable& lnQ)
@@ -546,9 +551,10 @@ SEPARABLE_FUNCTION void step(const int t, const dvar_vector& f1, const dvar_vect
   Pnll += 0.5*(log(TWO_M_PI*varlogPop) + square(p12-nextLogN)/varlogPop);
 
   dvariable Qnll = 0.0;
+  /*
   dvariable logib = lnQ + log(immigrant_biomass(t));
   Qnll += 0.5*(log(TWO_M_PI*varlogQ) + square(logib-nextLogN)/varlogQ);
-
+  */
   nll += (Fnll+Pnll+Qnll);
   //clogf << t << " " << Fnll << " " <<Pnll << " " <<PLnll << " " << Qnll << " " 
   //      << nll << endl;
@@ -665,7 +671,7 @@ SEPARABLE_FUNCTION void obs(const int t, const dvar_vector& f,const dvariable& p
   double K = mfexp(value(logdB1K+logB1));
   residuals(t,++rc) = value(pop21);
   residuals(t,++rc) = K;
-  residuals(t,++rc) = mfexp(value(logQ))*immigrant_biomass(t);
+  residuals(t,++rc) = 1e-5; //mfexp(value(logQ))*immigrant_biomass(t);
 
   for (int g = 1; g <= ngear; g++)
     residuals(t, ++rc) = value(ft(g));
@@ -687,10 +693,12 @@ FUNCTION void write_status(ofstream& s)
     s << "#   r_prior = " << r_prior << " (" << (use_r_prior>0) << ")" << endl;
     s << "# sdr_prior = " << sdr_prior << endl;
     s << "#   logB1 = " << logB1 << " (" << active(logB1) <<")" << endl;
-    s << "#      B1 = " << mfexp(value(logB1)) << endl;
     s << "# logdB1K = " << logdB1K << " (" << active(logdB1K) <<")" << endl;
+    s << "#      B1 = " << mfexp(value(logB1)) << endl;
     s << "#    dB1K = " << mfexp(value(logdB1K)) << endl;
     s << "#       K = " << K << endl;
+    s << "#     MSY = " << aMSY << endl;
+    s << "#    Fmsy = " << aFmsy << endl;
     s << "#   logsdlogProc: " << logsdlogProc
              <<  " (" << active(logsdlogProc) <<")" << endl;
     s << "#      sdlogProc: " << mfexp(logsdlogProc) << endl;

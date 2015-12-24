@@ -1,9 +1,9 @@
 #require("mvtnorm")
-gear.names = c("TunaHL","Troll","Longline","Bottom/inshore HL","AkuBoat",
+gear.names = c("Tuna HL","Troll","Longline","Bottom/inshore HL","Aku Boat",
                 "Klingon")
 sgn = c("THL","Troll","LL","BHL","Aku","K")
 have.xssams.R = FALSE
-have.xssams.R = TRUE
+have.issams.R = TRUE
 start.year = 1952
 
 plot.error=function(x,y,sd,bcol,fcol,mult=2)
