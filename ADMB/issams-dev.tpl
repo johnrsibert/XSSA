@@ -417,7 +417,7 @@ PROCEDURE_SECTION
 
   nll = 0.0;
 
-  step0(U(utPop+1), logsdlogProc, logQ);
+  step0(U(utPop+1), logsdlogProc, logB1, logdB1K, logQ);
  
   for (int t = 2; t <= ntime; t++)
   {
@@ -462,27 +462,26 @@ PROCEDURE_SECTION
   }
 
 
-  //SEPARABLE_FUNCTION void step0(const dvariable& p11, const dvariable& lsdlogProc, const dvariable& lFmsy, const dvariable& lMSY, const dvariable& tlogQ)
-SEPARABLE_FUNCTION void step0(const dvariable& p11, const dvariable& lsdlogProc, const dvariable& tlogQ)
+SEPARABLE_FUNCTION void step0(const dvariable& p11, const dvariable& lsdlogProc, const dvariable& lB1, const dvariable& ldB1K, const dvariable& tlogQ)
   // p11 U(utPop+t-1) log N at start of time step
 
+  dvariable Pnll = 0.0;
+  /*
   // ensure that starting population size is near K
-  //dvariable r = 2.0*mfexp(lFmsy);
-  //dvariable K = 4.0*mfexp(lMSY)/(1.0e-20+r);
-  //dvariable p10 = K;
-  //dvariable lsdlogPop = lsdlogProc;
-  //dvariable varlogPop = square(mfexp(lsdlogPop));
-  //dvariable Pnll = 0.0;
-  //Pnll += 0.5*(log(TWO_M_PI*varlogPop) + square(log(p10) - p11)/varlogPop);
-
+  dvariable logK = ldB1K+lB1;
+  dvariable p10 = logK;
+  dvariable lsdlogPop = lsdlogProc;
+  dvariable varlogPop = square(mfexp(lsdlogPop));
+  Pnll += 0.5*(log(TWO_M_PI*varlogPop) + square(p10 - p11)/varlogPop);
+  */
   dvariable Qnll = 0.0;
   dvariable varlogQ = square(mfexp(lsdlogProc));
-  //dvariable tQ = mfexp(tlogQ);
-  dvariable lnQ=tlogQ;
-  dvariable logib = lnQ + log(immigrant_biomass(1));
-  Qnll += 0.5*(log(TWO_M_PI*varlogQ) + square(logib-p11)/varlogQ);
+  //dvariable lnQ=tlogQ;
+  //dvariable logib = lnQ + log(immigrant_biomass(1));
+  //Qnll += 0.5*(log(TWO_M_PI*varlogQ) + square(logib-p11)/varlogQ);
+  Qnll += 0.5*(log(TWO_M_PI*varlogQ) + square(lB1-p11)/varlogQ);
 
-  nll += Qnll;
+  nll += (Pnll +Qnll);
 
 
 SEPARABLE_FUNCTION void step(const int t, const dvar_vector& f1, const dvar_vector& f2, const dvariable& p11, const dvariable p12, const dvariable& lsdlogProc, const dvariable& lr, const dvariable& lB1, const dvariable& ldB1K, const dvariable& lnQ)
@@ -496,7 +495,7 @@ SEPARABLE_FUNCTION void step(const int t, const dvar_vector& f1, const dvar_vect
   dvariable varlogF = square(mfexp(lsdlogF));
   dvariable lsdlogPop = lsdlogProc;
   dvariable varlogPop = square(mfexp(lsdlogPop));
-  dvariable varlogQ = square(mfexp(lsdlogProc));
+  dvariable varlogQ =   square(mfexp(lsdlogProc));
  
   dvariable r = mfexp(lr);
   dvariable K = mfexp(ldB1K+lB1);

@@ -121,18 +121,34 @@ plot.diagnostics=function(dat=NULL,file="diagnostics.dat",dt,ngear,
    }
 
    par(mar=c(3,4.5,0,0)+0.1)
-   np = ngear
+   np = ngear+1
    lm = layout(matrix(c(1:np),ncol=1,byrow=TRUE))
    layout.show(lm)
+   sum.obs = vector(length=ntime,mode="numeric")
+   sum.pred = vector(length=ntime,mode="numeric")
    for (g in 1:ngear)
    {
-      nice.ts.plot(dat$t,dat[,(gear.col+ngear+g)],bcol="darkgreen",fcol="lightgreen",lwd=lwd,ylab="Catch (mt)")
-      plot.error(dat$t,dat[,(gear.col+ngear+g)],sdlogYield,
+      pred.ndx = gear.col+  ngear+g
+      obs.ndx  = gear.col+2*ngear+g
+
+      nice.ts.plot(dat$t,dat[,pred.ndx],
+                 bcol="darkgreen",fcol="lightgreen",lwd=lwd,ylab="Catch (mt)")
+      plot.error(dat$t,dat[,pred.ndx],sdlogYield,
                  bcol="darkgreen",fcol="lightgreen")
-      lines(dat$t,dat[,(gear.col+ngear+g)],col="darkgreen",lwd=lwd+2)
-      points(dat$t,dat[,(gear.col+2*ngear+g)],col= "darkgreen",pch=3,cex=3) #16)
+      lines(dat$t,dat[,pred.ndx],col="darkgreen",lwd=lwd+2)
+      points(dat$t,dat[,obs.ndx],col= "darkgreen",pch=3,cex=3)
       title(main=gear.names[g],line=title.line)
+
+      sum.obs  = sum.obs  + dat[,obs.ndx]
+      sum.pred = sum.pred + dat[,pred.ndx]
    }
+    
+   nice.ts.plot(dat$t,sum.pred,
+                 bcol="darkgreen",fcol="lightgreen",lwd=lwd,ylab="Catch (mt)")
+   lines(dat$t,sum.pred,col="darkgreen",lwd=lwd+2)
+   points(dat$t,sum.obs,col= "darkgreen",pch=3,cex=3)
+   title(main="All Fleets",line=title.line)
+
    show.block.number(block,dat$t[1],line=2)
 
 #  plot.Fmort = TRUE
