@@ -47,7 +47,7 @@ GLOBALS_SECTION;
   template double alogit<double>(const double& a);
   template dvariable alogit<dvariable>(const dvariable& a);
   //template df1b2variable alogit<df1b2variable>(const df1b2variable& a); 
-
+  /*
   dvector alogit(const dvector& a)
   {
      int n1 = a.indexmin();
@@ -57,7 +57,7 @@ GLOBALS_SECTION;
         p(i) = alogit(a(i));
      return p;
   }
-
+  */
 TOP_OF_MAIN_SECTION
   arrmblsize = 50000000;
   gradient_structure::set_CMPDIF_BUFFER_SIZE(  150000000L);
@@ -141,6 +141,7 @@ DATA_SECTION
   init_int phase_Fmsy;
   init_number init_Fmsy;
   !! TTRACE(init_Fmsy,phase_Fmsy)
+
   init_int use_Fmsy_prior;
   init_number Fmsy_prior;
   init_number sdFmsy_prior;
@@ -155,14 +156,9 @@ DATA_SECTION
   init_number init_MSY;
   !! TTRACE(init_MSY,phase_MSY)
 
-
-  init_int phase_sdlogF;
-  init_number init_sdlogF;
-  !! TTRACE(init_sdlogF,phase_sdlogF)
-
-  init_int phase_sdlogPop;
-  init_number init_sdlogPop;
-  !! TTRACE(init_sdlogPop,phase_sdlogPop)
+  init_int phase_sdlogProc;
+  init_number init_sdlogProc;
+  !! TTRACE(init_sdlogProc,phase_sdlogProc)
 
   init_int phase_sdlogYield;
   init_number init_sdlogYield;
@@ -304,9 +300,8 @@ PARAMETER_SECTION
   init_number logFmsy(phase_Fmsy);
   init_number logMSY(phase_MSY);
 
-  // random walk standard deviations
-  init_number logsdlogF(phase_sdlogF);
-  init_number logsdlogPop(phase_sdlogPop);
+  // general process error standard deviations
+  init_number logsdlogProc(phase_sdlogProc);
 
   // observation error standard deviations
   init_number logsdlogYield(phase_sdlogYield);
@@ -324,33 +319,16 @@ PARAMETER_SECTION
   random_effects_vector U(1,lengthU);
   //vector U(1,lengthU);
 
-  //sdreport_number aT12;
-  //sdreport_number aT21;
-  //sdreport_number aFmsy;
-  //sdreport_number aMSY;
-  //sdreport_number asdlogF;
-  //sdreport_number asdlogPop;
-  //sdreport_number asdlogYield;
-  //sdreport_number aQ;
-  ////sdreport_number asdlogQ;
-  ////sdreport_number apcon;
-  //sdreport_number aBmsy;
+  sdreport_number aT12;
+  sdreport_number aT21;
+  sdreport_number alogMSY;
+  sdreport_number aMSY;
+  sdreport_number aFmsy;
   sdreport_number ar;
-  //sdreport_number aK;
-
-  number aT12;
-  number aT21;
-  number aFmsy;
-  number aMSY;
-  number asdlogF;
-  number asdlogPop;
-  number asdlogYield;
-  number aQ;
-  //number asdlogQ;
-  //number apcon;
-  number aBmsy;
-  //number ar;
-  number aK;
+  sdreport_number aK;
+  sdreport_number asdlogProc;
+  sdreport_number asdlogYield;
+  sdreport_number aQ;
 
   objective_function_value nll;
 
@@ -372,9 +350,8 @@ PRELIMINARY_CALCS_SECTION
        logMSY = log(init_MSY);
        TTRACE(logMSY,init_MSY)
 
-       logsdlogF = log(init_sdlogF);
        logsdlogYield = log(init_sdlogYield);
-       logsdlogPop = log(init_sdlogPop);
+       logsdlogProc = log(init_sdlogProc);
 
        LmeanProportion_local = logit((double)init_meanProportion_local);
        logsdLProportion_local = log(logit((double)init_sdProportion_local));
@@ -436,8 +413,7 @@ PRELIMINARY_CALCS_SECTION
        //PINOUT(logK)
        PINOUT(logFmsy)
        PINOUT(logMSY)
-       PINOUT(logsdlogF)
-       PINOUT(logsdlogPop)
+       PINOUT(logsdlogProc)
        PINOUT(logsdlogYield)
        PINOUT(LmeanProportion_local)
        PINOUT(logsdLProportion_local)
@@ -477,11 +453,8 @@ PRELIMINARY_CALCS_SECTION
     TRACE(logT21)
     TRACE(logFmsy)
     TRACE(logMSY)
-    TRACE(logsdlogF)
-    TRACE(logsdlogPop)
+    TRACE(logsdlogProc)
     TRACE(logsdlogYield)
-    TRACE(logsdlogF)
-    TRACE(logsdlogPop)
     TRACE(logsdlogYield)
     TRACE(LmeanProportion_local)
     TRACE(logsdLProportion_local)
@@ -505,9 +478,7 @@ PROCEDURE_SECTION
     TRACE(logT21)
     //TRACE(logr)
     //TRACE(logK)
-    TRACE(logsdlogF)
-    TRACE(logsdlogPop)
-    TRACE(logsdlogYield)
+    TRACE(logsdlogProc)
     TRACE(LmeanProportion_local)
     TRACE(logsdLProportion_local)
     TRACE(U)
@@ -520,12 +491,12 @@ PROCEDURE_SECTION
 
   nll = 0.0;
 
-  step0(U(utPop1+1), U(utPop2+1), logsdlogPop, logFmsy, logMSY, LmeanProportion_local);
+  step0(U(utPop1+1), U(utPop2+1), logsdlogProc, logFmsy, logMSY, LmeanProportion_local);
 
   for (int t = 2; t <= ntime; t++)
   {
-     step(t, U(Fndxl(t-1),Fndxu(t-1)), U(Fndxl(t),Fndxu(t)), logsdlogF,
-             U(utPop1+t-1), U(utPop1+t), U(utPop2+t-1), U(utPop2+t), logsdlogPop,
+     step(t, U(Fndxl(t-1),Fndxu(t-1)), U(Fndxl(t),Fndxu(t)), logsdlogProc,
+             U(utPop1+t-1), U(utPop1+t), U(utPop2+t-1), U(utPop2+t),
              logFmsy, logMSY, logT12,logT21,LmeanProportion_local,logsdLProportion_local,qProp);
   }
 
@@ -545,10 +516,8 @@ PROCEDURE_SECTION
   aK = 4.0*mfexp(logMSY)/(1.0e-20+ar);
   aFmsy = mfexp(logFmsy);
   aMSY = mfexp(logMSY);
-  aBmsy = aK*(1.0-aFmsy/ar);
-  asdlogF = mfexp(logsdlogF);
-  asdlogPop = mfexp(logsdlogPop);
-  asdlogYield = mfexp(logsdlogYield);
+  //aBmsy = aK*(1.0-aFmsy/ar);
+  asdlogProc = mfexp(logsdlogProc);
   aQ = qProp;
   aT12 = mfexp(logT12);
   aT21 = mfexp(logT21);
@@ -564,7 +533,7 @@ PROCEDURE_SECTION
   }
 
 
-SEPARABLE_FUNCTION void step0(const dvariable& p11, const dvariable p21, const dvariable& lsdlogPop, const dvariable& lFmsy, const dvariable& lMSY, const dvariable& LmPropL) 
+SEPARABLE_FUNCTION void step0(const dvariable& p11, const dvariable p21, const dvariable& lsdlogProc, const dvariable& lFmsy, const dvariable& lMSY, const dvariable& LmPropL) 
   // p11 U(utPop1+t-1) log N1 at start of time step
   // p21 U(utPop2+t-1) log N2 at start of time step
 
@@ -578,7 +547,7 @@ SEPARABLE_FUNCTION void step0(const dvariable& p11, const dvariable p21, const d
   //TTRACE(p10,p20)
   //TTRACE(log(p10),log(p20))
   //TTRACE(p11,p21)
-  dvariable varlogPop = square(mfexp(lsdlogPop));
+  dvariable varlogPop = square(mfexp(lsdlogProc));
   dvariable Pnll = 0.0;
   Pnll += 0.5*(log(TWO_M_PI*varlogPop) + square(log(p10) - p11)/varlogPop);
   Pnll += 0.5*(log(TWO_M_PI*varlogPop) + square(log(p20) - p21)/varlogPop);
@@ -586,7 +555,7 @@ SEPARABLE_FUNCTION void step0(const dvariable& p11, const dvariable p21, const d
   nll += Pnll;
 
 
-SEPARABLE_FUNCTION void step(const int t, const dvar_vector& f1, const dvar_vector& f2, const dvariable& lsdlogF, const dvariable& p11, const dvariable p12, const dvariable& p21, const dvariable p22, const dvariable& lsdlogPop, const dvariable& lFmsy, const dvariable& lMSY, const dvariable& lT12, const dvariable& lT21, const dvariable& LmPropL, const dvariable& lsdLProportion_local, const dvariable& qP)
+SEPARABLE_FUNCTION void step(const int t, const dvar_vector& f1, const dvar_vector& f2, const dvariable& lsdlogProc, const dvariable& p11, const dvariable p12, const dvariable& p21, const dvariable p22, const dvariable& lFmsy, const dvariable& lMSY, const dvariable& lT12, const dvariable& lT21, const dvariable& LmPropL, const dvariable& lsdLProportion_local, const dvariable& qP)
   // f1  U(Fndxl(t-1),Fndxu(t-1)) log F at start of time step
   // f2  U(Fndxl(t),Fndxu(t)      log F at end   of time step)
   // p11 U(utPop1+t-1) log N1 at start of time step
@@ -595,8 +564,8 @@ SEPARABLE_FUNCTION void step(const int t, const dvar_vector& f1, const dvar_vect
   // p22 U(utPop2+t)   log N2 at end   of time step
 
 
-  dvariable varlogF = square(mfexp(lsdlogF));
-  dvariable varlogPop = square(mfexp(lsdlogPop));
+  dvariable varlogF = square(mfexp(lsdlogProc));
+  dvariable varlogPop = square(mfexp(lsdlogProc));
 
   //dvariable r = mfexp(lr);
   //dvariable K = mfexp(lK);
@@ -911,15 +880,15 @@ FUNCTION void write_status(ofstream& s)
     s << "#    r = " << r << endl;
     s << "# logMSY = " << logMSY << " (" << active(logMSY) <<")" << endl;
     s << "#    MSY = " << mfexp(logMSY) << endl;
-    s << "#    Bmsy = " << aBmsy << endl;
+    //s << "#    Bmsy = " << aBmsy << endl;
     //s << "# logK = " << logK << " (" << active(logK) <<")" << endl;
     s << "#    K = " << K << endl;
-    s << "#     logsdlogF: " << logsdlogF 
-             <<  " (" << active(logsdlogF) <<")" << endl;
-    s << "#        sdlogF: " << mfexp(logsdlogF) << endl;
-    s << "#   logsdlogPop: " << logsdlogPop
-             <<  " (" << active(logsdlogPop) <<")" << endl;
-    s << "#      sdlogPop: " << mfexp(logsdlogPop) << endl;
+    //s << "#     logsdlogF: " << logsdlogF 
+    //         <<  " (" << active(logsdlogF) <<")" << endl;
+    //s << "#        sdlogF: " << mfexp(logsdlogF) << endl;
+    s << "#   logsdlogProc: " << logsdlogProc
+             <<  " (" << active(logsdlogProc) <<")" << endl;
+    s << "#      sdlogPop: " << mfexp(logsdlogProc) << endl;
     s << "# logsdlogYield: " << logsdlogYield
              <<  " (" << active(logsdlogYield) <<")" << endl;
     s << "#    sdlogYield: " << mfexp(logsdlogYield) << endl;
@@ -932,6 +901,14 @@ FUNCTION void write_status(ofstream& s)
     s << "#     sdProportion_local = " << alogit(value(mfexp(logsdLProportion_local))) << endl;
     s << "# pcon = " << alogit(value(Lpcon)) << " (" << active(Lpcon) <<")" << endl;
     s << "# qProp = " << qProp << " (" << active(qProp) << ")" << endl;
+    // to keep the diagnostics R script happy
+    s << "#     logsdlogF: " << logsdlogProc 
+	     <<  " (" << active(logsdlogProc) <<")" << endl;
+    s << "#        sdlogF: " << mfexp(logsdlogProc) << endl;
+    s << "#   logsdlogPop: " << logsdlogProc
+	     <<  " (" << active(logsdlogProc) <<")" << endl;
+    s << "#      sdlogPop: " << mfexp(logsdlogProc) << endl;
+
     s << "# Residuals:" << endl;
     s << "  t    pop1   pop2      K  forcing  propL";
     for (int g = 1; g <= ngear; g++)

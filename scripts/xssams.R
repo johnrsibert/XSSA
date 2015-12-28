@@ -1,12 +1,9 @@
 require("mvtnorm")
-workspace.junk=ls()
-#if (length(workspace.junk==0))
-#  source("utils.R")
-#if (length(grep("nice.ts.plot",workspace.junk)==0))
-#  source("utils.R")
-gear.names = c("TunaHL","Troll","Longline","Bottom/inshore HL","AkuBoat")
+gear.names = c("Tuna HL","Troll","Longline","Bottom/inshore HL","Aku Boat",
+                "Klingon")
 sgn = c("THL","Troll","LL","BHL","Aku")
 have.xssams.R = TRUE
+have.issams.R = FALSE
  
 dLogN1=function(pN1,pN2,r, K, F, q, T12)
 {
@@ -1126,10 +1123,10 @@ plot.diagnostics=function(dat=NULL,file="diagnostics.dat",dt,ngear,
           plot.error(dat$t,dat[,(gear.col+g)],sdlogF,
                     bcol="orange4",fcol="orange")
           lines(dat$t,dat[,(gear.col+g)],col="orange4",lwd=lwd+2)
-          if (g == 1)
-             title(main=paste(gear.names[g]," (",block,")",sep=""),line=title.line)
-          else
-             title(main=gear.names[g],line=title.line)
+          #if (g == 1)
+          #   title(main=paste(gear.names[g]," (",block,")",sep=""),line=title.line)
+          #else
+          title(main=gear.names[g],line=title.line)
        }
        show.block.number(block,dat$t[1],line=2)
    } #if (plot.Fmort)
