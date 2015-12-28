@@ -99,9 +99,12 @@ plot.diagnostics=function(dat=NULL,file="diagnostics.dat",dt,ngear,
    double.lines(dat$t,dat$pop,bcol="blue",fcol="lightblue",lwd=5)
    text(x[ntime],dat$pop[ntime],adj=c(0,1),col="blue",labels="  N")
 
-   plot.error(x,dat$forcing,sdlogQ,bcol="purple4",fcol="purple1")
-   double.lines(x,dat$forcing,bcol="purple4",fcol="purple1",lwd=5) 
-   text(x[ntime],dat$forcing[ntime],adj=c(0,0),col="purple4",labels="  I")
+   if (max(dat$forcing,na.rm=TRUE) > 1.0)
+   {
+      plot.error(x,dat$forcing,sdlogQ,bcol="purple4",fcol="purple1")
+      double.lines(x,dat$forcing,bcol="purple4",fcol="purple1",lwd=5) 
+      text(x[ntime],dat$forcing[ntime],adj=c(0,0),col="purple4",labels="  I")
+   }
    show.block.number(block,dat$t[1])
 
    # catch plots
