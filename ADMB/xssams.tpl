@@ -158,13 +158,27 @@ DATA_SECTION
   init_number init_sdlogYield;
   !! TTRACE(init_sdlogYield,phase_sdlogYield)
 
-  init_int phase_meanProportion_local;
-  init_number init_meanProportion_local;
-  !! TTRACE(init_meanProportion_local,phase_meanProportion_local)
+  //init_int phase_meanProportion_local;
+  //init_number init_meanProportion_local;
+  //!! TTRACE(init_meanProportion_local,phase_meanProportion_local)
 
-  init_int phase_sdProportion_local;
-  init_number init_sdProportion_local;
-  !! TTRACE(init_sdProportion_local,phase_sdProportion_local)
+  //init_int phase_sdProportion_local;
+  //init_number init_sdProportion_local;
+  //!! TTRACE(init_sdProportion_local,phase_sdProportion_local)
+
+  
+  init_number propL_prior;
+  number LpropL_prior;
+  !! LpropL_prior = logit((double)propL_prior);
+
+  init_number LsdpropL;
+  number sdpropL;
+  !! sdpropL = alogit((double)LsdpropL);
+  number varpropL;
+  !! varpropL = square(sdpropL);
+  !! TTRACE(propL_prior,sdpropL)
+  !! TTRACE(LpropL_prior,LsdpropL)
+
 
   init_int phase_qProp;
   init_number init_qProp;
@@ -300,8 +314,8 @@ PARAMETER_SECTION
   init_number logsdlogYield(phase_sdlogYield);
 
   // logit transformed porportion local prior
-  init_number LmeanProportion_local(phase_meanProportion_local);
-  init_number logsdLProportion_local(phase_sdProportion_local);
+  //init_number LmeanProportion_local(phase_meanProportion_local);
+  //init_number logsdLProportion_local(phase_sdProportion_local);
 
   // non-linear term apportionment
   init_bounded_number qProp(0.0,1.0,phase_qProp);
@@ -351,14 +365,16 @@ PRELIMINARY_CALCS_SECTION
        logsdlogYield = log(init_sdlogYield);
        logsdlogProc = log(init_sdlogProc);
 
-       LmeanProportion_local = logit((double)init_meanProportion_local);
-       TTRACE(LmeanProportion_local,init_meanProportion_local);
-       logsdLProportion_local = log(init_sdProportion_local);
-       TTRACE(LmeanProportion_local,logsdLProportion_local)
-       TTRACE(init_sdProportion_local,logit((double)init_sdProportion_local))
+       //LmeanProportion_local = logit((double)init_meanProportion_local);
+       //TTRACE(LmeanProportion_local,init_meanProportion_local);
+       //logsdLProportion_local = log(init_sdProportion_local);
+       //TTRACE(LmeanProportion_local,logsdLProportion_local)
+       //TTRACE(init_sdProportion_local,logit((double)init_sdProportion_local))
        //double prop = 1.0/(1.0+mfexp(-value(LmeanProportion_local)));
-       double prop = alogit(value(LmeanProportion_local));
-       TTRACE(LmeanProportion_local,prop)
+       //double prop = alogit(value(LmeanProportion_local));
+       //TTRACE(LmeanProportion_local,prop)
+       TTRACE(propL_prior,sdpropL)
+       TTRACE(LpropL_prior,LsdpropL)
 
        qProp = init_qProp;
        TTRACE(qProp,phase_qProp)
@@ -373,6 +389,7 @@ PRELIMINARY_CALCS_SECTION
        double r = mfexp(value(logr));
        double K = mfexp(value(logdB1K+logB1));
 
+       double prop = propL_prior;
        double Pop1 = prop*mfexp(value(logB1));
        double Pop2 = Pop1*(1.0*prop)/prop;
        int ut = 0;
@@ -409,10 +426,10 @@ PRELIMINARY_CALCS_SECTION
        PINOUT(logdB1K)
        PINOUT(logsdlogProc)
        PINOUT(logsdlogYield)
-       PINOUT(LmeanProportion_local)
-       PINOUT(logsdLProportion_local)
+       //PINOUT(LmeanProportion_local)
+       //PINOUT(logsdLProportion_local)
        PINOUT(alogit(value(Lpcon)))
-       //PINOUT(U)
+       PINOUT(U)
        pin << "# U:" << endl;
        pin << "#   F(t,g):" << endl;
        for (int tg = 1; tg <= (ntime*ngear); tg++)
@@ -449,8 +466,10 @@ PRELIMINARY_CALCS_SECTION
     TRACE(logsdlogProc)
     TRACE(logsdlogYield)
     TRACE(logsdlogYield)
-    TRACE(LmeanProportion_local)
-    TRACE(logsdLProportion_local)
+    TTRACE(propL_prior,sdpropL)
+    TTRACE(LpropL_prior,LsdpropL)
+    //TRACE(LmeanProportion_local)
+    //TRACE(logsdLProportion_local)
     TRACE(alogit(value(Lpcon)))
     TRACE(U)
     TTRACE(U(utPop1+1),U(utPop2+1))
@@ -469,11 +488,9 @@ PROCEDURE_SECTION
     TRACE(lengthU)
     TRACE(logT12)
     TRACE(logT21)
-    //TRACE(logr)
-    //TRACE(logK)
-    TRACE(logsdlogProc)
-    TRACE(LmeanProportion_local)
-    TRACE(logsdLProportion_local)
+    //TRACE(logsdlogProc)
+    //TRACE(LmeanProportion_local)
+    //TRACE(logsdLProportion_local)
     TRACE(U)
     TTRACE(U(utPop1+1),U(utPop2+1))
     trace_init_pars = 0;
@@ -484,14 +501,14 @@ PROCEDURE_SECTION
 
   nll = 0.0;
 
-  step0(U(utPop1+1), U(utPop2+1), logsdlogProc, logB1, logdB1K, LmeanProportion_local);
+  step0(U(utPop1+1), U(utPop2+1), logsdlogProc, logB1, logdB1K); //, LmeanProportion_local);
 
   for (int t = 2; t <= ntime; t++)
   {
      step(t, U(Fndxl(t-1),Fndxu(t-1)), U(Fndxl(t),Fndxu(t)), logsdlogProc,
              U(utPop1+t-1), U(utPop1+t), U(utPop2+t-1), U(utPop2+t),
-             logr, logB1, logdB1K, logT12, logT21,
-             LmeanProportion_local, logsdLProportion_local, qProp);
+             logr, logB1, logdB1K, logT12, logT21, qProp);
+             //LmeanProportion_local, logsdLProportion_local, qProp);
   }
 
   for (int t = 1; t <= ntime; t++)
@@ -531,16 +548,18 @@ PROCEDURE_SECTION
   }
 
 
-SEPARABLE_FUNCTION void step0(const dvariable& p11, const dvariable p21, const dvariable& lsdlogProc, const dvariable& lB1, const dvariable& ldB1K, const dvariable& LmPropL)
+SEPARABLE_FUNCTION void step0(const dvariable& p11, const dvariable p21, const dvariable& lsdlogProc, const dvariable& lB1, const dvariable& ldB1K)
+  //, const dvariable& LmPropL)
   // p11 U(utPop1+t-1) log N1 at start of time step
   // p21 U(utPop2+t-1) log N2 at start of time step
 
   // ensure that starting population size is near B1
   // dvariable r = 2.0*mfexp(lFmsy);
   // dvariable K = 4.0*mfexp(lMSY)/(1.0e-20+r);
-  dvariable PropL = alogit((dvariable&)LmPropL);
-  dvariable p10 = PropL*mfexp(lB1);
-  dvariable p20 = p10*(1.0-PropL)/PropL;
+  //dvariable PropL = alogit((dvariable&)LmPropL);
+  double propL = propL_prior;
+  dvariable p10 = propL*mfexp(lB1);
+  dvariable p20 = p10*(1.0-propL)/propL;
   //TTRACE(PropL,mfexp(lB1))
   //TTRACE(p10,p20)
   dvariable varlogPop = square(mfexp(lsdlogProc));
@@ -549,7 +568,7 @@ SEPARABLE_FUNCTION void step0(const dvariable& p11, const dvariable p21, const d
   Pnll += 0.5*(log(TWO_M_PI*varlogPop) + square(log(p20) - p21)/varlogPop);
   nll += Pnll;
 
-SEPARABLE_FUNCTION void step(const int t, const dvar_vector& f1, const dvar_vector& f2, const dvariable& lsdlogProc, const dvariable& p11, const dvariable p12, const dvariable& p21, const dvariable p22, const dvariable& lr, const dvariable& lB1, const dvariable& ldB1K, const dvariable& lT12, const dvariable& lT21, const dvariable& LmPropL, const dvariable& lsdLProportion_local, const dvariable& qP)
+SEPARABLE_FUNCTION void step(const int t, const dvar_vector& f1, const dvar_vector& f2, const dvariable& lsdlogProc, const dvariable& p11, const dvariable p12, const dvariable& p21, const dvariable p22, const dvariable& lr, const dvariable& lB1, const dvariable& ldB1K, const dvariable& lT12, const dvariable& lT21, const dvariable& qP)
   // f1  U(Fndxl(t-1),Fndxu(t-1)) log F at start of time step
   // f2  U(Fndxl(t),Fndxu(t)      log F at end   of time step)
   // p11 U(utPop1+t-1) log N1 at start of time step
@@ -566,8 +585,9 @@ SEPARABLE_FUNCTION void step(const int t, const dvar_vector& f1, const dvar_vect
 
   dvariable T12 =mfexp(lT12);
   dvariable T21 =mfexp(lT21);
-  dvariable LmeanPropL = LmPropL;
-  dvariable varLPropL = square(mfexp(lsdLProportion_local));
+  //dvariable LmeanPropL = LmPropL;
+  double LmeanPropL = propL_prior;
+  //dvariable varLPropL = square(mfexp(lsdLProportion_local));
   dvar_vector ft1(1,ngear);
   dvar_vector ft2(1,ngear);
   for (int g = 1; g <= ngear; g++)
@@ -715,7 +735,8 @@ SEPARABLE_FUNCTION void step(const int t, const dvar_vector& f1, const dvar_vect
   // proportion local prior
   dvariable PLnll = 0.0;
   dvariable LpropL = nextLogN1 - nextLogN2;
-  PLnll += 0.5*(log(TWO_M_PI*varLPropL) + square(LpropL - LmeanPropL)/varLPropL);
+  //PLnll += 0.5*(log(TWO_M_PI*varLPropL) + square(LpropL - LmeanPropL)/varLPropL);
+  PLnll += 0.5*(log(TWO_M_PI*varpropL) + square(LpropL - LpropL_prior)/varpropL);
 
   if (isnan(value(PLnll)) && (userfun_entries>0))
   {
@@ -723,8 +744,8 @@ SEPARABLE_FUNCTION void step(const int t, const dvar_vector& f1, const dvar_vect
      TTRACE(nextLogN1,nextLogN2)
      TTRACE(prevN1,prevN2)
      TTRACE(r,K)
-     TTRACE(LpropL,LmeanPropL)
-     TRACE(varLPropL)
+     //TTRACE(LpropL,LmeanPropL)
+     //TRACE(varLPropL)
      write_status(clogf);
      ad_exit(1);
   }
@@ -850,7 +871,7 @@ SEPARABLE_FUNCTION void obs(const int t, const dvar_vector& f,const dvariable& p
     residuals(t, ++rc) = value(log_pred_yield(g));
 
 FUNCTION void write_status(ofstream& s)
-    double prop = alogit(value(LmeanProportion_local));
+    double prop = propL_prior;
     status_blocks ++;
     double r = mfexp(value(logr));
     double K = mfexp(value(logdB1K+logB1));
@@ -882,12 +903,12 @@ FUNCTION void write_status(ofstream& s)
     s << "# logsdlogYield: " << logsdlogYield
              <<  " (" << active(logsdlogYield) <<")" << endl;
     s << "#    sdlogYield: " << mfexp(logsdlogYield) << endl;
-    s << "# LmeanProportion_local = " << LmeanProportion_local << " (" 
-                               << active(LmeanProportion_local) <<")" << endl;
-    s << "#                  prop = " << prop << endl;
-    s << "# logsdLProportion_local = " << logsdLProportion_local<< " (" 
-                                << active(logsdLProportion_local) <<")" << endl;
-    s << "#    sdLProportion_local = " << mfexp(logsdLProportion_local) << endl;
+    //s << "# LmeanProportion_local = " << LmeanProportion_local << " (" 
+    //                           << active(LmeanProportion_local) <<")" << endl;
+    //s << "#                  prop = " << prop << endl;
+    //s << "# logsdLProportion_local = " << logsdLProportion_local<< " (" 
+    //                            << active(logsdLProportion_local) <<")" << endl;
+    //s << "#    sdLProportion_local = " << mfexp(logsdLProportion_local) << endl;
     s << "# pcon = " << alogit(value(Lpcon)) << " (" << active(Lpcon) <<")" << endl;
     s << "# qProp = " << qProp << " (" << active(qProp) << ")" << endl;
     // to keep the diagnostics R script happy

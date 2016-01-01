@@ -46,13 +46,13 @@
                1     0.3
 # sdlogYield  phase initial values
                1    0.3
-# meanProportion_Local phase initial value
-                       -1    0.9
-# sdLproportion_local phase initial value
-                      -1    0.8
+# proportion local prior
+                    0.9
+# logit transfromd s.d. proportion local
+                    0.8
 # qProp phase initial value
-#        2    0.54
-        -1    0.75
+         2    0.54
+#        2    0.75
 # robust yield likelihood
 # use pfat_phase pfat initial values
 # 1   -1         0.07 
