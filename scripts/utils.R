@@ -130,3 +130,133 @@ save.png.plot<-function(root,width=6.5,height=4.5)
 # system(paste("rm -fv",file.pdf))
 }
 
+plot.error=function(x,y,sd,bcol,fcol,mult=2)
+{
+   if (capabilities("cairo"))
+   {
+      sdyu = exp(log(y)+mult*sd)
+      sdyl = exp(log(y)-mult*sd)
+      frgb = col2rgb(fcol)/255
+      polygon(c(x,rev(x)),c(sdyl,rev(sdyu)),
+              border=bcol,lty="dashed",lwd=1,
+              col=rgb(frgb[1],frgb[2],frgb[3],0.5))
+   }
+   else
+      polygon(c(x,rev(x)),c(sdyl,rev(sdyu)),
+              border=bcol,lty="dashed",lwd=1,col=fcol)
+
+}
+
+
+show.block.number=function(block.number,x,line=3)
+{
+   mtext(text=paste("(",block.number,")",sep=""),side=1,line=line,
+          at=c(x,0),cex=0.8)
+}
+
+plot.catches=function(t,obs,pred,sd=NULL,block=NULL)
+{
+#  print(head(t))
+#  print(head(obs))
+#  print(head(pred))
+   ntime = length(t)
+   ngear = ncol(obs)
+   par(mar=c(3,4.5,0,0)+0.1)
+   np = ngear+1
+   lm = layout(matrix(c(1:np),ncol=1,byrow=TRUE))
+   layout.show(lm)
+   lwd = 3
+   title.line = -1
+   sum.obs = vector(length=ntime,mode="numeric")
+   sum.pred = vector(length=ntime,mode="numeric")
+   for (g in 1:ngear)
+   {
+      nice.ts.plot(t,pred[,g],
+         bcol="darkgreen",fcol="lightgreen",lwd=lwd,ylab="Catch (mt)")
+      if (!is.null(sd))
+        plot.error(t,pred[,g],sd,
+                 bcol="darkgreen",fcol="lightgreen")
+      lines(t,pred[,g],col="darkgreen",lwd=lwd+2)
+      points(t,obs[,g],col= "darkgreen",pch=3,cex=3)
+      title(main=gear.names[g],line=title.line)
+
+      sum.obs  = sum.obs  + obs[,g]
+      sum.pred = sum.pred + pred[,g]
+   }
+
+   nice.ts.plot(t,sum.pred,
+                 bcol="darkgreen",fcol="lightgreen",lwd=lwd,ylab="Catch (mt)")
+   lines(t,sum.pred,col="darkgreen",lwd=lwd+2)
+   points(t,sum.obs,col= "darkgreen",pch=3,cex=3)
+   title(main="All Fleets",line=title.line)
+
+   if (!is.null(block))
+      show.block.number(block,t[1],line=2)
+}
+
+plot.biomass=function(x,y,K=NULL,sd=NULL,block=NULL,propL=NULL,forcing=NULL)
+{
+   print(length(x))
+   print(head(x))
+   print(dim(y))
+   print(head(y))
+   ntime = length(x)
+   print(ntime)
+
+   legend = c(parse(text=paste("N","[1]")),
+              parse(text=paste("N","[2]")),
+              parse(text=paste("N","[1]","+N","[2]")))
+
+   options(scipen=6)
+   xrange=nice.ts.plot(x,y,ylab="Biomass (mt)")
+
+   if (!is.null(K))
+   {
+      lines(x,K,lwd=2,lty="dotdash",col="blue",xlim=xrange)
+      text(x[ntime],K[ntime]," K",adj=c(0,0.5),col="blue")
+   }
+
+   sdlogNN = sqrt(4.0*sd*sd) # this is probably not correct
+   print("N3 error")
+   if ( (ncol(y) > 2) && (!is.null(sd)) )
+      plot.error(x,y[,3],sdlogNN, bcol="blue",fcol="lightblue")
+   print("N1 error")
+   if (!is.null(sd))
+      plot.error(x,y[,1],sd, bcol="blue",fcol="lightblue")
+   print("N2 error")
+   if ( (ncol(y) > 1) && (!is.null(sd)) )
+      plot.error(x,y[,2],sd, bcol="blue",fcol="lightblue")
+   lines(x,y[,1],col="blue",lwd=5)
+   print("N1 label")
+   text(x[ntime],y[ntime,1],parse(text=paste("N","[1]")),adj=c(0,0),col="blue")
+   if (ncol(y) > 1)
+      lines(x,y[,2],col="blue",lwd=5)
+   print("N2 label")
+   text(x[ntime],y[ntime,2],parse(text=paste("N","[2]")),adj=c(0,0),col="blue")
+   if (ncol(y) > 2)
+      lines(x,y[,3],col="blue",lwd=5)
+   if (!is.null(propL))
+   { 
+      par("new"=TRUE)
+      plot(x,dat$propL,lwd=3,type='l',col="red",ylim=c(0,1),
+            ann=FALSE,axes=FALSE,xlim=xrange)
+      text(x[ntime],dat$propL[ntime]," p",adj=c(0,0),col="red")
+      abline(h=0.9,lwd=2,lty="dotdash",col="red")
+      axis(4,col="red",ylab="p",col.axis="red")
+      mtext("p",side=4,col="red",line=0.1)
+   }
+   if (!is.null(forcing))
+   {
+      par("new"=TRUE)
+      tT21 = parse(text=paste("T","[21]"))
+      plot(x,forcing,lwd=3,type='l',col="purple", 
+           ylim=c(0.0,max(dat$forcing)), ann=FALSE,axes=FALSE,xlim=xrange)
+      text(x[ntime],forcing[ntime],tT21,adj=c(0,0),col="purple")
+      axis(4,line=-2,col="purple",col.axis="purple")
+   #  axis(2,col="purple",col.axis="purple",pos=xrange[2])
+      mtext(tT21, side=4,col="purple",line=-1.5)
+    }
+    if (!is.null(block))
+       show.block.number(block,t[1])
+}
+

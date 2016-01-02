@@ -891,10 +891,10 @@ FUNCTION void write_status(ofstream& s)
     s << "#   r_prior = " << r_prior << " (" << (use_r_prior>0) << ")" << endl;
     s << "# sdr_prior = " << sdr_prior << endl;
     s << "#   logB1 = " << logB1 << " (" << active(logB1) <<")" << endl;
-    s << "# logdB1K = " << logdB1K << " (" << active(logdB1K) <<")" << endl;
     s << "#      B1 = " << mfexp(value(logB1)) << endl;
-  
-    s << "#    K = " << K << endl;
+    s << "# logdB1K = " << logdB1K << " (" << active(logdB1K) <<")" << endl;
+    s << "#    dB1K = " << mfexp(logdB1K) << endl;
+    s << "#       K = " << K << endl;
     s << "#     MSY = " << aMSY << endl;
     s << "#    Fmsy = " << aFmsy << endl;
     s << "#   logsdlogProc: " << logsdlogProc

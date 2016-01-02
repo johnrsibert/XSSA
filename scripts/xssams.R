@@ -954,22 +954,22 @@ b27.test.sim=function(
 
 }
 
-plot.error=function(x,y,sd,bcol,fcol,mult=2)
-{
-   if (capabilities("cairo"))
-   {
-      sdyu = exp(log(y)+mult*sd)
-      sdyl = exp(log(y)-mult*sd)
-      frgb = col2rgb(fcol)/255
-      polygon(c(x,rev(x)),c(sdyl,rev(sdyu)),
-              border=bcol,lty="dashed",lwd=1,
-              col=rgb(frgb[1],frgb[2],frgb[3],0.5))
-   }
-   else
-      polygon(c(x,rev(x)),c(sdyl,rev(sdyu)),
-              border=bcol,lty="dashed",lwd=1,col=fcol)
-
-}
+#plot.error=function(x,y,sd,bcol,fcol,mult=2)
+#{
+#   if (capabilities("cairo"))
+#   {
+#      sdyu = exp(log(y)+mult*sd)
+#      sdyl = exp(log(y)-mult*sd)
+#      frgb = col2rgb(fcol)/255
+#      polygon(c(x,rev(x)),c(sdyl,rev(sdyu)),
+#              border=bcol,lty="dashed",lwd=1,
+#              col=rgb(frgb[1],frgb[2],frgb[3],0.5))
+#   }
+#   else
+#      polygon(c(x,rev(x)),c(sdyl,rev(sdyu)),
+#              border=bcol,lty="dashed",lwd=1,col=fcol)
+#
+#}
 
 
 plot.diagnostics=function(dat=NULL,file="diagnostics.dat",dt,ngear,
@@ -1027,53 +1027,61 @@ plot.diagnostics=function(dat=NULL,file="diagnostics.dat",dt,ngear,
       devices[d] = dev.cur()
    }
 
-   par(mar=c(4,5,0,4)+0.1)
    ntime = length(dat$t)
-   x = dat$t
-   y = matrix(nrow=ntime,ncol=3)
+   y = matrix(0.0,nrow=ntime,ncol=3)
    y[,1] = dat$pop1
    y[,2] = dat$pop2
    y[,3] = dat$pop1 + dat$pop2
- # legend = c(" N1"," N2"," N1+N2")
-   legend = c(parse(text=paste("N","[1]")),
-              parse(text=paste("N","[2]")),
-              parse(text=paste("N","[1]","+N","[2]")))
+   plot.biomass(dat$t,y,sd=sdlogPop,block=block)
 
-   options(scipen=6)
-   xrange=nice.ts.plot(x,y,ylab="Biomass (mt)")
 
-   lines(x,dat$K,lwd=2,lty="dotdash",col="blue",xlim=xrange)
-   text(x[ntime],dat$K[ntime]," K",adj=c(0,0.5),col="blue")
-
-   sdlogNN = sqrt(4.0*sdlogPop*sdlogPop) # is is probably not correct
-   plot.error(dat$t,y[,3],sdlogNN, 
-                    bcol="blue",fcol="lightblue")
-   plot.error(dat$t,y[,1],sdlogPop,
-                    bcol="blue",fcol="lightblue")
-   plot.error(dat$t,y[,2],sdlogPop,
-                    bcol="blue",fcol="lightblue")
-   lines(dat$t,y[,1],col="blue",lwd=5)
-   text(x[ntime],y[ntime,1],parse(text=paste("N","[1]")),adj=c(0,0),col="blue")
-   lines(dat$t,y[,2],col="blue",lwd=5)
-   text(x[ntime],y[ntime,2],parse(text=paste("N","[2]")),adj=c(0,0),col="blue")
-   lines(dat$t,y[,3],col="blue",lwd=5)
-   par("new"=TRUE)
-   plot(x,dat$propL,lwd=3,type='l',col="red",ylim=c(0,1),
-        ann=FALSE,axes=FALSE,xlim=xrange)
-   text(x[ntime],dat$propL[ntime]," p",adj=c(0,0),col="red")
-   abline(h=0.9,lwd=2,lty="dotdash",col="red")
-   axis(4,col="red",ylab="p",col.axis="red")
-   mtext("p",side=4,col="red",line=0.1)
-
-   par("new"=TRUE)
-   tT21 = parse(text=paste("T","[21]"))
-   plot(x,dat$forcing,lwd=3,type='l',col="purple", 
-        ylim=c(0.0,max(dat$forcing)), ann=FALSE,axes=FALSE,xlim=xrange)
-   text(x[ntime],dat$forcing[ntime],tT21,adj=c(0,0),col="purple")
-   axis(4,line=-2,col="purple",col.axis="purple")
-#  axis(2,col="purple",col.axis="purple",pos=xrange[2])
-   mtext(tT21, side=4,col="purple",line=-1.5)
-   show.block.number(block,dat$t[1])
+#   par(mar=c(4,5,0,4)+0.1)
+#   ntime = length(dat$t)
+#   x = dat$t
+#   y = matrix(nrow=ntime,ncol=3)
+#   y[,1] = dat$pop1
+#   y[,2] = dat$pop2
+#   y[,3] = dat$pop1 + dat$pop2
+# # legend = c(" N1"," N2"," N1+N2")
+#   legend = c(parse(text=paste("N","[1]")),
+#              parse(text=paste("N","[2]")),
+#              parse(text=paste("N","[1]","+N","[2]")))
+#
+#   options(scipen=6)
+#   xrange=nice.ts.plot(x,y,ylab="Biomass (mt)")
+#
+#   lines(x,dat$K,lwd=2,lty="dotdash",col="blue",xlim=xrange)
+#   text(x[ntime],dat$K[ntime]," K",adj=c(0,0.5),col="blue")
+#
+#   sdlogNN = sqrt(4.0*sdlogPop*sdlogPop) # is is probably not correct
+#   plot.error(dat$t,y[,3],sdlogNN, 
+#                    bcol="blue",fcol="lightblue")
+#   plot.error(dat$t,y[,1],sdlogPop,
+#                    bcol="blue",fcol="lightblue")
+#   plot.error(dat$t,y[,2],sdlogPop,
+#                    bcol="blue",fcol="lightblue")
+#   lines(dat$t,y[,1],col="blue",lwd=5)
+#   text(x[ntime],y[ntime,1],parse(text=paste("N","[1]")),adj=c(0,0),col="blue")
+#   lines(dat$t,y[,2],col="blue",lwd=5)
+#   text(x[ntime],y[ntime,2],parse(text=paste("N","[2]")),adj=c(0,0),col="blue")
+#   lines(dat$t,y[,3],col="blue",lwd=5)
+#   par("new"=TRUE)
+#   plot(x,dat$propL,lwd=3,type='l',col="red",ylim=c(0,1),
+#        ann=FALSE,axes=FALSE,xlim=xrange)
+#   text(x[ntime],dat$propL[ntime]," p",adj=c(0,0),col="red")
+#   abline(h=0.9,lwd=2,lty="dotdash",col="red")
+#   axis(4,col="red",ylab="p",col.axis="red")
+#   mtext("p",side=4,col="red",line=0.1)
+#
+#   par("new"=TRUE)
+#   tT21 = parse(text=paste("T","[21]"))
+#   plot(x,dat$forcing,lwd=3,type='l',col="purple", 
+#        ylim=c(0.0,max(dat$forcing)), ann=FALSE,axes=FALSE,xlim=xrange)
+#   text(x[ntime],dat$forcing[ntime],tT21,adj=c(0,0),col="purple")
+#   axis(4,line=-2,col="purple",col.axis="purple")
+##  axis(2,col="purple",col.axis="purple",pos=xrange[2])
+#   mtext(tT21, side=4,col="purple",line=-1.5)
+#   show.block.number(block,dat$t[1])
 
    # catch plots
    d = 2
@@ -1091,20 +1099,40 @@ plot.diagnostics=function(dat=NULL,file="diagnostics.dat",dt,ngear,
      devices[d] = dev.cur()
    }
 
-   par(mar=c(3,4.5,0,0)+0.1)
-   np = ngear
-   lm = layout(matrix(c(1:np),ncol=1,byrow=TRUE))
-   layout.show(lm)
-   for (g in 1:ngear)
-   {
-      nice.ts.plot(dat$t,dat[,(gear.col+ngear+g)],bcol="darkgreen",fcol="lightgreen",lwd=lwd,ylab="Catch (mt)")
-      plot.error(dat$t,dat[,(gear.col+ngear+g)],sdlogYield,
-                 bcol="darkgreen",fcol="lightgreen")
-      lines(dat$t,dat[,(gear.col+ngear+g)],col="darkgreen",lwd=lwd+2)
-      points(dat$t,dat[,(gear.col+2*ngear+g)],col= "darkgreen",pch=3,cex=3) #16)
-      title(main=gear.names[g],line=title.line)
-   }
-   show.block.number(block,dat$t[1],line=2)
+   plot.catches(dat$t,dat[,c(gear.col+2*ngear+1):(gear.col+3*ngear)],
+                      dat[,c(gear.col+ngear+1)  :(gear.col+2*ngear)],
+                      sdlogYield,block) 
+                      
+#   par(mar=c(3,4.5,0,0)+0.1)
+#   np = ngear+1
+#   lm = layout(matrix(c(1:np),ncol=1,byrow=TRUE))
+#   layout.show(lm)
+#   sum.obs = vector(length=ntime,mode="numeric")
+#   sum.pred = vector(length=ntime,mode="numeric")
+#   for (g in 1:ngear)
+#   {
+#      pred.ndx = gear.col+  ngear+g
+#      obs.ndx  = gear.col+2*ngear+g
+#
+#      nice.ts.plot(dat$t,dat[,pred.ndx],
+#         bcol="darkgreen",fcol="lightgreen",lwd=lwd,ylab="Catch (mt)")
+#      plot.error(dat$t,dat[,pred.ndx],sdlogYield,
+#                 bcol="darkgreen",fcol="lightgreen")
+#      lines(dat$t,dat[,pred.ndx],col="darkgreen",lwd=lwd+2)
+#      points(dat$t,dat[,obs.ndx],col= "darkgreen",pch=3,cex=3)
+#      title(main=gear.names[g],line=title.line)
+#
+#      sum.obs  = sum.obs  + dat[,obs.ndx]
+#      sum.pred = sum.pred + dat[,pred.ndx]
+#   }
+#
+#   nice.ts.plot(dat$t,sum.pred,
+#                 bcol="darkgreen",fcol="lightgreen",lwd=lwd,ylab="Catch (mt)")
+#   lines(dat$t,sum.pred,col="darkgreen",lwd=lwd+2)
+#   points(dat$t,sum.obs,col= "darkgreen",pch=3,cex=3)
+#   title(main="All Fleets",line=title.line)
+#
+#   show.block.number(block,dat$t[1],line=2)
 
 #  plot.Fmort = TRUE
    if (plot.Fmort)
@@ -1137,9 +1165,6 @@ plot.diagnostics=function(dat=NULL,file="diagnostics.dat",dt,ngear,
           plot.error(dat$t,dat[,(gear.col+g)],sdlogF,
                     bcol="orange4",fcol="orange")
           lines(dat$t,dat[,(gear.col+g)],col="orange4",lwd=lwd+2)
-          #if (g == 1)
-          #   title(main=paste(gear.names[g]," (",block,")",sep=""),line=title.line)
-          #else
           title(main=gear.names[g],line=title.line)
        }
        show.block.number(block,dat$t[1],line=2)
@@ -1417,11 +1442,11 @@ log.diagnostics=function(file="xssams_program.log",ntime=61,dt=1,ngear=5,
 #  return(counter)
 }
 
-show.block.number=function(block.number,x,line=3)
-{
-   mtext(text=paste("(",block.number,")",sep=""),side=1,line=line,
-          at=c(x,0),cex=0.8)
-}
+#show.block.number=function(block.number,x,line=3)
+#{
+#   mtext(text=paste("(",block.number,")",sep=""),side=1,line=line,
+#          at=c(x,0),cex=0.8)
+#}
 
 plot.prod.curve=function(file="xssams.rep")
 {

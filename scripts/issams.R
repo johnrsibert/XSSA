@@ -6,22 +6,22 @@ have.xssams.R = FALSE
 have.issams.R = TRUE
 start.year = 1952
 
-plot.error=function(x,y,sd,bcol,fcol,mult=2)
-{
-   if (capabilities("cairo"))
-   {
-      sdyu = exp(log(y)+mult*sd)
-      sdyl = exp(log(y)-mult*sd)
-      frgb = col2rgb(fcol)/255
-      polygon(c(x,rev(x)),c(sdyl,rev(sdyu)),
-              border=bcol,lty="dashed",lwd=1,
-              col=rgb(frgb[1],frgb[2],frgb[3],0.5))
-   }
-   else
-      polygon(c(x,rev(x)),c(sdyl,rev(sdyu)),
-              border=bcol,lty="dashed",lwd=1,col=fcol)
-
-}
+#plot.error=function(x,y,sd,bcol,fcol,mult=2)
+#{
+#   if (capabilities("cairo"))
+#   {
+#      sdyu = exp(log(y)+mult*sd)
+#      sdyl = exp(log(y)-mult*sd)
+#      frgb = col2rgb(fcol)/255
+#      polygon(c(x,rev(x)),c(sdyl,rev(sdyu)),
+#              border=bcol,lty="dashed",lwd=1,
+#              col=rgb(frgb[1],frgb[2],frgb[3],0.5))
+#   }
+#   else
+#      polygon(c(x,rev(x)),c(sdyl,rev(sdyu)),
+#              border=bcol,lty="dashed",lwd=1,col=fcol)
+#
+#}
 
 
 plot.diagnostics=function(dat=NULL,file="diagnostics.dat",dt,ngear,
@@ -123,36 +123,40 @@ plot.diagnostics=function(dat=NULL,file="diagnostics.dat",dt,ngear,
      devices[d] = dev.cur()
    }
 
-   par(mar=c(3,4.5,0,0)+0.1)
-   np = ngear+1
-   lm = layout(matrix(c(1:np),ncol=1,byrow=TRUE))
-   layout.show(lm)
-   sum.obs = vector(length=ntime,mode="numeric")
-   sum.pred = vector(length=ntime,mode="numeric")
-   for (g in 1:ngear)
-   {
-      pred.ndx = gear.col+  ngear+g
-      obs.ndx  = gear.col+2*ngear+g
+   plot.catches(dat$t,dat[,c(gear.col+2*ngear+1):(gear.col+3*ngear)],
+                      dat[,c(gear.col+ngear+1)  :(gear.col+2*ngear)],
+                      sdlogYield,block) 
 
-      nice.ts.plot(dat$t,dat[,pred.ndx],
-                 bcol="darkgreen",fcol="lightgreen",lwd=lwd,ylab="Catch (mt)")
-      plot.error(dat$t,dat[,pred.ndx],sdlogYield,
-                 bcol="darkgreen",fcol="lightgreen")
-      lines(dat$t,dat[,pred.ndx],col="darkgreen",lwd=lwd+2)
-      points(dat$t,dat[,obs.ndx],col= "darkgreen",pch=3,cex=3)
-      title(main=gear.names[g],line=title.line)
-
-      sum.obs  = sum.obs  + dat[,obs.ndx]
-      sum.pred = sum.pred + dat[,pred.ndx]
-   }
-    
-   nice.ts.plot(dat$t,sum.pred,
-                 bcol="darkgreen",fcol="lightgreen",lwd=lwd,ylab="Catch (mt)")
-   lines(dat$t,sum.pred,col="darkgreen",lwd=lwd+2)
-   points(dat$t,sum.obs,col= "darkgreen",pch=3,cex=3)
-   title(main="All Fleets",line=title.line)
-
-   show.block.number(block,dat$t[1],line=2)
+#   par(mar=c(3,4.5,0,0)+0.1)
+#   np = ngear+1
+#   lm = layout(matrix(c(1:np),ncol=1,byrow=TRUE))
+#   layout.show(lm)
+#   sum.obs = vector(length=ntime,mode="numeric")
+#   sum.pred = vector(length=ntime,mode="numeric")
+#   for (g in 1:ngear)
+#   {
+#      pred.ndx = gear.col+  ngear+g
+#      obs.ndx  = gear.col+2*ngear+g
+#
+#      nice.ts.plot(dat$t,dat[,pred.ndx],
+#                 bcol="darkgreen",fcol="lightgreen",lwd=lwd,ylab="Catch (mt)")
+#      plot.error(dat$t,dat[,pred.ndx],sdlogYield,
+#                 bcol="darkgreen",fcol="lightgreen")
+#      lines(dat$t,dat[,pred.ndx],col="darkgreen",lwd=lwd+2)
+#      points(dat$t,dat[,obs.ndx],col= "darkgreen",pch=3,cex=3)
+#      title(main=gear.names[g],line=title.line)
+#
+#      sum.obs  = sum.obs  + dat[,obs.ndx]
+#      sum.pred = sum.pred + dat[,pred.ndx]
+#   }
+#    
+#   nice.ts.plot(dat$t,sum.pred,
+#                 bcol="darkgreen",fcol="lightgreen",lwd=lwd,ylab="Catch (mt)")
+#   lines(dat$t,sum.pred,col="darkgreen",lwd=lwd+2)
+#   points(dat$t,sum.obs,col= "darkgreen",pch=3,cex=3)
+#   title(main="All Fleets",line=title.line)
+#
+#   show.block.number(block,dat$t[1],line=2)
 
 #  plot.Fmort = TRUE
    if (plot.Fmort)
