@@ -148,10 +148,10 @@ plot.error=function(x,y,sd,bcol,fcol,mult=2)
 }
 
 
-show.block.number=function(block.number,x,line=3)
+show.block.number=function(block.number,x,line=3,col="black")
 {
    mtext(text=paste("(",block.number,")",sep=""),side=1,line=line,
-          at=c(x,0),cex=0.8)
+          at=c(x,0),cex=0.8,col=col)
 }
 
 plot.catches=function(t,obs,pred,sd=NULL,block=NULL)
@@ -196,12 +196,12 @@ plot.catches=function(t,obs,pred,sd=NULL,block=NULL)
 
 plot.biomass=function(x,y,K=NULL,sd=NULL,block=NULL,propL=NULL,forcing=NULL)
 {
-   print(length(x))
-   print(head(x))
-   print(dim(y))
-   print(head(y))
+#  print(length(x))
+#  print(head(x))
+#  print(dim(y))
+#  print(head(y))
    ntime = length(x)
-   print(ntime)
+#  print(ntime)
 
    legend = c(parse(text=paste("N","[1]")),
               parse(text=paste("N","[2]")),
@@ -213,50 +213,157 @@ plot.biomass=function(x,y,K=NULL,sd=NULL,block=NULL,propL=NULL,forcing=NULL)
    if (!is.null(K))
    {
       lines(x,K,lwd=2,lty="dotdash",col="blue",xlim=xrange)
-      text(x[ntime],K[ntime]," K",adj=c(0,0.5),col="blue")
+      text(x[1],K[1]," K",adj=c(1.5,0.5),col="blue")
    }
 
-   sdlogNN = sqrt(4.0*sd*sd) # this is probably not correct
-   print("N3 error")
-   if ( (ncol(y) > 2) && (!is.null(sd)) )
-      plot.error(x,y[,3],sdlogNN, bcol="blue",fcol="lightblue")
-   print("N1 error")
+#  sdlogNN = sqrt(4.0*sd*sd) # this is probably not correct
+#  print("N3 error")
+#  if ( (ncol(y) > 2) && (!is.null(sd)) )
+#     plot.error(x,y[,3],sdlogNN, bcol="blue",fcol="lightblue")
+
+#  print("N1 error")
    if (!is.null(sd))
       plot.error(x,y[,1],sd, bcol="blue",fcol="lightblue")
-   print("N2 error")
+#  print("N2 error")
    if ( (ncol(y) > 1) && (!is.null(sd)) )
+   {
       plot.error(x,y[,2],sd, bcol="blue",fcol="lightblue")
-   lines(x,y[,1],col="blue",lwd=5)
-   print("N1 label")
-   text(x[ntime],y[ntime,1],parse(text=paste("N","[1]")),adj=c(0,0),col="blue")
+      lines(x,y[,1],col="blue",lwd=5)
+   }
+#  print("N1 label")
+   text(x[ntime],y[ntime,1],parse(text=paste("N","[1]")),adj=c(-0.5,0.5),col="blue")
    if (ncol(y) > 1)
+   {
       lines(x,y[,2],col="blue",lwd=5)
-   print("N2 label")
-   text(x[ntime],y[ntime,2],parse(text=paste("N","[2]")),adj=c(0,0),col="blue")
+#  print("N2 label")
+      text(x[ntime],y[ntime,2],parse(text=paste("N","[2]")),adj=c(-0.5,0.5),col="blue")
+   }
+   print("N3")
    if (ncol(y) > 2)
+   {
       lines(x,y[,3],col="blue",lwd=5)
+      text(x[ntime],y[ntime,3],parse(text=paste("N","[1]","+","N","[2]")),adj=c(0.5,0.5),col="blue")
+   }
    if (!is.null(propL))
    { 
+#     print("propL")
       par("new"=TRUE)
-      plot(x,dat$propL,lwd=3,type='l',col="red",ylim=c(0,1),
+      plot(x,propL,lwd=3,type='l',col="red",ylim=c(0,1),
             ann=FALSE,axes=FALSE,xlim=xrange)
-      text(x[ntime],dat$propL[ntime]," p",adj=c(0,0),col="red")
+      text(x[ntime],propL[ntime]," p",adj=c(0,0),col="red")
       abline(h=0.9,lwd=2,lty="dotdash",col="red")
       axis(4,col="red",ylab="p",col.axis="red")
       mtext("p",side=4,col="red",line=0.1)
    }
    if (!is.null(forcing))
    {
+#     print("forcing")
       par("new"=TRUE)
       tT21 = parse(text=paste("T","[21]"))
       plot(x,forcing,lwd=3,type='l',col="purple", 
-           ylim=c(0.0,max(dat$forcing)), ann=FALSE,axes=FALSE,xlim=xrange)
-      text(x[ntime],forcing[ntime],tT21,adj=c(0,0),col="purple")
+           ylim=c(0.0,max(forcing)), ann=FALSE,axes=FALSE,xlim=xrange)
+      text(x[ntime],forcing[ntime],tT21,adj=c(-0.25,0.5),col="purple")
       axis(4,line=-2,col="purple",col.axis="purple")
    #  axis(2,col="purple",col.axis="purple",pos=xrange[2])
       mtext(tT21, side=4,col="purple",line=-1.5)
     }
     if (!is.null(block))
-       show.block.number(block,t[1])
+       show.block.number(block,x[1])
 }
 
+
+plot.production=function(Fmort, obsC, predC, t, r, K, block=NULL)
+{
+    F.max=max(Fmort,na.rm=TRUE)
+    Fyield = seq(0,F.max,0.01*F.max)
+    yield = Fyield*K*(1.0-Fyield/r) # equilibirum yield at F
+    #  obsC = rowSums(dat[,obsC.ndx])
+    #  predC = rowSums(dat[,predC.ndx])
+    xrange = c(0,F.max)
+    yrange = c(0,max(obsC,predC,yield,na.rm=TRUE))
+    Flab = parse(text=paste("Total~Fishing~Mortality~(","y^-1",")",sep=""))
+    plot(xrange,yrange,type='n', xlab=Flab, ylab="Total Yield (mt)")
+
+    double.lines(Fmort,predC,bcol="darkgreen",fcol="lightgreen",lwd=5) 
+    points(Fmort,obsC,col= "darkgreen",pch=3,cex=2)
+    points(Fmort,predC,col="darkgreen",pch=16)
+   #   wmaxC = which(obsC==max(obsC,na.rm=TRUE))
+   #   lines(c(0,Fmort[wmaxC]),c(0,obsC[wmaxC]),col="red",lty="longdash")
+    lines(Fyield,yield,col="red",lwd=3,lty="longdash")
+    wy5 = which((floor(t%%5))==0)
+    text(x=Fmort[wy5],y=obsC[wy5],labels=floor(t[wy5]),
+         pos=4,offset=0.5,cex=0.8)
+    if (!is.null(block))
+       show.block.number(block,Fyield[1],line=4)
+}
+
+read.diagnostics=function(file="xssams_program.log",ntime=61,dt=1,ngear=5,block=NULL)
+{
+   get.numeric.field = function(what, text)
+   {
+      old.opt=getOption("warn")
+      options("warn"=-1)
+      ndx = grep(what,text)
+      lwhat = nchar(what)
+      value = 0.0
+      if (substr(what,lwhat,lwhat) == ":")
+         ndx = ndx + 1
+      else
+         ndx = ndx + 2
+
+      value = as.numeric(text[ndx])
+      wv = which(!is.na(value))
+      options("warn"=old.opt)
+      return(value[wv])   
+   } 
+
+
+
+   print(paste("Scanning file",file))
+   log = scan(file,what="character")
+ # print(length(log))
+   res = grep("Residuals:",log)
+   nblock = length(res)
+   print(paste(nblock,"residual blocks found"))
+
+   logsdlogF = get.numeric.field("logsdlogF:",log)   
+   sdlogF = exp(logsdlogF)
+
+   if (is.null(block))
+      block = nblock
+
+   ests = list(logT12=NA, T12=NA, logT21=NA, T21=NA, logr=NA,
+               r=NA, r_prior=NA, sdr_prior=NA, logB1=NA, logdB1K=NA,
+               B1=NA, K=NA, MSY=NA, Fmsy=NA, logsdlogProc=NA,
+               sdlogPop=NA, logsdlogYield=NA, sdlogYield=NA, pcon=NA,
+               qProp=NA, logsdlogF=NA, sdlogF=NA, logsdlogPop=NA)
+
+   print(ests)
+
+   ests$logT12=get.numeric.field("^logT12",log)[block]
+   ests$T12=get.numeric.field("^T12",log)[block]
+   ests$logT21=get.numeric.field("^logT21",log)[block]
+   ests$T21=get.numeric.field("^T21",log)[block]
+   ests$logr=get.numeric.field("^logr",log)[block]
+   ests$r=get.numeric.field("^r",log)[block]
+   ests$r_prior=get.numeric.field("^r_prior",log)[block]
+   ests$sdr_prior=get.numeric.field("^sdr_prior",log)[block]
+   ests$logB1=get.numeric.field("^logB1",log)[block]
+   ests$logdB1K=get.numeric.field("^logdB1K",log)[block]
+   ests$B1=get.numeric.field("^B1",log)[block]
+   ests$K=get.numeric.field("^K",log)[block]
+   ests$MSY=get.numeric.field("^MSY",log)[block]
+   ests$Fmsy=get.numeric.field("^Fmsy",log)[block]
+   ests$logsdlogProc=get.numeric.field("^logsdlogProc:",log)[block]
+   ests$sdlogPop=get.numeric.field("^sdlogPop:",log)[block]
+   ests$logsdlogYield=get.numeric.field("^logsdlogYield:",log)[block]
+   ests$sdlogYield=get.numeric.field("^sdlogYield:",log)[block]
+   ests$pcon=get.numeric.field("^pcon",log)[block]
+   ests$qProp=get.numeric.field("^qProp",log)[block]
+   ests$logsdlogF=get.numeric.field("^logsdlogF:",log)[block]
+   ests$sdlogF=get.numeric.field("^sdlogF:",log)[block]
+   ests$logsdlogPop=get.numeric.field("^logsdlogPop:",log)[block]
+
+   print(ests)
+ 
+}

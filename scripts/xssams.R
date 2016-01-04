@@ -1032,7 +1032,8 @@ plot.diagnostics=function(dat=NULL,file="diagnostics.dat",dt,ngear,
    y[,1] = dat$pop1
    y[,2] = dat$pop2
    y[,3] = dat$pop1 + dat$pop2
-   plot.biomass(dat$t,y,sd=sdlogPop,block=block)
+   plot.biomass(dat$t,y,sd=sdlogPop,block=block,K=dat$K,
+                propL=dat$propL,forcing=dat$forcing)
 
 
 #   par(mar=c(4,5,0,4)+0.1)
@@ -1170,6 +1171,7 @@ plot.diagnostics=function(dat=NULL,file="diagnostics.dat",dt,ngear,
        show.block.number(block,dat$t[1],line=2)
    } #if (plot.Fmort)
 
+#  production plot
    if (plot.prod)
    {
        d = d + 1
@@ -1187,29 +1189,36 @@ plot.diagnostics=function(dat=NULL,file="diagnostics.dat",dt,ngear,
                title="Production")
           devices[d] = dev.cur()
        }
+
+
        Fmort = rowSums(dat[,F.ndx])
-       F.max=max(Fmort,na.rm=TRUE)
-       if (F.max > r)
-         F.max = max(F.max,r)
-       Fyield = seq(0,F.max,0.01*F.max)
-       yield = Fyield*K*(1.0-Fyield/r) # equilibirum yield at F
        obsC = rowSums(dat[,obsC.ndx])
        predC = rowSums(dat[,predC.ndx])
-       xrange = c(0,F.max)
-       yrange = c(0,max(obsC,predC,yield,na.rm=TRUE))
-       Flab = parse(text=paste("Total~Fishing~Mortality~(","y^-1",")",sep=""))
-       plot(xrange,yrange,type='n', xlab=Flab, ylab="Total Yield (mt)")
+       plot.production(Fmort,obsC,predC,dat$t, r,K,block)
 
-       double.lines(Fmort,predC,bcol="darkgreen",fcol="lightgreen",lwd=5) 
-       points(Fmort,obsC,col= "darkgreen",pch=3,cex=2)
-       points(Fmort,predC,col="darkgreen",pch=16)
-   #   wmaxC = which(obsC==max(obsC,na.rm=TRUE))
-   #   lines(c(0,Fmort[wmaxC]),c(0,obsC[wmaxC]),col="red",lty="longdash")
-       lines(Fyield,yield,col="red",lwd=3,lty="longdash")
-
-       text(x=Fmort[wy5],y=obsC[wy5],labels=floor(dat$t[wy5]),
-             pos=4,offset=0.5,cex=0.8)
-       show.block.number(block,dat$t[1],line=3)
+#       Fmort = rowSums(dat[,F.ndx])
+#       F.max=max(Fmort,na.rm=TRUE)
+#       if (F.max > r)
+#         F.max = max(F.max,r)
+#       Fyield = seq(0,F.max,0.01*F.max)
+#       yield = Fyield*K*(1.0-Fyield/r) # equilibirum yield at F
+#       obsC = rowSums(dat[,obsC.ndx])
+#       predC = rowSums(dat[,predC.ndx])
+#       xrange = c(0,F.max)
+#       yrange = c(0,max(obsC,predC,yield,na.rm=TRUE))
+#       Flab = parse(text=paste("Total~Fishing~Mortality~(","y^-1",")",sep=""))
+#       plot(xrange,yrange,type='n', xlab=Flab, ylab="Total Yield (mt)")
+#
+#       double.lines(Fmort,predC,bcol="darkgreen",fcol="lightgreen",lwd=5) 
+#       points(Fmort,obsC,col= "darkgreen",pch=3,cex=2)
+#       points(Fmort,predC,col="darkgreen",pch=16)
+#   #   wmaxC = which(obsC==max(obsC,na.rm=TRUE))
+#   #   lines(c(0,Fmort[wmaxC]),c(0,obsC[wmaxC]),col="red",lty="longdash")
+#       lines(Fyield,yield,col="red",lwd=3,lty="longdash")
+#
+#       text(x=Fmort[wy5],y=obsC[wy5],labels=floor(dat$t[wy5]),
+#             pos=4,offset=0.5,cex=0.8)
+#       show.block.number(block,dat$t[1],line=3)
    } #if (plot.prod)
 
    if (plot.impact)
