@@ -978,10 +978,13 @@ plot.diagnostics=function(dat=NULL,file="diagnostics.dat",dt,ngear,
                  devices,block)
 {
    print(paste("Block: ",block))
+   print(is.data.frame(dat))
+   print(head(dat))
    if (is.null(dat))
      dat = read.table(file=file,header=TRUE)
 
    start.year = 1952
+   print(start.year)
    if (dat$t[1] == 1)
    {
       dat$t = (start.year-0.4*dt +  dat$t*dt)
@@ -1325,55 +1328,55 @@ log.diagnostics=function(file="xssams_program.log",ntime=61,dt=1,ngear=5,
    print(paste("Scanning file",file))
    log = scan(file,what="character")
    res = grep("Residuals:",log)
-   logsdlogF = grep("logsdlogF:",log)   
-   sdlogF = exp(as.numeric(log[logsdlogF+1]))
-#  print(sdlogF)
-   logsdlogPop = grep("logsdlogPop:",log)
-   sdlogPop = exp(as.numeric(log[logsdlogPop+1]))
-#  print(sdlogPop)
-   logsdlogYield = grep("logsdlogYield:",log)
-#  print(length(logsdlogYield))
-   sdlogYield = exp(as.numeric(log[logsdlogYield+1]))
-#  print(sdlogYield)
-
-   T12.pos = grep("^T12",log)
-#  print(T12.pos)
-   T12 = as.numeric(log[T12.pos+2])
-   wT12 = which(!is.na(T12))
-   T12 = T12[wT12]
-#  print(T12)
-
-   K.pos = grep("^K",log)
-   K1 = as.numeric(log[K.pos+2])
-   wK1 = which(!is.na(K1))
-   K = K1[wK1]
-#  print(K)
-
-   qProp.pos = grep("^qProp",log)
-   qProp1 = as.numeric(log[qProp.pos+2])
-   wqProp1 = which(!is.na(qProp1))
-   qProp = qProp1[wqProp1]
-#  print(qProp)
-
-   r.pos = grep("^r",log)
-   r1 = as.numeric(log[r.pos+2])
-   wr1 = which(!is.na(r1))
-   r = r1[wr1]
-#  print(r)
-   sdlogQ.pos = grep("^sdlogQ:",log)
-   sdlogQ = as.numeric(log[sdlogQ.pos+1])
-#  print(paste("sdlogQ",sdlogQ))
-  
-#  if(1)
-#    return(FALSE)
+#   logsdlogF = grep("logsdlogF:",log)   
+#   sdlogF = exp(as.numeric(log[logsdlogF+1]))
+##  print(sdlogF)
+#   logsdlogPop = grep("logsdlogPop:",log)
+#   sdlogPop = exp(as.numeric(log[logsdlogPop+1]))
+##  print(sdlogPop)
+#   logsdlogYield = grep("logsdlogYield:",log)
+##  print(length(logsdlogYield))
+#   sdlogYield = exp(as.numeric(log[logsdlogYield+1]))
+##  print(sdlogYield)
+#
+#   T12.pos = grep("^T12",log)
+##  print(T12.pos)
+#   T12 = as.numeric(log[T12.pos+2])
+#   wT12 = which(!is.na(T12))
+#   T12 = T12[wT12]
+##  print(T12)
+#
+#   K.pos = grep("^K",log)
+#   K1 = as.numeric(log[K.pos+2])
+#   wK1 = which(!is.na(K1))
+#   K = K1[wK1]
+##  print(K)
+#
+#   qProp.pos = grep("^qProp",log)
+#   qProp1 = as.numeric(log[qProp.pos+2])
+#   wqProp1 = which(!is.na(qProp1))
+#   qProp = qProp1[wqProp1]
+##  print(qProp)
+#
+#   r.pos = grep("^r",log)
+#   r1 = as.numeric(log[r.pos+2])
+#   wr1 = which(!is.na(r1))
+#   r = r1[wr1]
+##  print(r)
+#   sdlogQ.pos = grep("^sdlogQ:",log)
+#   sdlogQ = as.numeric(log[sdlogQ.pos+1])
+##  print(paste("sdlogQ",sdlogQ))
+#  
+##  if(1)
+##    return(FALSE)
    max.counter = length(res)
    counter = max.counter
-   print(paste(max.counter, "blocks found:"))
-#  print(res)
-
-   ncol = (3*ngear+6)
-   diag = matrix(nrow=ntime,ncol=ncol)
-   cnames = vector(length=ncol)
+#   print(paste(max.counter, "blocks found:"))
+##  print(res)
+#
+#   ncol = (3*ngear+6)
+#   diag = matrix(nrow=ntime,ncol=ncol)
+#   cnames = vector(length=ncol)
 
    c = 'n'
    dev.list = vector(mode="numeric",length=6)
@@ -1381,39 +1384,53 @@ log.diagnostics=function(file="xssams_program.log",ntime=61,dt=1,ngear=5,
 #  while (c != 'q')
    while ( (c != 'q') && (c != 'x') )
    {
-      fc = res[counter]
-      for (c in 1:ncol)
-      {
-         fc = fc + 1
-      #  print(paste(fc,log[fc])) 
-         cnames[c] = log[fc]
-      }
-      colnames(diag) = cnames
-   
-      for (t in 1:ntime)
-      {
-         for (c in 1:ncol)
-         {
-            fc = fc + 1
-            diag[t,c] = as.numeric(log[fc],ngear)
-         }
-      }
-#     print(paste("Block:",counter))
-#     print(head(diag))
-#     print(tail(diag))
-      print(paste("Displaying block ",counter,sep=""))
-      new.devices = plot.diagnostics(as.data.frame(diag),dt=dt,ngear=ngear,
-                    sdlogPop=sdlogPop[counter], 
-                    sdlogYield=sdlogYield[counter], 
-                    sdlogF=sdlogF[counter],
-                    sdlogQ=sdlogQ[counter],
-                    K=K[counter], r=r[counter],T12=T12[counter],
-                    q=qProp[counter],
+      tmp=get.diagnostics(log,ntime=ntime,dt=dt,ngear=ngear,block=counter,mtype="x")
+#      fc = res[counter]
+#      for (c in 1:ncol)
+#      {
+#         fc = fc + 1
+#      #  print(paste(fc,log[fc])) 
+#         cnames[c] = log[fc]
+#      }
+#      colnames(diag) = cnames
+#   
+#      for (t in 1:ntime)
+#      {
+#         for (c in 1:ncol)
+#         {
+#            fc = fc + 1
+#            diag[t,c] = as.numeric(log[fc],ngear)
+#         }
+#      }
+##     print(paste("Block:",counter))
+##     print(head(diag))
+##     print(tail(diag))
+#      print(paste("Displaying block ",counter,sep=""))
+#      new.devices = plot.diagnostics(as.data.frame(diag),dt=dt,ngear=ngear,
+#                    sdlogPop=sdlogPop[counter], 
+#                    sdlogYield=sdlogYield[counter], 
+#                    sdlogF=sdlogF[counter],
+#                    sdlogQ=sdlogQ[counter],
+#                    K=K[counter], r=r[counter],T12=T12[counter],
+#                    q=qProp[counter],
+#                    plot.Fmort=plot.Fmort,
+#                    plot.prod=plot.prod,
+#                    plot.impact=plot.impact,
+#                    plot.Discr=plot.Discr,
+#                    devices=dev.list,block=counter)
+      new.devices = plot.diagnostics(tmp$resid,dt=dt,ngear=ngear,
+                    sdlogPop=tmp$sdlogPop, 
+                    sdlogYield=tmp$sdlogYield, 
+                    sdlogF=tmp$sdlogF,
+                    sdlogQ=tmp$sdlogQ,
+                    K=tmp$K, r=tmp$r,T12=tmp$T12,
+                    q=tmp$qProp,
                     plot.Fmort=plot.Fmort,
                     plot.prod=plot.prod,
                     plot.impact=plot.impact,
                     plot.Discr=plot.Discr,
                     devices=dev.list,block=counter)
+
       dev.list=new.devices
      
       c = readline("next, back, save, quit or exit? (enter n,b,s,q,x):")

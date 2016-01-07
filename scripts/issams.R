@@ -85,27 +85,29 @@ plot.diagnostics=function(dat=NULL,file="diagnostics.dat",dt,ngear,
    par(mar=c(4,5,0,4)+0.1)
    ntime = length(dat$t)
    x = dat$t
-   y = matrix(nrow=ntime,ncol=2)
+   y = matrix(nrow=ntime,ncol=1)
    y[,1]=dat$pop
-   y[,2]=dat$forcing
+#  y[,2]=dat$forcing
+   plot.biomass(dat$t,y,sd=sdlogPop,block=block,K=dat$K,
+                forcing=dat$forcing)
 
-   options(scipen=6)
-   xrange=nice.ts.plot(x,y,ylab="Biomass (mt)")
+#  options(scipen=6)
+#  xrange=nice.ts.plot(x,y,ylab="Biomass (mt)")
 
-   lines(x,dat$K,lwd=2,lty="dotdash",col="blue",xlim=xrange)
-   text(x[ntime],dat$K[ntime],"  K",adj=c(0,0.5),col="blue")
+#  lines(x,dat$K,lwd=2,lty="dotdash",col="blue",xlim=xrange)
+#  text(x[ntime],dat$K[ntime],"  K",adj=c(0,0.5),col="blue")
 
-   plot.error(dat$t,dat$pop,sdlogPop,bcol="blue",fcol="lightblue")
-   double.lines(dat$t,dat$pop,bcol="blue",fcol="lightblue",lwd=5)
-   text(x[ntime],dat$pop[ntime],adj=c(0,1),col="blue",labels="  N")
+#  plot.error(dat$t,dat$pop,sdlogPop,bcol="blue",fcol="lightblue")
+#  double.lines(dat$t,dat$pop,bcol="blue",fcol="lightblue",lwd=5)
+#  text(x[ntime],dat$pop[ntime],adj=c(0,1),col="blue",labels="  N")
 
-   if (max(dat$forcing,na.rm=TRUE) > 1.0)
-   {
-      plot.error(x,dat$forcing,sdlogQ,bcol="purple4",fcol="purple1")
-      double.lines(x,dat$forcing,bcol="purple4",fcol="purple1",lwd=5) 
-      text(x[ntime],dat$forcing[ntime],adj=c(0,0),col="purple4",labels="  I")
-   }
-   show.block.number(block,dat$t[1])
+#  if (max(dat$forcing,na.rm=TRUE) > 1.0)
+#  {
+#     plot.error(x,dat$forcing,sdlogQ,bcol="purple4",fcol="purple1")
+#     double.lines(x,dat$forcing,bcol="purple4",fcol="purple1",lwd=5) 
+#     text(x[ntime],dat$forcing[ntime],adj=c(0,0),col="purple4",labels="  I")
+#  }
+#  show.block.number(block,dat$t[1])
 
    # catch plots
    d = 2
@@ -212,36 +214,42 @@ plot.diagnostics=function(dat=NULL,file="diagnostics.dat",dt,ngear,
           devices[d] = dev.cur()
        }
        Fmort = rowSums(dat[,F.ndx])
-       F.max=max(Fmort,na.rm=TRUE)
-       if (F.max > r)
-         F.max = max(F.max,r)
-       Fyield = seq(0,F.max,0.01*F.max)
-       yield = Fyield*K*(1.0-Fyield/r) # equilibirum yield at F
-    #  yield = Fyield*max(dat$forcing,K)*(1.0-Fyield/r) # 
-    #  Syield = Fmort*(dat$forcing+K*(1.0-Fmort/r)) # 
-    #  Syield = Fyield*((dat$forcing+K)*(1.0-Fyield/r)) # 
-       print(paste(K,r))
-       print(head(cbind(Fyield,yield)))
-       print(tail(cbind(Fyield,yield)))
        obsC = rowSums(dat[,obsC.ndx])
        predC = rowSums(dat[,predC.ndx])
-       xrange = c(0,F.max)
-       yrange = c(0,1.2*max(obsC,predC,yield,na.rm=TRUE))
-       Flab = parse(text=paste("Total~Fishing~Mortality~(","y^-1",")",sep=""))
-       plot(xrange,yrange,type='n', xlab=Flab, ylab="Total Yield (mt)")
+       plot.production(Fmort,obsC,predC,dat$t, r,K,block)
 
-       double.lines(Fmort,predC,bcol="darkgreen",fcol="lightgreen",lwd=5) 
-       points(Fmort,obsC,col= "darkgreen",pch=3,cex=2)
-       points(Fmort,predC,col="darkgreen",pch=16)
-   #   lines(Fmort,Syield,col="purple",lwd=3,lty="longdash")
-   #   lines(Fyield,Syield,col="purple",lwd=3,lty="longdash")
-   #   wmaxC = which(obsC==max(obsC,na.rm=TRUE))
-   #   lines(c(0,Fmort[wmaxC]),c(0,obsC[wmaxC]),col="red",lty="longdash")
-       lines(Fyield,yield,col="red",lwd=3,lty="longdash")
 
-       text(x=Fmort[wy5],y=obsC[wy5],labels=floor(dat$t[wy5]),
-             pos=4,offset=0.5,cex=0.8)
-       show.block.number(block,0)
+#       Fmort = rowSums(dat[,F.ndx])
+#       F.max=max(Fmort,na.rm=TRUE)
+#       if (F.max > r)
+#         F.max = max(F.max,r)
+#       Fyield = seq(0,F.max,0.01*F.max)
+#       yield = Fyield*K*(1.0-Fyield/r) # equilibirum yield at F
+#    #  yield = Fyield*max(dat$forcing,K)*(1.0-Fyield/r) # 
+#    #  Syield = Fmort*(dat$forcing+K*(1.0-Fmort/r)) # 
+#    #  Syield = Fyield*((dat$forcing+K)*(1.0-Fyield/r)) # 
+#       print(paste(K,r))
+#       print(head(cbind(Fyield,yield)))
+#       print(tail(cbind(Fyield,yield)))
+#       obsC = rowSums(dat[,obsC.ndx])
+#       predC = rowSums(dat[,predC.ndx])
+#       xrange = c(0,F.max)
+#       yrange = c(0,1.2*max(obsC,predC,yield,na.rm=TRUE))
+#       Flab = parse(text=paste("Total~Fishing~Mortality~(","y^-1",")",sep=""))
+#       plot(xrange,yrange,type='n', xlab=Flab, ylab="Total Yield (mt)")
+#
+#       double.lines(Fmort,predC,bcol="darkgreen",fcol="lightgreen",lwd=5) 
+#       points(Fmort,obsC,col= "darkgreen",pch=3,cex=2)
+#       points(Fmort,predC,col="darkgreen",pch=16)
+#   #   lines(Fmort,Syield,col="purple",lwd=3,lty="longdash")
+#   #   lines(Fyield,Syield,col="purple",lwd=3,lty="longdash")
+#   #   wmaxC = which(obsC==max(obsC,na.rm=TRUE))
+#   #   lines(c(0,Fmort[wmaxC]),c(0,obsC[wmaxC]),col="red",lty="longdash")
+#       lines(Fyield,yield,col="red",lwd=3,lty="longdash")
+#
+#       text(x=Fmort[wy5],y=obsC[wy5],labels=floor(dat$t[wy5]),
+#             pos=4,offset=0.5,cex=0.8)
+#       show.block.number(block,0)
    } #if (plot.prod)
 
    if (plot.impact)
@@ -306,41 +314,41 @@ log.diagnostics=function(file="issams_program.log",ntime=61,dt=1,ngear=5,
    print(paste("Scanning file",file))
    log = scan(file,what="character")
    res = grep("Residuals:",log)
-   logsdlogF = grep("logsdlogF:",log)   
-   sdlogF = exp(as.numeric(log[logsdlogF+1]))
-#  print(sdlogF)
-   logsdlogPop = grep("logsdlogPop:",log)
-   sdlogPop = exp(as.numeric(log[logsdlogPop+1]))
-#  print(sdlogPop)
-   logsdlogYield = grep("logsdlogYield:",log)
-#  print(length(logsdlogYield))
-   sdlogYield = exp(as.numeric(log[logsdlogYield+1]))
-#  print(sdlogYield)
-   K.pos = grep("^K",log)
-   K1 = as.numeric(log[K.pos+2])
-   wK1 = which(!is.na(K1))
-   K = K1[wK1]
-#  print(K)
-   r.pos = grep("^r",log)
-   r1 = as.numeric(log[r.pos+2])
-   wr1 = which(!is.na(r1))
-   r = r1[wr1]
-#  print(r)
-   sdlogQ.pos = grep("^sdlogQ:",log)
-   sdlogQ = as.numeric(log[sdlogQ.pos+1])
-#  print(paste("sdlogQ",sdlogQ))
+#   logsdlogF = grep("logsdlogF:",log)   
+#   sdlogF = exp(as.numeric(log[logsdlogF+1]))
+##  print(sdlogF)
+#   logsdlogPop = grep("logsdlogPop:",log)
+#   sdlogPop = exp(as.numeric(log[logsdlogPop+1]))
+##  print(sdlogPop)
+#   logsdlogYield = grep("logsdlogYield:",log)
+##  print(length(logsdlogYield))
+#   sdlogYield = exp(as.numeric(log[logsdlogYield+1]))
+##  print(sdlogYield)
+#   K.pos = grep("^K",log)
+#   K1 = as.numeric(log[K.pos+2])
+#   wK1 = which(!is.na(K1))
+#   K = K1[wK1]
+##  print(K)
+#   r.pos = grep("^r",log)
+#   r1 = as.numeric(log[r.pos+2])
+#   wr1 = which(!is.na(r1))
+#   r = r1[wr1]
+##  print(r)
+#   sdlogQ.pos = grep("^sdlogQ:",log)
+#   sdlogQ = as.numeric(log[sdlogQ.pos+1])
+##  print(paste("sdlogQ",sdlogQ))
   
    max.counter = length(res)
    counter = max.counter
-   print(paste(max.counter, "blocks found:"))
-#  print(res)
-
-   ncol = (3*ngear+4)
-   print(paste("ncol",ncol))
-   diag = matrix(nrow=ntime,ncol=ncol)
-   print(dim(diag))
-   cnames = vector(length=ncol)
-   print(cnames)
+#   print(paste(max.counter, "blocks found:"))
+##  print(res)
+#
+#   ncol = (3*ngear+4)
+#   print(paste("ncol",ncol))
+#   diag = matrix(nrow=ntime,ncol=ncol)
+#   print(dim(diag))
+#   cnames = vector(length=ncol)
+#   print(cnames)
 
    c = 'n'
    dev.list = vector(mode="numeric",length=5)
@@ -349,37 +357,50 @@ log.diagnostics=function(file="issams_program.log",ntime=61,dt=1,ngear=5,
 #  while (c != 'q')
    while ( (c != 'q') && (c != 'x') )
    {
-      fc = res[counter]
-      for (c in 1:ncol)
-      {
-         fc = fc + 1
-      #  print(paste(fc,log[fc])) 
-         cnames[c] = log[fc]
-      }
-      colnames(diag) = cnames
-   
-      for (t in 1:ntime)
-      {
-         for (c in 1:ncol)
-         {
-            fc = fc + 1
-            diag[t,c] = as.numeric(log[fc],ngear)
-         }
-      }
-      print(paste("Block:",counter))
-   #  print(head(diag))
-   #  print(tail(diag))
-      print(paste("Displaying block ",counter,sep=""))
-      new.devices = plot.diagnostics(as.data.frame(diag),dt=dt,ngear=ngear,
-                    sdlogPop=sdlogPop[counter], 
-                    sdlogYield=sdlogYield[counter], 
-                    sdlogF=sdlogF[counter],
-                    sdlogQ=sdlogQ[counter],
-                    K=K[counter], r=r[counter],
+      tmp=get.diagnostics(log,ntime=ntime,dt=dt,ngear=ngear,block=counter,mtype="i")
+#      fc = res[counter]
+#      for (c in 1:ncol)
+#      {
+#         fc = fc + 1
+#      #  print(paste(fc,log[fc])) 
+#         cnames[c] = log[fc]
+#      }
+#      colnames(diag) = cnames
+#   
+#      for (t in 1:ntime)
+#      {
+#         for (c in 1:ncol)
+#         {
+#            fc = fc + 1
+#            diag[t,c] = as.numeric(log[fc],ngear)
+#         }
+#      }
+#      print(paste("Block:",counter))
+#   #  print(head(diag))
+#   #  print(tail(diag))
+#      print(paste("Displaying block ",counter,sep=""))
+#      new.devices = plot.diagnostics(as.data.frame(diag),dt=dt,ngear=ngear,
+#                    sdlogPop=sdlogPop[counter], 
+#                    sdlogYield=sdlogYield[counter], 
+#                    sdlogF=sdlogF[counter],
+#                    sdlogQ=sdlogQ[counter],
+#                    K=K[counter], r=r[counter],
+#                    plot.Fmort=plot.Fmort,
+#                    plot.prod=plot.prod,
+#                    plot.impact=plot.impact,
+#                    devices=dev.list,block=counter)
+      new.devices = plot.diagnostics(tmp$resid,dt=dt,ngear=ngear,
+                    sdlogPop=tmp$sdlogPop,
+                    sdlogYield=tmp$sdlogYield,
+                    sdlogF=tmp$sdlogF,
+                    sdlogQ=tmp$sdlogQ,
+                    K=tmp$K, r=tmp$r,
                     plot.Fmort=plot.Fmort,
                     plot.prod=plot.prod,
                     plot.impact=plot.impact,
                     devices=dev.list,block=counter)
+
+
       dev.list=new.devices
      
       c = readline("next, back, save, quit or exit? (enter n,b,s,q,x):")

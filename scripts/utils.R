@@ -161,7 +161,8 @@ plot.catches=function(t,obs,pred,sd=NULL,block=NULL)
 #  print(head(pred))
    ntime = length(t)
    ngear = ncol(obs)
-   par(mar=c(3,4.5,0,0)+0.1)
+   old.par = par(no.readonly = TRUE) 
+   par(mar=c(3,4.5,0,4)+0.1)
    np = ngear+1
    lm = layout(matrix(c(1:np),ncol=1,byrow=TRUE))
    layout.show(lm)
@@ -192,6 +193,8 @@ plot.catches=function(t,obs,pred,sd=NULL,block=NULL)
 
    if (!is.null(block))
       show.block.number(block,t[1],line=2)
+
+   par(old.par)
 }
 
 plot.biomass=function(x,y,K=NULL,sd=NULL,block=NULL,propL=NULL,forcing=NULL)
@@ -208,7 +211,9 @@ plot.biomass=function(x,y,K=NULL,sd=NULL,block=NULL,propL=NULL,forcing=NULL)
               parse(text=paste("N","[1]","+N","[2]")))
 
    options(scipen=6)
-   xrange=nice.ts.plot(x,y,ylab="Biomass (mt)")
+   yrange = c(0,1.2*max(y,na.rm=TRUE))
+   xrange=nice.ts.plot(x,y,ylab="Biomass (mt)",ylim=yrange)
+   print(ncol(y))
 
    if (!is.null(K))
    {
@@ -221,51 +226,61 @@ plot.biomass=function(x,y,K=NULL,sd=NULL,block=NULL,propL=NULL,forcing=NULL)
 #  if ( (ncol(y) > 2) && (!is.null(sd)) )
 #     plot.error(x,y[,3],sdlogNN, bcol="blue",fcol="lightblue")
 
-#  print("N1 error")
    if (!is.null(sd))
+   {
+      print("N1 error")
       plot.error(x,y[,1],sd, bcol="blue",fcol="lightblue")
-#  print("N2 error")
+   }
    if ( (ncol(y) > 1) && (!is.null(sd)) )
    {
+      print("N2 error")
       plot.error(x,y[,2],sd, bcol="blue",fcol="lightblue")
       lines(x,y[,1],col="blue",lwd=5)
    }
-#  print("N1 label")
+   print("N1")
+   lines(x,y[,1],col="blue",lwd=5)
+   print("N1 label")
    text(x[ntime],y[ntime,1],parse(text=paste("N","[1]")),adj=c(-0.5,0.5),col="blue")
+
    if (ncol(y) > 1)
    {
+      print("N2")
       lines(x,y[,2],col="blue",lwd=5)
 #  print("N2 label")
       text(x[ntime],y[ntime,2],parse(text=paste("N","[2]")),adj=c(-0.5,0.5),col="blue")
    }
-   print("N3")
+
    if (ncol(y) > 2)
    {
+      print("N3")
       lines(x,y[,3],col="blue",lwd=5)
       text(x[ntime],y[ntime,3],parse(text=paste("N","[1]","+","N","[2]")),adj=c(0.5,0.5),col="blue")
    }
    if (!is.null(propL))
    { 
-#     print("propL")
+      print("propL")
       par("new"=TRUE)
       plot(x,propL,lwd=3,type='l',col="red",ylim=c(0,1),
             ann=FALSE,axes=FALSE,xlim=xrange)
       text(x[ntime],propL[ntime]," p",adj=c(0,0),col="red")
       abline(h=0.9,lwd=2,lty="dotdash",col="red")
-      axis(4,col="red",ylab="p",col.axis="red")
-      mtext("p",side=4,col="red",line=0.1)
+      axis(4,col="red",ylab="p",col.axis="red",line=-1.5)
+      mtext("p",side=4,col="red",line=-1.0)
    }
-   if (!is.null(forcing))
+   if ( (!is.null(forcing)) && (max(forcing)> 1) )
    {
-#     print("forcing")
+      print("forcing")
       par("new"=TRUE)
-      tT21 = parse(text=paste("T","[21]"))
-      plot(x,forcing,lwd=3,type='l',col="purple", 
-           ylim=c(0.0,max(forcing)), ann=FALSE,axes=FALSE,xlim=xrange)
-      text(x[ntime],forcing[ntime],tT21,adj=c(-0.25,0.5),col="purple")
-      axis(4,line=-2,col="purple",col.axis="purple")
-   #  axis(2,col="purple",col.axis="purple",pos=xrange[2])
-      mtext(tT21, side=4,col="purple",line=-1.5)
+      frange = c(0,1.2*max(forcing,na.rm=TRUE))
+      ftic <- pretty(c(frange[1],frange[2]),5)
+      plot(xrange,frange,type='n',axes=FALSE,ann=FALSE,yaxs='i')
+      lines(x,forcing,lwd=3,col="purple")
+   #  plot(x,forcing,lwd=3,type='l',col="purple",
+   #       ylim=frange,ann=FALSE,axes=FALSE,xlim=xrange)
+      text(x[ntime],forcing[ntime]," I",adj=c(-0.25,0.5),col="purple")
+      axis(4,lwd=1,at=ftic[2:length(ftic)],col="purple",col.axis="purple")
+      abline(v=par("usr")[2],lwd=2,col="purple")
+      mtext("Forcing (I)",side=4,col="purple",line=3)
     }
     if (!is.null(block))
        show.block.number(block,x[1])
@@ -297,7 +312,8 @@ plot.production=function(Fmort, obsC, predC, t, r, K, block=NULL)
        show.block.number(block,Fyield[1],line=4)
 }
 
-read.diagnostics=function(file="xssams_program.log",ntime=61,dt=1,ngear=5,block=NULL)
+#read.diagnostics=function(file="xssams_program.log",ntime=61,dt=1,ngear=5,block=NULL)
+get.diagnostics=function(log,ntime=61,dt=1,ngear=5,block=NULL,mtype)
 {
    get.numeric.field = function(what, text)
    {
@@ -319,9 +335,9 @@ read.diagnostics=function(file="xssams_program.log",ntime=61,dt=1,ngear=5,block=
 
 
 
-   print(paste("Scanning file",file))
-   log = scan(file,what="character")
- # print(length(log))
+#  print(paste("Scanning file",file))
+#  log = scan(file,what="character")
+## print(length(log))
    res = grep("Residuals:",log)
    nblock = length(res)
    print(paste(nblock,"residual blocks found"))
@@ -336,9 +352,10 @@ read.diagnostics=function(file="xssams_program.log",ntime=61,dt=1,ngear=5,block=
                r=NA, r_prior=NA, sdr_prior=NA, logB1=NA, logdB1K=NA,
                B1=NA, K=NA, MSY=NA, Fmsy=NA, logsdlogProc=NA,
                sdlogPop=NA, logsdlogYield=NA, sdlogYield=NA, pcon=NA,
-               qProp=NA, logsdlogF=NA, sdlogF=NA, logsdlogPop=NA)
+               qProp=NA, logsdlogF=NA, sdlogF=NA, logsdlogPop=NA,
+               resid=NA)
 
-   print(ests)
+#  print(ests)
 
    ests$logT12=get.numeric.field("^logT12",log)[block]
    ests$T12=get.numeric.field("^T12",log)[block]
@@ -364,6 +381,204 @@ read.diagnostics=function(file="xssams_program.log",ntime=61,dt=1,ngear=5,block=
    ests$sdlogF=get.numeric.field("^sdlogF:",log)[block]
    ests$logsdlogPop=get.numeric.field("^logsdlogPop:",log)[block]
 
-   print(ests)
+
+   # npop?
+   if (mtype == "x")
+      ncol = (3*ngear+6)
+   else if (mtype == "i")
+      ncol = (3*ngear+4)
+   else
+      stop(paste("Unknown model type(",mtype,
+                 ") passed to get.diagnostics(...)",sep=""))
+ 
+   resid = matrix(nrow=ntime,ncol=ncol)
+   cnames = vector(length=ncol)
+
+   fc = res[block]
+   for (c in 1:ncol)
+   {
+      fc = fc + 1
+      cnames[c] = log[fc]
+   }
+   colnames(resid) = cnames
+#  print(colnames(resid))
+ 
+   for (t in 1:ntime)
+   {
+      for (c in 1:ncol)
+      {
+         fc = fc + 1
+         resid[t,c] = as.numeric(log[fc],ngear)
+      }
+   }
+
+#  print(paste("Block",block,":"))
+#  print(ests)
+#  print(head(resid))
+
+   ests$resid=as.data.frame(resid)
+
+   return(ests)
  
 }
+
+
+plot.biomass.array=function(path.list=c("../run-issams-dev/issams-dev.rep",
+                                         "../run-issams/issams.rep",
+                                         "../run-xssams/1/xssams.rep"),
+                             ntime=61,dt=1,ngear=5,mtype=c("i","i","x"))
+{
+   npath = length(path.list)
+   print(npath)
+   width = 11.0
+   height = 11.0
+   x11(width=width,height=height)
+   old.par = par(no.readonly = TRUE) 
+   par(mar=c(3,4.5,0,5)+0.1)
+   lm = layout(matrix(c(1:npath),ncol=1,byrow=TRUE))
+   layout.show(lm)
+   for (p in 1:npath)
+   {
+      path=path.list[p]
+      print(path)
+      pv = unlist(strsplit(path,"[\\./]"))
+      model = pv[length(pv)-1]
+      print(model)
+      if (model == "issams-dev")
+         #     parse(text=paste("N","[1]","+","N","[2]"))
+         legend = parse(text=paste("B","[1]","~d","~~no~index"))
+      else
+         legend = model
+
+      log = scan(path,what="character")
+      res = grep("Residuals:",log)
+      block = length(res)
+      tmp=get.diagnostics(log,ntime=ntime,dt=dt,ngear=ngear,block=NULL,mtype=mtype[p])
+      dat=tmp$resid
+      ncol = ncol(dat)
+   #  print(head(dat))
+      if (mtype[p] == "x")
+      {
+         gear.col = 6
+         dd = c(2:3,(gear.col+1):ncol)
+         y = matrix(0.0,nrow=ntime,ncol=3)
+         dat[,dd] = exp(dat[,dd])
+         y[,1] = dat$pop1
+         y[,2] = dat$pop2
+         y[,3] = dat$pop1 + dat$pop2
+      } 
+      else if (mtype[p] == "i")
+      {
+         gear.col = 4
+         dd = c(2,(gear.col+1):ncol)
+         dat[,dd] = exp(dat[,dd])
+         y = matrix(0.0,nrow=ntime,ncol=1)
+         y[,1] = dat$pop
+      }
+      else
+         stop(paste("Unknown model type (",mtype[p],
+                    ") passed to plot.biomass.array(...)",sep=""))
+
+      plot.biomass(dat$t,y,sd=tmp$sdlogPop,K=dat$K, propL=dat$propL,forcing=dat$forcing)
+      legend(x="topleft",legend=legend,bty='n',cex=1.6)
+   }
+#  par(old.par)
+}
+
+## diagnostic.array=function(file,ntime=61,dt=1,ngear=5,mtype=NULL,block=NULL)
+## {
+##    require(grid)
+## #  require(gridBase)
+## 
+##    print(paste("Scanning file",file))
+##    log = scan(file,what="character")
+##    res = grep("Residuals:",log)
+##    if (is.null(block))
+##    {
+##       block = length(res)
+##    }
+##    tmp=get.diagnostics(log,ntime=ntime,dt=dt,ngear=ngear,block=block,mtype=mtype)
+##    print(names(tmp))
+##    dat=tmp$resid
+##    print(head(dat))
+##    predC.ndx=grep("predC",names(dat)) 
+##    obsC.ndx=grep("obsC",names(dat)) 
+##    if (mtype == "x")
+##    {
+##       gear.col = 6
+##       y = matrix(0.0,nrow=ntime,ncol=3)
+##       y[,1] = dat$pop1
+##       y[,2] = dat$pop2
+##       y[,3] = dat$pop1 + dat$pop2
+##    }
+##    else if (mtype == "i")
+##    {
+##       gear.col = 4
+##       y = matrix(0.0,nrow=ntime,ncol=1)
+##       y[,1] = dat$pop
+##    }
+##    else
+##       stop(paste("Unknown model type(",mtype,
+##                  ") passed to diagnostic,array(...)",sep=""))
+## 
+##    width = 9.0
+##    height = 6.5
+## #  x11(width=width,height=height)
+## #  par(mar=c(4,4,0,0)+0.1)
+##    opar <- par(no.readonly=TRUE) # Saving graphical parameters
+## #  la = layout(matrix(c(1,1,2,3),ncol=2,nrow=2,byrow=FALSE))
+## #  layout.show(la)
+## #  plot.catches(dat$t,dat[,c(gear.col+2*ngear+1):(gear.col+3*ngear)],
+## #                     dat[,c(gear.col+ngear+1)  :(gear.col+2*ngear)],
+## #                     tmp$sdlogYield)#,block) 
+##    plot.new()
+##    multitop.vp <- viewport(layout=grid.layout(2,2), width = unit(0.95, "npc"))
+##    grid.show.layout(grid.layout(1,2)) 
+##    pl1 <- viewport(layout.pos.col=1, layout.pos.row=2, name="A")
+##    p21 <- viewport(layout.pos.col=2, layout.pos.row=1, name="B")
+##    p22 <- viewport(layout.pos.col=2, layout.pos.row=2, name="C")
+##    vpall <- vpTree(multitop.vp, vpList(pl1,p21,p22))
+##    pushViewport(vpall)
+## 
+##    upViewport()
+##    downViewport("A")
+## # stackedplot(data=list(1:10,10:1,rep(10,10)),main="A")
+## #  plot.biomass(dat$t,y,sd=tmp$sdlogPop,K=dat$K, forcing=dat$forcing)
+## #  plot.catches(dat$t,dat[,c(gear.col+2*ngear+1):(gear.col+3*ngear)],
+## #                     dat[,c(gear.col+ngear+1)  :(gear.col+2*ngear)],
+## #                     tmp$sdlogYield)#,block) 
+## 
+##    upViewport()
+##    downViewport("B")
+## # stackedplot(data=list(10:1,rep(10,10),1:10),main="B")
+## #  plot.biomass(dat$t,y,sd=tmp$sdlogPop,K=dat$K, forcing=dat$forcing)
+##    
+##    upViewport(2)
+## 
+##   
+## 
+## #  plot.biomass(dat$t,y,sd=tmp$sdlogPop,K=dat$K, forcing=dat$forcing)
+## 
+##  
+##    par(opar) # Returning the graphical parameters saved earlier
+## }
+## 
+## # opar <- par(no.readonly=TRUE) # Saving graphical parameters
+## # plot.new() # Needed for par(new=TRUE) in stackedplot()
+## # 
+## # multitop.vp <- viewport(layout=grid.layout(1,2), width = unit(0.95, "npc"))
+## # pl1 <- viewport(layout.pos.col=1, layout.pos.row=1, name="A")
+## # pl2 <- viewport(layout.pos.col=2, layout.pos.row=1, name="B")
+## # vpall <- vpTree(multitop.vp, vpList(pl1,pl2))
+## # pushViewport(vpall)
+## # 
+## # upViewport()
+## # downViewport("A")
+## # stackedplot(data=list(1:10,10:1,rep(10,10)),main="A")
+## # 
+## # upViewport()
+## # downViewport("B")
+## # stackedplot(data=list(10:1,rep(10,10),1:10),main="B")
+## # 
+## # upViewport(2)
+## # par(opar) # Returning the graphical parameters saved earlier
