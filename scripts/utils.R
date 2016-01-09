@@ -197,7 +197,8 @@ plot.catches=function(t,obs,pred,sd=NULL,block=NULL)
    par(old.par)
 }
 
-plot.biomass=function(x,y,K=NULL,sd=NULL,block=NULL,propL=NULL,forcing=NULL)
+plot.biomass=function(x,y,K=NULL,sd=NULL,block=NULL,propL=NULL,
+                      forcing=NULL,yrange=NULL)
 {
 #  print(length(x))
 #  print(head(x))
@@ -211,14 +212,15 @@ plot.biomass=function(x,y,K=NULL,sd=NULL,block=NULL,propL=NULL,forcing=NULL)
               parse(text=paste("N","[1]","+N","[2]")))
 
    options(scipen=6)
-   yrange = c(0,1.2*max(y,na.rm=TRUE))
+   if (is.null(yrange))
+      yrange = c(0,1.2*max(y,na.rm=TRUE))
    xrange=nice.ts.plot(x,y,ylab="Biomass (mt)",ylim=yrange)
    print(ncol(y))
 
    if (!is.null(K))
    {
       lines(x,K,lwd=2,lty="dotdash",col="blue",xlim=xrange)
-      text(x[1],K[1]," K",adj=c(1.5,0.5),col="blue")
+      text(x[1],K[1],"K ",adj=c(1.5,0.5),col="blue",cex=1.2)
    }
 
 #  sdlogNN = sqrt(4.0*sd*sd) # this is probably not correct
@@ -240,21 +242,22 @@ plot.biomass=function(x,y,K=NULL,sd=NULL,block=NULL,propL=NULL,forcing=NULL)
    print("N1")
    lines(x,y[,1],col="blue",lwd=5)
    print("N1 label")
-   text(x[ntime],y[ntime,1],parse(text=paste("N","[1]")),adj=c(-0.5,0.5),col="blue")
+   text(x[ntime],y[ntime,1],parse(text=paste("N","[1]")),adj=c(-0.5,0.5),
+        col="blue",cex=1.2)
 
    if (ncol(y) > 1)
    {
       print("N2")
       lines(x,y[,2],col="blue",lwd=5)
 #  print("N2 label")
-      text(x[ntime],y[ntime,2],parse(text=paste("N","[2]")),adj=c(-0.5,0.5),col="blue")
+      text(x[ntime],y[ntime,2],parse(text=paste("N","[2]")),adj=c(-0.5,0.5),col="blue",cex=1.2)
    }
 
    if (ncol(y) > 2)
    {
       print("N3")
       lines(x,y[,3],col="blue",lwd=5)
-      text(x[ntime],y[ntime,3],parse(text=paste("N","[1]","+","N","[2]")),adj=c(0.5,0.5),col="blue")
+      text(x[ntime],y[ntime,3],parse(text=paste("N","[1]","+","N","[2]")),adj=c(0.5,0.5),col="blue",cex=1.2)
    }
    if (!is.null(propL))
    { 
@@ -264,7 +267,7 @@ plot.biomass=function(x,y,K=NULL,sd=NULL,block=NULL,propL=NULL,forcing=NULL)
             ann=FALSE,axes=FALSE,xlim=xrange)
       text(x[ntime],propL[ntime]," p",adj=c(0,0),col="red")
       abline(h=0.9,lwd=2,lty="dotdash",col="red")
-      axis(4,col="red",ylab="p",col.axis="red",line=-1.5)
+      axis(4,col="red",ylab="p",col.axis="red",line=-2.0)
       mtext("p",side=4,col="red",line=-1.0)
    }
    if ( (!is.null(forcing)) && (max(forcing)> 1) )
@@ -277,7 +280,7 @@ plot.biomass=function(x,y,K=NULL,sd=NULL,block=NULL,propL=NULL,forcing=NULL)
       lines(x,forcing,lwd=3,col="purple")
    #  plot(x,forcing,lwd=3,type='l',col="purple",
    #       ylim=frange,ann=FALSE,axes=FALSE,xlim=xrange)
-      text(x[ntime],forcing[ntime]," I",adj=c(-0.25,0.5),col="purple")
+      text(x[1],forcing[1],"I ",adj=c(1.5,0.5),col="purple",cex=1.2)
       axis(4,lwd=1,at=ftic[2:length(ftic)],col="purple",col.axis="purple")
       abline(v=par("usr")[2],lwd=2,col="purple")
       mtext("Forcing (I)",side=4,col="purple",line=3)
@@ -430,13 +433,25 @@ plot.biomass.array=function(path.list=c("../run-issams-dev/issams-dev.rep",
 {
    npath = length(path.list)
    print(npath)
-   width = 11.0
+   width = 9.0
    height = 11.0
-   x11(width=width,height=height)
-   old.par = par(no.readonly = TRUE) 
-   par(mar=c(3,4.5,0,5)+0.1)
+   yrange=c(0,30000)
+   start.year = 1952
+
+   old.par = par(no.readonly = TRUE,"new"=FALSE) 
+
+   x11(width=width,height=height,title="Biomass")
+   par(mar=c(3,4.5,0,5)+0.1,"new"=FALSE)
    lm = layout(matrix(c(1:npath),ncol=1,byrow=TRUE))
    layout.show(lm)
+   biomass.dev = dev.cur()
+
+   x11(width=width,height=height,title="Production",xpos=100)
+   par(mar=c(3,4.5,0,0)+0.1,"new"=FALSE,las=1)
+   lm = layout(matrix(c(1:npath),ncol=1,byrow=TRUE))
+   layout.show(lm)
+   prod.dev = dev.cur()
+
    for (p in 1:npath)
    {
       path=path.list[p]
@@ -447,6 +462,10 @@ plot.biomass.array=function(path.list=c("../run-issams-dev/issams-dev.rep",
       if (model == "issams-dev")
          #     parse(text=paste("N","[1]","+","N","[2]"))
          legend = parse(text=paste("B","[1]","~d","~~no~index"))
+      else if (model == "issams")
+         legend = parse(text=paste("MSY~F","[msy]","~~indexed"))
+      else if (model == "xssams")
+         legend = parse(text=paste("MSY~F","[msy]","~~immigration"))
       else
          legend = model
 
@@ -455,6 +474,8 @@ plot.biomass.array=function(path.list=c("../run-issams-dev/issams-dev.rep",
       block = length(res)
       tmp=get.diagnostics(log,ntime=ntime,dt=dt,ngear=ngear,block=NULL,mtype=mtype[p])
       dat=tmp$resid
+      dat$t = (start.year-0.4*dt +  dat$t*dt)
+
       ncol = ncol(dat)
    #  print(head(dat))
       if (mtype[p] == "x")
@@ -479,9 +500,35 @@ plot.biomass.array=function(path.list=c("../run-issams-dev/issams-dev.rep",
          stop(paste("Unknown model type (",mtype[p],
                     ") passed to plot.biomass.array(...)",sep=""))
 
-      plot.biomass(dat$t,y,sd=tmp$sdlogPop,K=dat$K, propL=dat$propL,forcing=dat$forcing)
+      dev.set(biomass.dev)
+      plot.biomass(dat$t,y,sd=tmp$sdlogPop,K=dat$K, propL=dat$propL,
+                   forcing=dat$forcing,yrange=yrange)
       legend(x="topleft",legend=legend,bty='n',cex=1.6)
+
+      F.ndx=grep("F",names(dat)) 
+      predC.ndx=grep("predC",names(dat)) 
+      obsC.ndx=grep("obsC",names(dat)) 
+
+      Fmort = rowSums(dat[,F.ndx])
+      obsC = rowSums(dat[,obsC.ndx])
+      predC = rowSums(dat[,predC.ndx])
+
+      dev.set(prod.dev)
+      plot.production(Fmort,obsC,predC,dat$t, r=tmp$r,K=tmp$K)
+      legend(x="topleft",legend=legend,bty='n',cex=1.6)
+
+
+
    }
+
+   dev.set(biomass.dev)
+   din = par("din")
+   save.png.plot("biomass-array",width=din[1],height=din[2])
+
+   dev.set(prod.dev)
+   din = par("din")
+   save.png.plot("production-array",width=din[1],height=din[2])
+
 #  par(old.par)
 }
 
