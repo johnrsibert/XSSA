@@ -6,23 +6,6 @@ have.xssams.R = FALSE
 have.issams.R = TRUE
 start.year = 1952
 
-#plot.error=function(x,y,sd,bcol,fcol,mult=2)
-#{
-#   if (capabilities("cairo"))
-#   {
-#      sdyu = exp(log(y)+mult*sd)
-#      sdyl = exp(log(y)-mult*sd)
-#      frgb = col2rgb(fcol)/255
-#      polygon(c(x,rev(x)),c(sdyl,rev(sdyu)),
-#              border=bcol,lty="dashed",lwd=1,
-#              col=rgb(frgb[1],frgb[2],frgb[3],0.5))
-#   }
-#   else
-#      polygon(c(x,rev(x)),c(sdyl,rev(sdyu)),
-#              border=bcol,lty="dashed",lwd=1,col=fcol)
-#
-#}
-
 
 plot.diagnostics=function(dat=NULL,file="diagnostics.dat",dt,ngear,
                  sdlogPop, sdlogYield, sdlogF, sdlogQ, K, r,
@@ -129,37 +112,6 @@ plot.diagnostics=function(dat=NULL,file="diagnostics.dat",dt,ngear,
                       dat[,c(gear.col+ngear+1)  :(gear.col+2*ngear)],
                       sdlogYield,block) 
 
-#   par(mar=c(3,4.5,0,0)+0.1)
-#   np = ngear+1
-#   lm = layout(matrix(c(1:np),ncol=1,byrow=TRUE))
-#   layout.show(lm)
-#   sum.obs = vector(length=ntime,mode="numeric")
-#   sum.pred = vector(length=ntime,mode="numeric")
-#   for (g in 1:ngear)
-#   {
-#      pred.ndx = gear.col+  ngear+g
-#      obs.ndx  = gear.col+2*ngear+g
-#
-#      nice.ts.plot(dat$t,dat[,pred.ndx],
-#                 bcol="darkgreen",fcol="lightgreen",lwd=lwd,ylab="Catch (mt)")
-#      plot.error(dat$t,dat[,pred.ndx],sdlogYield,
-#                 bcol="darkgreen",fcol="lightgreen")
-#      lines(dat$t,dat[,pred.ndx],col="darkgreen",lwd=lwd+2)
-#      points(dat$t,dat[,obs.ndx],col= "darkgreen",pch=3,cex=3)
-#      title(main=gear.names[g],line=title.line)
-#
-#      sum.obs  = sum.obs  + dat[,obs.ndx]
-#      sum.pred = sum.pred + dat[,pred.ndx]
-#   }
-#    
-#   nice.ts.plot(dat$t,sum.pred,
-#                 bcol="darkgreen",fcol="lightgreen",lwd=lwd,ylab="Catch (mt)")
-#   lines(dat$t,sum.pred,col="darkgreen",lwd=lwd+2)
-#   points(dat$t,sum.obs,col= "darkgreen",pch=3,cex=3)
-#   title(main="All Fleets",line=title.line)
-#
-#   show.block.number(block,dat$t[1],line=2)
-
 #  plot.Fmort = TRUE
    if (plot.Fmort)
    {
@@ -219,37 +171,6 @@ plot.diagnostics=function(dat=NULL,file="diagnostics.dat",dt,ngear,
        plot.production(Fmort,obsC,predC,dat$t, r,K,block)
 
 
-#       Fmort = rowSums(dat[,F.ndx])
-#       F.max=max(Fmort,na.rm=TRUE)
-#       if (F.max > r)
-#         F.max = max(F.max,r)
-#       Fyield = seq(0,F.max,0.01*F.max)
-#       yield = Fyield*K*(1.0-Fyield/r) # equilibirum yield at F
-#    #  yield = Fyield*max(dat$forcing,K)*(1.0-Fyield/r) # 
-#    #  Syield = Fmort*(dat$forcing+K*(1.0-Fmort/r)) # 
-#    #  Syield = Fyield*((dat$forcing+K)*(1.0-Fyield/r)) # 
-#       print(paste(K,r))
-#       print(head(cbind(Fyield,yield)))
-#       print(tail(cbind(Fyield,yield)))
-#       obsC = rowSums(dat[,obsC.ndx])
-#       predC = rowSums(dat[,predC.ndx])
-#       xrange = c(0,F.max)
-#       yrange = c(0,1.2*max(obsC,predC,yield,na.rm=TRUE))
-#       Flab = parse(text=paste("Total~Fishing~Mortality~(","y^-1",")",sep=""))
-#       plot(xrange,yrange,type='n', xlab=Flab, ylab="Total Yield (mt)")
-#
-#       double.lines(Fmort,predC,bcol="darkgreen",fcol="lightgreen",lwd=5) 
-#       points(Fmort,obsC,col= "darkgreen",pch=3,cex=2)
-#       points(Fmort,predC,col="darkgreen",pch=16)
-#   #   lines(Fmort,Syield,col="purple",lwd=3,lty="longdash")
-#   #   lines(Fyield,Syield,col="purple",lwd=3,lty="longdash")
-#   #   wmaxC = which(obsC==max(obsC,na.rm=TRUE))
-#   #   lines(c(0,Fmort[wmaxC]),c(0,obsC[wmaxC]),col="red",lty="longdash")
-#       lines(Fyield,yield,col="red",lwd=3,lty="longdash")
-#
-#       text(x=Fmort[wy5],y=obsC[wy5],labels=floor(dat$t[wy5]),
-#             pos=4,offset=0.5,cex=0.8)
-#       show.block.number(block,0)
    } #if (plot.prod)
 
    if (plot.impact)
@@ -314,41 +235,9 @@ log.diagnostics=function(file="issams_program.log",ntime=61,dt=1,ngear=5,
    print(paste("Scanning file",file))
    log = scan(file,what="character")
    res = grep("Residuals:",log)
-#   logsdlogF = grep("logsdlogF:",log)   
-#   sdlogF = exp(as.numeric(log[logsdlogF+1]))
-##  print(sdlogF)
-#   logsdlogPop = grep("logsdlogPop:",log)
-#   sdlogPop = exp(as.numeric(log[logsdlogPop+1]))
-##  print(sdlogPop)
-#   logsdlogYield = grep("logsdlogYield:",log)
-##  print(length(logsdlogYield))
-#   sdlogYield = exp(as.numeric(log[logsdlogYield+1]))
-##  print(sdlogYield)
-#   K.pos = grep("^K",log)
-#   K1 = as.numeric(log[K.pos+2])
-#   wK1 = which(!is.na(K1))
-#   K = K1[wK1]
-##  print(K)
-#   r.pos = grep("^r",log)
-#   r1 = as.numeric(log[r.pos+2])
-#   wr1 = which(!is.na(r1))
-#   r = r1[wr1]
-##  print(r)
-#   sdlogQ.pos = grep("^sdlogQ:",log)
-#   sdlogQ = as.numeric(log[sdlogQ.pos+1])
-##  print(paste("sdlogQ",sdlogQ))
-  
+
    max.counter = length(res)
    counter = max.counter
-#   print(paste(max.counter, "blocks found:"))
-##  print(res)
-#
-#   ncol = (3*ngear+4)
-#   print(paste("ncol",ncol))
-#   diag = matrix(nrow=ntime,ncol=ncol)
-#   print(dim(diag))
-#   cnames = vector(length=ncol)
-#   print(cnames)
 
    c = 'n'
    dev.list = vector(mode="numeric",length=5)
@@ -358,37 +247,7 @@ log.diagnostics=function(file="issams_program.log",ntime=61,dt=1,ngear=5,
    while ( (c != 'q') && (c != 'x') )
    {
       tmp=get.diagnostics(log,ntime=ntime,dt=dt,ngear=ngear,block=counter,mtype="i")
-#      fc = res[counter]
-#      for (c in 1:ncol)
-#      {
-#         fc = fc + 1
-#      #  print(paste(fc,log[fc])) 
-#         cnames[c] = log[fc]
-#      }
-#      colnames(diag) = cnames
-#   
-#      for (t in 1:ntime)
-#      {
-#         for (c in 1:ncol)
-#         {
-#            fc = fc + 1
-#            diag[t,c] = as.numeric(log[fc],ngear)
-#         }
-#      }
-#      print(paste("Block:",counter))
-#   #  print(head(diag))
-#   #  print(tail(diag))
-#      print(paste("Displaying block ",counter,sep=""))
-#      new.devices = plot.diagnostics(as.data.frame(diag),dt=dt,ngear=ngear,
-#                    sdlogPop=sdlogPop[counter], 
-#                    sdlogYield=sdlogYield[counter], 
-#                    sdlogF=sdlogF[counter],
-#                    sdlogQ=sdlogQ[counter],
-#                    K=K[counter], r=r[counter],
-#                    plot.Fmort=plot.Fmort,
-#                    plot.prod=plot.prod,
-#                    plot.impact=plot.impact,
-#                    devices=dev.list,block=counter)
+
       new.devices = plot.diagnostics(tmp$resid,dt=dt,ngear=ngear,
                     sdlogPop=tmp$sdlogPop,
                     sdlogYield=tmp$sdlogYield,
@@ -496,6 +355,7 @@ read.rep=function(file="issams.rep",ntime=61,dt=1,ngear=5)
    ret$KF = extract.value("klingon_multiplier",rep)
    return(ret)
 }
+
 read.rep.files=function(path.list)# read.rep.files(dir(path=".",pattern="CV*"))
 {
    print(path.list)
