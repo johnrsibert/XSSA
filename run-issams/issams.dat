@@ -40,9 +40,8 @@
              1     0.3
 # sdlogYield  phase initial value
                1    0.3
-# Q           phase initial value
-               1    0.05
-# sdlogQ      phase initial value
+# Q  use      phase initial value
+     1         1    0.05
 #             -1    0.3
 # yield likelihood
 # use pfat_phase pfat initial values

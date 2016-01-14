@@ -66,7 +66,7 @@ plot.catches=function(t,obs,pred,sd=NULL,block=NULL)
 }
 
 plot.biomass=function(x,y,K=NULL,sd=NULL,block=NULL,propL=NULL,
-                      forcing=NULL,yrange=NULL)
+                      forcing=NULL,yrange=NULL,B1=NULL)
 {
 #  print(length(x))
 #  print(head(x))
@@ -152,6 +152,12 @@ plot.biomass=function(x,y,K=NULL,sd=NULL,block=NULL,propL=NULL,
       axis(4,lwd=1,at=ftic[2:length(ftic)],col="purple",col.axis="purple")
       abline(v=par("usr")[2],lwd=2,col="purple")
       mtext("Forcing (I)",side=4,col="purple",line=3)
+    }
+    if (!is.null(B1))
+    {
+       points(x[1],B1,pch=8,cex=1.2,col="blue")
+    #  text(x[1],B1,adj=c(1.5,0.5),col="blue",cex=1.2)
+       text(x[1],B1,parse(text=paste("B","[1]")),adj=c(1.25,0.5),col="blue",cex=1.2)
     }
     if (!is.null(block))
        show.block.number(block,x[1])
@@ -370,7 +376,7 @@ plot.biomass.array=function(path.list=c("../run-issams-dev/issams-dev.rep",
 
       dev.set(biomass.dev)
       plot.biomass(dat$t,y,sd=tmp$sdlogPop,K=dat$K, propL=dat$propL,
-                   forcing=dat$forcing,yrange=yrange)
+                   forcing=dat$forcing,yrange=yrange,B1=tmp$B1)
       legend(x="topleft",legend=legend,bty='n',cex=1.6)
 
       F.ndx=grep("F",names(dat)) 

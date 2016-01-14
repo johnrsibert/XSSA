@@ -8,7 +8,7 @@ start.year = 1952
 
 
 plot.diagnostics=function(dat=NULL,file="diagnostics.dat",dt,ngear,
-                 sdlogPop, sdlogYield, sdlogF, sdlogQ, K, r,
+                 sdlogPop, sdlogYield, sdlogF, sdlogQ, K, r, B1,
                  plot.Fmort,plot.prod, plot.impact,
                  devices,block)
 {
@@ -71,7 +71,7 @@ plot.diagnostics=function(dat=NULL,file="diagnostics.dat",dt,ngear,
    y = matrix(nrow=ntime,ncol=1)
    y[,1]=dat$pop
 #  y[,2]=dat$forcing
-   plot.biomass(dat$t,y,sd=sdlogPop,block=block,K=dat$K,
+   plot.biomass(dat$t,y,sd=sdlogPop,block=block,K=dat$K,B1=B1,
                 forcing=dat$forcing)
 
 #  options(scipen=6)
@@ -253,7 +253,7 @@ log.diagnostics=function(file="issams_program.log",ntime=61,dt=1,ngear=5,
                     sdlogYield=tmp$sdlogYield,
                     sdlogF=tmp$sdlogF,
                     sdlogQ=tmp$sdlogQ,
-                    K=tmp$K, r=tmp$r,
+                    K=tmp$K, r=tmp$r, B1=tmp$B1,
                     plot.Fmort=plot.Fmort,
                     plot.prod=plot.prod,
                     plot.impact=plot.impact,

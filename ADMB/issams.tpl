@@ -60,7 +60,7 @@ TOP_OF_MAIN_SECTION
     ad_exit(1);
   }
   cout << "Opened program log: " << logname << endl;
-  //pad();
+  pad();
 
 
 DATA_SECTION
@@ -145,6 +145,7 @@ DATA_SECTION
   init_number init_sdlogYield;
   !! TTRACE(init_sdlogYield,phase_sdlogYield)
 
+  init_int use_Q;
   init_int phase_Q;
   init_number init_Q;
   !! TTRACE(init_Q,phase_Q)
@@ -297,7 +298,7 @@ PARAMETER_SECTION
 PRELIMINARY_CALCS_SECTION
     userfun_entries = 0;
     status_blocks = 0;
-    /*
+
     pininit = fexists(adstring(argv[0])+".pin");
     // set initial parameter value from data file
     TRACE(pininit)
@@ -326,7 +327,6 @@ PRELIMINARY_CALCS_SECTION
 
        double r = 2.0*mfexp(value(logFmsy));
        double K = 4.0*mfexp(value(logMSY))/(1.0e-20+r);
-       //double K = immigrant_biomass[1];
 
        int ut = 0;
        TRACE(ut)
@@ -376,7 +376,7 @@ PRELIMINARY_CALCS_SECTION
        }
     }
     trace_init_pars = 1;
-    */
+
     clogf << "\nAt end of PRELIMINARY_CALCS_SECTION:"<<endl;
     TRACE(userfun_entries)
     TRACE(utPop)
@@ -468,20 +468,22 @@ SEPARABLE_FUNCTION void step0(const dvariable& p11, const dvariable& lsdlogProc,
   // ensure that starting population size is near K
   dvariable r = 2.0*mfexp(lFmsy);
   dvariable K = 4.0*mfexp(lMSY)/(1.0e-20+r);
-  dvariable p10 = K;
+  dvariable p10 = log(K);
   dvariable lsdlogPop = lsdlogProc;
   dvariable varlogPop = square(mfexp(lsdlogPop));
   dvariable Pnll = 0.0;
-  Pnll += 0.5*(log(TWO_M_PI*varlogPop) + square(log(p10) - p11)/varlogPop);
+  Pnll += 0.5*(log(TWO_M_PI*varlogPop) + square(p10 - p11)/varlogPop);
+  nll += Pnll;
 
-  dvariable Qnll = 0.0;
-  dvariable varlogQ = square(mfexp(lsdlogProc));
-  dvariable tQ = mfexp(tlogQ);
-  dvariable lnQ=tlogQ;
-  dvariable logib = lnQ + log(immigrant_biomass(1));
-  Qnll += 0.5*(log(TWO_M_PI*varlogQ) + square(logib-p11)/varlogQ);
-
-  nll += (Pnll+Qnll);
+  if (use_Q)
+  {
+     dvariable Qnll = 0.0;
+     dvariable varlogQ = square(mfexp(lsdlogProc));
+     dvariable lnQ=tlogQ;
+     dvariable logib = lnQ + log(immigrant_biomass(1));
+     Qnll += 0.5*(log(TWO_M_PI*varlogQ) + square(logib-p11)/varlogQ);
+     nll += Qnll;
+  }
 
 
 SEPARABLE_FUNCTION void step(const int t, const dvar_vector& f1, const dvar_vector& f2, const dvariable& p11, const dvariable p12, const dvariable& lsdlogProc, const dvariable& lFmsy, const dvariable& lMSY, const dvariable lnQ)
@@ -495,7 +497,6 @@ SEPARABLE_FUNCTION void step(const int t, const dvar_vector& f1, const dvar_vect
   dvariable varlogF = square(mfexp(lsdlogF));
   dvariable lsdlogPop = lsdlogProc;
   dvariable varlogPop = square(mfexp(lsdlogPop));
-  dvariable varlogQ = square(mfexp(lsdlogProc));
  
   dvariable r = 2.0*exp(lFmsy);
   dvariable K = 4.0*exp(lMSY)/(1.0e-20+r);
@@ -545,11 +546,15 @@ SEPARABLE_FUNCTION void step(const int t, const dvar_vector& f1, const dvar_vect
   dvariable Pnll = 0.0;
   Pnll += 0.5*(log(TWO_M_PI*varlogPop) + square(p12-nextLogN)/varlogPop);
 
-  dvariable Qnll = 0.0;
-  dvariable logib = lnQ + log(immigrant_biomass(t));
-  Qnll += 0.5*(log(TWO_M_PI*varlogQ) + square(logib-nextLogN)/varlogQ);
-
-  nll += (Fnll+Pnll+Qnll);
+  nll += (Fnll+Pnll);
+  if (use_Q)
+  {
+     dvariable Qnll = 0.0;
+     dvariable varlogQ = square(mfexp(lsdlogProc));
+     dvariable logib = lnQ + log(immigrant_biomass(t));
+     Qnll += 0.5*(log(TWO_M_PI*varlogQ) + square(logib-nextLogN)/varlogQ);
+     nll += Qnll;
+  }
   //clogf << t << " " << Fnll << " " <<Pnll << " " <<PLnll << " " << Qnll << " " 
   //      << nll << endl;
   
@@ -697,7 +702,7 @@ FUNCTION void write_status(ofstream& s)
              <<  " (" << active(logsdlogYield) <<")" << endl;
     s << "#    sdlogYield: " << mfexp(logsdlogYield) << endl;
     s << "#          logQ: " << logQ <<  " (" << active(logQ) <<")" << endl;
-    s << "#             Q: " << mfexp(logQ) << endl;
+    s << "#             Q: " << mfexp(logQ) << " (" << use_Q <<")" << endl;
     s << "# Lpcon = " << value(Lpcon) << " (" << active(Lpcon) <<")" << endl;
     s << "# pcon = " << alogit(value(Lpcon)) << endl;
     s << "# klingon_multiplier = " << klingon_multiplier << endl;
