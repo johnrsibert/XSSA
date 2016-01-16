@@ -66,7 +66,7 @@ plot.catches=function(t,obs,pred,sd=NULL,block=NULL)
 }
 
 plot.biomass=function(x,y,K=NULL,sd=NULL,block=NULL,propL=NULL,
-                      forcing=NULL,yrange=NULL,B1=NULL)
+                      forcing=NULL,yrange=NULL,B1=NULL,indexed=NULL)
 {
 #  print(length(x))
 #  print(head(x))
@@ -88,7 +88,7 @@ plot.biomass=function(x,y,K=NULL,sd=NULL,block=NULL,propL=NULL,
    if (!is.null(K))
    {
       lines(x,K,lwd=2,lty="dotdash",col="blue",xlim=xrange)
-      text(x[1],K[1],"K ",adj=c(1.5,0.5),col="blue",cex=1.2)
+      text(x[1],K[1],"K ",adj=c(1.25,0.5),col="blue",cex=1.2)
    }
 
 #  sdlogNN = sqrt(4.0*sd*sd) # this is probably not correct
@@ -138,7 +138,9 @@ plot.biomass=function(x,y,K=NULL,sd=NULL,block=NULL,propL=NULL,
       axis(4,col="red",ylab="p",col.axis="red",line=-2.0)
       mtext("p",side=4,col="red",line=-1.0)
    }
-   if ( (!is.null(forcing)) && (max(forcing)> 1) )
+#  if ( (!is.null(forcing)) && (max(forcing)> 1) )
+   print(paste("p.b indexed",indexed))
+   if ( (!is.na(indexed)) && (indexed) )
    {
       print("forcing")
       par("new"=TRUE)
@@ -194,6 +196,7 @@ get.diagnostics=function(log,ntime=61,dt=1,ngear=5,block=NULL,mtype)
 {
    get.numeric.field = function(what, text)
    {
+   #  print(what)
       old.opt=getOption("warn")
       options("warn"=-1)
       ndx = grep(what,text)
@@ -210,6 +213,14 @@ get.diagnostics=function(log,ntime=61,dt=1,ngear=5,block=NULL,mtype)
       return(value[wv])   
    } 
 
+   get.active.field = function(what, text)
+   {
+      old.opt=getOption("warn")
+      ndx = grep(what,text)
+      active = text[ndx+2]
+      options("warn"=old.opt)
+      return(active=="(1)")
+   }
 
 
 #  print(paste("Scanning file",file))
@@ -225,14 +236,17 @@ get.diagnostics=function(log,ntime=61,dt=1,ngear=5,block=NULL,mtype)
    if (is.null(block))
       block = nblock
 
-   ests = list(logT12=NA, T12=NA, logT21=NA, T21=NA, logr=NA,
-               r=NA, r_prior=NA, sdr_prior=NA, logB1=NA, logdB1K=NA,
-               B1=NA, K=NA, MSY=NA, Fmsy=NA, logsdlogProc=NA,
-               sdlogPop=NA, logsdlogYield=NA, sdlogYield=NA, pcon=NA,
-               qProp=NA, logsdlogF=NA, sdlogF=NA, logsdlogPop=NA,
-               resid=NA)
+   ests = list(logT12=NULL, T12=NULL, logT21=NULL, T21=NULL, logr=NULL,
+               r=NULL, r_prior=NULL, sdr_prior=NULL, logB1=NULL, logdB1K=NULL,
+               B1=NULL, K=NULL, MSY=NULL, Fmsy=NULL, logsdlogProc=NULL,
+               sdlogPop=NULL, logsdlogYield=NULL, sdlogYield=NULL, pcon=NULL,
+               qProp=NULL, logsdlogF=NULL, sdlogF=NULL, logsdlogPop=NULL,
+               resid=NULL, indexed=NULL, nll=NULL, nvar=NULL)
 
 #  print(ests)
+
+   ests$indexed=get.active.field("^Q",log)[block]
+   print(paste("ests$indexed",ests$indexed))
 
    ests$logT12=get.numeric.field("^logT12",log)[block]
    ests$T12=get.numeric.field("^T12",log)[block]
@@ -257,7 +271,8 @@ get.diagnostics=function(log,ntime=61,dt=1,ngear=5,block=NULL,mtype)
    ests$logsdlogF=get.numeric.field("^logsdlogF:",log)[block]
    ests$sdlogF=get.numeric.field("^sdlogF:",log)[block]
    ests$logsdlogPop=get.numeric.field("^logsdlogPop:",log)[block]
-
+   ests$nll=get.numeric.field("^nll",log)[block]
+   ests$nvar=get.numeric.field("^nvar",log)[block]
 
    # npop?
    if (mtype == "x")
@@ -300,10 +315,15 @@ get.diagnostics=function(log,ntime=61,dt=1,ngear=5,block=NULL,mtype)
 }
 
 
-plot.biomass.array=function(path.list=c("../run-issams-dev/issams-dev.rep",
-                                         "../run-issams/issams.rep",
-                                         "../run-xssams/1/xssams.rep"),
-                             ntime=61,dt=1,ngear=5,mtype=c("i","i","x"))
+#plot.biomass.array=function(path.list=c("../run-issams-dev/issams-dev.rep",
+#                                         "../run-issams/issams.rep",
+#                                         "../run-xssams/1/xssams.rep"),
+ plot.biomass.array=function(path.list=c("./run-issams/r2/Q0/issams.rep",
+                                         "./run-issams-dev/r2/Q0/issams-dev.rep",
+                                         "./run-issams/r2/Q1/issams.rep",
+                                         "./run-issams-dev/r2/Q1/issams-dev.rep",
+                                         "./run-xssams/1/xssams.rep"),
+                             ntime=61,dt=1,ngear=5,mtype=c("i","i","i","i","x"))
 {
    npath = length(path.list)
    print(npath)
@@ -347,6 +367,7 @@ plot.biomass.array=function(path.list=c("../run-issams-dev/issams-dev.rep",
       res = grep("Residuals:",log)
       block = length(res)
       tmp=get.diagnostics(log,ntime=ntime,dt=dt,ngear=ngear,block=NULL,mtype=mtype[p])
+      print(paste("tmp$indexed",tmp$indexed))
       dat=tmp$resid
       dat$t = (start.year-0.4*dt +  dat$t*dt)
 
@@ -375,8 +396,10 @@ plot.biomass.array=function(path.list=c("../run-issams-dev/issams-dev.rep",
                     ") passed to plot.biomass.array(...)",sep=""))
 
       dev.set(biomass.dev)
+      print(paste("tmp$indexed",tmp$indexed))
       plot.biomass(dat$t,y,sd=tmp$sdlogPop,K=dat$K, propL=dat$propL,
-                   forcing=dat$forcing,yrange=yrange,B1=tmp$B1)
+                   forcing=dat$forcing,yrange=yrange,B1=tmp$B1,
+                   indexed=tmp$indexed)
       legend(x="topleft",legend=legend,bty='n',cex=1.6)
 
       F.ndx=grep("F",names(dat)) 
@@ -406,3 +429,125 @@ plot.biomass.array=function(path.list=c("../run-issams-dev/issams-dev.rep",
    par(old.par,"new"=FALSE) 
 }
 
+
+##make.fit.table = function(root = ".",regions="r2",indexing=c("Q0","Q1"),models=c("issams","issams-dev"))
+##{
+##   nmod = length(regions)*length(indexing)*length(models)
+##   print(nmod)
+##   fits = matrix(ncol=nmod,nrow=7)
+##   mm = 0
+##   for (r in regions)
+##   {
+##      for (Q in indexing)
+##      {
+##         for (m in models)
+##         {
+##            mm = mm + 1
+##            path=paste(root,"/run-",m,"/",r,"/",Q,sep="")
+##            print(paste(mm,path))
+##            file = paste(path,"/",m,"_program.log",sep="")
+##            print(file)
+##            log = scan(file,what="character")
+##            tmp=get.diagnostics(log,block=NULL,mtype="i")
+##            res = grep("Residuals:",tmp)
+##            block = length(res)
+##
+##         #  fits[1,mm] = tmp$indexed #[block]
+##            if (tmp$indexed)
+##               fits[1,mm] = r
+##            else
+##               fits[1,mm] = " "
+##            fits[2,mm] = tmp$nvar #[block]
+##            fits[3,mm] = tmp$nll #[block]
+##            fits[4,mm] = tmp$r #[block]
+##            fits[5,mm] = tmp$K #[block]
+##            fits[6,mm] = tmp$MSY #[block]
+##            fits[7,mm] = path
+##
+##         }
+##      }
+##   }
+##   row.names=c("Forcing","n","- log L","r","K","MSY","path")
+##   col.names = c("Fmsy MSY","B1 d","Fmsy MSY","B1 d")
+##   #write.table(x, file = "", append = FALSE, quote = TRUE, sep = " ",
+##   #             eol = "\n", na = "NA", dec = ".", row.names = TRUE,
+##   #             col.names = TRUE, qmethod = c("escape", "double"),
+##   #             fileEncoding = "")
+##   write.table(fits,"fit_comp.csv",row.names=row.names,col.names=col.names,sep=",")
+##
+##   return(fits)
+##}
+
+
+make.fit.table = function()
+{
+#  anames=c("alogB1", "alogdB1K", "aB1", "adB1K", "aMSY", "aFmsy", "alogr",
+#           "ar", "aK", "asdlogProc", "asdlogYield", "aQ", "alogQ", "apcon")
+   anames=c("aB1", "adB1K", "aMSY", "aFmsy", "ar", "aK", 
+             "asdlogProc", "asdlogYield", "aQ","aT12","aT21")
+   nnames = length(anames)
+#  indexing=c("Q0","Q1")
+#  models=c("issams","issams-dev")
+#  nmod = length(indexing)*length(models)
+   paths=c("./run-issams/r2/Q0/issams",
+           "./run-issams-dev/r2/Q0/issams-dev",
+           "./run-issams/r2/Q1/issams",
+           "./run-issams-dev/r2/Q1/issams-dev",
+           "./run-xssams/r2/xssams")
+   varnames=c("n","nll","gmax",anames)
+   fits = matrix(ncol=length(paths),nrow=length(varnames))
+   rownames(fits) = varnames
+
+
+
+   
+   mm = 0
+#  for (Q in indexing)
+#  {
+#     for (m in modelsr
+      for (p in paths)
+      {
+         mm = mm + 1
+      #  path=paste(root,"/run-",m,"/",region,"/",Q,sep="")
+      #  print(paste(mm,path))
+      #  par.file = paste(path,"/",m,".par",sep="")
+      #  std.file = paste(path,"/",m,".std",sep="")
+         par.file = paste(p,".par",sep="")
+         std.file = paste(p,".std",sep="")
+ 
+         print(par.file)
+         par = scan(file=par.file,what="character")
+         npar = as.numeric(par[6])
+         nll  = as.numeric(par[11])
+         gmax = as.numeric(par[16])
+         print(paste(npar,nll,gmax))
+      #  fits[1,mm] = m
+      #  fits[2,mm] = Q
+         fits[1,mm] = npar
+         fits[2,mm] = nll
+         fits[3,mm] = gmax
+         r = 3
+
+#  print(std.file)
+         print(std.file)
+         std=try(scan(file=std.file,what="character"),TRUE)
+         print(class(std))
+         if (class(std) == "try-error")
+         {
+            print(paste(std.file,"missing"))
+         }
+         else
+         {
+            for (i in 1:nnames)
+            {
+               w = which(std == anames[i])
+               print(paste(i,anames[i],w,length(w),std[w+1],std[w+2]))
+               if ( (length(w)>0) && (as.numeric(std[w+2] > 1.0e-3)) )
+                  fits[r+i,mm] = as.numeric(std[w+1])
+            }  
+         }
+      #  print(head(fits))
+      }
+#  }
+   return(fits)
+}
