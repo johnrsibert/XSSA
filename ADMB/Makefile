@@ -49,12 +49,17 @@ issams: issams.tpl
 	@echo -------- move $@
 	mv -f $@ $(BIN_DIR)
 
-xssams: xssams.tpl
+xssams-dev: xssams-dev.tpl
 	@echo ------- Translate $<
 	admb  -r $(FLAGS) $<
 	@echo -------- move $@
 	mv -f $@ $(BIN_DIR)
 
+xssams: xssams.tpl
+	@echo ------- Translate $<
+	admb  -r $(FLAGS) $<
+	@echo -------- move $@
+	mv -f $@ $(BIN_DIR)
 noKxssams: noKxssams.tpl
 	@echo ------- Translate $<
 	admb  -r $(FLAGS) $<
