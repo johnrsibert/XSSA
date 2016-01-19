@@ -430,56 +430,11 @@ get.diagnostics=function(log,ntime=61,dt=1,ngear=5,block=NULL,mtype)
 }
 
 
-##make.fit.table = function(root = ".",regions="r2",indexing=c("Q0","Q1"),models=c("issams","issams-dev"))
-##{
-##   nmod = length(regions)*length(indexing)*length(models)
-##   print(nmod)
-##   fits = matrix(ncol=nmod,nrow=7)
-##   mm = 0
-##   for (r in regions)
-##   {
-##      for (Q in indexing)
-##      {
-##         for (m in models)
-##         {
-##            mm = mm + 1
-##            path=paste(root,"/run-",m,"/",r,"/",Q,sep="")
-##            print(paste(mm,path))
-##            file = paste(path,"/",m,"_program.log",sep="")
-##            print(file)
-##            log = scan(file,what="character")
-##            tmp=get.diagnostics(log,block=NULL,mtype="i")
-##            res = grep("Residuals:",tmp)
-##            block = length(res)
-##
-##         #  fits[1,mm] = tmp$indexed #[block]
-##            if (tmp$indexed)
-##               fits[1,mm] = r
-##            else
-##               fits[1,mm] = " "
-##            fits[2,mm] = tmp$nvar #[block]
-##            fits[3,mm] = tmp$nll #[block]
-##            fits[4,mm] = tmp$r #[block]
-##            fits[5,mm] = tmp$K #[block]
-##            fits[6,mm] = tmp$MSY #[block]
-##            fits[7,mm] = path
-##
-##         }
-##      }
-##   }
-##   row.names=c("Forcing","n","- log L","r","K","MSY","path")
-##   col.names = c("Fmsy MSY","B1 d","Fmsy MSY","B1 d")
-##   #write.table(x, file = "", append = FALSE, quote = TRUE, sep = " ",
-##   #             eol = "\n", na = "NA", dec = ".", row.names = TRUE,
-##   #             col.names = TRUE, qmethod = c("escape", "double"),
-##   #             fileEncoding = "")
-##   write.table(fits,"fit_comp.csv",row.names=row.names,col.names=col.names,sep=",")
-##
-##   return(fits)
-##}
 
-
-make.fit.table = function()
+make.fit.table = function(paths=c("./run-issams/r2/Q0/issams",
+           "./run-issams-dev/r2/Q0/issams-dev",
+           "./run-issams/r2/Q1/issams",
+           "./run-issams-dev/r2/Q1/issams-dev"))
 {
 #  anames=c("alogB1", "alogdB1K", "aB1", "adB1K", "aMSY", "aFmsy", "alogr",
 #           "ar", "aK", "asdlogProc", "asdlogYield", "aQ", "alogQ", "apcon")
@@ -489,17 +444,15 @@ make.fit.table = function()
 #  indexing=c("Q0","Q1")
 #  models=c("issams","issams-dev")
 #  nmod = length(indexing)*length(models)
-   paths=c("./run-issams/r2/Q0/issams",
-           "./run-issams-dev/r2/Q0/issams-dev",
-           "./run-issams/r2/Q1/issams",
-           "./run-issams-dev/r2/Q1/issams-dev",
-           "./run-xssams/r2/xssams")
+#  paths=c("./run-issams/r2/Q0/issams",
+#          "./run-issams-dev/r2/Q0/issams-dev",
+#          "./run-issams/r2/Q1/issams",
+#          "./run-issams-dev/r2/Q1/issams-dev",
+#          "./run-xssams/r2/xssams")
+
    varnames=c("n","nll","gmax",anames)
    fits = matrix(ncol=length(paths),nrow=length(varnames))
    rownames(fits) = varnames
-
-
-
    
    mm = 0
 #  for (Q in indexing)
@@ -549,5 +502,13 @@ make.fit.table = function()
       #  print(head(fits))
       }
 #  }
+
+   write.table(fits, file = "fit_table.csv", append = FALSE, quote = FALSE, sep = ",",
+               eol = "\n", na = "NA", dec = ".", col.names = FALSE,
+               row.names = varnames) #, qmethod = c("escape", "double"),
+             # fileEncoding = "")
+
+
+
    return(fits)
 }
