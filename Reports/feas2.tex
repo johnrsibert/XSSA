@@ -42,8 +42,10 @@ Yellowfin Tuna Fishery}}
 \newcommand\MSY{\tilde{Y}}
 \newcommand\Fmsy{F_{\MSY}}
 
-\title{Feasibility of developing a stock assessment model for Main Hawaiian Islands Yellowfin Tuna
-Fishery Reconsidered}
+\title{Feasibility of developing a stock assessment model for Main
+Hawaiian Islands Yellowfin Tuna Fishery\\
+\vspace{2ex}
+Part 2}
 
 \author{
 John Sibert\thanks{sibert@hawaii.edu}\\
@@ -55,8 +57,8 @@ Honolulu, HI  96822 U.S.A.\\[0.125in]
 
 \pagestyle{myheadings}
 \markboth{John Sibert\hfil MHI Yellowfin Assessment Model
-Feasibility---2}
-{MHI Yellowfin Assessment Model Feasibility---2\hfil John Sibert}
+Feasibility---Part 2}
+{MHI Yellowfin Assessment Model Feasibility---Part 2\hfil John Sibert}
 
 \begin{document}
 % amsmath package
@@ -68,9 +70,9 @@ Feasibility---2}
 
 
 \section{Executive Summary}
-A previous analysis of evaluating the feasibility of developing a
+A previous evaluation of the feasibility of developing a
 stock assessment model for the Main Hawaiian Islands yellowfin tuna
-fisher concluded that such a model is feasible, but that estimation of
+fishery concluded that such a model is feasible, but that estimation of
 relevant management reference points is difficult (Sibert, 2015).
 The ambiguity of this
 conclusion is unsatisfying, and further research was undertaken to
@@ -78,11 +80,18 @@ develop more practical models. The 2015 model attempted to represent
 the dynamics of two coupled tuna populations with immigration,
 emigration, and fishing and required estimation of approximately 15
 model parameters.
-Several alternative single population models with less than 7 parameters
+Several alternative single population models with simplified model
+structure
 were examined. All of these simplified models are capable of
 estimating critical reference points such as maximum sustainable
-yield (MSY) and fishing mortality at MSY and produce consistent
-reconstruction of biomass from 1952 through 2012. These models are
+yield (MSY) and fishing mortality at MSY. Estimates of MSY range
+between 1100mt and 1300mt per year (Table~\ref{tag:ests4}).
+Estimated biomass trends between 1952 and 2012 
+(Figure~\ref{fig:estbiomass}) are
+qualitatively consistent across models with a period of high biomass
+between 1970 and 1990, including periods where the biomass exceeds the
+equilibrium biomass or ``carrying capacity''. 
+These models are
 promising staring places to begin development of a full-featured stock
 assessment model for the MHI yellowfin fishery.
 
@@ -169,20 +178,53 @@ proportionality constant $d$ are estimated directly and substituted in
 
 \section{Results}
 
+\begin{figure}
+\begin{center}
+%\includegraphics[height=0.8\textheight]{./graphics/hdar_catch_history.pdf}
+\includegraphics[width=\textwidth]{./graphics/biomass-array.pdf}
+\caption{\label{fig:estbiomass}
+}
+\end{center}
+\end{figure}
 
+\begin{figure}
+\begin{center}
+%\includegraphics[height=0.8\textheight]{./graphics/hdar_catch_history.pdf}
+\includegraphics[width=\textwidth]{./graphics/production-array.pdf}
+\caption{\label{fig:estprod}
+}
+\end{center}
+\end{figure}
 
 \begin{table}
+\caption{Model estimates from four different model configurations.
+Model complexity, expressed in number of parameters estimated ($n$)
+increases from left to right.
+\label{tag:ests4}}
+\begin{center}
 \begin{tabular}{lrrrr}
-&Fmsy MSY & B1 d & Fmsy MSY & B1 d\\
-Forcing &   &   & r2 & r2\\
-$n$ & 366 & 5 & 366 & 366\\
-$-\log L$ & 2.065 & 237.22 & 19.16 & 14.832\\
-$r$ & 1.6451 & 0.60851 & 0.3336 & 0.79262\\
-$K$ & 2790.3 & 6896.6 & 15452 & 7508\\
-$\MSY$ & 1147.6 & 1083 & 1288.7 & 998.07\\
+\hline
+Forcing & \multicolumn{2}{c}{None}&\multicolumn{2}{c}{MFCL 2}\\
+\cline{2-3}\cline{4-5}
+Parameterization&$\MSY\quad\Fmsy$&$B_1\quad d$&$\MSY\quad\Fmsy$&$B_1\quad d$\\
+\hline
+\hline
+$n$ & 4 & 5 & 5 & 6\\
+$-\log L$ & 237.238 & 237.221 & 247.175 & 242.816\\
+$|G|_{max}$ & 0.0016409 & 2.11959e-06 & 3.51082e-05 & 29.6554\\
+$B_1$ & --- & 5043.2 & --- & ---\\
+$d$ & --- & 1.3675 & --- & ---\\
+$\MSY$ & 1147.5 & 1083 & 1288.7 & ---\\
+$\Fmsy$ & 0.82239 & 0.31408 & 0.1668 & ---\\
+$r$ & 1.6448 & 0.62815 & 0.3336 & ---\\
+$K$ & 2790.8 & 6896.6 & 15452 & ---\\
+$\sigma_P$ & 0.37416 & 0.37042 & 0.2743 & ---\\
+$\sigma_Y$ & 0.41693 & 0.41937 & 0.46924 & ---\\
+$Q$ & --- & --- & 0.04321 & ---\\
+\hline
 \end{tabular}
+\end{center}
 \end{table}
-%path & ./run-issams/r2/Q0 & ./run-issams-dev/r2/Q0 & ./run-issams/r2/Q1 & ./run-issams-dev/r2/Q1\\
 
 
 
@@ -310,461 +352,9 @@ tuna in the Hawaiian Islands. Mar. Ecol. Prog. Ser. 461:187-196.
 
 \section*{Appendix}
 \appendix
-
-\section{Catch Time Series}
-\label{sec:data}
-%The Hawaii longline fishery has a long history and changed radically
-%in the 1990s when new vessels entered the fleet and fishing gear was
-%modernized.
-%The HDAR longline data covers the period 1949 through 2001 and does
-%not differentiate between ``deep'' and ``shallow'' sets.
-%The NOAA longline data covers the period 1995 through 2013 and reports deep
-%and shallow set set separately.
-%Thus the period of most radical change is included in time series.
-
-%[1] Aku boat          Bottom/inshore HL Longline          Other            
-%[5] Troll             Tuna HL           Casting           Hybrid           
-%[9] Shortline         Vertical line    
-
-% statistics of catch time series first differences
-%TS                 Mean     S. D.
-%OffshoreHL  0.017659002 0.5994987
-%Troll       0.018124404 0.7051216
-%Longline    0.002425213 0.7782023
-%InshoreHL  -0.002342312 0.6935796
-%AkuBoat    -0.004970204 1.0908600
-
-
-
-The HDAR data comprise catch reports for the following gear
-categories:
-``Aku boat'', ``Bottom/inshore HL'', ``Longline'',  ``Troll'', ``Tuna
-HL'', ``Casting'', ``Hybrid'',  ``Shortline'', ``Other'', and
-``Vertical line''.
-For this analysis catches by ``Casting'', ``Hybrid'',
-``Shortline'', ``Other'', and ``Vertical line'' are combined into a new
-category, ``Misc''. The ``Misc''
-catches are highest after year 2000,
-but comprise a very small proportion of the catch.
-The catch time series for the HDAR data are shown in
-Figure~\ref{fig:hdarTS}. These time
-series exhibit marked annual cycles suggesting a strong seasonal
-signal in the catches by all gears.
-Some series also contain sustained periods of zero catch which
-document the development and subsequent shift away from a specific
-gear type. It is assumed that these declines in catches represent a
-``collapse'' of a fishery due more to social and economic factors than
-to a decline of stock.
-Some time series are punctuated by brief episodes (one or two quarters in
-length) of zero catches. Again, it is assumed that these zero catches
-are not caused by low stock levels.
-
-The longline fishery has changed drastically over time. In the late
-1940s, it was a relatively small fishery using traditional
-tarred rope gear making relatively shallow sets.
-Participation in this fishery generally declined from 1950 to
-late 1980s. In the 1990s, the longline
-fishery expanded rapidly with the introduction of US fishing boats
-from the Atlantic ocean using modern monofilament longline gear
-capable of making both deep and shallow sets.
-
-Figure~\ref{fig:hdarTS} also displays the first order differences
-between successive quarters. This statistic emphasizes the seasonal
-periodicity of all fishing gear and helps to identify potential anomalies in
-the data such as changes in reporting protocols. 
-
-The partial autocorrelations within each time
-series are shown in Figure~\ref{fig:catchPACF}. These correlations
-confirm the quarterly periodicity  of the catch time series.
-The catch time series for Inshore HL, Longline, Troll, and Tuna HL show
-similar patters with
-significant positive autocorrelations at lags of 1, 3 and 4 quarters.
-The autocorrelation pattern appears to be somewhat different for the Aku
-boat catch time series.
-
-NOAA began to collect data from the longline fleet under a federally
-mandated logbook program in 1990, and in 1995, began to distinguish
-deep and shallow sets in the data. The HDAR data do not
-distinguish between deep and shallow sets.
-Figure~\ref{fig:hdarnoaaLLTS} shows the correspondence between the
-HDAR and NOAA time series. The combined deep plus shallow catches from
-NOAA align fairly well with the overlapping HDAR data. The simple
-average of the HDAR data with the combined NOAA deep plus shallow data
-appears to have roughly the same autocorrelation structure as the
-constituent time series, Figure~\ref{fig:LLpartialacf}.
-Data are also available from NOAA for the period 1990-1995, but
-have not yet been included in this analysis.
-
-Histograms of first differences of the logarithm of catch time series
-are shown in Figure~\ref{fig:diff1histo}. These differences are
-clearly not normally distributed, indicating that a robust catch
-likelihood might be useful.
-
-\begin{figure}
-\begin{center}
-%\includegraphics[height=0.8\textheight]{./graphics/hdar_catch_history.pdf}
-\includegraphics[width=\textwidth]{./graphics/hdar_catch_history.pdf}
-\caption{\label{fig:hdarTS}
-Yellowfin catch in metric tonnes by principle fisheries operating in
-the Main Hawaiian Islands from the HDAR data.
-The dotted red line superimposed on each time series is the difference in
-catch between successive quarters.
-The red tick marks on the abscissa indicate quarters where reported
-catches were zero.
-}
-\end{center}
-\end{figure}
-
-\begin{figure}
-\begin{center}
-%\includegraphics[height=0.8\textheight]{./graphics/partial_acf.pdf}
-\includegraphics[width=0.8\textwidth]{./graphics/partial_acf.pdf}
-\caption{\label{fig:catchPACF}
-Partial autocorrelation coefficients of the HDAR catch time series. The
-dashed blue lines indicate approximate 95\% confidence limits of the
-correlations.}
-\end{center}
-\end{figure}
-
-\begin{figure}
-\begin{center}
-%\includegraphics[height=0.8\textheight]{./graphics/hdar_noaa_LL_ts.pdf}
-\includegraphics[width=\textwidth]{./graphics/hdar_noaa_LL_ts.pdf}
-\caption{\label{fig:hdarnoaaLLTS}
-Comparison between HDAR and NOAA longline time series. The upper panel
-shows the NOAA deep and shallow set data superimposed on the HDAR
-data. The lower panel shows the time series produced by a simple
-average of the HDAR data and the sum of the NOAA deep and shallow
-catches.}
-\end{center}
-\end{figure}
-
-\begin{figure}
-\begin{center}
-%\includegraphics[height=0.8\textheight]{./graphics/LL_partial_acf.pdf}
-\includegraphics[width=\textwidth]{./graphics/LL_partial_acf.pdf}
-\caption{\label{fig:LLpartialacf}
-Partial autocorrelations within the NOAA and combined time
-series. F refers to the HDAR longline data, D refers to the NOAA deep
-set data, S to the shallow set data,
-DS to the combined deep and shallow set data, and Mean to the average
-of the HDAR and NOAA deep plus shallow.
-}
-\end{center}
-\end{figure}
-
-\begin{figure}
-\begin{center}
-%\includegraphics[height=0.8\textheight]{./graphics/first_difference_histograms.pdf}
-\includegraphics[width=\textwidth]{./graphics/first_difference_histograms.pdf}
-\caption{\label{fig:diff1histo}
-Histograms of first differences of the logarithm of catch time series. 
-The blue line is
-a normal distribution with the same mean and standard deviation as the
-first differences. The red line is the equivalent standard Cauchy distribution.}
-\end{center}
-\end{figure}
-
-\begin{figure}
-\begin{center}
-%\includegraphics[height=0.8\textheight]{./graphics/MFCL_region_biomass.pdf}
-\includegraphics[width=\textwidth]{./graphics/MFCL_region_biomass.pdf}
-\caption{\label{fig:MFCLregionB}
-Quarterly biomass trends estimated in MFCL Regions 2 and 4 from the
-2104 WCPFC YFT stock assessment, Davies et al. 2014.
-}
-\end{center}
-\end{figure}
-
-
-\clearpage
 \section{Model development}
 \label{sec:models}
-\subsection{Two populations with explicit exchange}
-%https://github.com/johnrsibert/XSSA/blob/master/ADMB/xssams.tpl
-Let $\None$ equal the biomass of fish originating in region 1
-and residing in region 1
-and $\Ntwo$ equal the biomass of fish originating in region 2
-but residing in region 1.
-The total biomass of fish residing in region 1 is
-$\Nsum$, and the dynamics of the population in region 1 is represented
-as a modified Schaefer model:
-\begin{equation}
-\frac{d}{dt}\big(\Nsum\big)=\big(\Nsum\big)\Big[r\Big(1-\frac{\Nsum}{K}\Big)-F-T_{12}\Big]+T_{21}
-\label{eqn:logistic}
-\end{equation}
-where $r$ is the logistic growth rate per year, $K$ is the
-asymptotic biomass,
-$F$ is the total fishing mortality in region 1, $T_{12}$
-is the emigration rate from region 1 to region 2, and $T_{21}$
-is the rate of immigration of biomass from region~2 to region~1.
-
-
-An equivalent differential equation could be devised for the dynamics of
-fish residing in region 2 
-(i.e., $\frac{d}{dt}\big(N_{2,2}+N_{1,2}\big)$), but 
-the dynamics of the fish population in region 2 is external to this
-model. $T_{21}$ can be considered to be a form of population ``forcing''
-by the larger stock in which the MHI population is embedded. $T_{21}$
-could be a prediction from other models, such as \MFCL\ or \SD, 
-in a sort of ``off-line'' coupling.
-
-The appearance of
-$\Nsum$ in the numerator of the logistic term reflects the assumption
-that the population dynamics of immigrant fish depends on
-the population dynamics in region 1. This assumption leads to an
-important non-linearity in the model that predicts potential
-overwhelming of one stock by the other.
-
-The proportion of ``local'' fish $p = \frac{\None}{\Nsum}$ is an
-important constraint, and it is necessary to model the two
-subpopulations separately.
-Equation~\ref{eqn:logistic} can be expanded and rearranged to become
-\begin{eqnarray}
-\label{eqn:coupledschaefer}
-\frac{d}{dt}\big(\Nsum\big) &=&\None\Big[r\Big(1-\frac{\None}{K}\Big)
--F - T_{12}\Big] \nonumber\\
-&+&\Ntwo\Big[r\Big(1-\frac{\Ntwo}{K}\Big)
--F - T_{12}\Big]  + T_{21}\\
-&-& 2r\frac{\None\Ntwo}{K}\nonumber
-\end{eqnarray}
-The non-linear term, $2r\frac{\None\Ntwo}{K}$, in
-equation~\ref{eqn:coupledschaefer} represents the reduction in biomass
-of one population by the presence of the other population.
-In order to represent
-the two populations by separate equations, this
-nonlinear term must be appropriately apportioned.
-A new parameter, $q$, is introduced to accomplish the apportionment,
-leading to a set of simultaneous non-linear differential equations for
-the components of the population inhabiting region~1.
-\begin{eqnarray}
-\label{eqn:coupledschaeferqa}
-\frac{d\None}{dt}&=&\None\Big[r\Big(1-\frac{\None}{K}\Big)
--F - T_{12}\Big] - (1-q)2r\frac{\None\Ntwo}{K}\nonumber\\
-\\
-\frac{d\Ntwo}{dt}&=&\Ntwo\Big[r\Big(1-\frac{\Ntwo}{K}\Big)
--F - T_{12}\Big] - q2r\frac{\None\Ntwo}{K} + T_{21}\nonumber
-\end{eqnarray}
-
-The log transformed equivalent of equation~\ref{eqn:coupledschaeferqa} is
-\begin{eqnarray}
-\label{eqn:coupledlogschaefer}
-\frac{d\log(\None)}{dt}&=&r\Big(1-\frac{\None}{K}\Big) -F - T_{12} -
-(1-q)2r\frac{\Ntwo}{K}\nonumber\\
-\\
-\frac{d\log(\Ntwo)}{dt}&=&r\Big(1-\frac{\Ntwo}{K}\Big) -F - T_{12} -
-q2r\frac{\None}{K} + \frac{T_{21}}{\Ntwo}\nonumber
-\end{eqnarray}
-
-{\bf Transition Equation $T(\alpha_{t-1})$.}
-The state space transition equation for the two components of the MHI
-population is developed by solving
-equations \ref{eqn:coupledlogschaefer} by finite differences
-with explicit time stepping and adding process error
-terms.
-\begin{eqnarray}
-\label{eqn:finitecoupledlogschaefer}
-\log \None_t &=& \log \None_{t-\Delta t}\nonumber\\ 
-             &+&\Delta t\bigg(r\Big(1-\frac{\None_{t-\Delta t}}{K}\Big)
--\sum_{g=1}^n F_{g,t-\Delta t} - T_{12} - (1-q)2r\frac{\Ntwo_{t-\Delta
-t}}{K}\bigg)+\eta_t\nonumber\\
-\\ \log \Ntwo_t &=& \log \Ntwo_{t-\Delta t}\nonumber\\
-             &+&\Delta t\bigg(r\Big(1-\frac{\Ntwo_{t-\Delta t}}{K}\Big)
--\sum_{g=1}^n F_{g,t-\Delta t} - T_{12} - q2r\frac{\None_{t-\Delta t}}{K}
-     +\frac{T_{{21}_{t-\Delta t}}}{\Ntwo_{t-\Delta t}}\bigg)+\eta_t\nonumber
-\end{eqnarray}
-where $\eta_t \sim N(0,\sigma_N)$
-expresses process errors for both populations.
-
-{\bf Behavior of model system.}
-Efforts to derive an analytical expression to determine 
-a meaningful equilibrium for equations~\ref{eqn:coupledlogschaefer}
-have not been completely fruitful (Section \ref{sec:schaefer}).
-Figure~\ref{fig:NNphase} shows phase plane diagrams for several
-combinations of model parameters assuming constant $K$ and
-$T_{21}$. Apparently the system tends towards
-equilibrium with both $0 < \None \le K$ and $0 < \Ntwo \le K$ for some
-combinations of model parameters.
-The proportion of ``local'' fish, $p = \frac{\None}{\Nsum}$, depends on
-the assumed value of $q$. For values of $q < 0.5$, the equilibrium
-value of $p$ is less than 0.9. The functional relationship, if any,
-between $p$ and $q$ is not clear, but it would appear that $q$ must be
-be greater than $\simeq 0.5$ to achieve $p=0.9$.
-
-The evolution of the model system in
-equation~\ref{eqn:finitecoupledlogschaefer} with time is shown in
-Figure~\ref{fig:NNts}. The system starts with $\None + \Ntwo = K$ and
-$p=0.9$. After a few time steps the population decreases to reflect
-influence of immigrants and the onset of fishing.
-Towards the end of the simulation period the proportion local drops
-below 0.9 in response to the decrease in the size of the immigrant
-population.
-
-\begin{figure}
-\begin{center}
-\includegraphics[width=1.00\textwidth]{./graphics/qcomp_4.pdf}
-\caption{\label{fig:NNphase}
-Phase plane for equation \ref{eqn:coupledlogschaefer}. Arrows represent
-the trajectory of the system for different combinations of $\None$ and
-$\Ntwo$; dashed red  line indicates $K = 1$; dashed green lines indicate
-different values of $p$. The thick light green line indicates $p=0.9$.
-Values of $q$ and $T_{21}$ are shown in each panel.
-Other parameter values: $r=0.3, K=1.0, F = 0.007, T_{12}=0.01$.
-}
-\end{center}
-\end{figure}
-
-\begin{figure}
-\begin{center}
-\includegraphics[width=1.00\textwidth]{./graphics/sim_default_NNts.pdf}
-\caption{\label{fig:NNts}
-Behavior of equations \ref{eqn:finitecoupledlogschaefer} over time with
-forcing from MFCL region 2 biomass (Figure~\ref{fig:MFCLregionB}) and
-fishing mortality by fleet set proportional to observed catch.
-Light blue lines indicate population components as indicated; 
-dashed blue line indicates $K$;
-solid red line indicates the proportion local, $p$;  
-dashed red line line indicates $p=0.9$.
-Other parameter values: $q=0.54, r=0.3, K=200000, T12=0.01, T21=0.002$.
-}
-\end{center}
-\end{figure}
-
-%Parameterization of $T_{21}$
-{\bf Population Forcing.}
-Immigration of stock from region 2 to region 1 is a
-form of forcing whereby events outside of the model influence the
-model dynamics. The term $T_{{21}_t}$ in 
-equation~\ref{eqn:finitecoupledlogschaefer}
-is the biomass immigrating
-into the MHI stock at each time step. 
-The likely candidates for forcing are MFCL regions 2 and 4, both of
-which overlap the MHI. The estimated biomass trajectories for these
-two regions are shown in Figure~\ref{fig:MFCLregionB}.
-For testing purposes,
-I assume that the source of immigrants is MFCL region 2, so that
-\begin{equation}
-T_{{21}_t} = T^*_{21}\cdot B_{2,t}
-\end{equation}
-where $B_{2,t}$ is biomass in region 2 at time $t$ taken from the MFCL output file
-{\tt plot-12.par.rep} from the 2014 WCPFC stock assessment
-(Davies et al 2014). $T^*_{21}$ is the proportion on
-$B_{2,t}$ which migrates at each time step.
-
-{\bf Asymptotic biomass.}
-$K$ is the asymptotic biomass in a population growing according to
-logistic dynamics. It is the population size to which the population
-tends at equilibrium and is often dubbed ``carrying capacity''. 
-It is not clear that a coupled logistic model such as equation~
-\ref{eqn:logistic} has a non-trivial equilibrium. 
-Given that the model forcing $B_{r,t}$ is not constant and that the
-fishery is developing in a period of profound change in the oceans,
-it is difficult to justify the assumption that the equilibrium
-population size, $K$, has been constant for over 65 years. An
-alternative parameterization for $K$ is to assume a random walk, for
-example,
-\begin{equation}
-\log K_t = \log K_{t-1} + \omega_t;\quad \omega_t\sim
-N(0,\sigma^2_\omega) \label{eqn:Kwalk}
-\end{equation}
-where  $\sigma^2_\omega$ is the variance of the
-asymptotic population size random walk.
-This parameterization was implemented in computer code, but not extensively
-tested.
-
-{\bf Observation Equation, $O(\alpha)$.}
-Predicted catch in region 1 is the product of fishing mortality
-and the total population in region, $\None+\Ntwo$.
-Thus the state-space observation model predicting catch in the region 1
-under this model is
-\begin{equation}
-\log C_{g,t} = \log \Biggl(F_{g,t}\cdot\Bigl(\frac{\None_{t-\Delta t}+\None_t}{2}
-                           +\frac{\Ntwo_{t-\Delta
-t}+\Ntwo_t}{2}\Bigr)\Biggr) + \varepsilon_t
-\label{eqn:obs2}
-\end{equation}
-where the total population in region 1 is the sum of the average
-population over the time step (Quinn and Deriso, 1999), and
-$\varepsilon_t$ is a robust likelihood given by
-\begin{equation}
-\varepsilon_t \sim (1-a_g)*N(0,\sigma^2_\varepsilon)+a_g*C(0,\sigma^2_\varepsilon).
-\end{equation}
-C is the standard Cauchy probability density and $a_g$ is a
-fleet-specifc proportion of ``contamination'' by the fat-tailed Cauchy
-distribution. In practice $a_g = 0.07\; g=1\ldots n$.
-
-{\bf Constraint on ``Proportion Local''.}
-Proportion local is defined as $p = \frac{\None}{\Nsum}$. The logit
-transformed proportion local, $L(p)$, is assumed to be normally
-distributed around a mean value, $L(\bar{p})$.
-\begin{equation}
-\label{eqn:LpropL}
-L(p)\sim N(L(\bar{p}),\sigma^2_{L(p)}).
-\end{equation} 
-$p$ is generally assumed to be approximately $0.9$. By varying the
-value of the variance, $\sigma^2_{L(p)}$, $p$ can be made as
-close to $0.9$ as is prudent.
-This representation of $p$ can be interpreted as a Bayesian prior.
-In principle, it may be possible to
-estimate $\bar{p}$ and $\sigma^2_{L(p)}$, but interactions with
-the parameter $q$ in equation~\ref{eqn:coupledschaeferq} should be
-explored.
-
-{\bf Estimation.} The model states, $\alpha_t$, are assumed to be random
-effects (Skaug and Fournier 2006). Model parameters are estimated by
-maximizing the joint likelihood of the random
-effects and the observations.
-\begin{equation}
-L(\theta,\alpha,x)=
-\prod^m_{t=2}\big[\phi\big(\alpha_t-T(\alpha_{t-1}), \Sigma_\eta\big)\big]
-\prod^m_{t=1}\big[\phi\big(x_t-O(\alpha_t), \Sigma_\varepsilon\big)\big]
-\end{equation}
-Here, $m$ is the number of time steps in the catch time series and
-$\theta$ is a vector of model parameters. A complete list of
-parameters is found in Table~\ref{tab:allvars2}. 
-The model is implemented in ADMB-RE (Fournier et al 2012).
-The actual number of
-parameters to be estimated depends on the model configuration,
-specified by phase flags in the input file. 
-%All computer code, data files, and draft reports in support of this
-%analysis can be found at Github:\linebreak
-%\url{https://github.com/johnrsibert/XSSA.git}.
-
-
-\begin{table}
-\caption{Complete list of variables and parameters for the two
-population model
-\label{tab:allvars2}}
-\begin{center}
-\begin{tabular}{ll}
-\hline
-Variable & Definition\\
-\hline
-\hline
-$m$ & Number of quarterly time steps\\
-$n$ & Number of fishing gears\\
-\hline
-\hline
-$r$ & Instantaneous growth rate $(y^{-1})$\\
-$K$ & Asymptotic biomass (mt) \\
-$T_{12}$ & Emigration rate $(y^{-1})$\\
-$T^*_{21}$& Immigration rate $(y^{-1})$\\
-$q$ & Nonlinear mortality apportionment proportion\\
-\hline
-$\sigma_N$ & Population growth SD\\
-$\sigma_F$ & Fishing mortality random walk SD\\
-$\sigma_Y$ & Observation error SD \\
-$a$ & Likelihood contribution from fat-tailed distribution\\
-\hline
-$\bar{p}$ & Mean proportion local\\
-$\sigma_{L(p)}$ & SD logit transformed $\bar{p}$\\
-\hline
-\end{tabular}
-\end{center}
-\end{table}
-
-\clearpage
-\subsection{Single population with indexed abundance}
+%\subsection{Single population with indexed abundance}
 The indexed abundance model\footnote{https://github.com/johnrsibert/XSSA/blob/master/ADMB/issams.tpl}
 assumes that the biomass of YFT in the MHI
 is proportional to the biomass of an ``index'' population.

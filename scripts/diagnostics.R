@@ -318,12 +318,16 @@ get.diagnostics=function(log,ntime=61,dt=1,ngear=5,block=NULL,mtype)
 #plot.biomass.array=function(path.list=c("../run-issams-dev/issams-dev.rep",
 #                                         "../run-issams/issams.rep",
 #                                         "../run-xssams/1/xssams.rep"),
- plot.biomass.array=function(path.list=c("./run-issams/r2/Q0/issams.rep",
-                                         "./run-issams-dev/r2/Q0/issams-dev.rep",
-                                         "./run-issams/r2/Q1/issams.rep",
-                                         "./run-issams-dev/r2/Q1/issams-dev.rep",
-                                         "./run-xssams/1/xssams.rep"),
-                             ntime=61,dt=1,ngear=5,mtype=c("i","i","i","i","x"))
+#plot.biomass.array=function(path.list=c("./run-issams/r2/Q0/issams.rep",
+#                                         "./run-issams-dev/r2/Q0/issams-dev.rep",
+#                                         "./run-issams/r2/Q1/issams.rep",
+#                                         "./run-issams-dev/r2/Q1/issams-dev.rep",
+#                                         "./run-xssams/1/xssams.rep"),
+#                             ntime=61,dt=1,ngear=5,mtype=c("i","i","i","i","x"))
+plot.biomass.array = function(path.list=c("./run-issams/r2/Q0/issams.rep",
+           "./run-issams-dev/r2/Q0/issams-dev.rep",
+           "./run-issams/r2/Q1/issams.rep"),
+           ntime=61,dt=1,ngear=5,mtype=c("i","i","i"))
 {
    npath = length(path.list)
    print(npath)
@@ -341,7 +345,7 @@ get.diagnostics=function(log,ntime=61,dt=1,ngear=5,block=NULL,mtype)
    biomass.dev = dev.cur()
 
    x11(width=width,height=height,title="Production",xpos=200)
-   par(mar=c(3,4.5,0,0)+0.1,"new"=FALSE,las=1)
+   par(mar=c(4,4.5,0,0)+0.1,"new"=FALSE,las=1)
    lm = layout(matrix(c(1:npath),ncol=1,byrow=TRUE))
    layout.show(lm)
    prod.dev = dev.cur()
@@ -353,13 +357,21 @@ get.diagnostics=function(log,ntime=61,dt=1,ngear=5,block=NULL,mtype)
       pv = unlist(strsplit(path,"[\\./]"))
       model = pv[length(pv)-1]
       print(model)
-      if (model == "issams-dev")
-         #     parse(text=paste("N","[1]","+","N","[2]"))
+   #  if (model == "issams-dev")
+   #     #     parse(text=paste("N","[1]","+","N","[2]"))
+   #     legend = parse(text=paste("B","[1]","~d","~~no~index"))
+   #  else if (model == "issams")
+   #     legend = parse(text=paste("MSY~F","[msy]","~~indexed"))
+   #  else if (model == "xssams")
+   #     legend = parse(text=paste("MSY~F","[msy]","~~immigration"))
+   #  else
+   #     legend = model
+      if (p == 1)
+         legend = parse(text=paste("MSY~F","[msy]","~~no~index"))
+      else if (p == 2)
          legend = parse(text=paste("B","[1]","~d","~~no~index"))
-      else if (model == "issams")
+      else if (p == 3)
          legend = parse(text=paste("MSY~F","[msy]","~~indexed"))
-      else if (model == "xssams")
-         legend = parse(text=paste("MSY~F","[msy]","~~immigration"))
       else
          legend = model
 
@@ -396,7 +408,7 @@ get.diagnostics=function(log,ntime=61,dt=1,ngear=5,block=NULL,mtype)
                     ") passed to plot.biomass.array(...)",sep=""))
 
       dev.set(biomass.dev)
-      print(paste("tmp$indexed",tmp$indexed))
+   #  print(paste("tmp$indexed",tmp$indexed))
       plot.biomass(dat$t,y,sd=tmp$sdlogPop,K=dat$K, propL=dat$propL,
                    forcing=dat$forcing,yrange=yrange,B1=tmp$B1,
                    indexed=tmp$indexed)
