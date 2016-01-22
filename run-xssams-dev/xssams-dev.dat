@@ -31,9 +31,9 @@
  0
 #
 # T12  phase  initial value
-        1      1e-4
-# T21  phase  initial value
        -1      0.0
+# T21  phase  initial value
+        1      1e-4
 #    r    phase  initial value
            1         0.5 
 # r_prior  use  value  sd

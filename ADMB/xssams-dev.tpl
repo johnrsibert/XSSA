@@ -46,7 +46,6 @@ GLOBALS_SECTION;
   template double alogit<double>(const double& a);
   template dvariable alogit<dvariable>(const dvariable& a);
 
-
 TOP_OF_MAIN_SECTION
   arrmblsize = 50000000;
   gradient_structure::set_CMPDIF_BUFFER_SIZE(  150000000L);
@@ -391,7 +390,7 @@ PRELIMINARY_CALCS_SECTION
 
        double prop = propL_prior;
        double Pop1 = prop*mfexp(value(logB1));
-       double Pop2 = Pop1*(1.0*prop)/prop;
+       double Pop2 = Pop1*(1.0-prop)/prop;
        int ut = 0;
        TRACE(ut)
        for (int t = 1; t <= ntime; t++)
@@ -488,7 +487,8 @@ PROCEDURE_SECTION
     TRACE(lengthU)
     TRACE(logT12)
     TRACE(logT21)
-    //TRACE(logsdlogProc)
+
+    TRACE(logsdlogProc)
     //TRACE(LmeanProportion_local)
     //TRACE(logsdLProportion_local)
     TRACE(U)

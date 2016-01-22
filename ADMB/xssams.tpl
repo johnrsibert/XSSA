@@ -382,10 +382,6 @@ PRELIMINARY_CALCS_SECTION
        double prop = propL_prior;
        double Pop1 = prop*K;
        double Pop2 = K-Pop1;
-
-       //dmatrix Ferr(1,ntime,1,ngear); Ferr.fill_randn(77);
-       //dmatrix logPop1Err(1,ntime,1,2); logPop1Err.fill_randn(79);
-       //dmatrix logPop2Err(1,ntime,1,2); logPop2Err.fill_randn(75);
        int ut = 0;
        TRACE(ut)
        for (int t = 1; t <= ntime; t++)
@@ -462,6 +458,8 @@ PRELIMINARY_CALCS_SECTION
     TRACE(logsdlogProc)
     TRACE(logsdlogYield)
     TRACE(logsdlogYield)
+    TTRACE(propL_prior,sdpropL)
+    TTRACE(LpropL_prior,LsdpropL)
     //TRACE(LmeanProportion_local)
     //TRACE(logsdLProportion_local)
     TRACE(alogit(value(Lpcon)))

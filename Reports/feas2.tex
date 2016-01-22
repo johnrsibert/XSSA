@@ -73,23 +73,24 @@ Feasibility---Part 2}
 A previous evaluation of the feasibility of developing a
 stock assessment model for the Main Hawaiian Islands yellowfin tuna
 fishery concluded that such a model is feasible, but that estimation of
-relevant management reference points is difficult (Sibert, 2015).
+fishery management reference points is difficult (Sibert, 2015).
 The ambiguity of this
 conclusion is unsatisfying, and further research was undertaken to
 develop more practical models. The 2015 model attempted to represent
 the dynamics of two coupled tuna populations with immigration,
 emigration, and fishing and required estimation of approximately 15
 model parameters.
-Several alternative single population models with simplified model
+Alternative single population models with simplified model
 structure
-were examined. All of these simplified models are capable of
+were examined. The simplified models are capable of
 estimating critical reference points such as maximum sustainable
 yield (MSY) and fishing mortality at MSY. Estimates of MSY range
 between 1100mt and 1300mt per year (Table~\ref{tag:ests4}).
 Estimated biomass trends between 1952 and 2012 
-(Figure~\ref{fig:estbiomass}) are
-qualitatively consistent across models with a period of high biomass
-between 1970 and 1990, including periods where the biomass exceeds the
+(Figure~\ref{fig:estbiomass}) differ in general level, but
+qualitatively consistent across models. All models estimate a period of high
+estimated high biomass between 1970 and 1990, 
+including periods where the biomass exceeds the
 equilibrium biomass or ``carrying capacity''. 
 These models are
 promising staring places to begin development of a full-featured stock
@@ -107,80 +108,13 @@ simple Schaefer model with MHI-specific growth parameters.
 \item The local dynamics are ``forced'' by assuming that the local
 abundance is approximately proportional to some ``index'' population
 such as the abundance of the larger Pacific population estimated by
-another model..
+another model.
 \end{enumerate}
-
-State-space models separate variability in the biological
-processes in the system (transition model)
-from errors in observing features of interest
-in the system (observation model). 
-The general form of the transition equation is
-\begin{equation}
-\alpha_t=T(\alpha_{t-1}) + \eta_t
-\end{equation}
-where the function $T$ embodies the stock dynamics mediating the
-development of the state at time $t$ from the state at the previous
-time with random process error, $\eta$.
-The general form of the observation equation is
-\begin{equation}
-x_t = O(\alpha_t) + \varepsilon_t
-\end{equation}
-where the function $O$ describes the measurement process with
-error $\varepsilon$ in observing the population.
-Age-aggregated models were developed in preference to a more complex
-age-structured model for examining the feasibility of a MHI YFT
-assessment model.
-
-Fishing mortality is treated explicitly as a random
-walk.  The logarithm of fishing
-mortality is assumed to
-follow a random walk with normal increments, i.e.,
-\begin{equation}
-\log F_{g,t} = \log F_{g,t-1} + \xi_t;\quad \xi_t\sim
-N(0,\sigma^2_F) \label{eqn:Fwalk}
-\end{equation}
-where  $\sigma^2_F$ is the variance of the fishing
-mortality random walk.
-
-Forcing is achieved by assuming that the difference between the local
-population $N_t$, and some proportion of the index population.
-\begin{equation}
-\log N_t - \log (Q\cdot I_t) + \omega_t;\quad \omega_t\sim N(0,\sigma^2_I)
-\label{eqn:index}
-\end{equation}
-where
-$I_t$ is the size of the index population at time $t$,
-$Q$ is the estimated ratio of the MHI population size to the index
-population,
-and $\sigma^2_I$ is the variance of the difference between the
-predicted population size.
-
-
-Thus the local dynamics follow the classic Schaefer form:
-\begin{equation}
-\label{eqn:ischaefer}
-\frac{dN}{dt} = rN(1-\frac{N}{K}) - FN
-\end{equation}
-where $N$ is the biomass of YFT in the MHI, 
-$r$ is the logistic growth rate per year,
-$K$ is the asymptotic biomass, and
-$F$ is the total fishing mortality per year in the MHI.
-
-The parameters $r$ and $K$ are notoriously difficult to estimate
-accurately. In an attempt to avoid this difficulty, two different
-alternative parameter substitutions were tested. In the first
-alternative, MSY ($\MSY$) and fishing mortality at MSY ($\Fmsy$) were
-estimated directly and substituted in in \ref{eqn:ischaefer} as
-$r=2F_{\MSY}$ and $K=\frac{4\MSY}{r}$.
-In the second alternative, the initial population size $B_1$ and a
-proportionality constant $d$ are estimated directly and substituted in
-\ref{eqn:ischaefer} as $K=d\cdot B_1$.
 
 \section{Results}
 
 \begin{figure}
 \begin{center}
-%\includegraphics[height=0.8\textheight]{./graphics/hdar_catch_history.pdf}
 \includegraphics[width=\textwidth]{./graphics/biomass-array.pdf}
 \caption{\label{fig:estbiomass}
 }
@@ -189,7 +123,6 @@ proportionality constant $d$ are estimated directly and substituted in
 
 \begin{figure}
 \begin{center}
-%\includegraphics[height=0.8\textheight]{./graphics/hdar_catch_history.pdf}
 \includegraphics[width=\textwidth]{./graphics/production-array.pdf}
 \caption{\label{fig:estprod}
 }
@@ -210,7 +143,7 @@ Parameterization&$\MSY\quad\Fmsy$&$B_1\quad d$&$\MSY\quad\Fmsy$&$B_1\quad d$\\
 \hline
 \hline
 $n$ & 4 & 5 & 5 & 6\\
-$-\log L$ & 237.238 & 237.221 & 247.175 & 242.816\\
+$-\log L$ & -237.238 & -237.221 & -247.175 & -242.816\\
 $|G|_{max}$ & 0.0016409 & 2.11959e-06 & 3.51082e-05 & 29.6554\\
 $B_1$ & --- & 5043.2 & --- & ---\\
 $d$ & --- & 1.3675 & --- & ---\\
@@ -354,45 +287,102 @@ tuna in the Hawaiian Islands. Mar. Ecol. Prog. Ser. 461:187-196.
 \appendix
 \section{Model development}
 \label{sec:models}
-%\subsection{Single population with indexed abundance}
-The indexed abundance model\footnote{https://github.com/johnrsibert/XSSA/blob/master/ADMB/issams.tpl}
-assumes that the biomass of YFT in the MHI
-is proportional to the biomass of an ``index'' population.
-Let $I_t$ equal the biomass of the index population and $Q$ the
-constant of proportionality between the MHI population and the index
-population, thus
+State-space models separate variability in the biological
+processes in the system (transition model)
+from errors in observing features of interest
+in the system (observation model). 
+
+{\bf Transition Model $T(\alpha_{t-1})$.}
+The general form of the transition model is
 \begin{equation}
-\label{eqn:Qprop}
-\varphi_t \sim N(QI_t-N_t,\sigma_Q)
+\alpha_t=T(\alpha_{t-1}) + \eta_t
 \end{equation}
-becomes a component of the total likelihood due to differences between
-the MHI biomass and the index population biomass.
+where $\alpha_t$ is the state at time $t$ and 
+the function $T$ embodies the dynamics mediating the
+development of the state at time $t$ from the state at the previous
+time with random process error, $\eta_t$.
 
+Stock dynamics of follow the classic Schaefer form:
+\begin{equation}
+\label{eqn:ischaefer}
+\frac{dN}{dt} = rN(1-\frac{N}{K}) - FN
+\end{equation}
+where $N$ is the biomass of YFT in the MHI, 
+$r$ is the logistic growth rate per year,
+$K$ is the asymptotic biomass, and
+$F$ is the total fishing mortality per year in the MHI.
 
-{\bf Transition Equation $T(\alpha_{t-1})$.}
 The state space transition equation for the single population model is
 developed by solving \ref{eqn:ischaefer} analytically from one time to
-the next (see Section \ref{sec:schaefer}).
+the next (see Appendix \ref{sec:schaefer}).
 \begin{equation}
-%\label{eqn:intschaefer}
+\label{eqn:intschaeferA}
 N_t = \frac{K(r-\bar{F}_t)}{\frac{K(r-\bar{F}_t)}{N_{t-\Delta t}}e^{-\Delta
-t(r-\bar{F}_t)}-re^{-\Delta t(r-\bar{F}_t)} -r} + \eta_t
+t(r-\bar{F}_t)}-re^{-\Delta t(r-\bar{F}_t)} -r} \cdot e^{\eta_t};
+\quad \eta_t\sim N(0,\sigma^2_N)
 \end{equation}
 where 
 $\bar{F}_t$ is the total fishing mortality, i. e.,
 $$
 \bar{F}_t =\sum_{g=1}^n F_{g,t-\Delta t}.
 $$
-$\eta_t \sim N(0,\sigma_N)$ is the process error expressing
+and $\eta_t \sim N(0,\sigma_N)$ is the process error expressing
 variability in population dynamics.
 
+Fishing mortality is treated as a random walk.
+The logarithm of fishing mortality is assumed to
+follow a random walk with normal increments, i.e.,
+\begin{equation}
+\label{eqn:Fwalk}
+\log F_{g,t} = \log F_{g,t-1} + \xi_t;\quad \xi_t\sim
+N(0,\sigma^2_F)
+\end{equation}
+where  $\sigma^2_F$ is the variance of the fishing
+mortality random walk.
 
-{\bf Observation Equation, $O(\alpha)$.}
+The indexed abundance model
+assumes that the biomass of YFT in the MHI
+is proportional to the biomass of an ``index'' population.
+\begin{equation}
+\log N_t - \log (Q\cdot I_t) + \omega_t;\quad \omega_t\sim N(0,\sigma^2_I)
+\label{eqn:index}
+\end{equation}
+where
+$I_t$ is the size of the index population at time $t$,
+$Q$ is the estimated ratio of the MHI population size to the index
+population,
+and $\sigma^2_I$ is the variance of the difference between the
+index and the predicted population size.
+
+All process errors are assumed to have the same distribution
+$N(0,\sigma^2_P)$; $\sigma_N$,$\sigma_F$, and $\sigma_I$ are assumed
+to be equal and estimated as a global process error with variance
+$\sigma^2_P$.
+
+The logistic parameters $r$ and $K$ are notoriously difficult to estimate
+accurately. Two different
+alternative parameter substitutions were tested. In the first
+alternative, MSY ($\MSY$) and fishing mortality at MSY ($\Fmsy$) were
+estimated directly and substituted in in \ref{eqn:intschaeferA} as
+$r=2F_{\MSY}$ and $K=\frac{4\MSY}{r}$.
+In the second alternative, the initial population size $B_1$ and a
+proportionality constant $d$ are estimated directly and substituted in
+\ref{eqn:intschaeferA} as $K=d\cdot B_1$.
+
+
+{\bf Observation Model, $O(\alpha)$.}
+The general form of the observation model is
+\begin{equation}
+x_t = O(\alpha_t) + \varepsilon_t
+\end{equation}
+where the function $O$ describes the measurement process with
+error $\varepsilon$ in observing the population.
+
 Predicted catch, $\widehat{C}_{g,t}$, for each gear is the product of
 estimated fishing mortality and the total biomass.
 \begin{equation}
-\log \widehat{C}_{g,t} = \log\bigg(F_{g,t}\cdot\Bigl(\frac{N_{t-\Delta
-t}+N_t}{2}\Bigr)\bigg) + \varepsilon_t
+\widehat{C}_{g,t} = F_{g,t}\cdot\Bigl(\frac{N_{t-\Delta
+t}+N_t}{2}\Bigr) \cdot e^{\varepsilon_t}
 \label{eqn:obs1}
 \end{equation}
 where the total biomass is  the average
@@ -409,7 +399,7 @@ C_{g,t}-\log\widehat{C}_{g,t}}{\sigma_Y}\Bigr)^2\bigg)\\
     \end{array}
   \right.
 \end{equation}
-$p_0$ is the proportion of observed catch observations equal to 0.0.
+$p_0$ is the proportion of observed catch observations equal to zero.
 This proportion may be estimated or fixed at a constant value. For
 current analysis, it is fixed at $p_0 = 0.15738$ as computed from the data.
 % line 186, file issams.cpp, prop_zero =  0.4918 0 0 0.098361 0.19672, tprop_zero = 0.15738
@@ -417,33 +407,52 @@ current analysis, it is fixed at $p_0 = 0.15738$ as computed from the data.
 
 
 \begin{table}
-\caption{Complete list of variables and parameters for the single
-population model.
+\caption{Complete list of parameters for two alternative
+parameterizations of the state-space single population Schaefer model.
 \label{tab:allvars1}}
 \begin{center}
-\begin{tabular}{ll}
+\begin{tabular}{lll}
 \hline
-Variable & Definition\\
-\hline
-\hline
-$m$ & Number of quarterly time steps\\
-$n$ & Number of fishing gears\\
+$\MSY\;\Fmsy$ & $B_1\;d$ & Definition\\
 \hline
 \hline
-$r$ & Instantaneous growth rate $(y^{-1})$\\
-$K$ & Asymptotic biomass (mt) \\
-$Q$ & Abundance index proportionality constant\\
-$p_0$ & Proportion of zero catch observations;\\
-      & fixed at $p_0 = 0.15738$\\
+$\Fmsy$&  & Fishing mortality at maximum sustainable yield\\
+$\MSY$ &  & Maximum sustainable yield\\
+    & $r$ & Instantaneous growth rate\\
+    & $B_1$ & Biomass at time of first observation\\
+    &  $d $ & Constant of proportionality; $B_1=Q\cdot K$\\
+$Q$ & $Q$ & Abundance index proportionality constant\\
+$\sigma_P$ & $\sigma_P$ & Global process error SD; $\sigma_P=\sigma_N=\sigma_F=\sigma_Q$\\
+$\sigma_Y$ & $\sigma_Y$ & Observation error SD \\
 \hline
-$\sigma_N$ & Population growth SD\\
-$\sigma_F$ & Fishing mortality random walk SD\\
-$\sigma_Q$ & Abundance index proportionality SD\\
-$\sigma_Y$ & Observation error SD \\
+$p_0$ & $p_0$ & Proportion of zero catch observations;\\
+      &        & fixed at $p_0 = 0.15738$\\
 \hline
 \end{tabular}
 \end{center}
 \end{table}
+
+{\bf Estimation.} The model states, $N_t$ and $F_{gt}$, are assumed to be random
+effects (Skaug and Fournier 2006). Model parameters are estimated by
+maximizing the joint likelihood of the random
+effects and the observations.
+\begin{equation}
+L(\theta,\alpha,x)=
+\prod^m_{t=2}\big[\phi\big(\alpha_t-T(\alpha_{t-1}), \Sigma_\eta\big)\big]
+\prod^m_{t=1}\big[\phi\big(x_t-O(\alpha_t), \Sigma_\varepsilon\big)\big]
+\end{equation}
+Here, $m$ is the number of time steps in the catch time series and
+$\theta$ is a vector of model parameters.
+The model is implemented in ADMB-RE (Fournier et al 2012).
+The actual number of
+parameters to be estimated depends on the model configuration,
+specified by phase flags in the input file. 
+All computer code, data files, and draft reports in support of this
+analysis can be found at Github:
+\url{https://github.com/johnrsibert/XSSA.git}.
+
+
+
 \clearpage
 \input{schaefer_section}
 
