@@ -45,7 +45,7 @@ Yellowfin Tuna Fishery}}
 \title{Feasibility of developing a stock assessment model for Main
 Hawaiian Islands Yellowfin Tuna Fishery\\
 \vspace{2ex}
-Part 2}
+Part Deux}
 
 \author{
 John Sibert\thanks{sibert@hawaii.edu}\\
@@ -57,8 +57,8 @@ Honolulu, HI  96822 U.S.A.\\[0.125in]
 
 \pagestyle{myheadings}
 \markboth{John Sibert\hfil MHI Yellowfin Assessment Model
-Feasibility---Part 2}
-{MHI Yellowfin Assessment Model Feasibility---Part 2\hfil John Sibert}
+Feasibility --- 2}
+{MHI Yellowfin Assessment Model Feasibility --- 2\hfil John Sibert}
 
 \begin{document}
 % amsmath package
@@ -76,70 +76,93 @@ fishery concluded that such a model is feasible, but that estimation of
 fishery management reference points is difficult (Sibert, 2015).
 The ambiguity of this
 conclusion is unsatisfying, and further research was undertaken to
-develop more practical models. The 2015 model attempted to represent
+develop more practical alnternative models. 
+The 2015 model attempted to represent
 the dynamics of two coupled tuna populations with immigration,
 emigration, and fishing and required estimation of approximately 15
 model parameters.
-Alternative single population models with simplified model
+
+Single population models with simplified model
 structure
 were examined. The simplified models are capable of
 estimating critical reference points such as maximum sustainable
-yield (MSY) and fishing mortality at MSY. Estimates of MSY range
-between 1100mt and 1300mt per year (Table~\ref{tag:ests4}).
+yield (MSY) and fishing mortality at MSY. 
+%Estimates of MSY range between 1100mt and 1300mt per year (Table~\ref{tag:ests4}).
 Estimated biomass trends between 1952 and 2012 
 (Figure~\ref{fig:estbiomass}) differ in general level, but
 qualitatively consistent across models. All models estimate a period of high
-estimated high biomass between 1970 and 1990, 
+biomass between 1970 and 1990, 
 including periods where the biomass exceeds the
 equilibrium biomass or ``carrying capacity''. 
 These models are
 promising staring places to begin development of a full-featured stock
 assessment model for the MHI yellowfin fishery.
 
-\section{Models}
+\section{Methods}
+Model feasibility depends equally on both the model and on whether the
+available data
+contain sufficient information to estimate model parameters.
+Evaluation of feasibility challenges both the model and the available
+data. The data used in this analysis are the annual catch data from
+five gear types fishing within 200 nm of the Main Hawaiian Islands
+(Sibert 2015).
+
 The basic model is  state-space implementation of the well known
 Schaefer biomass dynamics model (Schaefer, 1954).
 The principle model assumptions are:
 \begin{enumerate}
 \item The dynamics of the population of YFT in the MHI follows a
 simple Schaefer model with MHI-specific growth parameters.
-\item Fishing mortality is represented by a random walk (as in the
-2015 two-population model).
+\item Fishing mortality is represented by a random walk as in the
+2015 two-population model (Nielsen and Berg, 2014).
 \item The local dynamics are ``forced'' by assuming that the local
 abundance is approximately proportional to some ``index'' population
 such as the abundance of the larger Pacific population estimated by
 another model.
 \end{enumerate}
 
+The basic model was implemented with two different parameter
+substitutions in an attempt to find parameter combinations that are
+more easily estimated. Indexing was implemented flexibly to
+demonstrate the effects of omitting the index altogether.
+
+Model estimates of yellowfin biomass by \MFCL\ (MFCL)
+from the most recent WCPFC stock assessment (Davies et al 2014) provide
+a convenient choice of biomass indices. The MHI straddle the
+boundary between MFCL regions 2 and 4. Region 2 is arguably more similar
+ecologically to the MHI than the more equatorial region 4, and the population
+in region 4 is much larger and exhibits a greater level of depletion than the
+population in region 2. Estimated biomass trends from MFCL region 2
+were used as the abundance index for most model feasibility evaluations.
+
+Complete details of model structure are presented in Appendix~\ref{sec:models}.
+
+
+
 \section{Results}
 
-\begin{figure}
-\begin{center}
-\includegraphics[width=\textwidth]{./graphics/biomass-array.pdf}
-\caption{\label{fig:estbiomass}
-}
-\end{center}
-\end{figure}
-
-\begin{figure}
-\begin{center}
-\includegraphics[width=\textwidth]{./graphics/production-array.pdf}
-\caption{\label{fig:estprod}
-}
-\end{center}
-\end{figure}
-
 \begin{table}
-\caption{Model estimates from four different model configurations.
+\caption{
+Model estimates from four different model configurations.
 Model complexity, expressed in number of parameters estimated ($n$)
-increases from left to right.
+increases from left to right. Long dashes (---) indicate parameters
+not estimated. 
+{%\small
+%$n$ indicates the number of parameters estimated; 
+$-\log L$ is the negative log likelihood (the smaller the number, the
+better the fit);
+$|G|_{max}$ is the curvature of the likelihood at the its apparent
+minimum (values greater than $0.001$ indicate non-convergence);
+other variables are defined in Table~\ref{tab:allvars1}.
+}
 \label{tag:ests4}}
 \begin{center}
-\begin{tabular}{lrrrr}
+\begin{tabular}{|l|rr|rr|}
 \hline
-Forcing & \multicolumn{2}{c}{None}&\multicolumn{2}{c}{MFCL 2}\\
+Forcing & \multicolumn{2}{c|}{None}&\multicolumn{2}{c|}{MFCL 2}\\
 \cline{2-3}\cline{4-5}
 Parameterization&$\MSY\quad\Fmsy$&$B_1\quad d$&$\MSY\quad\Fmsy$&$B_1\quad d$\\
+Designation& A & B& C& D\\
 \hline
 \hline
 $n$ & 4 & 5 & 5 & 6\\
@@ -159,48 +182,77 @@ $Q$ & --- & --- & 0.04321 & ---\\
 \end{center}
 \end{table}
 
+Fitting results are summarized in Table~\ref{tag:ests4}.
+Both non-indexed models (A and B) converged to well-defined solutions.
+Only the $\MSY\;\Fmsy$ indexed parameterization (model C) converged. 
+(The value of $|G|_{max}$ for the $B_1\; d$ parameterization ,model D,
+was much higher than the value indicating convergence to a
+well-defined solution.)
+Estimated values of $r$ and $K$ and corresponding estimates of $\Fmsy$
+and $\MSY$ depend heavily on the use of the biomass index. The
+indexed model estimates a larger and slower growing stock than the
+non-indexed models.
+
+\begin{figure}
+\begin{center}
+\includegraphics[width=\textwidth]{./graphics/biomass-array.pdf}
+\caption{\label{fig:estbiomass}
+Estimated biomass trends for three model configurations, indicated in
+the upper left of each panel.
+Heavy blue lines indicate the estimated biomass in mt.
+The purple line indicates the estimated biomass index.
+The light blue shaded areas represent the process error as 
+$\pm 2\sigma_P$.
+The equilibrium biomass $K$ is indicated by the blue dot-dash line.
+}
+\end{center}
+\end{figure}
+
+Estimated biomass trends for the 3 converged models are shown in
+Figure~\ref{fig:estbiomass}.
+A five-fold difference in estimated population size is the
+most striking difference between the 3 models reflecting similar
+differences in estimates of $K$.
+Relatively high stock sizes in the late 1970s and early 1980s is
+apparent in all three models. 
+This period of abnormally high biomass is most obvious in the indexed model
+which reflects the high biomass in MFCL region 2 during that period.
+It is encouraging to
+detect this period of high biomass in the two non-indexed models as well.
+
+\begin{figure}
+\begin{center}
+\includegraphics[width=\textwidth]{./graphics/production-array.pdf}
+\caption{\label{fig:estprod}
+Catch plotted against fishing mortality (production curves)
+for three model configurations, 
+indicated in the upper left of each panel.
+The heavy green line and dark green dots are estimated catch plotted
+against.
+The green $+$ symbols are the observed catch annotated with the year.
+The dashed red line is the theoretical equilibrium yield.
+Note that the scale of the abscissa is different in each panel.
+}
+\end{center}
+\end{figure}
+
+Production curves for the 3 converged models are shown in
+Figure~\ref{fig:estprod}.
+In the two non-indexed models, the peaks of the production curves
+(dashed red line) are close to the highest estimated fishing mortality
+and near the highest observed catches. 
+In contrast, the peak of the production curve for the indexed model is
+far the right of the highest estimated fishing mortality.
+Catches exceed the production curve between the mid 1970 through the
+mid 1990s and drop below the production curve after 2000 for all three
+models.
+
 
 
 
 
 \section{Discussion}
 
-%The age-aggregated approach using a logistic model with emigration and
-%immigration shows sufficient promise to continue model development.
-%The general behavior of the model system (Figure~\ref{fig:simNN} and
-%~\ref{fig:NNts}) appropriately describes a small persistent population
-%interacting with a much larger one.
-%The efficacy of the random walk
-%representation of fishing mortality is particularly encouraging, and
-%avoids debates about changes in catchability associated with
-%changes in fishing efficiency.
-%The proportion of local fish in the system is sensitive to model
-%parameters and can effectively be constrained to be near the empirically
-%determined value of 0.9. Coupling immigration to the output of
-%some other model is relatively trivial to implement and is
-%sufficiently flexible to use output from alternative models.
-%
-%Unfortunately, population dynamics parameters, with the possible
-%exception of $q$, do not appear to be estimatable. Lack of
-%sensitivity could be due to several causes: the model is completely
-%ill-posed, the code is incorrect, there is no signal in data, or some
-%combination of these. Inspection of catch trends
-%(Figure~\ref{fig:annualTS}) does not reveal any obvious signs of stock
-%depletion and recovery. Estimation of population dynamics parameters
-%in a lightly exploited stock is a well-known problem in stock
-%assessment.
-%
-%Figure~\ref{fig:NNphase} suggests that the model equations
-%(\ref{eqn:coupledschaeferq}) have non-trivial equilibria for certain
-%parameter values.
-%The relationships between of the parameters $q$, $T^*_{21}$,
-%and $\bar{p}$ are not clear.
-%Estimation of fisheries reference point would be simpler if
-%an analytic expression for the equilibrium point were available.
-%Finite difference approximations of logistic population models are
-%notoriously unstable under certain circumstances. An analytical
-%solution of equation~\ref{eqn:coupledschaeferq} would be of great
-%help.
 
 \vspace{4ex}
 %\clearpage
@@ -212,29 +264,29 @@ actually take on this challenging project and for their on-going
 collaboration.
 Thanks to Dr. David Fournier for suggesting the ``$B_1\;d$''
 parameterization of the Schaefer model.
-Thanks to Mr. David Itano for sharing insights into the small-boat
-fisheries in Hawaii.
-Thanks to Mr. Reginald Kokubun of the Hawaii Division of Aquatic
+to Mr. David Itano for sharing insights into the small-boat
+fisheries in Hawaii,
+to Mr. Reginald Kokubun of the Hawaii Division of Aquatic
 Resources for supplying catch report data from the HDAR commercial
-fisheries data base.
-Thanks to Mr. Keith Bigelow and Ms. Karen Sender of NOAA Pacific
+fisheries data base,
+to Mr. Keith Bigelow and Ms. Karen Sender of NOAA Pacific
 Island Fisheries Science Center for supplying logbook reporting data and
 weight-frequency data from the PIFSC data base.
 Thanks also to Dr. John Hampton of the Secretariat of the Pacific
 Community, Oceanic Fisheries Programme, for making available
 MULTICAN-CL output files from the latest Western and Central Pacific
 Fisheries Commission yellowfin tuna stock assessment, and to Mr. Nick
-Davies for sharing R scripts and advice to decode the MFCL output files.
+Davies for sharing R scripts and advice on interpreting \MFCL\ output files.
 
 \section*{References}
 {\parindent=0cm \small
 \everypar={\hangindent=2em \hangafter=1}\par
 %\doublespacing
-%Adam, M. S., J. Sibert, D. Itano and K. Holland. 2003. Dynamics of
-%bigeye (Thunnus obesus) and yellowfin tuna (T. albacares) in Hawaii's
-%pelagic fishery: analysis of tagging data with a bulk transfer model
-%incorporating size specific attrition. Fishery Bulletin 101(2):
-%215-228.
+Carruthers, T. and M. McAllister. 2011.
+Computing prior probability distributions for the
+intrinsic rate of increase for atlantic tuna and
+billfish using demographic methods.
+Collect. Vol. Sci. Pap. ICCAT, 66(5): 2202-2205.
 
 Davies, N., S. Harley, J. Hampton, S. McKechnie. 2014. Stock
 assessment of yellowfin tuna in the western and central pacific ocean.
@@ -245,13 +297,6 @@ A. Magnusson, M. N. Maunder, A. Nielsen. 2012. AD Model Builder:
 using automatic differentiation for forstatistical inference of highly
 parameterized complex nonlinear models. Opti-mization Methods and
 Software 27, 233–249.
-
-Itano, D., K. Holland. 2000.  Movement and vulnerability of bigeye
-(Thunnus obesus) and yellowfin tuna (Thunnus albacares) in relation to
-FADs and natural aggregation points.Aquat. Living Resour. 13: 213-223.
-
-Kleiber, P., J. Hampton, N. Davies, S. Hoyle, D. Fournier. 2014.
-MULTIFAN-CL User’s Guide
 
 Nielsen, A., C. Berg. 2014. Estimation of time-varying selectivity
 in stock assessments using state-space models. Fisheries Research
@@ -282,15 +327,13 @@ tuna in the Hawaiian Islands. Mar. Ecol. Prog. Ser. 461:187-196.
 
 \clearpage
 
-
-\section*{Appendix}
-\appendix
+appendix
 \section{Model development}
 \label{sec:models}
 State-space models separate variability in the biological
 processes in the system (transition model)
 from errors in observing features of interest
-in the system (observation model). 
+in the system (observation model), g.g. Berg and Nielsen (2014). 
 
 {\bf Transition Model $T(\alpha_{t-1})$.}
 The general form of the transition model is
@@ -326,7 +369,7 @@ $\bar{F}_t$ is the total fishing mortality, i. e.,
 $$
 \bar{F}_t =\sum_{g=1}^n F_{g,t-\Delta t}.
 $$
-and $\eta_t \sim N(0,\sigma_N)$ is the process error expressing
+and $\eta_t \sim N(0,\sigma_N)$ is a process error expressing
 variability in population dynamics.
 
 Fishing mortality is treated as a random walk.
@@ -337,8 +380,8 @@ follow a random walk with normal increments, i.e.,
 \log F_{g,t} = \log F_{g,t-1} + \xi_t;\quad \xi_t\sim
 N(0,\sigma^2_F)
 \end{equation}
-where  $\sigma^2_F$ is the variance of the fishing
-mortality random walk.
+where  $\sigma^2_F$ is a process error expressing the year to year
+variability in fishing mortality.
 
 The indexed abundance model
 assumes that the biomass of YFT in the MHI
@@ -351,8 +394,8 @@ where
 $I_t$ is the size of the index population at time $t$,
 $Q$ is the estimated ratio of the MHI population size to the index
 population,
-and $\sigma^2_I$ is the variance of the difference between the
-index and the predicted population size.
+and $\sigma^2_I$ is a process error representeing the difference
+between the MHI biomass and the abundance index. 
 
 All process errors are assumed to have the same distribution
 $N(0,\sigma^2_P)$; $\sigma_N$,$\sigma_F$, and $\sigma_I$ are assumed
@@ -387,7 +430,7 @@ t}+N_t}{2}\Bigr) \cdot e^{\varepsilon_t}
 \end{equation}
 where the total biomass is  the average
 biomass over the time step (Quinn and Deriso, 1999), and
-$\varepsilon_t$ is a ``zero-inflated'' normal likelihood given by
+$\varepsilon_t$ is a ``zero-inflated'' log normal likelihood given by
 \begin{equation}
   \log \varepsilon_t = \left\{
     \begin{array}{r@{\;:\quad}l}
@@ -399,6 +442,7 @@ C_{g,t}-\log\widehat{C}_{g,t}}{\sigma_Y}\Bigr)^2\bigg)\\
     \end{array}
   \right.
 \end{equation}
+where $\sigma_Y$ is the observation error and
 $p_0$ is the proportion of observed catch observations equal to zero.
 This proportion may be estimated or fixed at a constant value. For
 current analysis, it is fixed at $p_0 = 0.15738$ as computed from the data.
@@ -432,6 +476,9 @@ $p_0$ & $p_0$ & Proportion of zero catch observations;\\
 \end{center}
 \end{table}
 
+{\bf Priors} $r$ or $\Fmsy$?
+
+
 {\bf Estimation.} The model states, $N_t$ and $F_{gt}$, are assumed to be random
 effects (Skaug and Fournier 2006). Model parameters are estimated by
 maximizing the joint likelihood of the random
@@ -457,3 +504,13 @@ analysis can be found at Github:
 \input{schaefer_section}
 
 \end{document}
+
+\begin{figure}
+\begin{center}
+\begin{tabular}{lr}
+\includegraphics[width=0.495\textwidth]{./graphics/biomass-array.pdf}&
+\includegraphics[width=0.495\textwidth]{./graphics/production-array.pdf}\\
+\end{tabular}
+\end{center}
+\caption{\label{fig:estprod}Blah blah}
+\end{figure}

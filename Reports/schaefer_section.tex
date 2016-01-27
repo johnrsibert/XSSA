@@ -14,9 +14,9 @@ $K$ is the asymptotic population size in the same units as $N$,
 and $F$ is the instantaneous rate of removal due to fishing ($t^{-1}$).
 Equation (\ref{eqn:sschaefer}) reduces to the logistic model
 if $F$ is assumed to be zero.
-These models are usually integrated numerically with
+Logistic models are usually integrated numerically with
 ``explict'' finite difference methods to compute an approximation 
-of the value of $N$ at some time. 
+of the value of $N$ at some (future) time. 
 Such approximations are often unstable for 
 values of $r$ large relative to the time step used in the finite
 difference solution.
@@ -28,12 +28,13 @@ computing resources if analytical solutions are used in preference
 to finite difference approximations. 
 
 \subsection{Single population}
-The integral of the logistic ODE can be found is several places
-including Murray (1993) and Quinn and Deriso (1999).
+The integral of the logistic differential equation can be found is
+several places;
+Murray (1993), Quinn and Deriso (1999).
 Numerous mathematics tutorials are available on the World Wide Web
 that use
-integration of the logistic ODE to illustrate the technique of
-integration by partial fractions.
+integration of the logistic differential equation as an exercise to
+illustrate the technique of integration by partial fractions.
 The same procedure can be applied to the Schaefer ODE.
 Equation~(\ref{eqn:sschaefer}) is rearranged and variables
 separated to become
@@ -64,7 +65,7 @@ N_t=\frac{K(r-F)}{Ce^{-t(r-F)}+r}
 A formula suitable for computing population size at successive
 time steps can be found by setting $N_t = N_{t-\Delta t}$ at time
 $t=t-\Delta t$ in equation (\ref{eqn:NtC}).
-The integration constant, $C$, becomes
+The integration constant becomes
 \begin{equation}
 C=\Bigg(\frac{K(r-f)}{N_{t-\Delta t}}-r\Bigg)e^{(t-\Delta t)(r-F)},
 \end{equation}
@@ -73,16 +74,16 @@ and finally
 \label{eqn:intschaefer}
 N_t = \frac{K(r-F)}{\frac{K(r-F)}{N_{t-\Delta t}}e^{-\Delta t(r-F)}-re^{-\Delta t(r-F)} -r}
 \end{equation}
-\help{
+%\help{
 Further simplification of this equation may be possible, but I have
 not found it. In any case, equation (\ref{eqn:intschaefer}) is the
 only general solution of the Schaefer ODE that I have seen, and it appears
 to work well in numerical applications.
-}
+%}
 
 \subsection{Two populations with exchange}
 The motivation for the two popultion Schaefer model with exchange is
-developed fully in Appendix~\ref{sec:models}.
+developed fully elsewhere. %in Appendix~\ref{sec:models}.
 
 The basic equations can be written
 \begin{eqnarray}
@@ -127,9 +128,16 @@ equation~(\ref{eqn:sschaefer}) to yield
 \None_t=\frac{K(r-Z_1)}{C_1e^{-t(r-Z_1)}+r}.
 \end{equation}
 
-\help{All that remains is to find an equivalent integral for
-equation~(\ref{eqn:xschaeferZ2}) and a means to simultaneously solve
-for $C_1$ and $C_2$. }
+
+An equivalent integral for
+equation~(\ref{eqn:xschaeferZ2}), possibly by completing the square and
+solving the resulting quadratic, and a means to simultaneously solve
+for $C_1$ and $C_2$ are required to achieve a complete solution to
+the two population model differential equations.
+
+%\help{All that remains is to find an equivalent integral for
+%equation~(\ref{eqn:xschaeferZ2}) and a means to simultaneously solve
+%for $C_1$ and $C_2$. }
 
 %\begin{equation*}
 %{{2\,\log \Big|{{2\,a\,x-\sqrt{b^2-4\,a\,c}+b}\over{2\,a\,x+
