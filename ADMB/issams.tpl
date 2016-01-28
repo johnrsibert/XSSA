@@ -123,15 +123,25 @@ DATA_SECTION
   init_number init_Fmsy;
   !! TTRACE(init_Fmsy,phase_Fmsy)
 
-  init_int use_Fmsy_prior;
-  init_number Fmsy_prior;
-  init_number sdFmsy_prior;
-  number logFmsy_prior;
-  !! logFmsy_prior = log(Fmsy_prior);
-  !! TRACE(use_Fmsy_prior)
-  !! TTRACE(Fmsy_prior,sdFmsy_prior)
-  number varFmsy_prior;
-  !! varFmsy_prior = square(sdFmsy_prior);
+  init_int use_r_prior;
+  init_number r_prior;
+  init_number sdr_prior;
+  number logr_prior;
+  !! logr_prior = log(r_prior);
+  !! TRACE(use_r_prior)
+  !! TTRACE(r_prior,sdr_prior)
+  number varr_prior;
+  !! varr_prior = square(sdr_prior);
+
+  //init_int use_Fmsy_prior;
+  //init_number Fmsy_prior;
+  //init_number sdFmsy_prior;
+  //number logFmsy_prior;
+  //!! logFmsy_prior = log(Fmsy_prior);
+  //!! TRACE(use_Fmsy_prior)
+  //!! TTRACE(Fmsy_prior,sdFmsy_prior)
+  //number varFmsy_prior;
+  //!! varFmsy_prior = square(sdFmsy_prior);
 
   init_int phase_MSY;
   init_number init_MSY;
@@ -431,11 +441,20 @@ PROCEDURE_SECTION
      obs(t,U(Fndxl(t),Fndxu(t)),U(utPop+t-1),U(utPop+t), logsdlogYield,Lpcon);
   }
 
-  if ((use_Fmsy_prior) && active(logFmsy) )
+  //if ((use_r_prior) && active(logr) )
+  if (use_r_prior)
   {
-     dvariable nll_Fmsy = 0.5*(log(TWO_M_PI*varFmsy_prior) + square(logFmsy - logFmsy_prior)/varFmsy_prior);
-     nll += nll_Fmsy;
+     //dvariable logr = log(2.0*mfexp(logFmsy));
+     //TTRACE(logr,(log(2.0)+logFmsy))
+     dvariable logr = log(2.0)+logFmsy;
+     dvariable nll_r = 0.5*(log(TWO_M_PI*varr_prior) + square(logr - logr_prior)/varr_prior);
+     nll += nll_r;
   }
+  //if ((use_Fmsy_prior) && active(logFmsy) )
+  //{
+  //   dvariable nll_Fmsy = 0.5*(log(TWO_M_PI*varFmsy_prior) + square(logFmsy - logFmsy_prior)/varFmsy_prior);
+  //   nll += nll_Fmsy;
+  //}
 
   ar = 2.0*mfexp(logFmsy);
   aK = 4.0*mfexp(logMSY)/(1.0e-20+ar);
@@ -689,9 +708,11 @@ FUNCTION void write_status(ofstream& s)
     s << "# nvar = " << initial_params::nvarcalc() << endl;
     s << "# logFmsy = " << logFmsy << " (" << active(logFmsy) <<")" << endl;
     s << "#    Fmsy = " << mfexp(logFmsy) << endl;
-    s << "#   Fmsy_prior = " << Fmsy_prior << " (" << (use_Fmsy_prior>0) << ")" << endl;
-    s << "# sdFmsy_prior = " << sdFmsy_prior << endl;
+    //s << "#   Fmsy_prior = " << Fmsy_prior << " (" << (use_Fmsy_prior>0) << ")" << endl;
+    //s << "# sdFmsy_prior = " << sdFmsy_prior << endl;
     s << "#    r = " << r << endl;
+    s << "#   r_prior = " << r_prior << " (" << (use_r_prior>0) << ")" << endl;
+    s << "# sdr_prior = " << sdr_prior << endl;
     s << "# logMSY = " << logMSY << " (" << active(logMSY) <<")" << endl;
     s << "#    MSY = " << mfexp(logMSY) << endl;
     s << "#    K = " << K << endl;

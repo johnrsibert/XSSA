@@ -325,9 +325,8 @@ get.diagnostics=function(log,ntime=61,dt=1,ngear=5,block=NULL,mtype)
 #                                         "./run-xssams/1/xssams.rep"),
 #                             ntime=61,dt=1,ngear=5,mtype=c("i","i","i","i","x"))
 plot.biomass.array = function(path.list=c("./run-issams/r2/Q0/issams.rep",
-           "./run-issams-dev/r2/Q0/issams-dev.rep",
            "./run-issams/r2/Q1/issams.rep"),
-           ntime=61,dt=1,ngear=5,mtype=c("i","i","i"))
+           ntime=61,dt=1,ngear=5,mtype=c("i","i"))
 {
    npath = length(path.list)
    print(npath)
@@ -368,9 +367,9 @@ plot.biomass.array = function(path.list=c("./run-issams/r2/Q0/issams.rep",
    #     legend = model
       if (p == 1)
          legend = parse(text=paste("MSY~F","[msy]","~~no~index"))
+   #  else if (p == 2)
+   #     legend = parse(text=paste("B","[1]","~d","~~no~index"))
       else if (p == 2)
-         legend = parse(text=paste("B","[1]","~d","~~no~index"))
-      else if (p == 3)
          legend = parse(text=paste("MSY~F","[msy]","~~indexed"))
       else
          legend = model
@@ -410,7 +409,7 @@ plot.biomass.array = function(path.list=c("./run-issams/r2/Q0/issams.rep",
       dev.set(biomass.dev)
    #  print(paste("tmp$indexed",tmp$indexed))
       plot.biomass(dat$t,y,sd=tmp$sdlogPop,K=dat$K, propL=dat$propL,
-                   forcing=dat$forcing,yrange=yrange,B1=tmp$B1,
+                   forcing=dat$forcing,B1=tmp$B1,#yrange=yrange)
                    indexed=tmp$indexed)
       legend(x="topleft",legend=legend,bty='n',cex=1.6)
 
@@ -523,4 +522,23 @@ make.fit.table = function(paths=c("./run-issams/r2/Q0/issams",
 
 
    return(fits)
+}
+
+
+print.error=function(y=0.486,sd=0.8,mult=2)
+{
+   #  sdyu = exp(log(y)+mult*sd)
+   #  sdyl = exp(log(y)-mult*sd)
+   yu = exp(log(y)+mult*sd)
+   yl = exp(log(y)-mult*sd)
+
+   print(paste(y,sd,yl,yu))
+#  xx = seq(y/5,y*5,0.01)
+   xx = seq(0.01,2.5,0.01)
+#  print(xx)
+   yy = dnorm(log(xx),mean=log(y),sd=sd)
+   plot(xx,yy,type='l')
+   abline(v=y,col="blue")
+   abline(v=yl,col="blue",lty="dotdash")
+   abline(v=yu,col="blue",lty="dotdash")
 }

@@ -436,7 +436,8 @@ PROCEDURE_SECTION
      obs(t,U(Fndxl(t),Fndxu(t)),U(utPop+t-1),U(utPop+t), logsdlogYield,Lpcon);
   }
 
-  if ((use_r_prior) && active(logr) )
+  //if ((use_r_prior) && active(logr) )
+  if (use_r_prior)
   {
      dvariable nll_r = 0.5*(log(TWO_M_PI*varr_prior) + square(logr - logr_prior)/varr_prior);
      nll += nll_r;
