@@ -8,9 +8,10 @@ fi
 WD=$PWD
 echo $WD
 #
-cd "./run-"$1/$2
+cd $HOME/xssa"/run-"$1/$2
 echo "Entering "$PWD
-$WD/ADMB/admb-clean.sh $1  
+#$WD/ADMB/admb-clean.sh $1  
+$HOME/xssa/ADMB/admb-clean.sh $1  
 $1 -noinit -shess -iprint 1 -nr 10 &> $1.out
 #ls -lrt
 cd $WD

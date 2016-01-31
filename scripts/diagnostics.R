@@ -325,27 +325,29 @@ get.diagnostics=function(log,ntime=61,dt=1,ngear=5,block=NULL,mtype)
 #                                         "./run-xssams/1/xssams.rep"),
 #                             ntime=61,dt=1,ngear=5,mtype=c("i","i","i","i","x"))
 plot.biomass.array = function(path.list=c("./run-issams/r2/Q0/issams.rep",
-           "./run-issams/r2/Q1/issams.rep"),
-           ntime=61,dt=1,ngear=5,mtype=c("i","i"))
+           "./run-issams/r2/Q1/issams.rep",
+           "./run-issams-dev/r2/Q0/issams-dev.rep",
+           "./run-issams-dev/r2/Q1/issams-dev.rep"),
+           ntime=61,dt=1,ngear=5,mtype=c("i","i","i","i"))
 {
    npath = length(path.list)
    print(npath)
-   width = 9.0
-   height = 11.0
-   yrange=c(0,30000)
+   width = 15.0
+   height = 9.0
+#  yrange=c(0,30000)
    start.year = 1952
 
    old.par = par(no.readonly = TRUE,"new"=FALSE) 
 
    x11(width=width,height=height,title="Biomass",xpos=100)
-   par(mar=c(3,4.5,0,5)+0.1,"new"=FALSE)
-   lm = layout(matrix(c(1:npath),ncol=1,byrow=TRUE))
+   par(mar=c(3,5,0,4)+0.1,"new"=FALSE)
+   lm = layout(matrix(c(1:npath),ncol=2,byrow=FALSE))
    layout.show(lm)
    biomass.dev = dev.cur()
 
    x11(width=width,height=height,title="Production",xpos=200)
    par(mar=c(4,4.5,0,0)+0.1,"new"=FALSE,las=1)
-   lm = layout(matrix(c(1:npath),ncol=1,byrow=TRUE))
+   lm = layout(matrix(c(1:npath),ncol=2,byrow=FALSE))
    layout.show(lm)
    prod.dev = dev.cur()
 
@@ -366,11 +368,13 @@ plot.biomass.array = function(path.list=c("./run-issams/r2/Q0/issams.rep",
    #  else
    #     legend = model
       if (p == 1)
-         legend = parse(text=paste("MSY~F","[msy]","~~no~index"))
-   #  else if (p == 2)
-   #     legend = parse(text=paste("B","[1]","~d","~~no~index"))
+         legend = parse(text=paste("A.~MSY~F","[msy]","~~no~index"))
       else if (p == 2)
-         legend = parse(text=paste("MSY~F","[msy]","~~indexed"))
+         legend = parse(text=paste("C.~MSY~F","[msy]","~~indexed"))
+      else if (p == 3)
+         legend = parse(text=paste("B.~B","[1]","~d","~~no~index"))
+      else if (p == 4)
+         legend = parse(text=paste("D.~B","[1]","~d","~~indexed"))
       else
          legend = model
 
@@ -408,8 +412,9 @@ plot.biomass.array = function(path.list=c("./run-issams/r2/Q0/issams.rep",
 
       dev.set(biomass.dev)
    #  print(paste("tmp$indexed",tmp$indexed))
+      yrange = c(0,1.2*max(y,na.rm=TRUE,dat$K))
       plot.biomass(dat$t,y,sd=tmp$sdlogPop,K=dat$K, propL=dat$propL,
-                   forcing=dat$forcing,B1=tmp$B1,#yrange=yrange)
+                   forcing=dat$forcing,B1=tmp$B1,yrange=yrange,
                    indexed=tmp$indexed)
       legend(x="topleft",legend=legend,bty='n',cex=1.6)
 
@@ -442,15 +447,17 @@ plot.biomass.array = function(path.list=c("./run-issams/r2/Q0/issams.rep",
 
 
 
-make.fit.table = function(paths=c("./run-issams/r2/Q0/issams",
-           "./run-issams-dev/r2/Q0/issams-dev",
-           "./run-issams/r2/Q1/issams",
-           "./run-issams-dev/r2/Q1/issams-dev"))
+make.fit.table = function(paths=c("./run-issams/NO_r_prior/r2/Q0/issams",
+           "./run-issams-dev/NO_r_prior/r2/Q0/issams-dev",
+           "./run-issams/NO_r_prior/r2/Q1/issams",
+           "./run-issams-dev/NO_r_prior/r2/Q1/issams-dev"))
 {
 #  anames=c("alogB1", "alogdB1K", "aB1", "adB1K", "aMSY", "aFmsy", "alogr",
 #           "ar", "aK", "asdlogProc", "asdlogYield", "aQ", "alogQ", "apcon")
    anames=c("aB1", "adB1K", "aMSY", "aFmsy", "ar", "aK", 
              "asdlogProc", "asdlogYield", "aQ","aT12","aT21")
+   tnames=c("$B_1$", "$d$", "$\\MSY$", "$\\Fmsy$", "$r$", "$K$", 
+             "$\\sigma_P$", "$\\sigma_Y$", "$Q$","$T_{12}$","$T_{21}$")
    nnames = length(anames)
 #  indexing=c("Q0","Q1")
 #  models=c("issams","issams-dev")
@@ -461,7 +468,7 @@ make.fit.table = function(paths=c("./run-issams/r2/Q0/issams",
 #          "./run-issams-dev/r2/Q1/issams-dev",
 #          "./run-xssams/r2/xssams")
 
-   varnames=c("n","nll","gmax",anames)
+   varnames=c("$n$","$-\\log L$","$|G|_{max}$",tnames)
    fits = matrix(ncol=length(paths),nrow=length(varnames))
    rownames(fits) = varnames
    
@@ -482,7 +489,7 @@ make.fit.table = function(paths=c("./run-issams/r2/Q0/issams",
          print(par.file)
          par = scan(file=par.file,what="character")
          npar = as.numeric(par[6])
-         nll  = as.numeric(par[11])
+         nll  = -1*as.numeric(par[11])
          gmax = as.numeric(par[16])
          print(paste(npar,nll,gmax))
       #  fits[1,mm] = m
