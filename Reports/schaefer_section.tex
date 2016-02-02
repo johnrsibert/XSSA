@@ -15,27 +15,29 @@ and $F$ is the instantaneous rate of removal due to fishing ($t^{-1}$).
 Equation (\ref{eqn:sschaefer}) reduces to the logistic model
 if $F$ is assumed to be zero.
 Logistic models are usually integrated numerically with
-``explict'' finite difference methods to compute an approximation 
+``explicit'' finite difference methods to compute an approximation 
 of the value of $N$ at some (future) time. 
-Such approximations are often unstable for 
-values of $r$ large relative to the time step used in the finite
-difference solution.
-The performance of estimation methods in which logistic models
-are embedded in a statistical procedure depending on numerical function
-minimizers, i.e, models build using ADMB, TMB and BUGS,
-is greatly improved in accuracy, speed and use of
-computing resources if analytical solutions are used in preference
+Such approximations are often unstable for values of $r$ large
+relative to the time step used in the finite difference solution.
+Statistical procedure depending on numerical function
+minimizers, i.e, models built using ADMB, TMB and BUGS,
+do not perform well in the face of numerical instabilities in solving
+differential equations.
+The accuracy, speed, and use of computing resources of 
+estimation methods involving logistic models are
+greatly improved analytical solutions can be used in preference
 to finite difference approximations. 
 
 \subsection{Single population}
-The integral of the logistic differential equation can be found is
+The integral of the logistic differential equation can be found in
 several places;
 Murray (1993), Quinn and Deriso (1999).
 Numerous mathematics tutorials are available on the World Wide Web
 that use
 integration of the logistic differential equation as an exercise to
 illustrate the technique of integration by partial fractions.
-The same procedure can be applied to the Schaefer ODE.
+The same procedure can be applied to the Schaefer differential
+equation.
 Equation~(\ref{eqn:sschaefer}) is rearranged and variables
 separated to become
 \begin{equation}
@@ -93,7 +95,7 @@ The basic equations can be written
 \label{eqn:xschaefer2}
 \frac{d\Ntwo}{dt}&=&\Ntwo\Big(r-F-T_{12}-2q\frac{r}{K}\None-\frac{r}{K}\Ntwo\Big)+T_{21}
 \end{eqnarray}
-where $\None$ the biomass of fish originating in region~1
+where $\None$ is the biomass of fish originating in region~1
 and residing in region~1,
 and $\Ntwo$ is the biomass of fish originating in region~2
 but residing in region~1.
@@ -102,7 +104,7 @@ equation~(\ref{eqn:sschaefer}), and
 $T_{12}$ is the emigration rate from region~1 ($t^{-1}$), 
 $T_{21}$ is the rate of immigration of biomass from region~2 to
 region~1 in units of biomass per time,
-and $q;\; (0 < q < 1)$ partitions the mortality caused by ``competition''
+and $q\;(0 < q < 1)$ partitions the mortality caused by ``competition''
 between the two subpopulations.
 Substitute
 \begin{eqnarray}
