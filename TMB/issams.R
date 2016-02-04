@@ -1,3 +1,5 @@
+print(" ",quote=FALSE)
+print("##############################################",quote=FALSE)
 require(TMB)
 compile("issams.cpp",flags="-O0 -g",safebounds=TRUE,safeunload=TRUE)
 dyn.load(dynlib("issams"))
@@ -43,7 +45,6 @@ ntime=data$ntime
 data$dt = get.numeric.field()
 print(paste(nobs.gear,ntime,data$dt))
 tcatch=matrix(nrow=nobs.gear,ncol=ntime)
-#data$obs.catch=matrix(nrow=nobs.gear,ncol=ntime)
 print(dim(data$obs.catch))
 for (g in 1:nobs.gear)
 {
@@ -76,7 +77,13 @@ while (nzero > 0)
 print(paste("Zero catch bridging instances:", nzero))
 ZeroCatch = 1.0
 data$obs_catch = t(log(tcatch+ZeroCatch))
-
+data$first_year = vector(length=nobs.gear)
+data$last_year = vector(length=nobs.gear)
+for (g in 1:nobs.gear)
+{
+   data$first_year[g] = 0
+   data$last_year[g] = ntime-1
+}
 
 forcing.matrix=matrix(nrow=9,ncol=data$ntime)
 for (r in 1:9)
@@ -120,13 +127,13 @@ phases = c(phases,data$phase_sdlogYield)
 data$init_sdlogYield = get.numeric.field()
 
 data$use_Q = get.numeric.field()
-data$phase.Q = get.numeric.field()
-phases = c(phases,data$phase_qProp)
+data$phase_Q = get.numeric.field()
+phases = c(phases,data$phase_Q)
 data$init_Q = get.numeric.field()
 
 data$use_robustY = get.numeric.field()
 data$phase_pcon = get.numeric.field()
-phases = c(phases,data$phase_pcon)
+#phases = c(phases,data$phase_pcon)
 data$init_pcon = get.numeric.field()
 
 print(paste(field.counter,"input fields processed"))
@@ -137,69 +144,50 @@ data$lengthU = ntime*(nobs.gear+1)
 data$Fndxl = seq(0,(ntime-1)*(nobs.gear),nobs.gear)
 data$Fndxu = data$Fndxl+(nobs.gear-1) 
 data$utPop = nobs.gear*ntime - 1
-
+if (!data$use_robustY)
+{
+   data$phase_pcon = -1;
+   data$init_pcon = 1e-25
+}
+data$Lpcon = logit(data$init_pcon)
 
 parameters = list(
   logFmsy = log(data$init_Fmsy),
   logMSY = log(data$init_MSY),
   logsdlogProc = log(data$init_sdlogProc),
   logsdlogYield = log(data$init_sdlogYield),
-  logQ = log(data$init_Q),
-  Lpcon = data$init_pcon
+  logQ = log(data$init_Q)
 )
-
-if (!data$use_robustY)
-{
-   data$phase_pcon = -1;
-   data$init_pcon = 1e-25
-}
-parameters$Lpcon = logit(data$init_pcon)
-
-print(data)
-print(parameters)
-
 parameters$U=rep(0.0,data$lengthU)
 
-phases=unlist(phases) # phase flag for each parameter
-nap = length(phases)  # number of parameters
-print(paste("number of parameters:",nap))
-nphase = max(phases)  # number of phases
-print(paste("number of phases",nphase))
-fit.par=vector(length=nphase) # parameters estimates from each fit
-
-for (p in 1:nphase) # loop through phases
-{
-   map = list() # name list of factors
-   nip = 0
-   for (n in 1:nap) # loop through parameters
+r = 2.0*data$init_Fmsy
+logK = log(4.0*data$init_MSY/r)
+ut = 0;
+for (t in 1:ntime)
+{   
+   for (g in 1:data$ngear)
    {
-      # check phase flag for this parameter
-      if ((phases[n] == -1) || (phases[n] > p))
-      {
-         map.entry = parameters[n]
-         map = c(map,map.entry)
-         nip = nip+1
-	 map[[nip]]=rep(factor(NA),length(parameters[[n]]))
-      }
+      ut = ut + 1
+      parameters$U[ut] =  -5.0
    }
-   print(paste("----------phase",p))
-   print(map)
-#  build model for active parameters, omiting thos in map
-   if (p == 1)
-   {
-      obj = MakeADFun(data,parameters,map=map,random=c("U"),DLL="issams")
-   }
-   else
-   {
-      obj = MakeADFun(data,opt.par[p-1],map=map,random=c("U"),DLL="issams")
-   }
-   lower <- obj$par*0-Inf
-   upper <- obj$par*0+Inf
-   opt = nlminb(obj$par,obj$fn,obj$gr,lower=lower,upper=upper)
-   # save parameter estimates for use in next fit
-   opt.par[p] = obj$env$parList(opt$par) 
+}
+for (t in 1:ntime)
+{   
+   ut = ut + 1
+   parameters$U[ut] = logK
 }
 
-#system.time(opt<-nlminb(obj$par,obj$fn,obj$gr,lower=lower,upper=upper))
-#rep<-sdreport(obj)
-#rep
+print("data:")
+print(data)
+print("starting parameters:")
+print(paste("number of parameters",length(parameters)))
+print(names(parameters))
+#print(parameters)
+
+print("^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^",quote=FALSE)
+obj = MakeADFun(data,parameters,random=c("U"),DLL="issams")
+
+opt = nlminb(obj$par,obj$fn,obj$gr)
+print("opt:")
+print(opt)
+
