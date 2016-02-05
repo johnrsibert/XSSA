@@ -225,16 +225,17 @@ LL.join=function(hdar=NULL,noaa=NULL,yr1=1952,yr2=2012)
    x11(width=width,height=height)
    par(mar=c(2.5,4,0,0)+0.1)
 #  par(mar=c(5  ,4,4,2)+0.1)
-   np = ncol(adat)
+   np = ncol(adat)+1
    lm <- layout(matrix(c(1:np),ncol=1,byrow=TRUE))
    layout.show(lm)
    yrange=c(0,max(adat,na.rm=TRUE))
-
    for (j in 1:ncol(adat))
    {
-      nice.ts.plot(ya,adat[,j],lwd=3,label=colnames(dat)[j],
+      nice.ts.plot(ya,adat[,j],lwd=5,label=colnames(dat)[j],
                    ylab="Catch (mt)",ylim=yrange)
    }
+   nice.ts.plot(ya,rowSums(adat),lwd=5,label="Total",
+                   ylab="Catch (mt)")
 
    save.png.plot(paste(ncol(adat),"_gear_catch_history_a",sep=""),width=width,height=height)
 
@@ -253,15 +254,19 @@ LL.join=function(hdar=NULL,noaa=NULL,yr1=1952,yr2=2012)
          region.biomass.a[j,i] = sum(region.biomass.q[j,wy],na.rm=TRUE)
       }
    }
-   fr = 2
-   x11()
-   nice.ts.plot(yy,1e-3*region.biomass.q[fr,],ylab=paste("Region",fr,"Biomass (1000 mt)"))
-   points(yy,region.biomass.q[fr,],pch=16,col="blue")
-   x11()
-   options(scipen=6)
-   nice.ts.plot(ya,1e-3*region.biomass.a[fr,],ylab=paste("Region",fr,"Biomass (1000 mt)"))
+#  fr = 2
+   for (fr in c(2,4))
+   {
+      x11()
+      nice.ts.plot(yy,1e-3*region.biomass.q[fr,],ylab=paste("Region",fr,"Biomass (1000 mt)"))
+      points(yy,region.biomass.q[fr,],pch=16,col="blue")
+ 
+      x11()
+      options(scipen=6)
+      nice.ts.plot(ya,1e-3*region.biomass.a[fr,],ylab=paste("Region",fr,"Biomass (1000 mt)"))
 #  points(ya,region.biomass.a[fr,],pch=16,col="blue")
-   save.png.plot(paste("annual_region_",fr,"_biomass",sep=""))
+      save.png.plot(paste("annual_region_",fr,"_biomass",sep=""))
+   }
 
    bio.file = "../run/total_biomass_a.dat"
    print(paste("writing",bio.file))

@@ -324,10 +324,10 @@ get.diagnostics=function(log,ntime=61,dt=1,ngear=5,block=NULL,mtype)
 #                                         "./run-issams-dev/r2/Q1/issams-dev.rep",
 #                                         "./run-xssams/1/xssams.rep"),
 #                             ntime=61,dt=1,ngear=5,mtype=c("i","i","i","i","x"))
-plot.biomass.array = function(path.list=c("./run-issams/r2/Q0/issams.rep",
-           "./run-issams/r2/Q1/issams.rep",
-           "./run-issams-dev/r2/Q0/issams-dev.rep",
-           "./run-issams-dev/r2/Q1/issams-dev.rep"),
+plot.biomass.array = function(path.list=c("./run-issams/use_r_prior/r2/Q0/issams.rep",
+           "./run-issams/use_r_prior/r2/Q1/issams.rep",
+           "./run-issams-dev/use_r_prior/r2/Q0/issams-dev.rep",
+           "./run-issams-dev/use_r_prior/r2/Q1/issams-dev.rep"),
            ntime=61,dt=1,ngear=5,mtype=c("i","i","i","i"))
 {
    npath = length(path.list)
