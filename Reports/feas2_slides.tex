@@ -87,39 +87,58 @@ Part Deux}
 \end{center}
 \end{slide}
 
-\begin{slide}\section{Biomass Estimates for MFCL Regions}
+\begin{slide}\section{WCPFC Stock Assessments}
 \label{fig:MFCL2}
 \begin{center}
 \begin{tabular}{cc}
-Region 2 & Region 4\\
+MFCL Region 2 & MFCL Region 4\\
 \includegraphics[width=0.45\textwidth]{./graphics/annual_region_2_biomass.pdf}&
 \includegraphics[width=0.45\textwidth]{./graphics/annual_region_4_biomass.pdf}\\
 \end{tabular}
 \end{center}
 \end{slide}
 
-\begin{slide}\section{Questions:}
+\begin{slide}\section{Feasibility questions}
 \begin{enumerate}
 \item Can we contrive a simple model of the MHI YFT population and
 fishery?
-\item Are the parameters of the model estimable from the data?
-\item Are the data informative about the stock biomass?
+\item Can the model parameters be estimated from the data?
+\item Are the model biomass estimates plausible?
 \end{enumerate}
 \end{slide}
 
-\begin{slide}\section{The principle model assumptions}
+\begin{slide}\section{Principle model assumptions}
 \begin{enumerate}
 \item The dynamics of the population of YFT in the MHI follows a
 simple Schaefer model.
-\item Fishing mortality is represented by a random walk (Nielsen and
-Berg, 2014).
-\item The local dynamics are forced by assuming that the local
-abundance is {\bfseries approximately proportional} to some index population.
-\item Annual catch by gear is the product of estimated fishing mortality
-of each gear and average biomass during a year.
+\item Fishing mortality is represented by a random walk.
+\item Predicted catch by gear is the product of estimated fishing mortality
+for each gear and average predicted biomass during a year.
+\item Optional use of MFCL biomass estimate as index of abundance so
+that local abundance is {\bfseries approximately proportional} to the
+index biomass.
 \end{enumerate}
 \end{slide}
 
+\begin{slide}\section{Technical features}
+\begin{enumerate}
+\item Fishing mortality and biomass are random effects.
+\item Process errors associated with population growth, fishing
+mortality random walk, and biomass index proportionality are assumed
+to be equal and represented by a single parameter $(\sigma_P)$.
+\item Two alternate logistic model parameterizations:
+\begin{enumerate}
+\item $K = \frac{4\MSY}{r};\quad r = 2\Fmsy$
+\item $K = d\cdot B_1$
+\end{enumerate}
+\item Zero-inflated log-normal catch likelihood.
+\item Optional log-normal prior on $r$ with 
+$\tilde{r} = 0.486$ and $\sigma_r = 0.8$,
+% (Carruthers and McAllister, 2011).
+\item Analytic solution to Schaefer ODE for stable propagation
+through time.
+\end{enumerate}
+\end{slide}
 \begin{slide}\section{Estimabilty}
 {\scriptsize
 \label{tag:ests4}
@@ -127,7 +146,8 @@ of each gear and average biomass during a year.
 \begin{tabular}{|ll|rr|rr|}
 \hline
 Index && \multicolumn{2}{c|}{None}&\multicolumn{2}{c|}{MFCL 2}\\
-\cline{3-4}\cline{5-6}
+%\cline{3-4}\cline{5-6}
+\hline
 Parameterization&&$\MSYFmsy$&$\Bd$&$\MSYFmsy$&$\Bd$\\
 Designation&& A & B& C& D\\
 \hline
@@ -210,12 +230,12 @@ $Q$ & --- & --- & 0.073752 & ---\\
 \end{center} }
 \end{slide}
 
-\begin{slide}\section{Alternate forcing; MFCL Region 4}
+\begin{slide}\section{Alternate forcing: MFCL Region 4}
 \label{fig:estr4}
 \begin{center}
 \begin{tabular}{lr}
-\includegraphics[width=0.45\textwidth]{./graphics/est_popB1.pdf}&
-\includegraphics[width=0.45\textwidth]{./graphics/est_FB1.pdf}\\
+\includegraphics[width=0.45\textwidth]{./graphics/r4_est_popB1.pdf}&
+\includegraphics[width=0.45\textwidth]{./graphics/r4_est_FB1.pdf}\\
 \end{tabular}
 \end{center}
 \end{slide}
