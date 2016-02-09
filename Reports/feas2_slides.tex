@@ -83,7 +83,8 @@ Part Deux}
 
 \begin{slide}\section{Combined HDAR and NOAA Catch Time Series}
 \begin{center}
-\includegraphics[height=0.8\textheight]{./graphics/5_gear_catch_history_a.pdf}
+\includegraphics[height=0.8\textheight]{./graphics/5_gear_catch_history_a.pdf}\\
+\color{red}{No Recreational Data}\normalcolor
 \end{center}
 \end{slide}
 
@@ -104,6 +105,7 @@ MFCL Region 2 & MFCL Region 4\\
 fishery?
 \item Can the model parameters be estimated from the data?
 \item Are the model biomass estimates plausible?
+\item Can the model results be used in alphabet soup?
 \end{enumerate}
 \end{slide}
 
@@ -137,6 +139,9 @@ $\tilde{r} = 0.486$ and $\sigma_r = 0.8$,
 % (Carruthers and McAllister, 2011).
 \item Analytic solution to Schaefer ODE for stable propagation
 through time.
+\item All computer code, data files, and draft reports in support of this
+analysis can be found at Github:
+\url{https://github.com/johnrsibert/XSSA.git}.
 \end{enumerate}
 \end{slide}
 \begin{slide}\section{Estimabilty}
@@ -148,20 +153,21 @@ through time.
 Index && \multicolumn{2}{c|}{None}&\multicolumn{2}{c|}{MFCL 2}\\
 %\cline{3-4}\cline{5-6}
 \hline
-Parameterization&&$\MSYFmsy$&$\Bd$&$\MSYFmsy$&$\Bd$\\
-Designation&& A & B& C& D\\
+\multicolumn{2}{|c|}{Parameterization}&$\MSYFmsy$&$\Bd$&$\MSYFmsy$&$\Bd$\\
+\multicolumn{2}{|c|}{Designation}& A & B& C& D\\
 \hline
 \hline
-$n$ & &4 & 5 & 5 & 6\\
-$-\log L$& & -237.238 & -237.968 & -247.175 & -243.343\\
-$|G|_{max}$& & 0.0016409 & 33.1289 & 3.51082e-05 & 3.77653\\
+$|G|_{max}$& Gradient at Minimum & 0.0016409 & 33.1289 & 3.51082e-05 & 3.77653\\
+$n$ & Estimated Parameters &4 & 5 & 5 & 6\\
+$-\log L$& Likelihood & -237.238 & -237.968 & -247.175 & -243.343\\
+AIC & Akaike Criterion & -466.476 & -465.936 & -484.35 & -474.686\\
 \hline
 $B_1$& Initial Biomass & --- & 1184.2 & --- & 2802.3\\
 $d$ &$K=dB_1$ & --- & 9.6674 & --- & 2.6348\\
-$\MSY$& MSY & 1147.5 & 1199.3 & 1288.7 & 1032.6\\
-$\Fmsy$& F at MSY & 0.82239 & 0.20952 & 0.1668 & 0.2797\\
-$r$& Growth Rate & 1.6448 & 0.41904 & 0.3336 & 0.5594\\
-$K$& Equilibrium Biomass & 2790.8 & 11448 & 15452 & 7383.5\\
+$\MSY$& MSY & 1147.5 & (1199.3) & 1288.7 & (1032.6)\\
+$\Fmsy$& F at MSY & 0.82239 & (0.20952) & 0.1668 & (0.2797)\\
+$r$& Growth Rate & (1.6448) & 0.41904 & (0.3336) & 0.5594\\
+$K$& Equilibrium Biomass & (2790.8) & (11448) & (15452) & (7383.5)\\
 $\sigma_P$& Process Error & 0.37416 & 0.36757 & 0.2743 & 0.2649\\
 $\sigma_Y$& Observation Error & 0.41693 & 0.43062 & 0.46924 & 0.47614\\
 $Q$& Index Proportionality  & --- & --- & 0.04321 & 0.016535\\
@@ -238,6 +244,34 @@ $Q$ & --- & --- & 0.073752 & ---\\
 \includegraphics[width=0.45\textwidth]{./graphics/r4_est_FB1.pdf}\\
 \end{tabular}
 \end{center}
+\end{slide}
+
+\begin{slide}\section{Conclusions}
+\begin{enumerate}
+\item Yellowfin catch data from fleets operating in the Main Hawaiian
+Islands waters are sufficiently informative to estimate relative
+biomass trends.
+\item An index of abundance is required to estimate absolute biomass,
+but absolute estimates are sensitive to the choice of index
+population.
+\item Representing trends in fishing mortality as a random walk is a
+convenient and effective approach to accounting for the removal of
+biomass from the fish population.
+\item The Bayesian prior on $r$ is difficult to assign and probably not required.
+\end{enumerate}
+\end{slide}
+
+\begin{slide}\section{Next Steps?}
+\begin{enumerate}
+\item Technical review of model, including statistical assumptions,
+and computing methods.
+\item Compare these results to Catch-MSY analysis. 
+\item Review previous uses of production models in tuna fisheries.
+\item Test alternative biomass indices, including MHI-specific
+SEAPODYM estimates.
+\item Work within WCPFC assessment process to improve applicability of
+WCPFC stock assessments to local requirements.
+\end{enumerate}
 \end{slide}
 
 \end{document}

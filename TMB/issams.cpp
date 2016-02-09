@@ -1,5 +1,6 @@
-//#include "trace.h"
 #include <TMB.hpp>
+#include "trace.h"
+#include <math.h>
 const double TWO_M_PI = 2.0*M_PI;
 const double LOG_M_PI = log(M_PI);
 const double logZeroCatch = 1.0;
@@ -121,8 +122,6 @@ template < class Type > Type objective_function < Type >::operator()()
    REPORT(r);
    Type K = 4.0*mfexp(logMSY)/(1.0e-20+r);
    REPORT(K)
-   Type shit = r*K;
-   REPORT(shit)
    //TTRACE(r,K)
    Type p10 = log(K);
    Type p11 = U(utPop+1);
@@ -132,6 +131,8 @@ template < class Type > Type objective_function < Type >::operator()()
    //TTRACE(logsdlogProc,varlogPop)
    Type Pnll = 0.0;
    Pnll += 0.5*(log(TWO_M_PI*varlogPop) + square(p10 - p11)/varlogPop);
+   if (isnan(value(Pnll)))
+       TRACE(Pnll)
    nll += Pnll;
    //TRACE(nll)
 
@@ -139,19 +140,24 @@ template < class Type > Type objective_function < Type >::operator()()
    if (use_Q)
    {
       Type varlogQ = square(mfexp(logsdlogProc));
+      TRACE(varlogQ)
       //TTRACE(logsdlogProc,varlogQ)
       Type logib = logQ + log(immigrant_biomass(0));
+      TTRACE(logib,p11)
       Qnll += 0.5*(log(TWO_M_PI*varlogQ) + square(logib-p11)/varlogQ);
+      if (isnan(value(Qnll)))
+         TRACE(Qnll)
    }
-   //TTRACE(nll,Qnll)
+   TTRACE(nll,Qnll)
    nll += Qnll;
-   //TRACE(nll)
+   TRACE(nll)
 
 
  //for (int t = 2; t <= ntime; t++)
    for (int t = 1; t < ntime; t++)
  //for (int t = 1; t < 2; t++)
    {
+      //TTRACE(t,nll)
       //step(t, U(Fndxl(t-1),Fndxu(t-1)), U(Fndxl(t),Fndxu(t)),
       //        U(utPop+t-1), U(utPop+t), logsdlogProc,
       //        logFmsy, logMSY, logQ);
@@ -192,6 +198,7 @@ template < class Type > Type objective_function < Type >::operator()()
    
          if (isnan(value(Fnll)))
          {
+            TRACE(Fnll)
             //write_status(clogf);
             exit(1);
             //return(Fnll);
@@ -211,12 +218,14 @@ template < class Type > Type objective_function < Type >::operator()()
       if ( isnan(value(nextLogN)) )
       {
           //write_status(clogf);
-         return(nextLogN);
+          TRACE(nextLogN) 
       }
    
       Type Pnll = 0.0;
       //Pnll += 0.5*(log(TWO_M_PI*varlogPop) + square(p12-nextLogN)/varlogPop);
       Pnll += 0.5*(log(TWO_M_PI*varlogPop) + square(U(utPop+t)-nextLogN)/varlogPop);
+      if (isnan(value(Pnll)))
+         TRACE(Pnll)
       //TTRACE(Fnll,Pnll) 
       nll += (Fnll+Pnll);
       //TTRACE(t,nll)
@@ -226,6 +235,8 @@ template < class Type > Type objective_function < Type >::operator()()
          Type varlogQ = square(mfexp(logsdlogProc));
          Type logib = logQ + log(immigrant_biomass(t));
          Qnll += 0.5*(log(TWO_M_PI*varlogQ) + square(logib-nextLogN)/varlogQ);
+         if (isnan(value(Qnll)))
+            TRACE(Qnll)
          nll += Qnll;
       }
    } //for (int t = 1; t < ntime; t++)
@@ -302,6 +313,8 @@ template < class Type > Type objective_function < Type >::operator()()
               {
                  Ynll += pzero*0.5*(log(TWO_M_PI*varlogYield));
               }
+              if (isnan(value(Ynll)))
+                 TRACE(Ynll)
            }
 
            else // default normal likelihood
@@ -329,11 +342,13 @@ template < class Type > Type objective_function < Type >::operator()()
       Type logr = log(2.0)+logFmsy;
       Type nll_r = 0.5*(log(TWO_M_PI*varr_prior) + square(logr - logr_prior)/varr_prior);
       nll += nll_r;
+      if (isnan(value(nll_r)))
+         TRACE(nll_r)
    }
-   //TRACE(nll)
+   TRACE(nll)
 
    REPORT(nll);
-   //HERE
+   HERE
    return nll;
 }
 

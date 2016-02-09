@@ -447,10 +447,10 @@ plot.biomass.array = function(path.list=c("./run-issams/use_r_prior/r2/Q0/issams
 
 
 
-make.fit.table = function(paths=c("./run-issams/NO_r_prior/r2/Q0/issams",
-           "./run-issams-dev/NO_r_prior/r2/Q0/issams-dev",
-           "./run-issams/NO_r_prior/r2/Q1/issams",
-           "./run-issams-dev/NO_r_prior/r2/Q1/issams-dev"))
+make.fit.table = function(paths=c("./run-issams/use_r_prior/r2/Q0/issams",
+           "./run-issams-dev/use_r_prior/r2/Q0/issams-dev",
+           "./run-issams/use_r_prior/r2/Q1/issams",
+           "./run-issams-dev/use_r_prior/r2/Q1/issams-dev"))
 {
 #  anames=c("alogB1", "alogdB1K", "aB1", "adB1K", "aMSY", "aFmsy", "alogr",
 #           "ar", "aK", "asdlogProc", "asdlogYield", "aQ", "alogQ", "apcon")
@@ -468,7 +468,12 @@ make.fit.table = function(paths=c("./run-issams/NO_r_prior/r2/Q0/issams",
 #          "./run-issams-dev/r2/Q1/issams-dev",
 #          "./run-xssams/r2/xssams")
 
-   varnames=c("$n$","$-\\log L$","$|G|_{max}$",tnames)
+# AIC = -2 ln L +2p and BIC = -2 ln L + p ln(n) 
+# p = number of parameters
+# n = number of observations
+
+
+   varnames=c("$n$","$-\\log L$","$|G|_{max}$","AIC",tnames)
    fits = matrix(ncol=length(paths),nrow=length(varnames))
    rownames(fits) = varnames
    
@@ -491,13 +496,15 @@ make.fit.table = function(paths=c("./run-issams/NO_r_prior/r2/Q0/issams",
          npar = as.numeric(par[6])
          nll  = -1*as.numeric(par[11])
          gmax = as.numeric(par[16])
+         AIC = 2*(npar - as.numeric(par[11]))
          print(paste(npar,nll,gmax))
       #  fits[1,mm] = m
       #  fits[2,mm] = Q
          fits[1,mm] = npar
          fits[2,mm] = nll
          fits[3,mm] = gmax
-         r = 3
+         fits[4,mm] = AIC
+         r = 4
 
 #  print(std.file)
          print(std.file)
