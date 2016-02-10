@@ -187,7 +187,8 @@ print(names(parameters))
 print("^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^",quote=FALSE)
 obj = MakeADFun(data,parameters,random=c("U"),DLL="issams")
 
-opt = nlminb(obj$par,obj$fn,obj$gr)
-print("opt:")
+cont.list=list(trace=1,abs.tol=1e-3,rel.tol=1e-3)
+opt = nlminb(obj$par,obj$fn,obj$gr,control=cont.list)
+print("opt ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^",quote=FALSE)
 print(opt)
 

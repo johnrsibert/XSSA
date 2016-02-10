@@ -43,57 +43,84 @@ template < class Type > Type alogit(const Type & a)
 template < class Type > Type objective_function < Type >::operator()()
 {
    DATA_INTEGER(ngear);
-   //TRACE(ngear)
+   REPORT(ngear)
    DATA_INTEGER(ntime);
+   REPORT(ntime);
    DATA_SCALAR(dt);
+   REPORT(dt)
    Type logdt = log(dt);
+   REPORT(logdt)
    DATA_MATRIX(obs_catch);
-   //std::cout << obs_catch << "\n\n";
+   REPORT(obs_catch);
    DATA_INTEGER(fr);
+   REPORT(fr)
    DATA_VECTOR(immigrant_biomass);
+   REPORT(immigrant_biomass);
    DATA_INTEGER(use_mean_forcing);
+   REPORT(use_mean_forcing);
    DATA_INTEGER(phase_Fmsy);
+   REPORT(phase_Fmsy);
    DATA_SCALAR(init_Fmsy);
+   REPORT(init_Fmsy);
    DATA_INTEGER(use_r_prior);
+   REPORT(use_r_prior);
    DATA_SCALAR(logr_prior);
+   REPORT(logr_prior);
    DATA_SCALAR(varr_prior);
+   REPORT(varr_prior);
    DATA_INTEGER(phase_MSY);
+   REPORT(phase_MSY);
    DATA_SCALAR(init_MSY);
+   REPORT(init_MSY);
    DATA_INTEGER(phase_sdlogProc);
+   REPORT(phase_sdlogProc);
    DATA_SCALAR(init_sdlogProc);
+   REPORT(init_sdlogProc);
    DATA_INTEGER(phase_sdlogYield);
+   REPORT(phase_sdlogYield);
    DATA_SCALAR(init_sdlogYield);
+   REPORT(init_sdlogYield);
    DATA_INTEGER(use_Q);
+   REPORT(use_Q);
    DATA_SCALAR(init_Q);
+   REPORT(init_Q);
    DATA_INTEGER(use_robustY);
+   REPORT(use_robustY);
    DATA_INTEGER(phase_pcon);
-   DATA_VECTOR(init_pcon);
+   REPORT(phase_pcon);
    DATA_SCALAR(Lpcon)
-   //DATA_INTEGER(maxtime);
+   REPORT(Lpcon)
    DATA_INTEGER(lengthU);
+   REPORT(lengthU);
    DATA_IVECTOR(Fndxl);
+   REPORT(Fndxl);
    DATA_IVECTOR(Fndxu);
-   //TTRACE(Fndxl,Fndxu)
+   REPORT(Fndxu);
    DATA_INTEGER(utPop);
+   REPORT(utPop);
    DATA_IVECTOR(first_year);
-   //TRACE(first_year)
+   REPORT(first_year);
    DATA_IVECTOR(last_year);
-   //TRACE(last_year)
-   //TRACE(utPop)
+   REPORT(last_year)
 
    //PARAMETER_SECTION
    // logistic parameters
    PARAMETER(logFmsy);
+   REPORT(logFmsy);
    PARAMETER(logMSY);
+   REPORT(logMSY);
 
    // general process error standard deviations
    PARAMETER(logsdlogProc);
+   REPORT(logsdlogProc);
 
    // observation error standard deviations
    PARAMETER(logsdlogYield);
+   REPORT(logsdlogYield);
 
    // abundance index proportionality constant
    PARAMETER(logQ);
+   REPORT(logQ);
 
    // robust yield likelihood proportion contamination
    // PARAMETER(Lpcon); // in data
@@ -119,9 +146,7 @@ template < class Type > Type objective_function < Type >::operator()()
 
    // ensure that starting population size is near K
    Type r = 2.0*mfexp(logFmsy);
-   REPORT(r);
    Type K = 4.0*mfexp(logMSY)/(1.0e-20+r);
-   REPORT(K)
    //TTRACE(r,K)
    Type p10 = log(K);
    Type p11 = U(utPop+1);
@@ -131,26 +156,25 @@ template < class Type > Type objective_function < Type >::operator()()
    //TTRACE(logsdlogProc,varlogPop)
    Type Pnll = 0.0;
    Pnll += 0.5*(log(TWO_M_PI*varlogPop) + square(p10 - p11)/varlogPop);
+   //TTRACE(nll,Pnll)
    if (isnan(value(Pnll)))
        TRACE(Pnll)
    nll += Pnll;
    //TRACE(nll)
 
-   Type Qnll = 0.0;
    if (use_Q)
    {
+      Type Qnll = 0.0;
       Type varlogQ = square(mfexp(logsdlogProc));
-      TRACE(varlogQ)
-      //TTRACE(logsdlogProc,varlogQ)
       Type logib = logQ + log(immigrant_biomass(0));
-      TTRACE(logib,p11)
+      //TTRACE(logib,p11)
       Qnll += 0.5*(log(TWO_M_PI*varlogQ) + square(logib-p11)/varlogQ);
       if (isnan(value(Qnll)))
          TRACE(Qnll)
+      nll += Qnll;
+      //TTRACE(Qnll,nll)
    }
-   TTRACE(nll,Qnll)
-   nll += Qnll;
-   TRACE(nll)
+   //TRACE(nll)
 
 
  //for (int t = 2; t <= ntime; t++)
@@ -206,19 +230,20 @@ template < class Type > Type objective_function < Type >::operator()()
       } 
    
    
-      Type prevlogN = U(utPop+t-1); //p11;
-      Type prevN = mfexp(prevlogN);
+      Type prevLogN = U(utPop+t); //p11;
+      Type prevN = mfexp(prevLogN);
       Type rmF = r - sumFg;
       Type ermF = mfexp(-1.0*rmF);
       Type Krmf = K*rmF;
      //    S[t] = (K*(r-Fmort))/((((K*(r-Fmort))/S[t-1])*exp(-(r-Fmort))) - r*exp(-(r-Fmort))  + r) # p5
       Type nextN = Krmf/(((Krmf/prevN)*ermF) - r*ermF +r); // 5
       Type nextLogN = log(nextN);
+      TTRACE(prevLogN,nextLogN)
    
       if ( isnan(value(nextLogN)) )
       {
           //write_status(clogf);
-          TRACE(nextLogN) 
+          TTRACE(prevLogN,nextLogN)
       }
    
       Type Pnll = 0.0;
@@ -226,9 +251,10 @@ template < class Type > Type objective_function < Type >::operator()()
       Pnll += 0.5*(log(TWO_M_PI*varlogPop) + square(U(utPop+t)-nextLogN)/varlogPop);
       if (isnan(value(Pnll)))
          TRACE(Pnll)
-      //TTRACE(Fnll,Pnll) 
       nll += (Fnll+Pnll);
-      //TTRACE(t,nll)
+      //TTRACE(Pnll,nll) 
+      //TTRACE(Fnll,nll) 
+      TTRACE(t,nll)
       if (use_Q)
       {
          Type Qnll = 0.0;
@@ -238,6 +264,7 @@ template < class Type > Type objective_function < Type >::operator()()
          if (isnan(value(Qnll)))
             TRACE(Qnll)
          nll += Qnll;
+         //TTRACE(Qnll,nll)
       }
    } //for (int t = 1; t < ntime; t++)
    //HERE
@@ -251,8 +278,8 @@ template < class Type > Type objective_function < Type >::operator()()
      // f2  U(Fndxl(t),Fndxu(t)) 
      // pop11 U(utPop1+t-1)
      // pop21 U(utPop1+t)
-     Type pop11 = U(utPop+t-1);
-     Type pop21 = U(utPop+t);
+     Type pop11 = U(utPop+t);
+     Type pop21 = U(utPop+t+1);
 
      //dvar_vector ft(1,ngear); ///< log fishing mortality by gear
      //for (int g = 1; g <= ngear; g++)
@@ -330,8 +357,8 @@ template < class Type > Type objective_function < Type >::operator()()
          }
      }
 
-     //TTRACE(Ynll,nll)
      nll += Ynll;
+     //TTRACE(Ynll,nll)
 
 
    } //for (int t = 0; t < ntime; t++)
@@ -342,13 +369,11 @@ template < class Type > Type objective_function < Type >::operator()()
       Type logr = log(2.0)+logFmsy;
       Type nll_r = 0.5*(log(TWO_M_PI*varr_prior) + square(logr - logr_prior)/varr_prior);
       nll += nll_r;
+      TTRACE(nll_r,nll)
       if (isnan(value(nll_r)))
          TRACE(nll_r)
    }
-   TRACE(nll)
 
-   REPORT(nll);
-   HERE
    return nll;
 }
 

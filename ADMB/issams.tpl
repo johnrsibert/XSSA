@@ -255,6 +255,7 @@ DATA_SECTION
     TTRACE(prop_zero,tprop_zero)
 
     obs_catch = log(obs_catch+ZeroCatch);
+    TRACE(obs_catch)
   
     // set up U indexing
     Fndxl.allocate(1,ntime);
@@ -434,6 +435,7 @@ PROCEDURE_SECTION
      step(t, U(Fndxl(t-1),Fndxu(t-1)), U(Fndxl(t),Fndxu(t)),
              U(utPop+t-1), U(utPop+t), logsdlogProc,
              logFmsy, logMSY, logQ);
+     TTRACE(t,nll)
   }
 
   for (int t = 1; t <= ntime; t++)
@@ -449,7 +451,9 @@ PROCEDURE_SECTION
      dvariable logr = log(2.0)+logFmsy;
      dvariable nll_r = 0.5*(log(TWO_M_PI*varr_prior) + square(logr - logr_prior)/varr_prior);
      nll += nll_r;
+     TTRACE(nll_r,nll)
   }
+
   //if ((use_Fmsy_prior) && active(logFmsy) )
   //{
   //   dvariable nll_Fmsy = 0.5*(log(TWO_M_PI*varFmsy_prior) + square(logFmsy - logFmsy_prior)/varFmsy_prior);
@@ -552,6 +556,7 @@ SEPARABLE_FUNCTION void step(const int t, const dvar_vector& f1, const dvar_vect
   //    S[t] = (K*(r-Fmort))/((((K*(r-Fmort))/S[t-1])*exp(-(r-Fmort))) - r*exp(-(r-Fmort))  + r) # p5
   dvariable nextN = Krmf/(((Krmf/prevN)*ermF) - r*ermF +r); // 5
   dvariable nextLogN = log(nextN);
+  TTRACE(prevlogN,nextLogN)
 
   if ( isnan(value(nextLogN)) )
   {
@@ -682,6 +687,7 @@ SEPARABLE_FUNCTION void obs(const int t, const dvar_vector& f,const dvariable& p
   }
 
   nll += Ynll;
+  TTRACE(Ynll,nll)
 
   // dump stuff in "residual" matrix
   int rc = 0; // residuals column counter
