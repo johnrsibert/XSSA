@@ -142,8 +142,10 @@ print(paste(field.counter,"input fields processed"))
 data$lengthU = ntime*(nobs.gear+1)
 # set up U indexing starting at 0
 data$Fndxl = seq(0,(ntime-1)*(nobs.gear),nobs.gear)
+#data$Fndxl = seq(1,ntime*(nobs.gear),nobs.gear)
 data$Fndxu = data$Fndxl+(nobs.gear-1) 
-data$utPop = nobs.gear*ntime - 1
+#data$utPop = nobs.gear*ntime
+data$utPop = data$Fndxu[length(data$Fndxu)]+1
 if (!data$use_robustY)
 {
    data$phase_pcon = -1;
@@ -188,7 +190,7 @@ print("^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^",quote=FALSE)
 obj = MakeADFun(data,parameters,random=c("U"),DLL="issams")
 
 cont.list=list(trace=1,abs.tol=1e-3,rel.tol=1e-3)
-opt = nlminb(obj$par,obj$fn,obj$gr,control=cont.list)
-print("opt ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^",quote=FALSE)
+opt = nlminb(obj$par,obj$fn,obj$gr) #,control=cont.list)
+print("opt^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^",quote=FALSE)
 print(opt)
 

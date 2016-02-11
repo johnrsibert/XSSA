@@ -149,7 +149,8 @@ template < class Type > Type objective_function < Type >::operator()()
    Type K = 4.0*mfexp(logMSY)/(1.0e-20+r);
    //TTRACE(r,K)
    Type p10 = log(K);
-   Type p11 = U(utPop+1);
+   Type p11 = U(utPop);
+   //TTRACE(p11,(utPop))
    //TTRACE(p10,p11)
    Type lsdlogPop = logsdlogProc;
    Type varlogPop = square(mfexp(lsdlogPop));
@@ -214,7 +215,9 @@ template < class Type > Type objective_function < Type >::operator()()
       {
       // Fnll += 0.5*(log(TWO_M_PI*varlogF) + square(ft1(g)-ft2(g))/varlogF);
          Type ft1 = U(Fndxl(t-1)+g);
+      // TTRACE(ft1,(Fndxl(t-1)+g))
          Type ft2 = U(Fndxl(t)+g);
+      // TTRACE(ft2,(Fndxl(t)+g))
          //TTRACE(ft1,ft2)
          Fnll += 0.5*(log(TWO_M_PI*varlogF) + square(ft1-ft2)/varlogF);
          sumFg += mfexp(ft1);
@@ -230,7 +233,9 @@ template < class Type > Type objective_function < Type >::operator()()
       } 
    
    
-      Type prevLogN = U(utPop+t); //p11;
+      Type p11 = U(utPop+t-1);
+      Type p12 = U(utPop+t);
+      Type prevLogN = p11;
       Type prevN = mfexp(prevLogN);
       Type rmF = r - sumFg;
       Type ermF = mfexp(-1.0*rmF);
@@ -238,7 +243,7 @@ template < class Type > Type objective_function < Type >::operator()()
      //    S[t] = (K*(r-Fmort))/((((K*(r-Fmort))/S[t-1])*exp(-(r-Fmort))) - r*exp(-(r-Fmort))  + r) # p5
       Type nextN = Krmf/(((Krmf/prevN)*ermF) - r*ermF +r); // 5
       Type nextLogN = log(nextN);
-      TTRACE(prevLogN,nextLogN)
+      //TTRACE(prevLogN,nextLogN)
    
       if ( isnan(value(nextLogN)) )
       {
@@ -247,14 +252,14 @@ template < class Type > Type objective_function < Type >::operator()()
       }
    
       Type Pnll = 0.0;
-      //Pnll += 0.5*(log(TWO_M_PI*varlogPop) + square(p12-nextLogN)/varlogPop);
-      Pnll += 0.5*(log(TWO_M_PI*varlogPop) + square(U(utPop+t)-nextLogN)/varlogPop);
+      //TTRACE(t,(utPop+t))
+      Pnll += 0.5*(log(TWO_M_PI*varlogPop) + square(p12-nextLogN)/varlogPop);
       if (isnan(value(Pnll)))
          TRACE(Pnll)
       nll += (Fnll+Pnll);
       //TTRACE(Pnll,nll) 
       //TTRACE(Fnll,nll) 
-      TTRACE(t,nll)
+      //TTRACE(t,nll)
       if (use_Q)
       {
          Type Qnll = 0.0;
@@ -278,14 +283,18 @@ template < class Type > Type objective_function < Type >::operator()()
      // f2  U(Fndxl(t),Fndxu(t)) 
      // pop11 U(utPop1+t-1)
      // pop21 U(utPop1+t)
-     Type pop11 = U(utPop+t);
-     Type pop21 = U(utPop+t+1);
+     Type pop11 = U(utPop+t-1);
+     Type pop21 = U(utPop+t);
 
      //dvar_vector ft(1,ngear); ///< log fishing mortality by gear
+     vector <Type> ft(ngear);
      //for (int g = 1; g <= ngear; g++)
-     //{
+     for (int g = 0; g < ngear; g++)
+     {
      //   ft(g) = f(f.indexmin()+g-1);
-     //}
+        ft(g) = U(Fndxl(t)+g);
+     // TTRACE(ft(g),(Fndxl(t)+g))
+     }
 
      // sum of the average populations sizes over time step
      Type log_total_mean_pop;
@@ -303,8 +312,7 @@ template < class Type > Type objective_function < Type >::operator()()
         // observation error
         if ( (t >= first_year(g)) && (t <= last_year(g)) )
         {
-           //log_pred_yield(g) = logdt + ft(g) + log_total_mean_pop;
-           log_pred_yield(g) = logdt + U(Fndxl(t)+g) + log_total_mean_pop;
+           log_pred_yield(g) = logdt + ft(g) + log_total_mean_pop;
 
            Type varlogYield = square(mfexp(logsdlogYield));
            if (use_robustY == 1)  // normal + t distribution
@@ -369,7 +377,7 @@ template < class Type > Type objective_function < Type >::operator()()
       Type logr = log(2.0)+logFmsy;
       Type nll_r = 0.5*(log(TWO_M_PI*varr_prior) + square(logr - logr_prior)/varr_prior);
       nll += nll_r;
-      TTRACE(nll_r,nll)
+      //TTRACE(nll_r,nll)
       if (isnan(value(nll_r)))
          TRACE(nll_r)
    }
