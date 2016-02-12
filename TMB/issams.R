@@ -132,26 +132,17 @@ phases = c(phases,data$phase_Q)
 data$init_Q = get.numeric.field()
 
 data$use_robustY = get.numeric.field()
-data$phase_pcon = get.numeric.field()
-#phases = c(phases,data$phase_pcon)
-data$init_pcon = get.numeric.field()
+phase_pcon = get.numeric.field()
+init_pcon = get.numeric.field()
+data$pcon = init_pcon
 
 print(paste(field.counter,"input fields processed"))
 
-#data$maxtime = ntime
 data$lengthU = ntime*(nobs.gear+1)
 # set up U indexing starting at 0
 data$Fndxl = seq(0,(ntime-1)*(nobs.gear),nobs.gear)
-#data$Fndxl = seq(1,ntime*(nobs.gear),nobs.gear)
 data$Fndxu = data$Fndxl+(nobs.gear-1) 
-#data$utPop = nobs.gear*ntime
 data$utPop = data$Fndxu[length(data$Fndxu)]+1
-if (!data$use_robustY)
-{
-   data$phase_pcon = -1;
-   data$init_pcon = 1e-25
-}
-data$Lpcon = logit(data$init_pcon)
 
 parameters = list(
   logFmsy = log(data$init_Fmsy),
@@ -189,8 +180,16 @@ print(names(parameters))
 print("^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^",quote=FALSE)
 obj = MakeADFun(data,parameters,random=c("U"),DLL="issams")
 
-cont.list=list(trace=1,abs.tol=1e-3,rel.tol=1e-3)
-opt = nlminb(obj$par,obj$fn,obj$gr) #,control=cont.list)
+print("starting optimization^^^^^^^^^^^^^^^^^^^^^^^^^",quote=FALSE)
+cont.list=list(trace=1)#,abs.tol=1e-3,rel.tol=1e-3)
+opt = nlminb(obj$par,obj$fn,obj$gr,control=cont.list)
 print("opt^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^",quote=FALSE)
 print(opt)
 
+
+make.diagnostics=function(residuals)
+{
+   resid.names =c("pop","K","forcing","F1","F2","F3","F4","F5","predC1","predC2","predC3","predC4","predC5","obsC1","obsC2","obsC3","obsC4","obsC5")
+   colnames(residuals)=resid.names
+   head(residuals)
+}
