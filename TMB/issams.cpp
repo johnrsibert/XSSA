@@ -306,7 +306,9 @@ template < class Type > Type objective_function < Type >::operator()()
      residuals(t,++rc) = value(pop21);
      residuals(t,++rc) = K;
      double Q = exp(value(logQ));
-     residuals(t,++rc) = Q; //*immigrant_biomass(t);
+   //residuals(t,++rc) = Q; 
+     residuals(t,++rc) = Q*immigrant_biomass(t); // produces error
+
 
      for (int g = 0; g < ngear; g++)
         residuals(t, ++rc) = value(ft(g));
