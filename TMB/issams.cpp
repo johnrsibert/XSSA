@@ -305,15 +305,20 @@ template < class Type > Type objective_function < Type >::operator()()
      double K = 4.0*exp(value(logMSY))/(1.0e-20+r);
      residuals(t,++rc) = value(pop21);
      residuals(t,++rc) = K;
-     double Q = exp(value(logQ));
+   //double Q = exp(value(logQ));
+   //double ibt = value(immigrant_biomass(t)); // produces error
+   //residuals(t,++rc) = Q*ibt; 
    //residuals(t,++rc) = Q; 
-     residuals(t,++rc) = Q*immigrant_biomass(t); // produces error
+   //residuals(t,++rc) = Q*immigrant_biomass(t); // produces error
+     residuals(t,++rc) = exp(value(logQ))*value(immigrant_biomass(t));
 
 
      for (int g = 0; g < ngear; g++)
         residuals(t, ++rc) = value(ft(g));
      for (int g = 0; g < ngear; g++)
         residuals(t, ++rc) = value(log_pred_yield(g));
+     for (int g = 0; g < ngear; g++)
+        residuals(t, ++rc) = value(obs_catch(t,g));
 
    } //for (int t = 0; t < ntime; t++)
 

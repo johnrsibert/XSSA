@@ -68,6 +68,7 @@ plot.catches=function(t,obs,pred,sd=NULL,block=NULL)
 plot.biomass=function(x,y,K=NULL,sd=NULL,block=NULL,propL=NULL,
                       forcing=NULL,yrange=NULL,B1=NULL,indexed=NULL)
 {
+   print("plot.biomass, diagnostics.R")
 #  print(length(x))
 #  print(head(x))
 #  print(dim(y))
@@ -83,7 +84,7 @@ plot.biomass=function(x,y,K=NULL,sd=NULL,block=NULL,propL=NULL,
    if (is.null(yrange))
       yrange = c(0,1.2*max(y,na.rm=TRUE))
    xrange=nice.ts.plot(x,y,ylab="Biomass (mt)",ylim=yrange)
-   print(ncol(y))
+   print(paste("ncol",ncol(y)))
 
    if (!is.null(K))
    {
@@ -96,6 +97,7 @@ plot.biomass=function(x,y,K=NULL,sd=NULL,block=NULL,propL=NULL,
 #  if ( (ncol(y) > 2) && (!is.null(sd)) )
 #     plot.error(x,y[,3],sdlogNN, bcol="blue",fcol="lightblue")
 
+   print("N error")
    if (!is.null(sd))
    {
       print("N1 error")
@@ -168,6 +170,7 @@ plot.biomass=function(x,y,K=NULL,sd=NULL,block=NULL,propL=NULL,
 
 plot.production=function(Fmort, obsC, predC, t, r, K, block=NULL)
 {
+    print(paste("plot.prod",r,K))
     F.max=max(Fmort,na.rm=TRUE)
     Fyield = seq(0,F.max,0.01*F.max)
     yield = Fyield*K*(1.0-Fyield/r) # equilibirum yield at F
@@ -419,7 +422,7 @@ plot.biomass.array = function(path.list=c("./run-issams/use_r_prior/r2/Q0/issams
       legend(x="topleft",legend=legend,bty='n',cex=1.6)
 
       F.ndx=grep("F",names(dat)) 
-      predC.ndx=grep("predC",names(dat)) 
+      predC.ndx=grep("predC",names(dat))
       obsC.ndx=grep("obsC",names(dat)) 
 
       Fmort = rowSums(dat[,F.ndx])

@@ -12,6 +12,7 @@ plot.diagnostics=function(dat=NULL,file="diagnostics.dat",dt,ngear,
                  plot.Fmort,plot.prod, plot.impact,
                  devices,block)
 {
+   print("plot.diagnostics, issams.R")
    print(paste("Block: ",block))
    if (is.null(dat))
      dat = read.table(file=file,header=TRUE)
@@ -30,8 +31,8 @@ plot.diagnostics=function(dat=NULL,file="diagnostics.dat",dt,ngear,
 #  print(tail(dat))
    gear.col = 4
    dd = c(2,(gear.col+1):ncol)
-#  print("Names of log transformed variables:")
-#  print(names(dat)[dd])
+   print("Names of log transformed variables:")
+   print(names(dat)[dd])
    dat[,dd] = exp(dat[,dd])
 #  print(head(dat))
 #  print(tail(dat))
@@ -71,6 +72,7 @@ plot.diagnostics=function(dat=NULL,file="diagnostics.dat",dt,ngear,
    y = matrix(nrow=ntime,ncol=1)
    y[,1]=dat$pop
 #  y[,2]=dat$forcing
+   print(paste("sdlogPop",sdlogPop))
    plot.biomass(dat$t,y,sd=sdlogPop,block=block,K=dat$K,B1=B1,
                 forcing=dat$forcing,indexed=indexed)
 
@@ -145,7 +147,8 @@ plot.diagnostics=function(dat=NULL,file="diagnostics.dat",dt,ngear,
           lines(dat$t,dat[,(gear.col+g)],col="orange4",lwd=lwd+2)
           title(main=gear.names[g],line=title.line)
        }
-       show.block.number(block,dat$t[1],line=2)
+       if (!is.null(block))
+          show.block.number(block,dat$t[1],line=2)
    } #if (plot.Fmort)
 
    if (plot.prod)
@@ -738,3 +741,99 @@ plot.Qprop.prior=function(propL=0.01)
 
    save.png.plot("Qprop_prior",width=6.5,height=6.5)
 }
+
+TMB.diagnostics=function(data,obj,opt,
+                         plot.Fmort=TRUE,plot.prod=TRUE,plot.impact=FALSE)
+{
+
+#log.diagnostics=function(file="issams_program.log",ntime=61,dt=1,ngear=5,
+                         #plot.Fmort=FALSE,plot.prod=FALSE,plot.impact=FALSE)
+      
+   #   dat$t = (start.year-0.4*dt +  dat$t*dt)
+
+   dt = data$dt
+   ntime = data$ntime
+   ngear = data$ngear
+   start.year = 1952
+   yy = seq(1,ntime,1)
+   yy = (start.year-0.4*dt +  yy*dt)
+#  print(yy)
+   resid = as.data.frame(cbind(yy,obj$report()$resid))
+   resid.names =c("t","pop","K","forcing","F1","F2","F3","F4","F5","predC1","predC2","predC3","predC4","predC5","obsC1","obsC2","obsC3","obsC4","obsC5")
+   colnames(resid)=resid.names
+   print(head(resid))
+
+
+   ests = opt$par
+#  exp(junk[which(names(junk)=="logMSY")])
+   MSY = exp(ests[which(names(ests)=="logMSY")])
+   Fmsy = exp(ests[which(names(ests)=="logFmsy")])
+   print(paste("TMB.diagnostics",MSY,Fmsy))
+   r = 2.0*Fmsy
+   K = 4.0*MSY/(1.0e-20+r)
+   print(paste("TMB.diagnostics",r,K))
+   B1 = NULL
+   d = NULL
+   sdlogProc = exp(ests[which(names(ests)=="logsdlogProc")])
+   sdlogYield = exp(ests[which(names(ests)=="logsdlogYield")])
+
+   max.counter = 1
+   counter = max.counter
+   c = 'n'
+   dev.list = vector(mode="numeric",length=5)
+#  dev.file.names=c("tmp/est_pop","tmp/est_catch","tmp/est_F","tmp/prod")
+   dev.file.names=c("est_pop","est_catch","est_F","prod")
+#  while (c != 'q')
+   while ( (c != 'q') && (c != 'x') )
+   {
+   #  tmp=get.diagnostics(log,ntime=ntime,dt=dt,ngear=ngear,block=counter,mtype="i")
+
+      new.devices = plot.diagnostics(resid,dt=dt,ngear=ngear,
+                    sdlogPop=sdlogProc,
+                    sdlogYield=sdlogYield,
+                    sdlogF=sdlogProc,
+                    sdlogQ=sdlogProc,
+                    K=K, r=r, B1=B1, indexed=data$use_Q,
+                    plot.Fmort=plot.Fmort,
+                    plot.prod=plot.prod,
+                    plot.impact=plot.impact,
+                    devices=dev.list,block=NULL)
+
+
+      dev.list=new.devices
+     
+      c = readline("next, back, save, quit or exit? (enter n,b,s,q,x):")
+      print(paste(c," entered"))
+      if (c == 'n')
+         counter = counter + 1
+      else if (c == 'b')
+         counter = counter - 1
+      else if (c == 's')
+      {
+         print(dev.list)
+         for (d in 1:length(dev.list))
+         {
+            if (dev.list[d] > 0)
+            {
+               tname = paste(dev.file.names[d],"B",counter,sep="")
+               print(paste("Saving device",d,"to file",tname))
+               dev.set(dev.list[d])
+               din = par("din")
+               print(din)
+               save.png.plot(tname,width=din[1],height=din[2])
+            }
+            else
+               print(paste("Skipping device",d))
+          }
+      }
+      if (counter < 1)
+         counter = max.counter
+      else if (counter > max.counter)
+         counter = 1
+   } #while
+   graphics.off()
+   if (c == 'x')
+      q("no")
+#  return(counter)
+}
+
