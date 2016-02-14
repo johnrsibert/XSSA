@@ -27,7 +27,7 @@ GLOBALS_SECTION;
     else
        return 1;
   }
-
+  /*
   template <typename SCALAR> SCALAR logit(const SCALAR& p)
   {
      SCALAR a = log(p/(1.0-p));
@@ -45,7 +45,7 @@ GLOBALS_SECTION;
   template double alogit<double>(const double& a);
   template dvariable alogit<dvariable>(const dvariable& a);
   //template df1b2variable alogit<df1b2variable>(const df1b2variable& a); 
-
+  */
 
 TOP_OF_MAIN_SECTION
   arrmblsize = 50000000;
@@ -163,8 +163,7 @@ DATA_SECTION
   init_int use_robustY;
   !! TRACE(use_robustY)
   init_int phase_pcon;
-  init_number init_pcon;
-  !! TTRACE(init_pcon,phase_pcon)
+  init_number pcon;
 
   int pininit;
   int lengthU;
@@ -286,9 +285,6 @@ PARAMETER_SECTION
   // abundance index proportionality constant
   init_number logQ(phase_Q);
 
-  // robust yield likelihood proportion contamination
-  init_number Lpcon(phase_pcon);
-
   random_effects_vector U(1,lengthU);
   //vector U(1,lengthU);
 
@@ -302,7 +298,6 @@ PARAMETER_SECTION
   sdreport_number asdlogYield;
   sdreport_number aQ;
   sdreport_number alogQ;
-  sdreport_number apcon;
 
   objective_function_value nll;
 
@@ -327,14 +322,6 @@ PRELIMINARY_CALCS_SECTION
        logsdlogProc = log(init_sdlogProc);
        logQ = log(init_Q);
        TTRACE(logQ,init_Q);
-
-
-       if (!use_robustY)
-       {
-          phase_pcon = -1;
-          init_pcon = 1e-25;
-       }
-       Lpcon = logit((const double&)init_pcon);
 
        double r = 2.0*mfexp(value(logFmsy));
        double K = 4.0*mfexp(value(logMSY))/(1.0e-20+r);
@@ -400,7 +387,6 @@ PRELIMINARY_CALCS_SECTION
     TRACE(logMSY)
     TRACE(logsdlogProc)
     TRACE(logsdlogYield)
-    TRACE(alogit(value(Lpcon)))
     TRACE(U)
     TRACE(U(utPop+1))
     TRACE (trace_init_pars)
@@ -440,7 +426,7 @@ PROCEDURE_SECTION
 
   for (int t = 1; t <= ntime; t++)
   {
-     obs(t,U(Fndxl(t),Fndxu(t)),U(utPop+t-1),U(utPop+t), logsdlogYield,Lpcon);
+     obs(t,U(Fndxl(t),Fndxu(t)),U(utPop+t-1),U(utPop+t), logsdlogYield);
   }
 
   //if ((use_r_prior) && active(logr) )
@@ -470,7 +456,6 @@ PROCEDURE_SECTION
   asdlogYield = mfexp(logsdlogYield);
   aQ = mfexp(logQ);
   alogQ = logQ;
-  apcon = alogit((dvariable&)Lpcon);
 
   ++userfun_entries;
   if (!mc_phase())
@@ -583,7 +568,7 @@ SEPARABLE_FUNCTION void step(const int t, const dvar_vector& f1, const dvar_vect
   //      << nll << endl;
   
 
-SEPARABLE_FUNCTION void obs(const int t, const dvar_vector& f,const dvariable& pop11, const dvariable& pop21, const dvariable& logsdlogYield, const dvariable& Lpc)
+SEPARABLE_FUNCTION void obs(const int t, const dvar_vector& f,const dvariable& pop11, const dvariable& pop21, const dvariable& logsdlogYield)
   // f2  U(Fndxl(t),Fndxu(t)) 
   // pop11 U(utPop1+t-1)
   // pop21 U(utPop1+t)
@@ -624,9 +609,7 @@ SEPARABLE_FUNCTION void obs(const int t, const dvar_vector& f,const dvariable& p
    
            // standard Cauchy density
            dvariable fat_part = 1.0/(M_PI*(1.0 + z));
-           //dvariable pfat = alogit(Lpc(g));
-           dvariable pfat = alogit(Lpc);
-           Ynll += log((1.0-pfat)*mfexp(norm_part) + pfat*fat_part);
+           Ynll += log((1.0-pcon)*mfexp(norm_part) + pcon*fat_part);
         }
    
         // this block is incorrect and should not be used
@@ -643,8 +626,6 @@ SEPARABLE_FUNCTION void obs(const int t, const dvar_vector& f,const dvariable& p
            dvariable diff2 = square(obs_catch(t,g)-log_pred_yield(g));
            dvariable v_hat = diff2+1.0e-80;
    
-           //dvariable pcon = alogit(Lpc(g));
-           dvariable pcon = alogit(Lpc);
            dvariable b=2.*pcon/(width*sqrt(PI));  // This is the weight for the "robustifying" term
    
            dvariable norm_part = log(1.0-pcon)*mfexp(-diff2/(2.0*a2*v_hat));
@@ -656,14 +637,14 @@ SEPARABLE_FUNCTION void obs(const int t, const dvar_vector& f,const dvariable& p
         else if (use_robustY == 3) // zero inflated normal
         {
            //dvariable pzero = alogit(Lpc(g));
-           dvariable pzero = alogit((dvariable&)Lpc);
+           //dvariable pzero = alogit((dvariable&)Lpc);
            if (obs_catch(t,g) > logZeroCatch)
            {
-              Ynll += (1.0-pzero)*0.5*(log(TWO_M_PI*varlogYield) + square(obs_catch(t,g)-log_pred_yield(g))/varlogYield);
+              Ynll += (1.0-pcon)*0.5*(log(TWO_M_PI*varlogYield) + square(obs_catch(t,g)-log_pred_yield(g))/varlogYield);
            }
            else
            {
-              Ynll += pzero*0.5*(log(TWO_M_PI*varlogYield));
+              Ynll += pcon*0.5*(log(TWO_M_PI*varlogYield));
            }
         }
    
@@ -730,8 +711,7 @@ FUNCTION void write_status(ofstream& s)
     s << "#    sdlogYield: " << mfexp(logsdlogYield) << endl;
     s << "#          logQ: " << logQ <<  " (" << active(logQ) <<")" << endl;
     s << "#             Q: " << mfexp(logQ) << " (" << use_Q <<")" << endl;
-    s << "# Lpcon = " << value(Lpcon) << " (" << active(Lpcon) <<")" << endl;
-    s << "# pcon = " << alogit(value(Lpcon)) << endl;
+    s << "# pcon = " << pcon << endl;
     s << "# klingon_multiplier = " << klingon_multiplier << endl;
     // to keep the diagnostics R script happy
     s << "#     logsdlogF: " << logsdlogProc 
