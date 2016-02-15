@@ -43,86 +43,86 @@ template < class Type > Type alogit(const Type & a)
 template < class Type > Type objective_function < Type >::operator()()
 {
    DATA_INTEGER(ngear);
-   REPORT(ngear)
+   //REPORT(ngear)
    DATA_INTEGER(ntime);
-   REPORT(ntime);
+   //REPORT(ntime);
    DATA_SCALAR(dt);
-   REPORT(dt)
+   //REPORT(dt)
    Type logdt = log(dt);
-   REPORT(logdt)
+   //REPORT(logdt)
    DATA_MATRIX(obs_catch);
-   REPORT(obs_catch);
+   //REPORT(obs_catch);
    DATA_INTEGER(fr);
-   REPORT(fr)
+   //REPORT(fr)
    DATA_VECTOR(immigrant_biomass);
-   REPORT(immigrant_biomass);
+   //REPORT(immigrant_biomass);
    DATA_INTEGER(use_mean_forcing);
-   REPORT(use_mean_forcing);
+   //REPORT(use_mean_forcing);
    DATA_INTEGER(phase_Fmsy);
-   REPORT(phase_Fmsy);
+   //REPORT(phase_Fmsy);
    DATA_SCALAR(init_Fmsy);
-   REPORT(init_Fmsy);
+   //REPORT(init_Fmsy);
    DATA_INTEGER(use_r_prior);
-   REPORT(use_r_prior);
+   //REPORT(use_r_prior);
    DATA_SCALAR(logr_prior);
-   REPORT(logr_prior);
+   //REPORT(logr_prior);
    DATA_SCALAR(varr_prior);
-   REPORT(varr_prior);
+   //REPORT(varr_prior);
    DATA_INTEGER(phase_MSY);
-   REPORT(phase_MSY);
+   //REPORT(phase_MSY);
    DATA_SCALAR(init_MSY);
-   REPORT(init_MSY);
+   //REPORT(init_MSY);
    DATA_INTEGER(phase_sdlogProc);
-   REPORT(phase_sdlogProc);
+   //REPORT(phase_sdlogProc);
    DATA_SCALAR(init_sdlogProc);
-   REPORT(init_sdlogProc);
+   //REPORT(init_sdlogProc);
    DATA_INTEGER(phase_sdlogYield);
-   REPORT(phase_sdlogYield);
+   //REPORT(phase_sdlogYield);
    DATA_SCALAR(init_sdlogYield);
-   REPORT(init_sdlogYield);
+   //REPORT(init_sdlogYield);
    DATA_INTEGER(use_Q);
-   REPORT(use_Q);
+   //REPORT(use_Q);
    DATA_SCALAR(init_Q);
-   REPORT(init_Q);
+   //REPORT(init_Q);
    DATA_INTEGER(use_robustY);
-   REPORT(use_robustY);
+   //REPORT(use_robustY);
    DATA_SCALAR(pcon)
-   REPORT(pcon)
+   //REPORT(pcon)
    DATA_INTEGER(lengthU);
-   REPORT(lengthU);
+   //REPORT(lengthU);
    DATA_IVECTOR(Fndxl);
-   REPORT(Fndxl);
+   //REPORT(Fndxl);
    DATA_IVECTOR(Fndxu);
-   REPORT(Fndxu);
+   //REPORT(Fndxu);
    DATA_INTEGER(utPop);
-   REPORT(utPop);
+   //REPORT(utPop);
    DATA_IVECTOR(first_year);
-   REPORT(first_year);
+   //REPORT(first_year);
    DATA_IVECTOR(last_year);
-   REPORT(last_year)
+   //REPORT(last_year)
 
    // logistic parameters
    PARAMETER(logFmsy);
-   REPORT(logFmsy);
+   //REPORT(logFmsy);
    PARAMETER(logMSY);
-   REPORT(logMSY);
+   //REPORT(logMSY);
 
    // general process error standard deviations
    PARAMETER(logsdlogProc);
-   REPORT(logsdlogProc);
+   //REPORT(logsdlogProc);
 
    // observation error standard deviations
    PARAMETER(logsdlogYield);
-   REPORT(logsdlogYield);
+   //REPORT(logsdlogYield);
 
    // abundance index proportionality constant
    PARAMETER(logQ);
-   REPORT(logQ);
+   //REPORT(logQ);
 
    //random_effects_vector U(1,lengthU);
    PARAMETER_VECTOR(U);
 
-   //residuals.allocate(1,ntime,1,3*ngear+3);
+   // diagnostic information
    matrix < double > residuals(ntime, 3 * ngear + 3);
 
    int userfun_entries = 0;
@@ -130,10 +130,27 @@ template < class Type > Type objective_function < Type >::operator()()
 
    Type nll = 0.0;
 
+   Type sdlogProc  = exp(logsdlogProc);
+   Type sdlogYield = exp(logsdlogYield);
+   Type Q = exp(logQ);
+
+   Type MSY = exp(logMSY);
+   Type Fmsy = exp(logFmsy);
+   Type r = 2.0*Fmsy;
+   Type K = 4.0*MSY/r;
+
+   ADREPORT(sdlogProc);
+   ADREPORT(sdlogYield);
+   ADREPORT(Q);
+   ADREPORT(MSY);
+   ADREPORT(Fmsy);
+   ADREPORT(r);
+   ADREPORT(K);
+
    // special case for initial population
    // ensure that starting population size is near K
-   Type r = 2.0*mfexp(logFmsy);
-   Type K = 4.0*mfexp(logMSY)/(1.0e-20+r);
+   //Type r = 2.0*mfexp(logFmsy);
+   //Type K = 4.0*mfexp(logMSY)/(1.0e-20+r);
    Type p10 = log(K);
    Type p11 = U(utPop);
    Type lsdlogPop = logsdlogProc;
@@ -164,8 +181,8 @@ template < class Type > Type objective_function < Type >::operator()()
       Type lsdlogPop = logsdlogProc;
       Type varlogPop = square(mfexp(lsdlogPop));
     
-      Type r = 2.0*exp(logFmsy);
-      Type K = 4.0*exp(logMSY)/(1.0e-20+r);
+      //Type r = 2.0*exp(logFmsy);
+      //Type K = 4.0*exp(logMSY)/(1.0e-20+r);
    
       Type Fnll = 0.0;
       Type sumFg = 0.0; // total fishing mortality
@@ -301,15 +318,8 @@ template < class Type > Type objective_function < Type >::operator()()
 
      // dump stuff in "residual" matrix
      int rc = -1; // residuals column counter
-     double r = 2.0*exp(value(logFmsy));
-     double K = 4.0*exp(value(logMSY))/(1.0e-20+r);
      residuals(t,++rc) = value(pop21);
-     residuals(t,++rc) = K;
-   //double Q = exp(value(logQ));
-   //double ibt = value(immigrant_biomass(t)); // produces error
-   //residuals(t,++rc) = Q*ibt; 
-   //residuals(t,++rc) = Q; 
-   //residuals(t,++rc) = Q*immigrant_biomass(t); // produces error
+     residuals(t,++rc) = value(K);
      residuals(t,++rc) = exp(value(logQ))*value(immigrant_biomass(t));
 
 

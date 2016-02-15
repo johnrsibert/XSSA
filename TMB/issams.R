@@ -170,11 +170,11 @@ for (t in 1:ntime)
    parameters$U[ut] = logK
 }
 
-print("data:")
-print(data)
-print("starting parameters:")
-print(paste("number of parameters",length(parameters)))
-print(names(parameters))
+#print("data:")
+#print(data)
+#print("starting parameters:")
+#print(paste("number of parameters",length(parameters)))
+#print(names(parameters))
 #print(parameters)
 
 print("^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^",quote=FALSE)
@@ -185,11 +185,20 @@ cont.list=list(trace=1)#,abs.tol=1e-3,rel.tol=1e-3)
 opt = nlminb(obj$par,obj$fn,obj$gr,control=cont.list)
 print("opt^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^",quote=FALSE)
 print(opt)
+print("std^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^",quote=FALSE)
+sd.rep = sdreport(obj)
+max.grad = max(sd.rep$gradient.fixed)
+std = rbind(summary(sd.rep,select="fixed"),
+            summary(sd.rep,select="report"))
+print(paste("Number of parameters = ",length(opt$par),
+            " Objective function value = ",opt$objective,
+            " Maximum gradient component = ",max.grad,sep=""),quote=FALSE)
+print(std)
+print(paste("Convergence:",as.logical(opt$convergence)),quote=FALSE)
 
-
-make.diagnostics=function(residuals)
-{
-   resid.names =c("pop","K","forcing","F1","F2","F3","F4","F5","predC1","predC2","predC3","predC4","predC5","obsC1","obsC2","obsC3","obsC4","obsC5")
-   colnames(residuals)=resid.names
-   head(residuals)
-}
+#make.diagnostics=function(residuals)
+#{
+#   resid.names =c("pop","K","forcing","F1","F2","F3","F4","F5","predC1","predC2","predC3","predC4","predC5","obsC1","obsC2","obsC3","obsC4","obsC5")
+#   colnames(residuals)=resid.names
+#   head(residuals)
+#}
