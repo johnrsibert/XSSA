@@ -745,12 +745,6 @@ plot.Qprop.prior=function(propL=0.01)
 TMB.diagnostics=function(data,obj,opt,
                          plot.Fmort=TRUE,plot.prod=TRUE,plot.impact=FALSE)
 {
-
-#log.diagnostics=function(file="issams_program.log",ntime=61,dt=1,ngear=5,
-                         #plot.Fmort=FALSE,plot.prod=FALSE,plot.impact=FALSE)
-      
-   #   dat$t = (start.year-0.4*dt +  dat$t*dt)
-
    dt = data$dt
    ntime = data$ntime
    ngear = data$ngear
@@ -787,7 +781,7 @@ TMB.diagnostics=function(data,obj,opt,
    while ( (c != 'q') && (c != 'x') )
    {
    #  tmp=get.diagnostics(log,ntime=ntime,dt=dt,ngear=ngear,block=counter,mtype="i")
-
+G
       new.devices = plot.diagnostics(resid,dt=dt,ngear=ngear,
                     sdlogPop=sdlogProc,
                     sdlogYield=sdlogYield,
@@ -837,3 +831,123 @@ TMB.diagnostics=function(data,obj,opt,
 #  return(counter)
 }
 
+
+TMB.sd.comp=function(TMB.path="/home/jsibert/Projects/xssa/TMB/issams-fit.Rdata",
+                    ADMB.path="/home/jsibert/Projects/xssa/run-issams/use_r_prior/r2/Q1/issams")
+{
+   varnames = c("logFmsy","logMSY","logsdlogProc","logsdlogYield",
+                "logQ","sdlogProc","sdlogYield","Q",
+                "MSY","Fmsy","r","K")
+#  print(varnames)
+   nnames = length(varnames)
+
+   TMB.fit = load(TMB.path)
+   TMB.std = std
+#  print(TMB.fit)
+
+   ADMB.std.file = paste(ADMB.path,".std",sep="")
+   ADMB.std = matrix(ncol=2,nrow=nnames)
+
+   rownames(ADMB.std) = varnames
+   colnames(ADMB.std) = c("Estimate","Std. Error")
+   ttt=try(scan(file=ADMB.std.file,what="character"),TRUE)
+#  print(paste("class(std))",class(std)))
+   if (class(std) == "try-error")
+   {
+      print(paste(ADMB.std.file,"missing"))
+   }
+   else
+   {
+      for (i in 1:nnames)
+      {
+         w = which(ttt == varnames[i])
+
+         if (length(w) < 1)
+         {
+            tname = paste("a",varnames[i],sep="")
+            w = which(ttt == tname)
+         #  print(paste(i,tname,w,length(w),ttt[w+1],ttt[w+2]))
+       
+         }
+         ADMB.std[i,1] = as.numeric(ttt[w+1])
+         ADMB.std[i,2] = as.numeric(ttt[w+2])
+      }  
+   #  print(ADMB.std)
+   }
+
+   fit.list = list(ADMB=ADMB.std,TMB=TMB.std)
+#  return(fit.list)
+
+   get.sd.range=function(var,fits)
+   {
+      for (v in var)
+      {
+         smax = (-Inf)
+         smin =   Inf 
+      #  print(paste(smin,smax))
+         for (f in 1:length(fits))
+         {
+            ff = as.data.frame(fits[[f]])
+            smin = min(smin,ff$Estimate[v]-ff$"Std. Error"[v])
+            smax = max(smax,ff$Estimate[v]+ff$"Std. Error"[v])
+         }
+      }
+      return(range(smin,smax))
+   } 
+#  print(get.sd.range(1,fit.list))
+#  print(get.sd.range(c(3,4),fit.list))
+#  print(get.sd.range(12,fit.list))
+
+   plot.sd.range=function(var,fits)
+   { 
+      yinc = c(1.5/5,3.5/5)
+      vcount = 0
+      cols=c("blue","red")
+      for (v in var)
+      {
+         xrange = get.sd.range(v,fits)
+         print(varnames[var])
+         print(xrange)
+         plot(xrange,c(0,1),type='n',ylab="",axes=FALSE,ann=FALSE,col="black")
+         for (f in 1:length(fits))
+         {
+            vcount = vcount + 1
+            vndx   = 1 + vcount%%2
+         #  print(paste(vcount,vndx))
+            ff = as.data.frame(fits[[f]])
+            x = c(ff$Estimate[v]-ff$"Std. Error"[v],
+                  ff$Estimate[v]+ff$"Std. Error"[v])
+            y = c(yinc[vndx],yinc[vndx])
+            print(x)
+         #  print(y)
+            lines(x,y,lwd=3,col=cols[f])
+            points(ff$Estimate[v],y[1],pch=16,col=cols[f],cex=2)         
+            title(main=varnames[var],line=-0.5,cex.main=0.9)
+            axis(1)
+         }
+      }
+   }   
+
+
+   width = 6.5
+   height = 9.0
+   x11(width=width,height=height)
+   par(mar=c(2,2,0,0)+0.1)
+   lm = layout(matrix(c(1:nnames),ncol=1,byrow=TRUE))
+   layout.show(lm)
+
+   plot.sd.range(1,fit.list)
+   plot.sd.range(2,fit.list)
+   plot.sd.range(3,fit.list)
+   plot.sd.range(4,fit.list)
+   plot.sd.range(5,fit.list)
+   plot.sd.range(6,fit.list)
+   plot.sd.range(7,fit.list)
+   plot.sd.range(8,fit.list)
+   plot.sd.range(9,fit.list)
+   plot.sd.range(10,fit.list)
+   plot.sd.range(11,fit.list)
+   plot.sd.range(12,fit.list)
+
+   save.png.plot("ADMB-TMB-sd-comp",width=width,height=height)
+}

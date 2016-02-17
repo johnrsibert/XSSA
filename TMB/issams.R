@@ -1,7 +1,8 @@
 print(" ",quote=FALSE)
 print("##############################################",quote=FALSE)
 require(TMB)
-compile("issams.cpp",flags="-O0 -g",safebounds=TRUE,safeunload=TRUE)
+#compile("issams.cpp",flags="-O0 -g",safebounds=TRUE,safeunload=TRUE)
+compile("issams.cpp",flags="-O3 -g",safebounds=FALSE,safeunload=TRUE)
 dyn.load(dynlib("issams"))
 
 field.counter <<- 0
@@ -181,8 +182,8 @@ print("^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^",quote=FALSE)
 obj = MakeADFun(data,parameters,random=c("U"),DLL="issams")
 
 print("starting optimization^^^^^^^^^^^^^^^^^^^^^^^^^",quote=FALSE)
-cont.list=list(trace=1)#,abs.tol=1e-3,rel.tol=1e-3)
-opt = nlminb(obj$par,obj$fn,obj$gr,control=cont.list)
+cont.list=list(trace=1) #,abs.tol=1e-3,rel.tol=1e-3)
+opt = nlminb(obj$par,obj$fn,obj$gr) #,control=cont.list)
 print("opt^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^",quote=FALSE)
 print(opt)
 print("std^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^",quote=FALSE)
@@ -195,6 +196,8 @@ print(paste("Number of parameters = ",length(opt$par),
             " Maximum gradient component = ",max.grad,sep=""),quote=FALSE)
 print(std)
 print(paste("Convergence:",as.logical(opt$convergence)),quote=FALSE)
+
+save(obj,opt,std,file="issams-fit.Rdata")
 
 #make.diagnostics=function(residuals)
 #{
