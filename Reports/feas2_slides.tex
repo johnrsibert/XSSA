@@ -84,7 +84,7 @@ Part Deux}
 \begin{slide}\section{Combined HDAR and NOAA Catch Time Series}
 \begin{center}
 \includegraphics[height=0.8\textheight]{./graphics/5_gear_catch_history_a.pdf}\\
-\color{red}{No Recreational Data}\normalcolor
+{\Large \bfseries \color{red}{No Recreational Data}\normalcolor}
 \end{center}
 \end{slide}
 
@@ -103,16 +103,16 @@ MFCL Region 2 & MFCL Region 4\\
 \begin{enumerate}
 \item Can we contrive a simple model of the MHI YFT population and
 fishery?
-\item Can the model parameters be estimated from the data?
-\item Are the model biomass estimates plausible?
-\item Can the model results be used in alphabet soup?
+\item Can model parameters be estimated from the data?
+\item Are model biomass estimates plausible?
+\item Can model results be used in alphabet soup?
 \end{enumerate}
 \end{slide}
 
 \begin{slide}\section{Principle model assumptions}
 \begin{enumerate}
 \item The dynamics of the population of YFT in the MHI follows a
-simple Schaefer model.
+surplus production (Schaefer) model.
 \item Fishing mortality is represented by a random walk.
 \item Predicted catch by gear is the product of estimated fishing mortality
 for each gear and average predicted biomass during a year.
@@ -157,8 +157,8 @@ Index && \multicolumn{2}{c|}{None}&\multicolumn{2}{c|}{MFCL 2}\\
 \multicolumn{2}{|c|}{Designation}& A & B& C& D\\
 \hline
 \hline
-$|G|_{max}$& Gradient at Minimum & 0.0016409 & 33.1289 & 3.51082e-05 & 3.77653\\
 $n$ & Estimated Parameters &4 & 5 & 5 & 6\\
+$|G|_{max}$& Gradient at Minimum & 0.0016409 & 33.1289 & 3.51082e-05 & 3.77653\\
 $-\log L$& Likelihood & -237.238 & -237.968 & -247.175 & -243.343\\
 AIC & Akaike Criterion & -466.476 & -465.936 & -484.35 & -474.686\\
 \hline
@@ -263,9 +263,12 @@ biomass from the fish population.
 
 \begin{slide}\section{Next Steps?}
 \begin{enumerate}
+\item Reevaluate data: Complete? Accurate (yellowfin or
+bigeye)? Recreational catch?
 \item Technical review of model, including statistical assumptions,
 and computing methods.
-\item Compare these results to Catch-MSY analysis. 
+\item Run Simulations.
+\item Compare results to Catch-MSY analysis. 
 \item Review previous uses of production models in tuna fisheries.
 \item Test alternative biomass indices, including MHI-specific
 SEAPODYM estimates.
