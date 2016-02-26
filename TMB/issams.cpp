@@ -3,13 +3,14 @@
 #include <math.h>
 const double TWO_M_PI = 2.0*M_PI;
 const double LOG_M_PI = log(M_PI);
-const double logZeroCatch = 1.0;
+const double logZeroCatch = 0.0;
 
 template < class Type > Type square(Type x)
 {
    return x * x;
 }
 
+/*
 template < class Type > Type mfexp(Type x)
 {
    double b = 60;
@@ -24,6 +25,8 @@ template < class Type > Type mfexp(Type x)
       return exp(-b) * (1. - x - b) / (1. + 2. * (-x - b));
    }
 }
+*/
+
 /*
 template < class Type > Type logit(Type p)
 {
@@ -34,7 +37,7 @@ template < class Type > Type logit(Type p)
 
 template < class Type > Type alogit(const Type & a)
 {
-   Type p = Type(1.0) / (Type(1.0) + mfexp(-a));
+   Type p = Type(1.0) / (Type(1.0) + exp(-a));
    return p;
 }
 
@@ -104,6 +107,7 @@ template < class Type > Type objective_function < Type >::operator()()
    // logistic parameters
    PARAMETER(logFmsy);
    //REPORT(logFmsy);
+
    PARAMETER(logMSY);
    //REPORT(logMSY);
 
@@ -121,6 +125,8 @@ template < class Type > Type objective_function < Type >::operator()()
 
    //random_effects_vector U(1,lengthU);
    PARAMETER_VECTOR(U);
+   //DATA_VECTOR(U);
+   //REPORT(U)
 
    // diagnostic information
    matrix < double > residuals(ntime, 3 * ngear + 3);
@@ -132,6 +138,7 @@ template < class Type > Type objective_function < Type >::operator()()
 
    Type sdlogProc  = exp(logsdlogProc);
    Type sdlogYield = exp(logsdlogYield);
+   Type varlogYield = square(sdlogYield);
    Type Q = exp(logQ);
 
    Type MSY = exp(logMSY);
@@ -147,39 +154,37 @@ template < class Type > Type objective_function < Type >::operator()()
    ADREPORT(r);
    ADREPORT(K);
 
+   //step0(U(utPop+1), logsdlogProc, logFmsy, logMSY, logQ);
    // special case for initial population
    // ensure that starting population size is near K
-   //Type r = 2.0*mfexp(logFmsy);
-   //Type K = 4.0*mfexp(logMSY)/(1.0e-20+r);
    Type p10 = log(K);
    Type p11 = U(utPop);
    Type lsdlogPop = logsdlogProc;
-   Type varlogPop = square(mfexp(lsdlogPop));
+   Type varlogPop = square(exp(lsdlogPop));
    Type Pnll = 0.0;
    Pnll += 0.5*(log(TWO_M_PI*varlogPop) + square(p10 - p11)/varlogPop);
    if (isnan(value(Pnll)))
        TRACE(Pnll)
    nll += Pnll;
-
    if (use_Q)
    {
       Type Qnll = 0.0;
-      Type varlogQ = square(mfexp(logsdlogProc));
+      Type varlogQ = square(exp(logsdlogProc));
       Type logib = logQ + log(immigrant_biomass(0));
       Qnll += 0.5*(log(TWO_M_PI*varlogQ) + square(logib-p11)/varlogQ);
       if (isnan(value(Qnll)))
          TRACE(Qnll)
       nll += Qnll;
    }
-
+   //TRACE(nll)
 
    // update population until the end of time
    for (int t = 1; t < ntime; t++)
    {
       Type lsdlogF = logsdlogProc;
-      Type varlogF = square(mfexp(lsdlogF));
+      Type varlogF = square(exp(lsdlogF));
       Type lsdlogPop = logsdlogProc;
-      Type varlogPop = square(mfexp(lsdlogPop));
+      Type varlogPop = square(exp(lsdlogPop));
     
       //Type r = 2.0*exp(logFmsy);
       //Type K = 4.0*exp(logMSY)/(1.0e-20+r);
@@ -190,7 +195,7 @@ template < class Type > Type objective_function < Type >::operator()()
       {
          Type ft1 = U(Fndxl(t-1)+g);
          Type ft2 = U(Fndxl(t)+g);
-         sumFg += mfexp(ft1);
+         sumFg += exp(ft1);
          Fnll += 0.5*(log(TWO_M_PI*varlogF) + square(ft1-ft2)/varlogF);
          if (isnan(value(Fnll)))
             TRACE(Fnll)
@@ -200,9 +205,9 @@ template < class Type > Type objective_function < Type >::operator()()
       Type p11 = U(utPop+t-1);
       Type p12 = U(utPop+t);
       Type prevLogN = p11;
-      Type prevN = mfexp(prevLogN);
+      Type prevN = exp(prevLogN);
       Type rmF = r - sumFg;
-      Type ermF = mfexp(-1.0*rmF);
+      Type ermF = exp(-1.0*rmF);
       Type Krmf = K*rmF;
       Type nextN = Krmf/(((Krmf/prevN)*ermF) - r*ermF +r); // 5
       Type nextLogN = log(nextN);
@@ -221,7 +226,7 @@ template < class Type > Type objective_function < Type >::operator()()
       if (use_Q)
       {
          Type Qnll = 0.0;
-         Type varlogQ = square(mfexp(logsdlogProc));
+         Type varlogQ = square(exp(logsdlogProc));
          Type logib = logQ + log(immigrant_biomass(t));
          Qnll += 0.5*(log(TWO_M_PI*varlogQ) + square(logib-nextLogN)/varlogQ);
          if (isnan(value(Qnll)))
@@ -229,8 +234,9 @@ template < class Type > Type objective_function < Type >::operator()()
          nll += Qnll;
       }
    } //for (int t = 1; t < ntime; t++)
+   //TRACE(nll)
 
-   // obs
+   // obs(t,U(Fndxl(t),Fndxu(t)),U(utPop+t-1),U(utPop+t), logsdlogYield);
    // loop through observations to compute likelihood
    for (int t = 0; t < ntime; t++)
    {
@@ -242,21 +248,20 @@ template < class Type > Type objective_function < Type >::operator()()
      {
         ft(g) = U(Fndxl(t)+g);
      }
-     //TTRACE(t,ft)
 
      // sum of the average populations sizes over time step
      Type log_total_mean_pop;
      if (t < 2)
         log_total_mean_pop = pop21;
      else
-        log_total_mean_pop = log( 0.5*(mfexp(pop11) + mfexp(pop21)) );
+        log_total_mean_pop = log( 0.5*(exp(pop11) + exp(pop21)) );
 
      vector <Type> log_pred_yield(ngear);
      for (int g = 0; g < ngear; g++)
      {
         log_pred_yield(g) = logdt + ft(g) + log_total_mean_pop;
      }
-     //TTRACE(t,log_pred_yield)
+     //TRACE(log_pred_yield)
    
      Type Ynll = 0.0;
      for (int g = 0; g < ngear; g++)
@@ -266,7 +271,8 @@ template < class Type > Type objective_function < Type >::operator()()
         {
            //log_pred_yield(g) = logdt + ft(g) + log_total_mean_pop;
 
-           Type varlogYield = square(mfexp(logsdlogYield));
+           //Type varlogYield = square(exp(logsdlogYield));
+
            if (use_robustY == 1)  // normal + t distribution
            {
               Type z = square(obs_catch(t,g)-log_pred_yield(g))/varlogYield;
@@ -276,7 +282,7 @@ template < class Type > Type objective_function < Type >::operator()()
               // standard Cauchy density
               Type fat_part = 1.0/(M_PI*(1.0 + z));
               //Type pfat = alogit(Lpcon);
-              Ynll += log((1.0-pcon)*mfexp(norm_part) + pcon*fat_part);
+              Ynll += log((1.0-pcon)*exp(norm_part) + pcon*fat_part);
            }
 
            // this block is incorrect and should not be used
@@ -289,16 +295,26 @@ template < class Type > Type objective_function < Type >::operator()()
 
            else if (use_robustY == 3) // zero inflated normal
            {
+              //TRACE(obs_catch(t,g))
+              Type tmp;
               if (obs_catch(t,g) > logZeroCatch)
               {
-                 Ynll += (1.0-pcon)*0.5*(log(TWO_M_PI*varlogYield) + square(obs_catch(t,g)-log_pred_yield(g))/varlogYield);
+                 tmp = (1.0-pcon)*0.5*(log(TWO_M_PI*varlogYield) + square(obs_catch(t,g)-log_pred_yield(g))/varlogYield);
+                 Ynll += tmp; //(1.0-pcon)*0.5*(log(TWO_M_PI*varlogYield) + square(obs_catch(t,g)-log_pred_yield(g))/varlogYield);
+                 //TTRACE(g,tmp)
               } 
               else
               {
-                 Ynll += pcon*0.5*(log(TWO_M_PI*varlogYield));
+                 tmp = pcon*0.5*(log(TWO_M_PI*varlogYield));
+                 //TTRACE(g,tmp)
+                 Ynll += tmp; //pcon*0.5*(log(TWO_M_PI*varlogYield));
               }
-              if (isnan(value(Ynll)))
-                 TRACE(Ynll)
+            //if (t > 55)
+            //{
+            //   TTRACE(g,tmp)
+            //   TTRACE(obs_catch(t,g),log_pred_yield(g))
+            //}
+                  
            }
 
            else // default normal likelihood
@@ -310,12 +326,13 @@ template < class Type > Type objective_function < Type >::operator()()
          else
          {
             log_pred_yield(g) = logZeroCatch;
-            //HERE
+            HERE
          }
-     }
+     } // for (int g = 0; g < ngear; g++)
+     //TTRACE(t,Ynll)
 
      nll += Ynll;
-
+     //TTRACE(t,nll)
      // dump stuff in "residual" matrix
      int rc = -1; // residuals column counter
      residuals(t,++rc) = value(pop21);
@@ -331,9 +348,10 @@ template < class Type > Type objective_function < Type >::operator()()
         residuals(t, ++rc) = value(obs_catch(t,g));
 
    } //for (int t = 0; t < ntime; t++)
+   //TRACE(nll)
 
    REPORT(residuals)
-
+ 
    if (use_r_prior)
    {
       Type logr = log(2.0)+logFmsy;
@@ -343,6 +361,7 @@ template < class Type > Type objective_function < Type >::operator()()
          TRACE(nll_r)
    }
 
+   //TRACE(nll)
    return nll;
 }
 

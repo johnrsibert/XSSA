@@ -192,6 +192,7 @@ DATA_SECTION
     double ZeroCatch = 1.0; //1.0e-8;
     logZeroCatch = log(ZeroCatch);
     TTRACE(ZeroCatch,logZeroCatch)
+
     int nzero = ntime;
     if (use_robustY != 3)
     {
@@ -387,6 +388,7 @@ PRELIMINARY_CALCS_SECTION
     TRACE(logMSY)
     TRACE(logsdlogProc)
     TRACE(logsdlogYield)
+    TRACE(logQ)
     TRACE(U)
     TRACE(U(utPop+1))
     TRACE (trace_init_pars)
@@ -394,6 +396,7 @@ PRELIMINARY_CALCS_SECTION
     //if (1) ad_exit(1);
 
 PROCEDURE_SECTION
+
   if (trace_init_pars)
   {
     clogf << "\nInitial step in to PROCEDURE_SECTION:" << endl;
@@ -415,37 +418,33 @@ PROCEDURE_SECTION
   nll = 0.0;
 
   step0(U(utPop+1), logsdlogProc, logFmsy, logMSY, logQ);
+  //TRACE(nll)
  
   for (int t = 2; t <= ntime; t++)
   {
      step(t, U(Fndxl(t-1),Fndxu(t-1)), U(Fndxl(t),Fndxu(t)),
              U(utPop+t-1), U(utPop+t), logsdlogProc,
              logFmsy, logMSY, logQ);
-     TTRACE(t,nll)
   }
+  //TRACE(nll)
 
+  
   for (int t = 1; t <= ntime; t++)
   {
      obs(t,U(Fndxl(t),Fndxu(t)),U(utPop+t-1),U(utPop+t), logsdlogYield);
   }
+  //TRACE(nll)
+ 
 
-  //if ((use_r_prior) && active(logr) )
   if (use_r_prior)
   {
-     //dvariable logr = log(2.0*mfexp(logFmsy));
-     //TTRACE(logr,(log(2.0)+logFmsy))
      dvariable logr = log(2.0)+logFmsy;
      dvariable nll_r = 0.5*(log(TWO_M_PI*varr_prior) + square(logr - logr_prior)/varr_prior);
      nll += nll_r;
-     TTRACE(nll_r,nll)
   }
+  //TRACE(nll)
 
-  //if ((use_Fmsy_prior) && active(logFmsy) )
-  //{
-  //   dvariable nll_Fmsy = 0.5*(log(TWO_M_PI*varFmsy_prior) + square(logFmsy - logFmsy_prior)/varFmsy_prior);
-  //   nll += nll_Fmsy;
-  //}
-
+  // compute sdreport_numbers
   ar = 2.0*mfexp(logFmsy);
   aK = 4.0*mfexp(logMSY)/(1.0e-20+ar);
   aFmsy = mfexp(logFmsy);
@@ -541,7 +540,6 @@ SEPARABLE_FUNCTION void step(const int t, const dvar_vector& f1, const dvar_vect
   //    S[t] = (K*(r-Fmort))/((((K*(r-Fmort))/S[t-1])*exp(-(r-Fmort))) - r*exp(-(r-Fmort))  + r) # p5
   dvariable nextN = Krmf/(((Krmf/prevN)*ermF) - r*ermF +r); // 5
   dvariable nextLogN = log(nextN);
-  TTRACE(prevlogN,nextLogN)
 
   if ( isnan(value(nextLogN)) )
   {
@@ -568,7 +566,7 @@ SEPARABLE_FUNCTION void step(const int t, const dvar_vector& f1, const dvar_vect
   //      << nll << endl;
   
 
-SEPARABLE_FUNCTION void obs(const int t, const dvar_vector& f,const dvariable& pop11, const dvariable& pop21, const dvariable& logsdlogYield)
+SEPARABLE_FUNCTION void obs(const int t, const dvar_vector& f,const dvariable& pop11, const dvariable& pop21, const dvariable& lsdlogYield)
   // f2  U(Fndxl(t),Fndxu(t)) 
   // pop11 U(utPop1+t-1)
   // pop21 U(utPop1+t)
@@ -587,20 +585,24 @@ SEPARABLE_FUNCTION void obs(const int t, const dvar_vector& f,const dvariable& p
      log_total_mean_pop = log( 0.5*(mfexp(pop11) + mfexp(pop21)) );
 
   dvar_vector log_pred_yield(1,ngear);
-  //for (int g = 1; g <= ngear; g++)
-  //{
-     //log_pred_yield(g) = logdt + ft(g) + log_total_mean_pop;
-  //}
-
+  for (int g = 1; g <= ngear; g++)
+  {
+     log_pred_yield(g) = logdt + ft(g) + log_total_mean_pop;
+  }
+  //TRACE(log_pred_yield)
+  
   dvariable Ynll = 0.0;
+  //dvariable varlogYield = square(mfexp(logsdlogYield));
+  dvariable sdlogYield = mfexp(lsdlogYield);
+  dvariable varlogYield = square(sdlogYield);
   for (int g = 1; g <= ngear; g++)
   {
      // observation error
      if ( (t >= first_year(g)) && (t <= last_year(g)) )
      {
-        log_pred_yield(g) = logdt + ft(g) + log_total_mean_pop;
+        //log_pred_yield(g) = logdt + ft(g) + log_total_mean_pop;
 
-        dvariable varlogYield = square(mfexp(logsdlogYield));
+
         if (use_robustY == 1)  // normal + t distribution
         {
            dvariable z = square(obs_catch(t,g)-log_pred_yield(g))/varlogYield;
@@ -636,16 +638,25 @@ SEPARABLE_FUNCTION void obs(const int t, const dvar_vector& f,const dvariable& p
    
         else if (use_robustY == 3) // zero inflated normal
         {
-           //dvariable pzero = alogit(Lpc(g));
-           //dvariable pzero = alogit((dvariable&)Lpc);
+           //TRACE(obs_catch(t,g))
+           dvariable tmp;
            if (obs_catch(t,g) > logZeroCatch)
            {
-              Ynll += (1.0-pcon)*0.5*(log(TWO_M_PI*varlogYield) + square(obs_catch(t,g)-log_pred_yield(g))/varlogYield);
+              tmp = (1.0-pcon)*0.5*(log(TWO_M_PI*varlogYield) + square(obs_catch(t,g)-log_pred_yield(g))/varlogYield);
+              //TTRACE(g,tmp)
+              Ynll += tmp; //(1.0-pcon)*0.5*(log(TWO_M_PI*varlogYield) + square(obs_catch(t,g)-log_pred_yield(g))/varlogYield);
            }
            else
            {
-              Ynll += pcon*0.5*(log(TWO_M_PI*varlogYield));
+              tmp = pcon*0.5*(log(TWO_M_PI*varlogYield));
+              //TTRACE(g,tmp)
+              Ynll += tmp; //pcon*0.5*(log(TWO_M_PI*varlogYield));
            }
+         //if (t > 56)
+         //{
+         //   TTRACE(g,tmp)
+         //   TTRACE(obs_catch(t,g),log_pred_yield(g))
+         //}
         }
    
         else // default normal likelihood
@@ -664,11 +675,13 @@ SEPARABLE_FUNCTION void obs(const int t, const dvar_vector& f,const dvariable& p
      else
      {
         log_pred_yield(g) = logZeroCatch;
+        HERE
      }
-  }
+  } //for (int g = 1; g <= ngear; g++)
+  //TTRACE(t,Ynll)
 
   nll += Ynll;
-  TTRACE(Ynll,nll)
+  //TTRACE(t,nll)
 
   // dump stuff in "residual" matrix
   int rc = 0; // residuals column counter
