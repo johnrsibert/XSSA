@@ -57,30 +57,6 @@ for (g in 1:nobs.gear)
 data$use.klingons=get.numeric.field()
 data$use.klingon.multiplier=get.numeric.field()
 
-# nzero = ntime;
-# ziter = 0;
-# while (nzero > 0)
-# {
-#    print(paste(nzero,ziter))
-#    ziter = ziter + 1
-#    nzero = 0;
-#    for (g in 1:nobs.gear)
-#       for (t in 2:ntime)
-#          if ( (tcatch[g,t] <= 0.0) 
-#               && (tcatch[g,t-1] > 0.0) && (tcatch[g,t+1] > 0.0) )
-#          {
-#             print(paste(tcatch[g,t-1],tcatch[g,t+1] > 0.0) )
-#             nzero = nzero + 1 
-#             print(paste(nzero,ziter))
-#             tcatch[g,t] = 0.5*(tcatch[g,t-1] + tcatch[g,t+1])
-#             print(paste(nzero, " catch for gear ", g ," at time ", t,
-#                   " set to ", tcatch[g,t],sep=""))
-#          }
-# }
-# print(paste("Zero catch bridging instances:", nzero))
-# 
-# ZeroCatch = 1.0
-# data$obs_catch = t(log(tcatch+ZeroCatch))
 
 data$first_year = vector(length=nobs.gear)
 data$last_year = vector(length=nobs.gear)
@@ -165,9 +141,9 @@ if(data$use_robustY !=3)
                      " set to ", tcatch[g,t],sep=""))
             }
    }
+   print(paste("Zero catch bridging instances:", nzero))
 }
 
-print(paste("Zero catch bridging instances:", nzero))
 ZeroCatch = 1.0
 data$obs_catch = t(log(tcatch+ZeroCatch))
 
@@ -210,20 +186,17 @@ for (t in 1:ntime)
 #print(names(parameters))
 #print(parameters)
 
-print("^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^",quote=FALSE)
+print("MakeADFun-------------------------------------",quote=FALSE)
 obj = MakeADFun(data,parameters,random=c("U"),DLL="issams")
 #obj = MakeADFun(data,parameters,DLL="issams")
-obj$control=list(trace=1) #,iter.max=1)
+obj$control=list(trace=1,eval.max=1,iter.max=2)
 
-print("starting optimization^^^^^^^^^^^^^^^^^^^^^^^^^",quote=FALSE)
-#cont.list=list(trace=1) #,abs.tol=1e-3,rel.tol=1e-3)
-#opt = nlminb(obj$par,obj$fn,obj$gr) #,control=cont.list)
-st=system.time(opt <- nlminb(obj$par,obj$fn,obj$gr))
-print("opt^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^",quote=FALSE)
-print(paste("opt$objective =",opt$objective))
+print("starting optimization-------------------------",quote=FALSE)
+st=system.time(opt <- nlminb(obj$par,obj$fn,obj$gr)) #,control=obj$control))
+print("finished optimization-------------------------",quote=FALSE)
+print("Timings:")
 print(st)
-#print(opt)
-#print("std^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^",quote=FALSE)
+print(paste("Objective function value =",opt$objective))
 sd.rep = sdreport(obj)
 max.grad = max(sd.rep$gradient.fixed)
 std = rbind(summary(sd.rep,select="fixed"),
@@ -232,9 +205,9 @@ print(paste("Number of parameters = ",length(opt$par),
             " Objective function value = ",opt$objective,
             " Maximum gradient component = ",max.grad,sep=""),quote=FALSE)
 print(std)
-print(paste("Convergence:",as.logical(opt$convergence)),quote=FALSE)
+#print(paste("Convergence:",as.logical(opt$convergence)),quote=FALSE)
 
-#save(obj,opt,std,file="issams-fit.Rdata")
+save(obj,opt,std,file="issams-fit.Rdata")
 
 #make.diagnostics=function(residuals)
 #{

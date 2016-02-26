@@ -212,8 +212,8 @@ DATA_SECTION
                      << " set to " << obs_catch(t,g)  << endl;
                }
        }
+       clogf << "Zero catch bridging instances: " << nzero << endl;
     }
-    clogf << "Zero catch bridging instances: " << nzero << endl;
 
     first_year.allocate(1,ngear);
     first_year = ntime;
