@@ -637,15 +637,19 @@ awkread = function(file,name)
 #  fit = read.fit(file)
 hst.plot=function(model="issams")
 {
-#  hst.names=c("MSY","Fmsy","r","K","sdlogF","sdlogPop",
-   hst.names=c("logMSY","MSY","logFmsy","Fmsy","r","K","sdlogProc",
-               "sdlogYield","logQ","Q")
+#  hst.names=c("logMSY","MSY","logFmsy","Fmsy","r","K","sdlogProc",
+#              "sdlogYield","logQ","Q")
+#  print(length(hst.names))
+   hst.names=c("logFmsy","logMSY","sdlogProc","sdlogYield","logQ",
+               "Fmsy","MSY","K","r","Q")
+#  print(length(hst.names))
    dat = scan(paste(model,".dat",sep=""),what="character")
-   wp = which(dat == "Fmsy_prior")
-   Fmsy.prior.use = as.numeric(dat[wp+4])
-   Fmsy.prior = as.numeric(dat[wp+5])
-   sdFmsy.prior = as.numeric(dat[wp+6])
-   print(paste(wp,Fmsy.prior.use,Fmsy.prior,sdFmsy.prior))
+#  print(dat)
+   wp = which(dat == "r_prior")
+   r.prior.use = as.numeric(dat[wp+4])
+   r.prior = as.numeric(dat[wp+5])
+   sd.r.prior = as.numeric(dat[wp+6])
+   print(paste(wp,r.prior.use,r.prior,sd.r.prior))
 
    nvar = length(hst.names)
    nrc = ceiling(sqrt(nvar))
@@ -656,6 +660,7 @@ hst.plot=function(model="issams")
    xpos = 0
    ypos = 50
    incr = 50
+   lwd = 2
    hst.file = paste(model,".hst",sep="")
    fit = read.fit(model)
 #  print(fit)
@@ -670,12 +675,12 @@ hst.plot=function(model="issams")
       x2 = max(dist$x,na.rm=TRUE)
       x1 = fit$est[w]-5*fit$std[w]
       x2 = fit$est[w]+5*fit$std[w]
-      print(" ")
+   #  print(" ")
       print(paste(v,fit$names[w],fit$est[w],fit$std[w],x1,x2))
       xx = seq(x1,x2,(x2-x1)/100.0)
       yy = dnorm(xx,mean=fit$est[w],sd=fit$std[w])
       pp = dist$p
-      print(paste(sum(pp),sum(yy)))
+   #  print(paste(sum(pp),sum(yy)))
    #  yy = yy/sum(yy,na.rm=TRUE)
    #  pp = pp/(sum(pp,na.rm=TRUE))
    #  print(paste(sum(pp),sum(yy)))
@@ -685,23 +690,49 @@ hst.plot=function(model="issams")
          x11(xpos=xpos,ypos=ypos,title=hst.names[v])
          xrange = c(max(min(xx),min(dist$x)),min(max(xx),max(dist$x))) #range(xx,dist$x)
          xrange = c(x1,x2) #range(dist$x)
-         print(paste(range(pp),range(yy)))
+   #     print(paste(range(pp),range(yy)))
          yrange = range(pp,yy) #range(yy,dist$p)
          ylab=paste("p(",hst.names[v],")",sep="") 
          plot(xrange,yrange,xlab=hst.names[v],ylab=ylab,type='n')
-         lines(dist$x,pp,type='b')
-         abline(v=fit$est[w],lty="dotdash",col="blue")
-         abline(v=fit$est[w]-2.0*fit$std[w],lty="dotted",col="blue")
-         abline(v=fit$est[w]+2.0*fit$std[w],lty="dotted",col="blue")
-         lines(xx,yy,col="blue")
-         if ((hst.names[v] == "Fmsy" || (hst.names[v] == "logFmsy"))
-             && Fmsy.prior.use > 0)
+         lines(dist$x,pp,type='b',lwd=lwd)
+         abline(v=fit$est[w],lty="dotdash",col="blue",lwd=lwd)
+         abline(v=fit$est[w]-2.0*fit$std[w],lty="dotted",col="blue",lwd=lwd)
+         abline(v=fit$est[w]+2.0*fit$std[w],lty="dotted",col="blue",lwd=lwd)
+         lines(xx,yy,col="blue",lwd=lwd)
+         if ((hst.names[v] == "r" ) && r.prior.use > 0)
          {
-            pyy = dnorm(xx,mean=Fmsy.prior,sd=sdFmsy.prior)
-         #  pyy = pyy/sum(pyy,na.rm=TRUE)
-            lines(xx,pyy,col="orange")
-            abline(v=Fmsy.prior,lty="dotdash",col="orange")
+            pyy = dnorm(xx,mean=r.prior,sd=sd.r.prior)
+            lines(xx,pyy,col="red",lwd=lwd)
+            abline(v=r.prior,lty="dotdash",col="red",lwd=lwd)
          }
+         #   ar = 2.0*mfexp(logFmsy);
+         if ((hst.names[v] == "logFmsy" ) && r.prior.use > 0)
+         {
+            logFmsy.prior = log(r.prior)-log(2)
+            pyy = dnorm(xx,mean=logFmsy.prior,sd=sd.r.prior)
+            lines(xx,pyy,col="red",lwd=lwd)
+            abline(v=logFmsy.prior,lty="dotdash",col="red")
+         }
+         if ((hst.names[v] == "Fmsy" ) && r.prior.use > 0)
+         {
+            Fmsy.prior = r.prior/2.0
+            sd.Fmsy.prior = sd.r.prior/2.0
+            pyy = dnorm(xx,mean=Fmsy.prior,sd=sd.Fmsy.prior)
+            lines(xx,pyy,col="red",lwd=lwd)
+            abline(v=Fmsy.prior,lty="dotdash",col="red")
+         }
+         #   aK = 4.0*mfexp(logMSY)/(1.0e-20+ar);
+         if ((hst.names[v] == "K" ) && r.prior.use > 0)
+         {
+            wMSY = which(fit$names=="aMSY")
+            MSY = fit$est[wMSY]
+            K.prior = 4.0*MSY/r.prior
+            sd.K.prior = 4.0*MSY/r.prior
+            pyy = dnorm(xx,mean=K.prior,sd=sd.K.prior)
+            lines(xx,pyy,col="red",lwd=lwd)
+            abline(v=K.prior,lty="dotdash",col="red")
+         }
+
          xpos = xpos + incr
          ypos = ypos + incr
       }
