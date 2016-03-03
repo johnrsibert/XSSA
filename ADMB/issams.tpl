@@ -13,11 +13,9 @@ GLOBALS_SECTION;
   const double TWO_M_PI = 2.0*M_PI;
   const double LOG_M_PI = log(M_PI);
 
-  //   issams -noinit -iprint 1 &> issams.out&
-  //   issams -ainp issams.ainp -noinit -iprint 1 -mcmc 50000 -mcsave 20 -shess -noest &> issams.out 
-   //  issams -ainp issams.ainp -noinit -iprint 1 -mcmc 1000000 -mcsave 200 -shess -noest &> issams.out 
-   //  issams -ainp issams.ainp -noinit -iprint 1 -mcmc 1000000 -mcsave 200 -shess -noest -mcpin issams.ainp &> issams.out 
-   //  issams -ainp issams.ainp -iprint 1 -mcmc 1000000 -mcsave 200 -shess -noest -mcpin issams.ainp &> issams.out 
+   //  issams -noinit -iprint 1 -shess &> issams.out&
+   //  issams -noinit -mcmc2 500000 -mcsave 20 -shess &> issams.out
+
 
   int fexists(const adstring& filename)
   {

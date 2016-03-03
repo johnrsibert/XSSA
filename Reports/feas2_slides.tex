@@ -18,8 +18,9 @@
 \hypersetup{pdftitle={Assessment model of Main Hawaiian Islands
 Yellowfin Tuna Population}}
 \hypersetup{pdfkeywords={yellowfin tuna, state space, abundance index, model, Hawaii}}
-\hypersetup{pdfpagemode=UseThumbs}
-\hypersetup{bookmarks=false}
+\hypersetup{pdfpagemode=UseOutlines} %Thumbs}
+\hypersetup{bookmarks=true}
+
 \newcommand\doublespacing{\baselineskip=1.6\normalbaselineskip}
 \newcommand\singlespacing{\baselineskip=1.0\normalbaselineskip}
 \renewcommand\deg[1]{$^\circ$#1}
@@ -88,6 +89,30 @@ Part Deux}
 \end{center}
 \end{slide}
 
+\begin{slide}\section{Feasibility questions}
+\begin{enumerate}
+\item Can we contrive a simple model of the MHI YFT population and
+fishery?
+\item Can model parameters be estimated from the data?
+\item Are biomass estimates plausible?
+\item Can model results be used in alphabet soup?
+\end{enumerate}
+\end{slide}
+
+\begin{slide}\section{Principle model assumptions}
+\begin{enumerate}
+\item The dynamics of the population of YFT in the MHI follows a
+state-space surplus production (Schaefer) model.
+\item Fishing mortality exerted by each gear is represented by
+distinct random walks with common variance.
+\item Predicted catch by gear is the product of estimated fishing mortality
+for each gear and average predicted biomass during a year.
+\item Optional use of MFCL biomass estimate as index of abundance so
+that local abundance is {\bfseries approximately proportional} to the
+index biomass.
+\end{enumerate}
+\end{slide}
+
 \begin{slide}\section{WCPFC Stock Assessments}
 \label{fig:MFCL2}
 \begin{center}
@@ -99,51 +124,31 @@ MFCL Region 2 & MFCL Region 4\\
 \end{center}
 \end{slide}
 
-\begin{slide}\section{Feasibility questions}
-\begin{enumerate}
-\item Can we contrive a simple model of the MHI YFT population and
-fishery?
-\item Can model parameters be estimated from the data?
-\item Are model biomass estimates plausible?
-\item Can model results be used in alphabet soup?
-\end{enumerate}
-\end{slide}
-
-\begin{slide}\section{Principle model assumptions}
-\begin{enumerate}
-\item The dynamics of the population of YFT in the MHI follows a
-surplus production (Schaefer) model.
-\item Fishing mortality is represented by a random walk.
-\item Predicted catch by gear is the product of estimated fishing mortality
-for each gear and average predicted biomass during a year.
-\item Optional use of MFCL biomass estimate as index of abundance so
-that local abundance is {\bfseries approximately proportional} to the
-index biomass.
-\end{enumerate}
-\end{slide}
-
 \begin{slide}\section{Technical features}
 \begin{enumerate}
 \item Fishing mortality and biomass are random effects.
-\item Process errors associated with population growth, fishing
-mortality random walk, and biomass index proportionality are assumed
-to be equal and represented by a single parameter $(\sigma_P)$.
+\item All process errors (population growth, fishing
+mortality random walk, biomass index proportionality) are assumed
+to be equal to a single estimated error $(\sigma_P)$.
+\item Zero-inflated log-normal catch likelihood with estimated
+observation error $(\sigma_Y)$.
 \item Two alternate logistic model parameterizations:
 \begin{enumerate}
 \item $K = \frac{4\MSY}{r};\quad r = 2\Fmsy$
 \item $K = d\cdot B_1$
 \end{enumerate}
-\item Zero-inflated log-normal catch likelihood.
 \item Optional log-normal prior on $r$ with 
 $\tilde{r} = 0.486$ and $\sigma_r = 0.8$,
 % (Carruthers and McAllister, 2011).
 \item Analytic solution to Schaefer ODE for stable propagation
 through time.
-\item All computer code, data files, and draft reports in support of this
+\end{enumerate}
+\vfill
+\par All computer code, data files, and draft reports in support of this
 analysis can be found at Github:
 \url{https://github.com/johnrsibert/XSSA.git}.
-\end{enumerate}
 \end{slide}
+
 \begin{slide}\section{Estimabilty}
 {\scriptsize
 \label{tag:ests4}
@@ -158,9 +163,10 @@ Index && \multicolumn{2}{c|}{None}&\multicolumn{2}{c|}{MFCL 2}\\
 \hline
 \hline
 $n$ & Estimated Parameters &4 & 5 & 5 & 6\\
-$|G|_{max}$& Gradient at Minimum & 0.0016409 & 33.1289 & 3.51082e-05 & 3.77653\\
+$|G|_{max}$& Gradient at Minimum & $\underline{\mbox{0.0016409}}$ & 33.1289 &
+$\underline{\underline{\mbox{3.51082e-05}}}$ & 3.77653\\
 $-\log L$& Likelihood & -237.238 & -237.968 & -247.175 & -243.343\\
-AIC & Akaike Criterion & -466.476 & -465.936 & -484.35 & -474.686\\
+%AIC & Akaike Criterion & -466.476 & -465.936 & -484.35 & -474.686\\
 \hline
 $B_1$& Initial Biomass & --- & 1184.2 & --- & 2802.3\\
 $d$ &$K=dB_1$ & --- & 9.6674 & --- & 2.6348\\
@@ -205,6 +211,83 @@ $Q$& Index Proportionality  & --- & --- & 0.04321 & 0.016535\\
 \end{center}
 \end{slide}
 
+
+\begin{slide}\section{Alternate forcing: MFCL Region 4}
+\label{fig:estr4}
+\begin{center}
+\begin{tabular}{lr}
+\includegraphics[width=0.45\textwidth]{./graphics/r4_est_popB1.pdf}&
+\includegraphics[width=0.45\textwidth]{./graphics/r4_est_FB1.pdf}\\
+\end{tabular}
+\end{center}
+\end{slide}
+
+\begin{slide}\section{Conclusions}
+\begin{enumerate}
+\item Yellowfin catch data from fleets operating in the Main Hawaiian
+Islands waters are sufficiently informative to estimate 
+{\bfseries relative} biomass trends.
+\item An index of abundance is required to estimate 
+{\bfseries absolute} biomass;\par
+{\bfseries absolute estimates are sensitive to the choice of index
+population.}
+\item Representing trends in fishing mortality as a random walk is a
+convenient and effective approach to accounting for the removal of
+biomass from the fish population.
+\item Estimates of MSY and F$_{msy}$ are possible, but should not be
+used for setting ACLs without further analysis.
+\item The prior on $r$ is difficult to assign and probably not required.
+\end{enumerate}
+\end{slide}
+
+\begin{slide}\section{Next Steps?}
+\begin{enumerate}
+\item Re-evaluate data: Complete (recreational catch)? Accurate (yellowfin or
+bigeye)? Stratified appropriately (quarterly or annual; gear types)?
+\item Technical review of model, including statistical assumptions
+and computing methods.
+\item Review previous work on Hawaiian yellowfin fisheries
+\item Review previous uses of production models in tuna fisheries
+(to improve $r$ prior).
+\item Run simulations to evaluate sensitivity of estimates to
+different levels of process and observation error.
+\item Test alternative biomass indices, e.g. MHI-specific
+SEAPODYM estimates.
+\item Compare results to Catch-MSY analysis. 
+\item Work within WCPFC assessment process to improve applicability of
+WCPFC stock assessments to local requirements.
+\end{enumerate}
+\end{slide}
+
+\begin{slide}\section{Thanks for your attention}
+\begin{center}
+%\url{https://github.com/johnrsibert/XSSA.git}
+\includegraphics[width=0.8\textwidth]{./graphics/recumbant.png}
+\end{center}
+\end{slide}
+
+\begin{slide}\section{Alternative Schaefer Parameterizations}
+\begin{center}
+%\begin{equation*}
+$$\frac{dN}{dt} = rN(1-\frac{N}{K}) - FN$$
+%\end{equation}
+\end{center}
+\begin{itemize}
+\item $r=2F_{\MSY};\quad K=\frac{4\MSY}{r}$.
+\item Partial non-dimensional: $K=d\cdot B_1$.
+\item $K$ as random walk $\log K_t = \log K_{t-1} + \xi_t;\quad \xi_t\sim
+N(0,\sigma^2_K)$?
+\item $K_t = Q\cdot I_t$?
+\item Fully non-dimensional ... ?
+\end{itemize}
+\end{slide}
+
+\begin{slide}\section{Catch Predictions}
+\begin{center}
+\includegraphics[height=0.8\textheight]{./graphics/est_catchB1.pdf}
+\end{center}
+\end{slide}
+
 \begin{slide}\section{Omitting $r$ prior}
 \label{tag:ests4NOprior}
 {\scriptsize
@@ -216,7 +299,6 @@ Index & \multicolumn{2}{c|}{None}&\multicolumn{2}{c|}{MFCL 2}\\
 Parameterization&$\MSYFmsy$&$\Bd$&$\MSYFmsy$&$\Bd$\\
 Designation& A & B& C& D\\
 \hline
-
 \hline
 $n$ & 4 & 5 & 5 & 6\\
 $-\log L$ & -284.898 & -236.212 & -246.302 & -242.176\\
@@ -236,45 +318,17 @@ $Q$ & --- & --- & 0.073752 & ---\\
 \end{center} }
 \end{slide}
 
-\begin{slide}\section{Alternate forcing: MFCL Region 4}
-\label{fig:estr4}
+\begin{slide}\section{Posteriors --- Estimated Parameters}
 \begin{center}
-\begin{tabular}{lr}
-\includegraphics[width=0.45\textwidth]{./graphics/r4_est_popB1.pdf}&
-\includegraphics[width=0.45\textwidth]{./graphics/r4_est_FB1.pdf}\\
-\end{tabular}
+\includegraphics[width=0.9\textwidth]{./graphics/par_posteriors.pdf}
 \end{center}
 \end{slide}
 
-\begin{slide}\section{Conclusions}
-\begin{enumerate}
-\item Yellowfin catch data from fleets operating in the Main Hawaiian
-Islands waters are sufficiently informative to estimate relative
-biomass trends.
-\item An index of abundance is required to estimate absolute biomass,
-but absolute estimates are sensitive to the choice of index
-population.
-\item Representing trends in fishing mortality as a random walk is a
-convenient and effective approach to accounting for the removal of
-biomass from the fish population.
-\item The Bayesian prior on $r$ is difficult to assign and probably not required.
-\end{enumerate}
+\begin{slide}\section{Posteriors --- Functions of Parameters}
+\begin{center}
+\includegraphics[width=0.9\textwidth]{./graphics/fpar_posteriors.pdf}
+\end{center}
 \end{slide}
 
-\begin{slide}\section{Next Steps?}
-\begin{enumerate}
-\item Reevaluate data: Complete? Accurate (yellowfin or
-bigeye)? Recreational catch?
-\item Technical review of model, including statistical assumptions,
-and computing methods.
-\item Run Simulations.
-\item Compare results to Catch-MSY analysis. 
-\item Review previous uses of production models in tuna fisheries.
-\item Test alternative biomass indices, including MHI-specific
-SEAPODYM estimates.
-\item Work within WCPFC assessment process to improve applicability of
-WCPFC stock assessments to local requirements.
-\end{enumerate}
-\end{slide}
 
 \end{document}

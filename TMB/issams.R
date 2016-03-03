@@ -207,7 +207,29 @@ print(paste("Number of parameters = ",length(opt$par),
 print(std)
 #print(paste("Convergence:",as.logical(opt$convergence)),quote=FALSE)
 
-save(obj,opt,std,file="issams-fit.Rdata")
+print("Starting MCMC --------------------------------",quote=FALSE)
+rwm = mcmc(obj=obj, nsim=50000, algorithm='RWM') 
+#, params.init=opt$par, alpha=.08, diagnostic=TRUE)
+
+## 
+## 
+## Error in if (log(runif(1)) < fn.new - fn.cur) { : 
+##   missing value where TRUE/FALSE needed
+## In addition: There were 50 or more warnings (use warnings() to see the first 50)
+## Timing stopped at: 421.661 0.277 421.819 
+## > warnings()
+## Warning messages:
+## 1: In destructive_Chol_update(L, H, t) :
+##   Cholmod warning 'matrix not positive definite' at file ../Supernodal/t_cholmod_super_numeric.c, line 729
+## 2: In destructive_Chol_update(L, H, t) :
+##   Cholmod warning 'matrix not positive definite' at file ../Supernodal/t_cholmod_super_numeric.c, line 729
+## 
+## 
+
+
+
+
+#save(obj,opt,std,file="issams-fit.Rdata")
 
 #make.diagnostics=function(residuals)
 #{
