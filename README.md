@@ -23,7 +23,7 @@ Development of state-space stock assessment models for application to open syste
 *	run-issams - run directory (.dat file) for issams ADMB implementation
 *	run-issams-dev - run directory (.dat file) for issams-dev ADMB implementation
 *	run-xssams - run directory (.dat file) for xssams ADMB implementation
-*	run-xssams-dev - run directory (.dat file) for xssams-dev ADMB implementation`
+*	run-xssams-dev - run directory (.dat file) for xssams-dev ADMB implementation
 *	run-issams-msy - __deprecated__
 *	run-issams-proc - __deprecated__
 
