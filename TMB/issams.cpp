@@ -3,7 +3,7 @@
 #include <math.h>
 const double TWO_M_PI = 2.0*M_PI;
 const double LOG_M_PI = log(M_PI);
-const double logZeroCatch = 0.0;
+const double logZeroCatch = 0.0;  // log(1.0)
 
 template < class Type > Type square(Type x)
 {
