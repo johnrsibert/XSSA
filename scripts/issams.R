@@ -58,7 +58,7 @@ plot.diagnostics=function(dat=NULL,file="diagnostics.dat",dt,ngear,
    }
    else
    {
-      width = 9.0
+      width= 9.0
       height = 9.0
       xpos = 100
       ypos = 0
@@ -654,16 +654,29 @@ hst.plot=function(model="issams")
    nvar = length(hst.names)
    nrc = ceiling(sqrt(nvar))
    print(paste(nvar,nrc))
-#  lm = layout(matrix(c(1:(nrc*nrc)),ncol=nrc,nrow=nrc,byrow=TRUE))
-#  print(lm)
-#  layout.show(lm)
+   dev.list = vector(mode="numeric",length=2)
+   width= 12.0
+   height = 8.0
    xpos = 0
-   ypos = 50
+   ypos = 100
    incr = 50
+   nrow = c(2,3)
+   for (d in 1:2)
+   {
+      x11(width=width,height=height,xpos=xpos,ypos=ypos)
+      lm = layout(matrix(c(1:6),ncol=3,nrow=2,byrow=TRUE))
+   #  print(lm)
+      layout.show(lm)
+      dev.list[d] = dev.cur()
+      xpos = xpos + incr
+      ypos = ypos + incr
+   }
+
    lwd = 2
    hst.file = paste(model,".hst",sep="")
    fit = read.fit(model)
 #  print(fit)
+   dev = 1
    for (v in 1:nvar)
    {
       w = which(fit$names==paste("a",hst.names[v],sep=""))
@@ -687,7 +700,11 @@ hst.plot=function(model="issams")
    #  print(cbind(xx,yy))
       if (nrow(dist) > 4)
       {
-         x11(xpos=xpos,ypos=ypos,title=hst.names[v])
+         if (v > 5)
+            dev = 2
+      #  print(paste("dev",dev,dev.list[dev]))
+         dev.set(dev.list[dev])
+      #  x11(xpos=xpos,ypos=ypos,title=hst.names[v])
          xrange = c(max(min(xx),min(dist$x)),min(max(xx),max(dist$x))) #range(xx,dist$x)
          xrange = c(x1,x2) #range(dist$x)
    #     print(paste(range(pp),range(yy)))
@@ -733,11 +750,18 @@ hst.plot=function(model="issams")
             abline(v=K.prior,lty="dotdash",col="red")
          }
 
-         xpos = xpos + incr
-         ypos = ypos + incr
+      #  xpos = xpos + incr
+      #  ypos = ypos + incr
       }
    }
-
+   
+   tname = c("par_posteriors","fpar_posteriors")
+   for (d in 1:2)
+   {
+      dev.set(dev.list[d])
+      din = par("din")
+      save.png.plot(tname[d],width=din[1],height=din[2])
+   }
 }
 
 # logit(N1/(N1+N2)) = log(N1)-log(N2)
