@@ -635,14 +635,25 @@ awkread = function(file,name)
 
 
 #  fit = read.fit(file)
-hst.plot=function(model="issams")
+hst.plot=function(model="issams",model.type="")
 {
-#  hst.names=c("logMSY","MSY","logFmsy","Fmsy","r","K","sdlogProc",
-#              "sdlogYield","logQ","Q")
-#  print(length(hst.names))
-   hst.names=c("logFmsy","logMSY","sdlogProc","sdlogYield","logQ",
-               "Fmsy","MSY","K","r","Q")
-#  print(length(hst.names))
+   hst.names=list()
+   ncol = 1
+   nrow = 2
+   if (model.type == "")
+   {
+      hst.names=c("logFmsy","logMSY","sdlogProc","sdlogYield","logQ",
+                  "Fmsy","MSY","K","r","Q")
+      ncol = 3
+   }
+   else
+   {
+      hst.names=c("sdlogProc","sdlogYield","logQ","logr",
+                  "Fmsy","Q","r")
+      ncol = 2
+   }
+   print(length(hst.names))
+   print(hst.names)
    dat = scan(paste(model,".dat",sep=""),what="character")
 #  print(dat)
    wp = which(dat == "r_prior")
@@ -652,25 +663,26 @@ hst.plot=function(model="issams")
    print(paste(wp,r.prior.use,r.prior,sd.r.prior))
 
    nvar = length(hst.names)
-   nrc = ceiling(sqrt(nvar))
-   print(paste(nvar,nrc))
    dev.list = vector(mode="numeric",length=2)
    width= 12.0
    height = 8.0
    xpos = 0
    ypos = 100
    incr = 50
-   nrow = c(2,3)
+   #nrow = c(2,3)
    for (d in 1:2)
    {
       x11(width=width,height=height,xpos=xpos,ypos=ypos)
-      lm = layout(matrix(c(1:6),ncol=3,nrow=2,byrow=TRUE))
+      lm = layout(matrix(c(1:(nrow*ncol)),ncol=ncol,nrow=nrow,byrow=TRUE))
    #  print(lm)
       layout.show(lm)
       dev.list[d] = dev.cur()
       xpos = xpos + incr
       ypos = ypos + incr
    }
+#  if (1) 
+#     return("---------- quitting")
+
 
    lwd = 2
    hst.file = paste(model,".hst",sep="")
@@ -689,7 +701,7 @@ hst.plot=function(model="issams")
       x1 = fit$est[w]-5*fit$std[w]
       x2 = fit$est[w]+5*fit$std[w]
    #  print(" ")
-      print(paste(v,fit$names[w],fit$est[w],fit$std[w],x1,x2))
+      print(paste(v,hst.names[v],length(w),w,fit$names[w],fit$est[w],fit$std[w],x1,x2))
       xx = seq(x1,x2,(x2-x1)/100.0)
       yy = dnorm(xx,mean=fit$est[w],sd=fit$std[w])
       pp = dist$p
@@ -700,10 +712,11 @@ hst.plot=function(model="issams")
    #  print(cbind(xx,yy))
       if (nrow(dist) > 4)
       {
-         if (v > 5)
+         if (v > 4) # > 5)
             dev = 2
       #  print(paste("dev",dev,dev.list[dev]))
          dev.set(dev.list[dev])
+         print(paste(v,hst.names[v],dev,dev.list[dev]))
       #  x11(xpos=xpos,ypos=ypos,title=hst.names[v])
          xrange = c(max(min(xx),min(dist$x)),min(max(xx),max(dist$x))) #range(xx,dist$x)
          xrange = c(x1,x2) #range(dist$x)
@@ -722,6 +735,13 @@ hst.plot=function(model="issams")
             lines(xx,pyy,col="red",lwd=lwd)
             abline(v=r.prior,lty="dotdash",col="red",lwd=lwd)
          }
+         if ((hst.names[v] == "logr" ) && r.prior.use > 0)
+         {
+            pyy = dnorm(xx,mean=log(r.prior),sd=sd.r.prior)
+            lines(xx,pyy,col="red",lwd=lwd)
+            abline(v=log(r.prior),lty="dotdash",col="red",lwd=lwd)
+         }
+
          #   ar = 2.0*mfexp(logFmsy);
          if ((hst.names[v] == "logFmsy" ) && r.prior.use > 0)
          {

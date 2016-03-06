@@ -124,31 +124,6 @@ MFCL Region 2 & MFCL Region 4\\
 \end{center}
 \end{slide}
 
-\begin{slide}\section{Technical features}
-\begin{enumerate}
-\item Fishing mortality and biomass are random effects.
-\item All process errors (population growth, fishing
-mortality random walk, biomass index proportionality) are assumed
-to be equal to a single estimated error $(\sigma_P)$.
-\item Zero-inflated log-normal catch likelihood with estimated
-observation error $(\sigma_Y)$.
-\item Two alternate logistic model parameterizations:
-\begin{enumerate}
-\item $K = \frac{4\MSY}{r};\quad r = 2\Fmsy$
-\item $K = d\cdot B_1$
-\end{enumerate}
-\item Optional log-normal prior on $r$ with 
-$\tilde{r} = 0.486$ and $\sigma_r = 0.8$,
-% (Carruthers and McAllister, 2011).
-\item Analytic solution to Schaefer ODE for stable propagation
-through time.
-\end{enumerate}
-\vfill
-\par All computer code, data files, and draft reports in support of this
-analysis can be found at Github:
-\url{https://github.com/johnrsibert/XSSA.git}.
-\end{slide}
-
 \begin{slide}\section{Estimabilty}
 {\scriptsize
 \label{tag:ests4}
@@ -264,6 +239,32 @@ WCPFC stock assessments to local requirements.
 %\url{https://github.com/johnrsibert/XSSA.git}
 \includegraphics[width=0.8\textwidth]{./graphics/recumbant.png}
 \end{center}
+\end{slide}
+
+\begin{slide}\section{Technical features}
+\begin{enumerate}
+\item Fishing mortality and biomass are random effects.
+\item All process errors (population growth, fishing
+mortality random walk, biomass index proportionality) are assumed
+to be equal to a single estimated error $(\sigma_P)$.
+\item Zero-inflated log-normal catch likelihood with estimated
+observation error $(\sigma_Y)$.
+\item Two alternate logistic model parameterizations:
+\begin{enumerate}
+\item $K = \frac{4\MSY}{r};\quad r = 2\Fmsy$
+\item $K = d\cdot B_1$
+\end{enumerate}
+\item Optional log-normal prior on $r$ with 
+$\tilde{r} = 0.486$ and $\sigma_r = 0.8$.
+% (Carruthers and McAllister, 2011).
+\item Analytic solution to Schaefer ODE for stable propagation
+through time.
+\end{enumerate}
+\vfill
+\par Models implemented in ADMB and TMB;
+all computer code, data files, and draft reports 
+can be found at Github:
+\url{https://github.com/johnrsibert/XSSA.git}.
 \end{slide}
 
 \begin{slide}\section{Alternative Schaefer Parameterizations}
