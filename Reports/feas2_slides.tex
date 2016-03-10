@@ -141,7 +141,7 @@ $n$ & Estimated Parameters &4 & 5 & 5 & 6\\
 $|G|_{max}$& Gradient at Minimum & $\underline{\mbox{0.0016409}}$ & 33.1289 &
 $\underline{\underline{\mbox{3.51082e-05}}}$ & 3.77653\\
 $-\log L$& Likelihood & -237.238 & -237.968 & -247.175 & -243.343\\
-%AIC & Akaike Criterion & -466.476 & -465.936 & -484.35 & -474.686\\
+AIC & Akaike Criterion & -466.476 & -465.936 & -484.350 & -474.686\\
 \hline
 $B_1$& Initial Biomass & --- & 1184.2 & --- & 2802.3\\
 $d$ &$K=dB_1$ & --- & 9.6674 & --- & 2.6348\\
@@ -283,9 +283,16 @@ N(0,\sigma^2_K)$?
 \end{itemize}
 \end{slide}
 
-\begin{slide}\section{Catch Predictions}
+\begin{slide}\section{F and Catch Predictions}
 \begin{center}
-\includegraphics[height=0.8\textheight]{./graphics/est_catchB1.pdf}
+%\includegraphics[height=0.8\textheight]{./graphics/est_catchB1.pdf}
+\begin{tabular}{cc}
+Fishing Mortality & Catch\\
+\includegraphics[width=0.45\textwidth]{../run-issams/use_r_prior/r2/Q1/est_FB1.pdf}
+&
+\includegraphics[width=0.45\textwidth]{../run-issams/use_r_prior/r2/Q1/est_catchB1.pdf}\\
+\end{tabular}
+
 \end{center}
 \end{slide}
 
