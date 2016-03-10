@@ -37,6 +37,12 @@ endif
 #BIN_DIR = ../run
 BIN_DIR = ~/bin
 
+issams-rrK: issams-rrK.tpl
+	@echo ------- Translate $<
+	$(ADMB_HOME)/bin/admb ${FLAGS} -r $<
+	@echo -------- move $@
+	mv -f $@ $(BIN_DIR)/$@$(VER)
+
 issams-QIK: issams-QIK.tpl
 	@echo ------- Translate $<
 	$(ADMB_HOME)/bin/admb ${FLAGS} -r $<
