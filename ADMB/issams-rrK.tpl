@@ -312,12 +312,13 @@ PRELIMINARY_CALCS_SECTION
           }
        }
        TTRACE(ut,utPop)
-       double logK = value(logQ) + log(mean_immigrant_biomass);
+       double logK = 9.0;//value(logQ) + log(mean_immigrant_biomass);
        for (int t = 1; t <= ntime; t++)
        {   
           U(++ut) = logK;
        }
        TTRACE(ut,utK)
+       logK ++;
        for (int t = 1; t <= ntime; t++)
        {   
           U(++ut) = logK;
@@ -342,6 +343,9 @@ PRELIMINARY_CALCS_SECTION
        pin << "\n#   Pop(t):"<< endl;
        for (int tt = 1; tt <= ntime; tt++)
           pin << " " << U(utPop+tt);
+       pin << "\n#   K(t):"<< endl;
+       for (int tt = 1; tt <= ntime; tt++)
+          pin << " " << U(utK+tt);
        pin << endl;
        if (!pin)
        {
@@ -456,6 +460,7 @@ SEPARABLE_FUNCTION void step0(const dvariable& p11, const dvariable& lsdlogProc,
   dvariable varlogK = square(mfexp(lsdlogProc));
   dvariable logK0 = p10; //log(K0);
   dvariable logK1 = lnK1;
+  //TTRACE(logK0,logK1)
   dvariable Knll = 0.0;
   Knll += 0.5*(log(TWO_M_PI*varlogK) + square(logK0 - logK1)/varlogK);
   nll += Knll;
@@ -488,7 +493,7 @@ SEPARABLE_FUNCTION void step(const int t, const dvar_vector& f1, const dvar_vect
   dvariable Knll = 0.0;
   dvariable varlogK = square(mfexp(lsdlogProc));
   //TTRACE(lsdlogK,varlogK)
-  //TTRACE(logK1,logK2)
+  TTRACE(logK1,logK2)
   Knll += 0.5*(log(TWO_M_PI*varlogK) + square(logK1 - logK2)/varlogK);
   dvariable K = mfexp(logK1);
 
