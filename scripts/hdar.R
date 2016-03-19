@@ -8,7 +8,7 @@ yq.time = function(year,quarter)
    return(time)
 }
 
-make.hdar.dat<-function(file="hdar_calendar.csv",yr1=1952,yr2=2012)
+make.hdar.dat<-function(file="hdar_calendar.csv",yr1=1952,yr2=2012,ngear=5)
 {
    print(paste("Reading ",file))
    dat1 <- read.csv(file,header=TRUE)
@@ -52,12 +52,35 @@ make.hdar.dat<-function(file="hdar_calendar.csv",yr1=1952,yr2=2012)
       }
    }
 #  print("dat2:")
+#  print(dim(dat2))
 #  print(head(dat2))
 #  print(tail(dat2))
 
-   cc = c(1,3:8)
+   if (ngear == 5)
+   {
+#     makes five gear data
+      cc = c(1,3:8)
 #  print(cc)
-   dat3 <- as.matrix(dat2[,cc])
+      dat3 <- as.matrix(dat2[,cc])
+   }
+   else if (ngear == 4)
+   {
+#     makes four gear data by combining "TunaHL" and "InshoreHL"
+      dat3 = matrix(nrow=nrow(dat2),ncol=6)
+      dat3[,1] = dat2[,1]
+      dat3[,2] = dat2[,3]
+      dat3[,3] = dat2[,4] + dat2[,7]
+      dat3[,4] = dat2[,5]
+      dat3[,5] = dat2[,6]
+      dat3[,6] = dat2[,8]
+      colnames(dat3)=c("year","time","Handline","Troll","Longline","Aku Boat")
+   }
+   else
+   {
+      print(paste(ngear,"is an icorrect number of gears; you must specify 5 or 4")) 
+      return(NULL)
+   }
+#  print("dat3:")
 #  print(dim(dat3))
 #  print(head(dat3))
 #  print(tail(dat3))
@@ -67,7 +90,7 @@ make.hdar.dat<-function(file="hdar_calendar.csv",yr1=1952,yr2=2012)
    write(dat3,file=dat.file,ncolumns=dim(dat3)[1])
    print(paste("finished",dat.file))
 
-   return(dat2)
+   return(as.data.frame(dat3))
 }
 
 

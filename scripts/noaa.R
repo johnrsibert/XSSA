@@ -53,18 +53,30 @@ make.noaa.dat=function(file="noaa_quarterly.csv",yr1=1995,yr2=2013)
    return(dat2)
 }
 
-LL.join=function(hdar=NULL,noaa=NULL,yr1=1952,yr2=2012)
+LL.join=function(hdar=NULL,noaa=NULL,yr1=1952,yr2=2012,ngear=4)
 {
    if(is.null(hdar))
-      hdar = make.hdar.dat(file="../HDAR/hdar_calendar.csv",yr1=1949,yr2=2014)
+      hdar = make.hdar.dat(file="../HDAR/hdar_calendar.csv",yr1=1949,yr2=2014,ngear=ngear)
+   print(dim(hdar))
    print(head(hdar))
+#  print(tail(hdar))
+   wll = which(colnames(hdar)=="Longline")
+   gll = wll - 2
+   if (length(wll) < 1)
+   {
+      print(paste("Unable to find 'Longline' in",colnames(hdar)))
+      return(NULL)
+   }
+   print(paste("wll:",length(wll),wll,gll))
+
 
    if(is.null(noaa))
       noaa = make.noaa.dat(file="../NOAA/noaa_quarterly.csv",yr1=1995,yr2=2013)
+   print(dim(noaa))
    print(head(noaa))
 
    mm = match(hdar$time,noaa$time)
-#  print(paste(nrow(hdar),nrow(noaa),length(mm)))
+   print(paste(nrow(hdar),nrow(noaa),length(mm)))
 
    ntime = nrow(hdar)
    LL = matrix(nrow=ntime,ncol=6)
@@ -72,8 +84,8 @@ LL.join=function(hdar=NULL,noaa=NULL,yr1=1952,yr2=2012)
 
    for (n in 1:ntime)
    {
-      LL[n,1] = hdar[n,3]
-      LL[n,2] = hdar[n,6]
+      LL[n,1] = hdar[n,2]
+      LL[n,2] = hdar[n,wll]
       if (!is.na(mm[n]))
       {
          ni = mm[n]
@@ -148,27 +160,43 @@ LL.join=function(hdar=NULL,noaa=NULL,yr1=1952,yr2=2012)
    save.png.plot("LL_partial_acf",width=width,height=height)
 
    nqd = (yr2-yr1+1)*4
-   dat = as.data.frame(matrix(nrow=nqd,ncol=5))
+   dat = as.data.frame(matrix(nrow=nqd,ncol=ngear))
    yy = vector(length=nqd)
-   colnames(dat) = c("OffshoreHL","Troll","Longline","InshoreHL","AkuBoat")
+#  colnames(dat) = c("OffshoreHL","Troll","Longline","InshoreHL","AkuBoat")
+   if (ngear == 4)
+      colnames(dat) = c("Handline","Troll","Longline","Aku Boat")
+   else if (ngear == 5)
+      colnames(dat) = c("TunaHL","Troll","Longline","InshoreHL","AkuBoat")
+   print(colnames(dat))
+   print(dim(dat))
+ 
+   j = 0
    for (n in 1:ntime)
    {
       year = hdar[n,]$year
       if ( (year >= yr1) && (year < (yr2+1)) )
       {
-         qi = hdar[n,]$quarter
-         j = (year-yr1)*4+qi
-         dat[j,1] = hdar[n,4]#$OffshoreHL
-         dat[j,2] = hdar[n,5] #$Troll
-         dat[j,3] = LL[n,]$Mean # Longline
-         dat[j,4] = hdar[n,7]#$InshoreHL
-         dat[j,5] = hdar[n,8]#$AkuBoat
+         j = j + 1
          yy[j] = LL$time[n]
+
+      #  dat[j,1] = hdar[n,4]#$OffshoreHL
+      #  dat[j,2] = hdar[n,5] #$Troll
+      #  dat[j,3] = LL[n,]$Mean # Longline
+      #  dat[j,4] = hdar[n,7]#$InshoreHL
+      #  dat[j,5] = hdar[n,8]#$AkuBoat
+
+         for (k in 1:ngear)
+         {
+            if (k == gll)
+               dat[j,k] = LL[n,]$Mean # Longline
+            else
+               dat[j,k] = hdar[n,k+2]
+         }
       }
    }
-   colnames(dat) = c("Tuna HL","Troll","Longline","Bottom/inshore HL","Aku boat")
+#  colnames(dat) = c("Tuna HL","Troll","Longline","Bottom/inshore HL","Aku boat")
 
-   dat.file = paste("five_gears_q_",yr1,"_",yr2,".dat",sep="")
+   dat.file = paste(ngear,"_gears_q_",yr1,"_",yr2,".dat",sep="")
    print(paste("writing",dat.file))
    write(as.matrix(dat),file=dat.file,ncolumns=dim(dat)[1])
    print(paste("finished",dat.file))
@@ -176,8 +204,6 @@ LL.join=function(hdar=NULL,noaa=NULL,yr1=1952,yr2=2012)
    yy2008 = which(yy >= 2008)
    print(yy2008)
    print(paste(length(yy2008), 0.25*length(yy2008)))
-   print(dat[yy2008,])
-   print(sum(dat[yy2008,],na.rm=TRUE))
    print(paste("Post 2008 annual average: ",
          sum(dat[yy2008,],na.rm=TRUE)/(0.25*length(yy2008))))
    
@@ -197,7 +223,7 @@ LL.join=function(hdar=NULL,noaa=NULL,yr1=1952,yr2=2012)
                    ylab="Catch (mt)")
    }
 
-   save.png.plot(paste(ncol(dat),"_gear_catch_history_q",sep=""),width=width,height=height)
+   save.png.plot(paste(ngear,"_gear_catch_history_q",sep=""),width=width,height=height)
 
    ####################################
    # sum catch over quarters to generate annual data
@@ -205,7 +231,7 @@ LL.join=function(hdar=NULL,noaa=NULL,yr1=1952,yr2=2012)
    ya = seq(yr1,yr2,1)
    nyear = length(ya)
    print(paste("nyear =",nyear))
-   adat = as.data.frame(matrix(nrow=nyear,ncol=5))
+   adat = as.data.frame(matrix(nrow=nyear,ncol=ngear))
    colnames(adat) = colnames(dat)
    for (i in 1:nyear)
    {
@@ -217,7 +243,7 @@ LL.join=function(hdar=NULL,noaa=NULL,yr1=1952,yr2=2012)
       }
    }
 
-   dat.file = paste("five_gears_a_",yr1,"_",yr2,".dat",sep="")
+   dat.file = paste(ngear,"_gears_a_",yr1,"_",yr2,".dat",sep="")
    print(paste("writing",dat.file))
    write(as.matrix(adat),file=dat.file,ncolumns=dim(adat)[1])
    print(paste("finished",dat.file))
@@ -237,7 +263,7 @@ LL.join=function(hdar=NULL,noaa=NULL,yr1=1952,yr2=2012)
    nice.ts.plot(ya,rowSums(adat),lwd=5,label="Total",
                    ylab="Catch (mt)")
 
-   save.png.plot(paste(ncol(adat),"_gear_catch_history_a",sep=""),width=width,height=height)
+   save.png.plot(paste(ngear,"_gear_catch_history_a",sep=""),width=width,height=height)
 
 
    # now do the forcing biomass
