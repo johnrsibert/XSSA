@@ -66,10 +66,18 @@ make.hdar.dat<-function(file="hdar_calendar.csv",yr1=1952,yr2=2012,ngear=5)
    else if (ngear == 4)
    {
 #     makes four gear data by combining "TunaHL" and "InshoreHL"
+      for (j in 4:8)
+      {
+         w = which(is.na(dat2[,j]))
+         if (length(w) > 0)
+            dat2[w,j] = 0.0
+
+      }
       dat3 = matrix(nrow=nrow(dat2),ncol=6)
       dat3[,1] = dat2[,1]
       dat3[,2] = dat2[,3]
       dat3[,3] = dat2[,4] + dat2[,7]
+   #  dat3[,3] = sum(dat2[,4],dat2[,7],na.rm=TRUE)
       dat3[,4] = dat2[,5]
       dat3[,5] = dat2[,6]
       dat3[,6] = dat2[,8]
