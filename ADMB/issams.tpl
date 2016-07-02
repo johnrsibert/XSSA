@@ -130,6 +130,7 @@ DATA_SECTION
   !! TTRACE(r_prior,sdr_prior)
   number varr_prior;
   !! varr_prior = square(sdr_prior);
+  !! TRACE(varr_prior)
 
   //init_int use_Fmsy_prior;
   //init_number Fmsy_prior;
@@ -175,6 +176,11 @@ DATA_SECTION
   ivector UU;
   ivector first_year;
   ivector last_year;
+
+  int nll_count;
+  !! nll_count = 0;
+  vector nll_vector(1,100000);
+  !! nll_vector.initialize();
 
  LOCAL_CALCS;
     TRACE(ntime);
@@ -331,7 +337,7 @@ PRELIMINARY_CALCS_SECTION
        {   
           for (int g = 1; g <= ngear; g++)
           {
-             U(++ut) =  -5.0; //log(0.001);
+             U(++ut) = -5.0;
           }
        }
        TTRACE(ut,utPop)
@@ -414,6 +420,7 @@ PROCEDURE_SECTION
   }
 
   nll = 0.0;
+  nll_count = 0;
 
   step0(U(utPop+1), logsdlogProc, logFmsy, logMSY, logQ);
   //TRACE(nll)
@@ -432,14 +439,16 @@ PROCEDURE_SECTION
      obs(t,U(Fndxl(t),Fndxu(t)),U(utPop+t-1),U(utPop+t), logsdlogYield);
   }
   //TRACE(nll)
- 
 
   if (use_r_prior)
   {
      dvariable logr = log(2.0)+logFmsy;
      dvariable nll_r = 0.5*(log(TWO_M_PI*varr_prior) + square(logr - logr_prior)/varr_prior);
      nll += nll_r;
+     NLL_TRACE(nll_r)
+     NLL_TRACE(nll)
   }
+
   //TRACE(nll)
 
   // compute sdreport_numbers
@@ -465,6 +474,7 @@ PROCEDURE_SECTION
        write_status(clogf);
     }
   }
+  write_nll_vector();
 
 
 SEPARABLE_FUNCTION void step0(const dvariable& p11, const dvariable& lsdlogProc, const dvariable& lFmsy, const dvariable& lMSY, const dvariable& tlogQ)
@@ -478,17 +488,22 @@ SEPARABLE_FUNCTION void step0(const dvariable& p11, const dvariable& lsdlogProc,
   dvariable varlogPop = square(mfexp(lsdlogPop));
   dvariable Pnll = 0.0;
   Pnll += 0.5*(log(TWO_M_PI*varlogPop) + square(p10 - p11)/varlogPop);
+  NLL_TRACE(Pnll)
+  NLL_TRACE(nll)
   nll += Pnll;
 
+  dvariable Qnll = 0.0;
   if (use_Q)
   {
-     dvariable Qnll = 0.0;
      dvariable varlogQ = square(mfexp(lsdlogProc));
      dvariable lnQ=tlogQ;
      dvariable logib = lnQ + log(immigrant_biomass(1));
      Qnll += 0.5*(log(TWO_M_PI*varlogQ) + square(logib-p11)/varlogQ);
      nll += Qnll;
   }
+  NLL_TRACE(Qnll)
+  NLL_TRACE(nll)
+
 
 
 SEPARABLE_FUNCTION void step(const int t, const dvar_vector& f1, const dvar_vector& f2, const dvariable& p11, const dvariable p12, const dvariable& lsdlogProc, const dvariable& lFmsy, const dvariable& lMSY, const dvariable lnQ)
@@ -527,6 +542,7 @@ SEPARABLE_FUNCTION void step(const int t, const dvar_vector& f1, const dvar_vect
         ad_exit(1);
      }
   } 
+  NLL_TRACE(Fnll)
 
   dvariable sumFg = sum(mfexp(ft1)); // total fishing mortality
 
@@ -550,19 +566,21 @@ SEPARABLE_FUNCTION void step(const int t, const dvar_vector& f1, const dvar_vect
 
   dvariable Pnll = 0.0;
   Pnll += 0.5*(log(TWO_M_PI*varlogPop) + square(p12-nextLogN)/varlogPop);
+  NLL_TRACE(Pnll)
 
   nll += (Fnll+Pnll);
+  NLL_TRACE(nll)
+
+  dvariable Qnll = 0.0;
   if (use_Q)
   {
-     dvariable Qnll = 0.0;
      dvariable varlogQ = square(mfexp(lsdlogProc));
      dvariable logib = lnQ + log(immigrant_biomass(t));
      Qnll += 0.5*(log(TWO_M_PI*varlogQ) + square(logib-nextLogN)/varlogQ);
      nll += Qnll;
   }
-  //clogf << t << " " << Fnll << " " <<Pnll << " " <<PLnll << " " << Qnll << " " 
-  //      << nll << endl;
-  
+  NLL_TRACE(Qnll)
+  NLL_TRACE(nll)
 
 SEPARABLE_FUNCTION void obs(const int t, const dvar_vector& f,const dvariable& pop11, const dvariable& pop21, const dvariable& lsdlogYield)
   // f2  U(Fndxl(t),Fndxu(t)) 
@@ -679,7 +697,8 @@ SEPARABLE_FUNCTION void obs(const int t, const dvar_vector& f,const dvariable& p
   //TTRACE(t,Ynll)
 
   nll += Ynll;
-  //TTRACE(t,nll)
+  NLL_TRACE(Ynll)
+  NLL_TRACE(nll)
 
   // dump stuff in "residual" matrix
   int rc = 0; // residuals column counter
@@ -693,6 +712,12 @@ SEPARABLE_FUNCTION void obs(const int t, const dvar_vector& f,const dvariable& p
     residuals(t, ++rc) = value(ft(g));
   for (int g = 1; g <= ngear; g++)
     residuals(t, ++rc) = value(log_pred_yield(g));
+
+FUNCTION void write_nll_vector(void)
+    clogf << "\nnll_count " << nll_count << endl;
+    for (int i = 1; i <= nll_count; i++)
+       clogf << " " << setw(18) << setprecision(15) << nll_vector(i) 
+                    << setw(6) << i << endl;
 
 FUNCTION void write_status(ofstream& s)
     status_blocks ++;
@@ -756,6 +781,12 @@ FUNCTION void write_status(ofstream& s)
 
 
 REPORT_SECTION
+    clogf << "\nnll_count " << nll_count << endl;
+    TRACE(nll_count)
+    for (int i = 1; i <= nll_count; i++)
+       clogf << " " << setw(18) << setprecision(15) << nll_vector(i) 
+                    << setw(6) << i << endl;
+
     write_status(clogf);
     status_blocks --;
     write_status(report);

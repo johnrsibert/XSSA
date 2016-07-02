@@ -1,6 +1,6 @@
 //$Id: trace.h 2853 2011-09-21 19:15:11Z jsibert $
-#ifndef __TRACE__
-#define __TRACE__
+#ifndef __TRACE_H__
+#define __TRACE_H__
 #if (__GNUC__ >=3)
   #include <fstream>
   using std::ofstream;
@@ -52,4 +52,8 @@ Prints the value of two arguments (note the double 'T'), file name and line numb
 It the argument is logically false, prints the file name, line number and value of argument and exits with exict code = 1.
 */
 #define ASSERT(object) if (!object) { cerr << "ASSERT: line = " << __LINE__ << " file = " << __FILE__ << " " << #object << " = " << object << " (false)\n"; exit(1); }
-#endif
+
+#undef NLL_TRACE
+#define NLL_TRACE(nll) nll_vector(++nll_count) = value(nll); 
+
+#endif // #ifndef __TRACE_H__

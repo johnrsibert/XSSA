@@ -125,7 +125,6 @@ template < class Type > Type objective_function < Type >::operator()()
 
    //random_effects_vector U(1,lengthU);
    PARAMETER_VECTOR(U);
-   //DATA_VECTOR(U);
    //REPORT(U)
 
    // diagnostic information
@@ -135,6 +134,9 @@ template < class Type > Type objective_function < Type >::operator()()
    int status_blocks = 0;
 
    Type nll = 0.0;
+   int nll_count = 0;
+   //std::vector < double > tnll_vector(6100,0.0);
+   vector < double > nll_vector(12000);
 
    Type sdlogProc  = exp(logsdlogProc);
    Type sdlogYield = exp(logsdlogYield);
@@ -163,20 +165,22 @@ template < class Type > Type objective_function < Type >::operator()()
    Type varlogPop = square(exp(lsdlogPop));
    Type Pnll = 0.0;
    Pnll += 0.5*(log(TWO_M_PI*varlogPop) + square(p10 - p11)/varlogPop);
-   if (isnan(value(Pnll)))
-       TRACE(Pnll)
+   NLL_TRACE(Pnll)
+   NLL_TRACE(nll)
    nll += Pnll;
+   //nll_vector[nll_count] = value(Pnll);
+   //nll_count ++;
+
+   Type Qnll = 0.0;
    if (use_Q)
    {
-      Type Qnll = 0.0;
       Type varlogQ = square(exp(logsdlogProc));
       Type logib = logQ + log(immigrant_biomass(0));
       Qnll += 0.5*(log(TWO_M_PI*varlogQ) + square(logib-p11)/varlogQ);
-      if (isnan(value(Qnll)))
-         TRACE(Qnll)
       nll += Qnll;
    }
-   //TRACE(nll)
+   NLL_TRACE(Qnll)
+   NLL_TRACE(nll)
 
    // update population until the end of time
    for (int t = 1; t < ntime; t++)
@@ -200,6 +204,7 @@ template < class Type > Type objective_function < Type >::operator()()
          if (isnan(value(Fnll)))
             TRACE(Fnll)
       } 
+      NLL_TRACE(Fnll)
    
    
       Type p11 = U(utPop+t-1);
@@ -220,19 +225,23 @@ template < class Type > Type objective_function < Type >::operator()()
    
       Type Pnll = 0.0;
       Pnll += 0.5*(log(TWO_M_PI*varlogPop) + square(p12-nextLogN)/varlogPop);
-      if (isnan(value(Pnll)))
-         TRACE(Pnll)
+      NLL_TRACE(Pnll)
       nll += (Fnll+Pnll);
+      NLL_TRACE(nll)
+   //nll_vector[nll_count] = value(Fnll);
+   //nll_count ++;
+
+
+      Type Qnll = 0.0;
       if (use_Q)
       {
-         Type Qnll = 0.0;
          Type varlogQ = square(exp(logsdlogProc));
          Type logib = logQ + log(immigrant_biomass(t));
          Qnll += 0.5*(log(TWO_M_PI*varlogQ) + square(logib-nextLogN)/varlogQ);
-         if (isnan(value(Qnll)))
-            TRACE(Qnll)
          nll += Qnll;
       }
+      NLL_TRACE(Qnll)
+      NLL_TRACE(nll)
    } //for (int t = 1; t < ntime; t++)
    //TRACE(nll)
 
@@ -332,6 +341,9 @@ template < class Type > Type objective_function < Type >::operator()()
      //TTRACE(t,Ynll)
 
      nll += Ynll;
+     NLL_TRACE(Ynll)
+     NLL_TRACE(nll)
+
      //TTRACE(t,nll)
      // dump stuff in "residual" matrix
      int rc = -1; // residuals column counter
@@ -349,17 +361,18 @@ template < class Type > Type objective_function < Type >::operator()()
 
    } //for (int t = 0; t < ntime; t++)
    //TRACE(nll)
-
-   REPORT(residuals)
  
    if (use_r_prior)
    {
       Type logr = log(2.0)+logFmsy;
       Type nll_r = 0.5*(log(TWO_M_PI*varr_prior) + square(logr - logr_prior)/varr_prior);
       nll += nll_r;
-      if (isnan(value(nll_r)))
-         TRACE(nll_r)
+      NLL_TRACE(nll_r)
+      NLL_TRACE(nll)
    }
+   REPORT(nll_count)
+   REPORT(nll_vector)
+   REPORT(residuals)
 
    //TRACE(nll)
    return nll;

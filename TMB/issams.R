@@ -46,7 +46,6 @@ ntime=data$ntime
 data$dt = get.numeric.field()
 print(paste(nobs.gear,ntime,data$dt))
 tcatch=matrix(nrow=nobs.gear,ncol=ntime)
-print(dim(data$obs.catch))
 for (g in 1:nobs.gear)
 {
    for (t in 1:ntime)
@@ -83,8 +82,6 @@ mean.immigrant.biomass = mean(forcing.matrix[data$fr]);
 maximum.immigrant.biomass = max(forcing.matrix[data$fr]);
 if (data$use_mean_forcing)
    data$immigrant_biomass = mean.immigrant.biomass;
-print(data$immigrant.biomass)
-
 
 data$phase_Fmsy = get.numeric.field()
 phases = c(phases,data$phase_Fmsy)
@@ -170,7 +167,7 @@ for (t in 1:ntime)
    for (g in 1:data$ngear)
    {
       ut = ut + 1
-      parameters$U[ut] =  -5.0
+      parameters$U[ut] = -5.0
    }
 }
 for (t in 1:ntime)
@@ -190,30 +187,40 @@ print("MakeADFun-------------------------------------",quote=FALSE)
 obj = MakeADFun(data,parameters,random=c("U"),DLL="issams")
 #obj = MakeADFun(data,parameters,DLL="issams")
 obj$control=list(trace=1,eval.max=1,iter.max=2)
+Objective.function.value = obj$fn(obj$par)
 
-print("starting optimization-------------------------",quote=FALSE)
-st=system.time(opt <- nlminb(obj$par,obj$fn,obj$gr)) #,control=obj$control))
-print("finished optimization-------------------------",quote=FALSE)
-print("Timings:")
-print(st)
-print(paste("Objective function value =",opt$objective))
-sd.rep = sdreport(obj)
-max.grad = max(sd.rep$gradient.fixed)
-std = rbind(summary(sd.rep,select="fixed"),
-            summary(sd.rep,select="report"))
-print(paste("Number of parameters = ",length(opt$par),
-            " Objective function value = ",opt$objective,
-            " Maximum gradient component = ",max.grad,sep=""),quote=FALSE)
-print(std)
+#print("starting optimization-------------------------",quote=FALSE)
+##st=system.time(opt <- nlminb(obj$praar,obj$fn,obj$gr)) #,control=obj$control))
+#ist=system.time(opt <- nlminb(admb.par,obj$fn,obj$gr,control=list(trace=1)))
+#print("finished optimization-------------------------",quote=FALSE)
+#print("Timings:")
+#print(st)
+#print(paste("Objective function value =",opt$objective))
+#sd.rep = sdreport(obj)
+#max.grad = max(sd.rep$gradient.fixed)
+#std = rbind(summary(sd.rep,select="fixed"),
+            #summary(sd.rep,select="report"))
+#print(paste("Number of parameters = ",length(opt$par),
+            #" Objective function value = ",opt$objective,
+            #" Maximum gradient component = ",max.grad,sep=""),quote=FALSE)
+#print(std)
 #print(paste("Convergence:",as.logical(opt$convergence)),quote=FALSE)
 
-print("Starting MCMC --------------------------------",quote=FALSE)
-rwm = mcmc(obj=obj, nsim=50000, algorithm='RWM') 
+#print("Starting MCMC --------------------------------",quote=FALSE)
+#rwm = mcmc(obj=obj, nsim=50000, algorithm='RWM') 
 #, params.init=opt$par, alpha=.08, diagnostic=TRUE)
+
+print.nll.vector=function(obj)
+{
+   for (i in 1:(obj$report()$nll_count))
+   {
+      print(paste(signif(obj$report()$nll_vector[i],15),i,sep=" "),quote=FALSE)
+   }
+}
 
 ## 
 ## 
-## Error in if (log(runif(1)) < fn.new - fn.cur) { : 
+## Error in if (log(runif(1)) < fn.new - fn.cur) { 
 ##   missing value where TRUE/FALSE needed
 ## In addition: There were 50 or more warnings (use warnings() to see the first 50)
 ## Timing stopped at: 421.661 0.277 421.819 

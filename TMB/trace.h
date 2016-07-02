@@ -36,3 +36,7 @@ It the argument is logically false, prints the file name, line number and value 
 */
 #define ASSERT(object) if (!object) { std::cout << "ASSERT: line = " << __LINE__ << " file = " << __FILE__ << " " << #object << " = " << object << " (false)\n"; exit(1); }
 #endif
+
+#ifndef NLL_TRACE
+#define NLL_TRACE(nll) nll_vector(nll_count++) = value(nll);
+#endif

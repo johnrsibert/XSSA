@@ -1026,3 +1026,297 @@ TMB.sd.comp=function(TMB.path="/home/jsibert/Projects/xssa/TMB/issams-fit.Rdata"
 
    save.png.plot("ADMB-TMB-sd-comp",width=width,height=height)
 }
+
+
+
+# Status after 4758 PROCEDURE_SECTION entries;
+# Status block 19
+# current phase = 1
+# nll = 19.166
+# nvar = 366
+# logFmsy = -1.791 (1)
+#    Fmsy = 0.1668
+#    r = 0.3336
+#   r_prior = 0.486 (1)
+# sdr_prior = 0.8
+# logMSY = 7.1614 (1)
+#    MSY = 1288.7
+#    K = 15452
+#   logsdlogProc: -1.2935 (1)
+#      sdlogProc: 0.2743
+# logsdlogYield: -0.75655 (1)
+#    sdlogYield: 0.46928
+#          logQ: -3.1419 (1)
+#             Q: 0.043202 (1)
+# Lpcon = -1.6779 (0)
+# pcon = 0.15738
+# klingon_multiplier = 0
+#     logsdlogF: -1.2935 (1)
+#        sdlogF: 0.2743
+#   logsdlogPop: -1.2935 (1)
+#      sdlogPop: 0.2743
+
+issams.sim=function(r=0.3, K=15000, Q=0.04, sdlogProc=0.3, 
+                    sdlogF=sdlogProc, sdlogPop=sdlogProc, sdlogQ=sdlogProc, 
+                    sdlogYield=0.5, logPop0=log(K))
+{
+   eps = 1e-8
+   dat = read.dat.file("issams.dat")
+   print(names(dat))
+
+   ngear = dat$ngear
+   nfish = ngear
+   ntime = dat$ntime
+   dt = dat$dt
+
+   obs.catch = dat$obs_catch
+#  F.mort  = obs.catch/K
+   logK = log(K)
+   log.F.mort = log(obs.catch+eps) - logK
+
+#  prop.catch = obs.catch/K
+#  return(prop.catch)
+
+#  max.catchy$ = vector(length=ngear)
+#  f.mult = matrix(1.0,ncol=ngear,nrow=ntime)
+#  for (g in 1:ngear)
+#  {
+#     max.catch[g] = max(obs.catch[,g],na.rm=TRUE)
+#     for (t in 2:ntime)
+#     {
+#         f.mult[t,g] = obs.catch[t,g]/(obs.catch[t-1,g]+eps)
+#     }
+#  }
+#  print(max(obs.catch))
+#  print(max.catch)
+#  print(head(f.mult))
+#  print(tail(f.mult))
+
+#  # compute fishing mortality time series
+#  F.mort = matrix(1.0,ncol=ngear,nrow=ntime)
+#  for (g in 1:ngear)
+#  {
+#     for (t in 2:ntime)  
+#     {
+#        F.mort[t,g] = F.mort[t-1,g]*f.mult[t,g]
+#     }
+#     F.mort[1,g] = F.mort[2,g]
+
+#     F.mort[,g] = F.mort[,g]/max(F.mort[,g])*max.catch[g]/max(obs.catch)
+#  }
+
+   print(head(log.F.mort))
+   print(tail(log.F.mort))
+#  return(log.F.mort)
+
+
+   for (g in 1:ngear)
+   {
+      F.err = rnorm(n=ntime,sd=sdlogF)
+      for (t in 2:ntime)
+      {
+         log.F.mort[t,g] = log.F.mort[t-1,g] + F.err[t]
+      }
+
+   }
+   print(head(log.F.mort))
+   print(tail(log.F.mort))
+#  return(log.F.mort)
+
+   Pop = vector(length=ntime)
+   Pop[1] = exp(logPop0)
+   for (t in 2:ntime)
+   {
+#  dvariable sumFg = sum(mfexp(ft1)); // total fishing mortality
+      sumFg = sum(exp(log.F.mort[t,]))
+#     print(exp(log.F.mort[t,]))
+ 
+#  dvariable prevlogN = p11;
+      prevlogN = log(Pop[t-1])
+#  dvariable prevN = mfexp(prevlogN);
+      prevN = exp(prevlogN)
+#  dvariable rmF = r - sumFg;
+      rmF = r - sumFg
+#  dvariable ermF = mfexp(-1.0*rmF);
+      ermF = exp(-1.0*rmF)
+#  dvariable Krmf = K*rmF;
+      Krmf = K*rmF
+#  //    S[t] = (K*(r-Fmort))/((((K*(r-Fmort))/S[t-1])*exp(-(r-Fmort))) - r*exp(-(r-Fmort))  + r) # p5
+#  dvariable nextN = Krmf/(((Krmf/prevN)*ermF) - r*ermF +r); // 5
+      nextN = Krmf/(((Krmf/prevN)*ermF) - r*ermF +r)
+#  dvariable nextLogN = log(nextN);
+      nextLogN = log(nextN)
+      Pop[t] = nextN
+
+#   N_t = (1-Q)S(N_(t-1)) + QI_t
+   }
+
+#  return(Pop)
+
+   logdt = log(dt)
+   log.pred.yield = matrix(0.0,ncol=ngear,nrow=ntime)
+   for (t in 1:ntime)
+   {
+      log.total.mean.pop = 0
+      if (t < 2)
+         log.total.mean.pop = log(Pop[t])
+      else
+         log.total.mean.pop = log(0.5*(Pop[t-2]+Pop[t]))
+
+#   dvariable log_total_mean_pop;
+#   if (t < 2)
+#      log_total_mean_pop = pop21;
+#   else
+#      log_total_mean_pop = log( 0.5*(mfexp(pop11) + mfexp(pop21)) );
+
+#   dvar_vector log_pred_yield(1,ngear);
+#   for (int g = 1; g <= ngear; g++)
+#   {
+#      log_pred_yield(g) = logdt + ft(g) + log_total_mean_pop;
+#   }
+
+      for (g in 1:ngear)
+      {
+         log.pred.yield[t,g] = logdt + log.F.mort[t,g] + log.total.mean.pop;
+      }
+
+   }
+   return(log.pred.yield)
+
+}
+
+
+read.dat.file=function(dat.file="issams.dat")
+{
+
+   field.counter <<- 0
+
+   get.field = function()
+   {
+     field.counter <<- field.counter + 1
+     field = sca[field.counter]
+   # print(paste(field.counter,field))
+     return(field)
+   }
+   
+   get.numeric.field<-function()
+   {
+      ret = as.numeric(get.field())
+      return(ret)
+   }
+   
+   sca = scan(file=dat.file,comment.char="#",what="raw",quiet=TRUE)
+   print(paste("Read",length(sca),"items from ",dat.file))
+   
+   data = list()
+   phases = list()
+   
+   data$ngear = get.numeric.field()
+   nobs.gear=data$ngear
+   data$ntime = get.numeric.field()
+   ntime=data$ntime
+   data$dt = get.numeric.field()
+   print(paste(nobs.gear,ntime,data$dt))
+   tcatch=matrix(nrow=nobs.gear,ncol=ntime)
+   print(dim(data$obs.catch))
+   for (g in 1:nobs.gear)
+   {
+      for (t in 1:ntime)
+      {
+         tcatch[g,t] = get.numeric.field()
+      }
+   }
+   data$use.klingons=get.numeric.field()
+   data$use.klingon.multiplier=get.numeric.field()
+   
+   
+   data$first_year = vector(length=nobs.gear)
+   data$last_year = vector(length=nobs.gear)
+   for (g in 1:nobs.gear)
+   {
+      data$first_year[g] = 0
+      data$last_year[g] = ntime-1
+   }
+   
+   forcing.matrix=matrix(nrow=9,ncol=data$ntime)
+   for (r in 1:9)
+   {
+      for (y in 1:ntime)
+      {
+         forcing.matrix[r,y] = get.numeric.field()
+      }
+   }
+   
+   data$fr = get.numeric.field()
+   data$immigrant_biomass = forcing.matrix[data$fr,]
+   
+   data$use_mean_forcing = get.numeric.field()
+   mean.immigrant.biomass = mean(forcing.matrix[data$fr]);
+   maximum.immigrant.biomass = max(forcing.matrix[data$fr]);
+   if (data$use_mean_forcing)
+      data$immigrant_biomass = mean.immigrant.biomass;
+   print(data$immigrant.biomass)
+   
+   
+   data$phase_Fmsy = get.numeric.field()
+   phases = c(phases,data$phase_Fmsy)
+   data$init_Fmsy = get.numeric.field()
+   
+   data$use_r_prior = get.numeric.field()
+   r.prior = get.numeric.field()
+   data$logr_prior = log(r.prior)
+   sdr.prior = get.numeric.field()
+   data$varr_prior = sdr.prior*sdr.prior
+   
+   data$phase_MSY = get.numeric.field()
+   phases = c(phases,data$phase_MSY)
+   data$init_MSY = get.numeric.field()
+   
+   data$phase_sdlogProc = get.numeric.field()
+   phases = c(phases,data$phase_sdlogProc)
+   data$init_sdlogProc = get.numeric.field()
+   
+   data$phase_sdlogYield = get.numeric.field()
+   phases = c(phases,data$phase_sdlogYield)
+   data$init_sdlogYield = get.numeric.field()
+   
+   data$use_Q = get.numeric.field()
+   data$phase_Q = get.numeric.field()
+   phases = c(phases,data$phase_Q)
+   data$init_Q = get.numeric.field()
+   
+   data$use_robustY = get.numeric.field()
+   phase_pcon = get.numeric.field()
+   init_pcon = get.numeric.field()
+   data$pcon = init_pcon
+   print(paste(field.counter,"input fields processed"))
+   
+   nzero = ntime;
+   if(data$use_robustY !=3)
+   {
+      ziter = 0;
+      while (nzero > 0)
+      {
+         print(paste(nzero,ziter))
+         ziter = ziter + 1
+         nzero = 0;
+         for (g in 1:nobs.gear)
+            for (t in 2:ntime)
+               if ( (tcatch[g,t] <= 0.0) 
+                    && (tcatch[g,t-1] > 0.0) && (tcatch[g,t+1] > 0.0) )
+               {
+                  print(paste(tcatch[g,t-1],tcatch[g,t+1] > 0.0) )
+                  nzero = nzero + 1 
+                  print(paste(nzero,ziter))
+                  tcatch[g,t] = 0.5*(tcatch[g,t-1] + tcatch[g,t+1])
+                  print(paste(nzero, " catch for gear ", g ," at time ", t,
+                        " set to ", tcatch[g,t],sep=""))
+               }
+      }
+      print(paste("Zero catch bridging instances:", nzero))
+   }
+   data$obs_catch = t(tcatch)
+
+
+   return(data)
+}
