@@ -79,7 +79,7 @@ Honolulu, HI  96822 U.S.A.\\[0.125in]
 
 \section*{Introduction}
 The responsibility to manage fisheries for tunas and tuna-like species
-lies regional organizations established under international treaties.
+lies with regional organizations established under international treaties.
 In the Western Central Pacific Ocean, this responsibility devolves to
 the Western and Central Pacific Fisheries Commission (WCPFC, 
 \url{https://www.wcpfc.int}).
@@ -107,16 +107,17 @@ assessment.
 This paper presents an assessment of the stock of yellowfin tuna
 residing in the MHI that may be of use to fishery managers in Hawaii
 in addressing questions about the effects of the fishery on the
-population. The general approach is to adopt a state-space surplus
-production model  (Schaefer, 1954). The model has several
-novel features.
+population. The general approach is to adopt a state-space variant of
+the surplus production model  (Schaefer, 1954). 
+The model has several novel features.
 Fishing mortality, the proportion of the population harvested each
 year, is represented as a random walk (Nielsen and Berg, 2014).
 Biomass estimates from the 2014 WCPFC yellowfin stock assessment
 (Davies, et al. 2014) can be used as indices of abundance.
 The logistic component of the surplus production model is
 reparameterized to estimate parameters of direct relevance to fishery
-management.
+management. State transitions and observations are represented as
+random effects.
 
 \begin{figure}
 \begin{center}
@@ -130,6 +131,281 @@ full explanation.
 }
 \end{center}
 \end{figure}
+
+
+\section*{Data}
+%Commercial Marine Landings, Division of Aquatic Resources, Dept. of Land and Natural Resources, State of Hawaii
+The State of Hawaii Department of Land and Natural Resources
+Commercial Marine Landings data base (CML) from 1949 through 2014 
+and the United States National Oceanic and
+Atmospheric Administration (NOAA) longline log sheet data base from
+1995 through 2013
+are the sources of catch data used in this assessment. Catch data from
+both sources were aggregated by quarter of the calendar year for the
+relevant time periods 
+
+The CML catch reports were aggregated into the following gear
+categories:
+``Aku boat'', ``Bottom/inshore HL'', ``Longline'',  ``Troll'', ``Tuna
+HL'', ``Casting'', ``Hybrid'',  ``Shortline'', ``Other'', and
+``Vertical line''.
+For this analysis catches by ``Casting'', ``Hybrid'',
+``Shortline'', ``Other'', and ``Vertical line'' are combined into a new
+category, ``Misc''. The ``Misc''
+catches are highest after year 2000,
+and comprise a very small proportion of the catch.
+The catch time series for the CML data are shown in Figure~\ref{fig:hdarTS}.
+The ``Bottom/inshore HL'' and ``Tuna HL'' are both handline gears and
+the data for these two gear types were combined at the suggestion of
+the CML database administrator.
+These series also contain sustained periods of zero catch which
+document the development and subsequent shift away from a specific
+gear type. It is assumed that these declines in catches represent a
+``collapse'' of a fishery due to social and economic factors rather than
+to a decline of fish stocks.
+Some time series are also punctuated by brief episodes (one or two quarters in
+length) of zero catches. Again, it is assumed that these zero catches
+are not caused by low stock levels.
+
+The Hawaii-based longline fishery began a rapid expansion in the late
+1980s, and NOAA began to collect data from the longline fleet under a
+federally mandated logbook program in 1990.
+In 1995 NOAA, began to distinguish deep and shallow sets in the data. 
+The CML data do not distinguish between deep and shallow sets.
+Since the longline fleet ranges widely in the North Pacific Ocean,
+only catches reported in the United States EEZ around Hawaii east of
+162\deg{W} longitude were included in the data.
+Figure~\ref{fig:hdarnoaaLLTS} shows the correspondence between the
+CML and NOAA time series. The combined deep plus shallow catches from
+NOAA align fairly well with the overlapping CML data. The simple
+average of the CML data with the combined NOAA deep plus shallow data
+appears to be roughly the same trajectory as the
+constituent time series, Figure~\ref{fig:LLpartialacf}.
+%Data are also available from NOAA for the period 1990-1995, but
+%have not yet been included in this analysis.
+
+
+All catch time series exhibit annual cycles suggesting seasonal
+signals in the catches by all gears. To avoid attempting to estimate
+autocorrelation matrices for each time series and to minimize the
+number of zero catch observations, the quarterly time series were
+aggregated into annual time series show in Figure~\ref{fit:data}.
+
+\section*{Model development}
+\label{sec:models}
+State-space models separate variability in the biological
+processes in the system (transition model)
+from errors in observing features of interest
+in the system (observation model).
+
+{\bf Transition Model $T(\alpha_{t-1})$.}
+The general form of the transition model is
+\begin{equation}
+\alpha_t=T(\alpha_{t-1}) + \eta_t
+\end{equation}
+where $\alpha_t$ is the state at time $t$ and 
+the function $T$ embodies the dynamics mediating the
+development of the state at time $t$ from the state at the previous
+time with random process error, $\eta_t$.
+
+Stock dynamics follow the classic Schaefer differential equation:
+\begin{equation}
+\label{eqn:ischaefer}
+\frac{dN}{dt} = rN(1-\frac{N}{K}) - FN
+\end{equation}
+where $N$ is the biomass of YFT in the MHI, 
+$r$ is the logistic growth rate per year,
+$K$ is the asymptotic biomass, and
+$F$ is the total fishing mortality per year in the MHI.
+
+The state space transition equation for the single population model is
+developed by solving \ref{eqn:ischaefer} analytically from one time to
+the next (see Appendix \ref{sec:schaefer}).
+\begin{equation}
+\label{eqn:intschaeferA}
+N_t = \frac{K(r-\bar{F}_t)}{\frac{K(r-\bar{F}_t)}{N_{t-\Delta t}}e^{-\Delta
+t(r-\bar{F}_t)}-re^{-\Delta t(r-\bar{F}_t)} -r} \cdot e^{\eta_t};
+\quad \eta_t\sim N(0,\sigma^2_N)
+\end{equation}
+where 
+$\bar{F}_t$ is the total fishing mortality, i. e.,
+$$
+\bar{F}_t =\sum_{g=1}^n F_{g,t-\Delta t}.
+$$
+and $\eta_t \sim N(0,\sigma_N)$ is a process error expressing
+variability in population dynamics.
+
+Fishing mortality is treated as a random walk.
+The logarithm of fishing mortality is assumed to
+follow a random walk with normal increments, as suggested by Berg and
+Nielsen (2014).
+\begin{equation}
+\label{eqn:Fwalk}
+\log F_{g,t} = \log F_{g,t-1} + \xi_t;\quad \xi_t\sim
+N(0,\sigma^2_F)
+\end{equation}
+where  $\sigma^2_F$ is a process error expressing the year to year
+variability in fishing mortality.
+
+The indexed abundance model assumes that the biomass of YFT in the MHI
+is approximately proportional to the biomass of an ``index''
+population.
+\begin{equation}
+\log N_t - \log (Q\cdot I_t) = \omega_t;\quad \omega_t\sim N(0,\sigma^2_I)
+\label{eqn:index}
+\end{equation}
+where
+$I_t$ is the size of the index population at time $t$,
+$Q$ is the estimated ratio of the MHI population size to the index
+population,
+and $\sigma^2_I$ is a process error representing the difference
+between the MHI biomass and the abundance index. 
+
+All process errors are assumed to have the same distribution
+$N(0,\sigma^2_P)$; $\sigma_N$,$\sigma_F$, and $\sigma_I$ are assumed
+to be equal and estimated as a global process error with variance
+$\sigma^2_P$.
+
+The logistic parameters $r$ and $K$ are notoriously difficult to estimate
+accurately, so a parameter substitutions was used. In the first
+alternative, MSY ($\MSY$) and fishing mortality at MSY ($\Fmsy$) were
+estimated directly and substituted in \ref{eqn:intschaeferA} as
+$r=2F_{\MSY}$ and $K=\frac{4\MSY}{r}$.
+
+Carruthers and McAllister (2011) recommend use of Bayesian priors for the
+logistic growth parameter $r$ in equation~(\ref{eqn:ischaefer}). They
+suggest $\tilde{r} = 0.486$ with a standard deviation of $\sigma_r = 0.046$
+and coefficient of variation of ${\rm cv}=0.094$ for Atlantic YFT.
+A lognormal prior on $r$ was implemented with 
+$\tilde{r} = 0.486$ and $\sigma_r = 0.8$.
+\begin{equation}
+\log r - \log \tilde{r} = \rho ;\quad \rho\sim N(0,\sigma^2_r)
+\end{equation}
+which is a somewhat ``looseer'' constraint on the estimate of $r$.
+$\rho$ becomes a component of the likelihood
+(equation~\ref{eqn:likelihood}).
+
+{\bf Observation Model, $O(\alpha)$.}
+The general form of the observation model is
+\begin{equation}
+x_t = O(\alpha_t) + \varepsilon_t
+\end{equation}
+where the function $O$ describes the measurement process with
+error $\varepsilon$ in observing the population.
+
+Predicted catch, $\widehat{C}_{g,t}$, for each gear is the product of
+estimated fishing mortality and the total biomass.
+\begin{equation}
+\widehat{C}_{g,t} = F_{g,t}\cdot\Bigl(\frac{N_{t-\Delta
+t}+N_t}{2}\Bigr) \cdot e^{\varepsilon_t}
+\label{eqn:obs1}
+\end{equation}
+where the total biomass is  the average
+biomass over the time step (Quinn and Deriso, 1999), and
+$\varepsilon_t$ is a ``zero-inflated'' log normal likelihood given by
+\begin{equation}
+  \log \varepsilon_t = \left\{
+    \begin{array}{r@{\;:\quad}l}
+       C_{g,t} > 0 &
+(1-p_0)\cdot\bigg(\log\frac{1}{\sqrt{2\pi\sigma^2_Y}}
+          -\Bigl(\frac{\log
+C_{g,t}-\log\widehat{C}_{g,t}}{\sigma_Y}\Bigr)^2\bigg)\\
+       C_{g,t} = 0 & p_0 \cdot\log \frac{1}{\sqrt{2\pi\sigma^2_Y}}\\
+    \end{array}
+  \right.
+\end{equation}
+where $\sigma_Y$ is the observation error and
+$p_0$ is the proportion of observed catch observations equal to zero.
+This proportion may be estimated or fixed at a constant value. For
+current analysis, it is fixed at $p_0 = 0.15738$ as computed from the data.
+% line 186, file issams.cpp, prop_zero =  0.4918 0 0 0.098361 0.19672, tprop_zero = 0.15738
+
+
+
+\begin{table}
+\caption{Complete list of estimated parameters for 
+the state-space surplus production model.
+Values of non-estimated model variables, e.g., $K$, are computed by
+parameter substitution formulas.}
+\label{tab:allvars1}
+\begin{center}
+\begin{tabular}{ll}
+\hline
+Parameter & Definition\\
+\hline
+\hline
+$\Fmsy$& Fishing mortality at maximum sustainable yield\\
+$\MSY$ & Maximum sustainable yield\\
+$Q$    & Abundance index proportionality constant\\
+$\sigma_P$ & Global process error SD; $\sigma_P=\sigma_N=\sigma_F=\sigma_I$\\
+$\sigma_Y$ & Observation error SD \\
+\hline
+$p_0$  & Proportion of zero catch observations;\\
+       & fixed at $p_0 = 0.15738$\\
+$\tilde{r}$ & An {\it a priori} assumed value for $r$\\
+            & fixed at $\tilde{r}=0.486$ (Carruthers and McAllister, 2011)\\
+$\sigma_r$  & Assumed standard deviation of $r$ around its prior;\\
+            & fixed at $\sigma_r=0.8$.\\
+\hline
+$r$    & Instantaneous growth rate; $r=2F_{\MSY}$\\
+$K$    & Asymptotic population size; $K=\frac{4\MSY}{r}$\\
+\hline
+\end{tabular}
+\end{center}
+\end{table}
+
+
+
+{\bf Estimation.} The model states, $N_t$ and $F_{gt}$, are assumed to be random
+effects (Skaug and Fournier, 2006). Model parameters are estimated by
+maximizing the joint likelihood of the random
+effects and the observations.
+\begin{equation}
+\label{eqn:likelihood}
+L(\theta,\alpha,x)=
+\prod^m_{t=2}\big[\phi\big(\alpha_t-T(\alpha_{t-1}), \Sigma_\eta\big)\big]\cdot
+\prod^m_{t=1}\big[\phi\big(x_t-O(\alpha_t),
+\Sigma_\varepsilon\big)\big]\cdot\rho
+\end{equation}
+Here, $m$ is the number of time steps in the catch time series and
+$\theta$ is a vector of model parameters (Table~\ref{tab:allvars1}).
+The model is implemented in ADMB-RE (Fournier et al, 2012).
+The actual number of
+parameters to be estimated depends on the model configuration,
+specified by phase flags in the input file. 
+All computer code, data files, and draft reports in support of this
+analysis can be found at Github:
+\url{https://github.com/johnrsibert/XSSA.git}.
+
+
+
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+%\vspace{4ex}
+\clearpage
+\singlespacing
+\noindent {\bf Acknowledgements.}
+This work was funded by the Western Pacific Regional Fisheries
+Managment Council. I thank the Council for its generous support and
+Council Staff Paul Dalzell and Eric Kingma for encouraging me to
+actually take on this challenging project and for their on-going
+collaboration.
+to David Itano for sharing insights into the small-boat
+fisheries in Hawaii,
+to Reginald Kokubun State of Hawaii, Division of Aquatic Resources,
+Departmemnt of Land and Natural Resources for supplying catch report
+data from the Commercial Marine Landings data base,
+to Keith Bigelow and Karen Sender of NOAA Pacific
+Island Fisheries Science Center for supplying logbook reporting data and
+from the PIFSC data base.
+Thanks also to John Hampton of the Secretariat of the Pacific
+Community, Oceanic Fisheries Programme, for making available \MFCL\
+output files from the latest Western and Central Pacific
+Fisheries Commission yellowfin tuna stock assessment, and to Nick
+Davies for sharing R scripts and advice on interpreting those files.
+
 
 \section*{References}
 {\parindent=0cm \small

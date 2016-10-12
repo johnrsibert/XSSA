@@ -25,25 +25,6 @@ GLOBALS_SECTION;
     else
        return 1;
   }
-  /*
-  template <typename SCALAR> SCALAR logit(const SCALAR& p)
-  {
-     SCALAR a = log(p/(1.0-p));
-     return a;
-  }
-  template double logit<double>(const double& p);
-  template dvariable logit<dvariable>(const dvariable& p);
-  //template df1b2variable logit(const df1b2variable& p); 
-
-  template <typename SCALAR> SCALAR alogit(const SCALAR& a)
-  {
-     SCALAR p = 1.0/(1.0+(mfexp(-a))+1e-20);
-     return p;
-  }
-  template double alogit<double>(const double& a);
-  template dvariable alogit<dvariable>(const dvariable& a);
-  //template df1b2variable alogit<df1b2variable>(const df1b2variable& a); 
-  */
 
 TOP_OF_MAIN_SECTION
   arrmblsize = 50000000;
@@ -131,16 +112,6 @@ DATA_SECTION
   number varr_prior;
   !! varr_prior = square(sdr_prior);
   !! TRACE(varr_prior)
-
-  //init_int use_Fmsy_prior;
-  //init_number Fmsy_prior;
-  //init_number sdFmsy_prior;
-  //number logFmsy_prior;
-  //!! logFmsy_prior = log(Fmsy_prior);
-  //!! TRACE(use_Fmsy_prior)
-  //!! TTRACE(Fmsy_prior,sdFmsy_prior)
-  //number varFmsy_prior;
-  //!! varFmsy_prior = square(sdFmsy_prior);
 
   init_int phase_MSY;
   init_number init_MSY;
@@ -423,7 +394,6 @@ PROCEDURE_SECTION
   nll_count = 0;
 
   step0(U(utPop+1), logsdlogProc, logFmsy, logMSY, logQ);
-  //TRACE(nll)
  
   for (int t = 2; t <= ntime; t++)
   {
@@ -431,14 +401,11 @@ PROCEDURE_SECTION
              U(utPop+t-1), U(utPop+t), logsdlogProc,
              logFmsy, logMSY, logQ);
   }
-  //TRACE(nll)
-
   
   for (int t = 1; t <= ntime; t++)
   {
      obs(t,U(Fndxl(t),Fndxu(t)),U(utPop+t-1),U(utPop+t), logsdlogYield);
   }
-  //TRACE(nll)
 
   if (use_r_prior)
   {
@@ -448,8 +415,6 @@ PROCEDURE_SECTION
      NLL_TRACE(nll_r)
      NLL_TRACE(nll)
   }
-
-  //TRACE(nll)
 
   // compute sdreport_numbers
   ar = 2.0*mfexp(logFmsy);
@@ -551,7 +516,6 @@ SEPARABLE_FUNCTION void step(const int t, const dvar_vector& f1, const dvar_vect
   dvariable rmF = r - sumFg;
   dvariable ermF = mfexp(-1.0*rmF);
   dvariable Krmf = K*rmF;
-  //    S[t] = (K*(r-Fmort))/((((K*(r-Fmort))/S[t-1])*exp(-(r-Fmort))) - r*exp(-(r-Fmort))  + r) # p5
   dvariable nextN = Krmf/(((Krmf/prevN)*ermF) - r*ermF +r); // 5
   dvariable nextLogN = log(nextN);
 
@@ -608,93 +572,75 @@ SEPARABLE_FUNCTION void obs(const int t, const dvar_vector& f,const dvariable& p
   //TRACE(log_pred_yield)
   
   dvariable Ynll = 0.0;
-  //dvariable varlogYield = square(mfexp(logsdlogYield));
   dvariable sdlogYield = mfexp(lsdlogYield);
   dvariable varlogYield = square(sdlogYield);
   for (int g = 1; g <= ngear; g++)
   {
      // observation error
-     if ( (t >= first_year(g)) && (t <= last_year(g)) )
+     if (use_robustY == 1)  // normal + t distribution
      {
-        //log_pred_yield(g) = logdt + ft(g) + log_total_mean_pop;
+        dvariable z = square(obs_catch(t,g)-log_pred_yield(g))/varlogYield;
 
+        dvariable norm_part = 0.5*(log(TWO_M_PI*varlogYield) + z);
 
-        if (use_robustY == 1)  // normal + t distribution
+        // standard Cauchy density
+        dvariable fat_part = 1.0/(M_PI*(1.0 + z));
+        Ynll += log((1.0-pcon)*mfexp(norm_part) + pcon*fat_part);
+     }
+
+     // this block is incorrect and should not be used
+     else if (use_robustY == 2) 
+     {
+        cerr << "Unsupported robustifation option: " << use_robustY << endl;
+        if (1)
+           ad_exit(1);
+        // based on a misreading of newreg2.cpp 
+        double width=3.0;
+        double width2=width*width;
+        const double alpha = 0.7;
+        const double a2 = square(alpha);
+        dvariable diff2 = square(obs_catch(t,g)-log_pred_yield(g));
+        dvariable v_hat = diff2+1.0e-80;
+
+        dvariable b=2.*pcon/(width*sqrt(PI));  // This is the weight for the "robustifying" term
+
+        dvariable norm_part = log(1.0-pcon)*mfexp(-diff2/(2.0*a2*v_hat));
+   
+        dvariable fat_part =  b/(1.+pow(diff2/(width2*a2*v_hat),2));
+        Ynll += norm_part + fat_part;
+     }
+
+     else if (use_robustY == 3) // zero inflated normal
+     {
+        //TRACE(obs_catch(t,g))
+        dvariable tmp;
+        if (obs_catch(t,g) > logZeroCatch)
         {
-           dvariable z = square(obs_catch(t,g)-log_pred_yield(g))/varlogYield;
-   
-           dvariable norm_part = 0.5*(log(TWO_M_PI*varlogYield) + z);
-   
-           // standard Cauchy density
-           dvariable fat_part = 1.0/(M_PI*(1.0 + z));
-           Ynll += log((1.0-pcon)*mfexp(norm_part) + pcon*fat_part);
+           tmp = (1.0-pcon)*0.5*(log(TWO_M_PI*varlogYield) + square(obs_catch(t,g)-log_pred_yield(g))/varlogYield);
+           //TTRACE(g,tmp)
+           Ynll += tmp; //(1.0-pcon)*0.5*(log(TWO_M_PI*varlogYield) + square(obs_catch(t,g)-log_pred_yield(g))/varlogYield);
         }
-   
-        // this block is incorrect and should not be used
-        else if (use_robustY == 2) 
+        else
         {
-           cerr << "Unsupported robustifation option: " << use_robustY << endl;
-           if (1)
-              ad_exit(1);
-           // based on a misreading of newreg2.cpp 
-           double width=3.0;
-           double width2=width*width;
-           const double alpha = 0.7;
-           const double a2 = square(alpha);
-           dvariable diff2 = square(obs_catch(t,g)-log_pred_yield(g));
-           dvariable v_hat = diff2+1.0e-80;
-   
-           dvariable b=2.*pcon/(width*sqrt(PI));  // This is the weight for the "robustifying" term
-   
-           dvariable norm_part = log(1.0-pcon)*mfexp(-diff2/(2.0*a2*v_hat));
-      
-           dvariable fat_part =  b/(1.+pow(diff2/(width2*a2*v_hat),2));
-           Ynll += norm_part + fat_part;
-        }
-   
-        else if (use_robustY == 3) // zero inflated normal
-        {
-           //TRACE(obs_catch(t,g))
-           dvariable tmp;
-           if (obs_catch(t,g) > logZeroCatch)
-           {
-              tmp = (1.0-pcon)*0.5*(log(TWO_M_PI*varlogYield) + square(obs_catch(t,g)-log_pred_yield(g))/varlogYield);
-              //TTRACE(g,tmp)
-              Ynll += tmp; //(1.0-pcon)*0.5*(log(TWO_M_PI*varlogYield) + square(obs_catch(t,g)-log_pred_yield(g))/varlogYield);
-           }
-           else
-           {
-              tmp = pcon*0.5*(log(TWO_M_PI*varlogYield));
-              //TTRACE(g,tmp)
-              Ynll += tmp; //pcon*0.5*(log(TWO_M_PI*varlogYield));
-           }
-         //if (t > 56)
-         //{
-         //   TTRACE(g,tmp)
-         //   TTRACE(obs_catch(t,g),log_pred_yield(g))
-         //}
-        }
-   
-        else // default normal likelihood
-        {
-           Ynll += 0.5*(log(TWO_M_PI*varlogYield) + square(obs_catch(t,g)-log_pred_yield(g))/varlogYield);
-   
-           if (isnan(value(Ynll)))
-           {
-              TRACE(Ynll)
-              TTRACE(t,g)
-              write_status(clogf);
-              ad_exit(1);
-           }
+           tmp = pcon*0.5*(log(TWO_M_PI*varlogYield));
+           //TTRACE(g,tmp)
+           Ynll += tmp; //pcon*0.5*(log(TWO_M_PI*varlogYield));
         }
      }
-     else
+
+     else // default normal likelihood
      {
-        log_pred_yield(g) = logZeroCatch;
-        HERE
+        Ynll += 0.5*(log(TWO_M_PI*varlogYield) + square(obs_catch(t,g)-log_pred_yield(g))/varlogYield);
+
+        if (isnan(value(Ynll)))
+        {
+           TRACE(Ynll)
+           TTRACE(t,g)
+           write_status(clogf);
+           ad_exit(1);
+        }
      }
   } //for (int g = 1; g <= ngear; g++)
-  //TTRACE(t,Ynll)
 
   nll += Ynll;
   NLL_TRACE(Ynll)
@@ -731,8 +677,6 @@ FUNCTION void write_status(ofstream& s)
     s << "# nvar = " << initial_params::nvarcalc() << endl;
     s << "# logFmsy = " << logFmsy << " (" << active(logFmsy) <<")" << endl;
     s << "#    Fmsy = " << mfexp(logFmsy) << endl;
-    //s << "#   Fmsy_prior = " << Fmsy_prior << " (" << (use_Fmsy_prior>0) << ")" << endl;
-    //s << "# sdFmsy_prior = " << sdFmsy_prior << endl;
     s << "#    r = " << r << endl;
     s << "#   r_prior = " << r_prior << " (" << (use_r_prior>0) << ")" << endl;
     s << "# sdr_prior = " << sdr_prior << endl;
@@ -782,7 +726,6 @@ FUNCTION void write_status(ofstream& s)
 
 REPORT_SECTION
     clogf << "\nnll_count " << nll_count << endl;
-    TRACE(nll_count)
     for (int i = 1; i <= nll_count; i++)
        clogf << " " << setw(18) << setprecision(15) << nll_vector(i) 
                     << setw(6) << i << endl;

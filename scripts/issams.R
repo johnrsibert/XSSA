@@ -1,7 +1,8 @@
 #require("mvtnorm")
-gear.names = c("Tuna HL","Troll","Longline","Bottom/inshore HL","Aku Boat",
-                "Klingon")
-sgn = c("THL","Troll","LL","BHL","Aku","K")
+#gear.names = c("Tuna HL","Troll","Longline","Bottom/inshore HL","Aku Boat",
+#                "Klingon")
+gear.names = c("Handline","Troll","Longline","Aku Boat", "Klingon")
+sgn = c("HL","Troll","LL","Aku","K")
 have.xssams.R = FALSE
 have.issams.R = TRUE
 start.year = 1952
@@ -231,7 +232,7 @@ plot.diagnostics=function(dat=NULL,file="diagnostics.dat",dt,ngear,
    return(new.devices)
 }
 
-log.diagnostics=function(file="issams_program.log",ntime=61,dt=1,ngear=5,
+log.diagnostics=function(file="issams_program.log",ntime=61,dt=1,ngear=4,
                          plot.Fmort=FALSE,plot.prod=FALSE,plot.impact=FALSE)
 {
       
@@ -331,7 +332,7 @@ extract.value=function(text,text.list)
 }
 
 
-read.rep=function(file="issams.rep",ntime=61,dt=1,ngear=5)
+read.rep=function(file="issams.rep",ntime=61,dt=1,ngear=4)
 
 {
 #  print(paste("Scanning file",file))
