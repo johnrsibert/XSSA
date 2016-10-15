@@ -8,7 +8,7 @@ yq.time = function(year,quarter)
    return(time)
 }
 
-make.hdar.dat<-function(file="hdar_calendar.csv",yr1=1952,yr2=2012,ngear=5)
+make.hdar.dat<-function(file="hdar_calendar.csv",yr1=1952,yr2=2012,ngear=4)
 {
    print(paste("Reading ",file))
    dat1 <- read.csv(file,header=TRUE)
@@ -51,10 +51,11 @@ make.hdar.dat<-function(file="hdar_calendar.csv",yr1=1952,yr2=2012,ngear=5)
          dat2[j,1] <- year
       }
    }
-#  print("dat2:")
-#  print(dim(dat2))
-#  print(head(dat2))
+   print("dat2:")
+   print(dim(dat2))
+   print(head(dat2))
 #  print(tail(dat2))
+   plot.cml(dat2)
 
    if (ngear == 5)
    {
@@ -111,25 +112,55 @@ get.index<-function(pattern,x,nomatch = 0)
        return(nomatch)
 }
 
-plot.hdar<-function(dat)
+plot.cml=function(dat)
 {
-   xrange<-c(1948,2015)
-   yrange<-c(0,500) #1300000)
+#  print(rowSums(dat[,4:ncol(dat)],na.rm=TRUE))
+#  Total = rowSums(dat[,4:ncol(dat)],na.rm=TRUE)
+#  print(dim(dat))
+#  dat=cbind(dat,Total)
+#  print(dim(dat))
 
-   plot(xrange,yrange,type='n')
+   old.par <- par(no.readonly = TRUE) 
+   width = 6.5
+   height <- 9.0
+   x11(width=width,height=height)
+   par(mar=c(2.5,4,0,0)+0.1)
+   np = ncol(dat) - 3
+   lm <- layout(matrix(c(1:np),ncol=1,byrow=TRUE))
+   layout.show(lm)
+   print(head(dat))
 
    for (j in 4:ncol(dat))
    {
-      lines(dat[,3],dat[,j],col=j,lwd=3)
-
+      nice.ts.plot(dat[,3],dat[,j],lwd=3,label=colnames(dat)[j],
+                   ylab="Catch (mt)")
+      wna = which(is.na(dat[,j]))
+      zz = vector(length=length(wna))
+      points(dat[wna,3],zz,pch='|',col="red")
    }
-   print(colnames(dat))
-   ltext <- c(colnames(dat)[4:9])
-   print(ltext)
-
-   legend(xrange[1],yrange[2],ltext,lwd=3,col=c(4:ncol(dat)))
-
+   save.png.plot("CML",width=width,height=height)
+   par(old.par)
 }
+
+#plot.hdar<-function(dat)
+#{
+#   xrange<-c(1948,2015)
+#   yrange<-c(0,500) #1300000)
+#
+#   plot(xrange,yrange,type='n')
+#
+#   for (j in 3:ncol(dat))
+#   {
+#      lines(dat[,3],dat[,j],col=j,lwd=3)
+#
+#   }
+#   print(colnames(dat))
+#   ltext <- c(colnames(dat)[4:ncol(dat)])
+#   print(ltext)
+#
+#   legend(xrange[1],yrange[2],ltext,lwd=3,col=c(4:ncol(dat)))
+#
+#}
 
 ###############################
 plot.all.ccf<-function(dat)
@@ -209,23 +240,23 @@ plot.all.hdar.gears<-function(dat)
    old.par <- par(no.readonly = TRUE) 
    par(mar=c(2,2.75,0,0)+0.1)
 #  par(mar=c(5,4,4,2)+0.1)
-   np = ncol(dat) - 3
+   np = ncol(dat) - 2
    lm <- layout(matrix(c(1:np),ncol=1,byrow=TRUE))
    layout.show(lm)
 
-   for (j in 4:ncol(dat))
+   for (j in 3:ncol(dat))
    {
-      nice.ts.plot(dat[,3],dat[,j],lwd=3,label=colnames(dat)[j],
+      nice.ts.plot(dat[,2],dat[,j],lwd=3,label=colnames(dat)[j],
                    ylab="Catch (mt)")
       wna = which(is.na(dat[,j]))
       zz = vector(length=length(wna))
-      points(dat[wna,3],zz,pch='|',col="red")
-      dy = diff(dat[,j])
-      maxdy=max(abs(dat[,j]))
-      yrange=c(-maxdy,maxdy)
-      par("new"=TRUE)
-      plot(dat[-1,3],dy,type='l',axes=FALSE,ann=FALSE,
-           lty="dotted",lwd=2,col="red")
+      points(dat[wna,2],zz,pch='|',col="red")
+   #  dy = diff(dat[,j])
+   #  maxdy=max(abs(dat[,j]))
+   #  yrange=c(-maxdy,maxdy)
+   #  par("new"=TRUE)
+   #  plot(dat[-1,2],dy,type='l',axes=FALSE,ann=FALSE,
+   #       lty="dotted",lwd=2,col="red")
    }
 
    save.png.plot("hdar_catch_history",width=width,height=height)

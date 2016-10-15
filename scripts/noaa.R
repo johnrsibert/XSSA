@@ -57,9 +57,6 @@ LL.join=function(hdar=NULL,noaa=NULL,yr1=1952,yr2=2012,ngear=4)
 {
    if(is.null(hdar))
       hdar = make.hdar.dat(file="../HDAR/hdar_calendar.csv",yr1=1949,yr2=2014,ngear=ngear)
-   print(dim(hdar))
-   print(head(hdar))
-#  print(tail(hdar))
    wll = which(colnames(hdar)=="Longline")
    gll = wll - 2
    if (length(wll) < 1)
@@ -72,10 +69,9 @@ LL.join=function(hdar=NULL,noaa=NULL,yr1=1952,yr2=2012,ngear=4)
 
    if(is.null(noaa))
       noaa = make.noaa.dat(file="../NOAA/noaa_quarterly.csv",yr1=1995,yr2=2013)
-   print(dim(noaa))
-   print(head(noaa))
 
    mm = match(hdar$time,noaa$time)
+   print("mm:")
    print(paste(nrow(hdar),nrow(noaa),length(mm)))
 
    ntime = nrow(hdar)
@@ -86,22 +82,24 @@ LL.join=function(hdar=NULL,noaa=NULL,yr1=1952,yr2=2012,ngear=4)
    {
       LL[n,1] = hdar[n,2]
       LL[n,2] = hdar[n,wll]
-      if (!is.na(mm[n]))
-      {
-         ni = mm[n]
-         LL[n,3] = noaa[ni,4]
-         LL[n,4] = noaa[ni,5]
-         if (is.na(LL[n,4]))
-            LL[n,5] = LL[n,3]
-         else if (is.na(LL[n,3]))
-            LL[n,5] = LL[n,4]
-         else
-            LL[n,5] = LL[n,3] + LL[n,4]
-      }
+      ni = mm[n]
+      LL[n,3] = noaa[ni,4]
+      LL[n,4] = noaa[ni,5]
+      if (is.na(LL[n,4]))
+         LL[n,5] = LL[n,3]
+      else if (is.na(LL[n,3]))
+         LL[n,5] = LL[n,4]
+      else
+         LL[n,5] = LL[n,3] + LL[n,4]
+
+      if(LL[n,1] < 1995)
+         LL[n,6] = LL[n,2]
+      else if(LL[n,1] < 2002)
+         LL[n,6] = (LL[n,2] + LL[n,5])*0.5
+      else
+         LL[n,6] = LL[n,5]
    } 
    LL = as.data.frame(LL)
-   #rowMeans(cbind(tmp$F,tmp$DS),na.rm=TRUE)
-   LL$Mean = rowMeans(cbind(LL$F,LL$DS),na.rm=TRUE)
 
    width = 6.5
    height = 9.0
@@ -116,27 +114,28 @@ LL.join=function(hdar=NULL,noaa=NULL,yr1=1952,yr2=2012,ngear=4)
    plot(LL$time,LL$F,las=1,type='l',lwd=5,col="blue",
               ylab="Yellofin Catch (mt)",xlab="")
    lines(LL$time,LL$F,lwd=3,col="lightblue")
+   lines(LL$time,LL$DS,col="blue",lwd=3)
    lines(LL$time,LL$S,col="red",lwd=1,lty="dotted")
    lines(LL$time,LL$D,col="orange",lwd=1)
-   lines(LL$time,LL$DS,col="blue",lwd=3)
 #  lines(LL$time,LL$Mean,col="green",lwd=1)
-   rug(LL$time)
+#  rug(LL$time)
 
    legend("topleft",col=c("lightblue","blue","red","orange"),
                     lwd=c(5,3,1,1),bty='n',
         legend=c("HDAR Longline","NOAA Total Longline",
                   "NOAA Shallow Set Longline","NOAA Deep Set Longline"))
 
-   dy = diff(LL$Mean)
    plot(LL$time,LL$Mean,las=1,type='l',lwd=5,col="blue",
               ylab="Yellofin Catch (mt)",xlab="")
    lines(LL$time,LL$Mean,lwd=3,col="lightblue")
-   par("new"=TRUE)
-   plot(LL$time[-1],dy,type='l',lwd=1,lty="dotted",col="black",axes=FALSE,ylab="")
-   legend("topleft",col=c("lightblue","black"),
-                    lwd=c(5,1),bty='n',lty=c("solid","dotted"),
-        legend=c("Average of HDAR and NOAA Total",
-                  "First differences"))
+
+#  par("new"=TRUE)
+#  dy = diff(LL$Mean)
+#  plot(LL$time[-1],dy,type='l',lwd=1,lty="dotted",col="black",axes=FALSE,ylab="")
+#  legend("topleft",col=c("lightblue","black"),
+#                   lwd=c(5,1),bty='n',lty=c("solid","dotted"),
+#       legend=c("Average of HDAR and NOAA Total",
+#                 "First differences"))
 
    save.png.plot("hdar_noaa_LL_ts",width=width,height=height)
 
@@ -258,7 +257,7 @@ LL.join=function(hdar=NULL,noaa=NULL,yr1=1952,yr2=2012,ngear=4)
    for (j in 1:ncol(adat))
    {
       nice.ts.plot(ya,adat[,j],lwd=5,label=colnames(dat)[j],
-                   ylab="Catch (mt)",ylim=yrange)
+                   ylab="Catch (mt)")#,ylim=yrange)
    }
    nice.ts.plot(ya,rowSums(adat),lwd=5,label="Total",
                    ylab="Catch (mt)")

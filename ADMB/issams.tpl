@@ -732,5 +732,6 @@ REPORT_SECTION
 
     write_status(clogf);
     status_blocks --;
+    report << "# Gmax = " << nll.gmax << endl;
     write_status(report);
 
