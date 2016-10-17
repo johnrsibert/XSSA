@@ -422,11 +422,13 @@ Nielsen, A., C. Berg. 2014. Estimation of time-varying selectivity
 in stock assessments using state-space models. Fisheries Research
 158:96-101.
 
-Murray, J. D. 1993. Mathematical biology. Second Edition.
-Springer-Verlag. 767pp.
+%Murray, J. D. 1993. Mathematical biology. Second Edition.
+%Springer-Verlag. 767pp.
 
 Quinn, T, R. Deriso. 1999. Quantitative fish dynamics. Oxford
 University Press, New York.
+
+Rooker, J. 2016.
 
 Schaefer, M. B. 1954. Some aspects of the dynamics of populations
 important to the management of the commercial marine fisheries. IATTC
@@ -435,6 +437,12 @@ Bull. 1(2):27-56.
 Senina, I., J. Sibert, P. Lehodey  2008. Parameter estimation for
 basin-scale ecosystem linked population models of large pelagic
 predators: Application to skipjack tuna.  Prog. Oceanogr. 78:319-335.
+
+Senina, I.,  P. Lehodey, B. Calmettes, S. Nicol, S. Caillot,
+J. Hampton and P. Williams. 2015.
+SEAPODYM application for yellow tuna in the Pacific Ocean.
+WCPFC-SC11-2015/EB-IP-01.
+
 
 Skaug, H., Fournier, D., 2006. Automatic approximation of the marginal
 likelihood in non-Gaussian hierarchical models. Computational
@@ -449,8 +457,10 @@ tuna in the Hawaiian Islands. Mar. Ecol. Prog. Ser. 461:187-196.
 
 %\numberwithin{figure}{section}
 \appendix
-\section*{Data processing}
+\section*{Data preparation}
 \label{sec:data}
+
+\subsection*{Catch data}
 
 \begin{figure}
 \begin{center}
@@ -550,22 +560,51 @@ and used in this analysis.
 \begin{center}
 %                                         graphics/4_gear_catch_history_a.pdf
 \includegraphics[height=0.8\textheight]{./graphics/4_gear_catch_history_a.pdf}
-\caption{\label{fit:data}
+\caption{\label{fig:data}
 Four gear type catch time series used in the assessment model.
 }
 \end{center}
 \end{figure}
 
+\clearpage
+\subsection*{Off line coupling}
+The MHI assessment model could be 1coupled to two different models of
+the WCPO yellowfin stocks, \MFCL\ and \SD. Both models are age
+structure and spatially resolved and have been applied to YFT.
+The spatial resolution of the \SD\ YFT model is 1\deg{} whereas the
+\MFCL\ yellowfin assessment divides the WCPO into 9 regions to facilitate
+incorporation of tagging data and to improve mortality estimates
+Figure~\ref{fig:mfclregions}.
+The spatial resolution of the \SD\ model would make it an ideal
+candiate for computing an index of abundance, but the model is still
+under active development. In contrast the 2014 \MFCL\ assessment has
+been officially adopted as the best available assessment.
+
+\begin{figure}
+\begin{center}
+\includegraphics[width=0.8\textwidth]{./graphics/MFCLregions.png}
+\caption{\label{fig:mfclregions}
+Regional structure used in the 2014 WCPFC YFT stocks assessment.
+}
+\end{center}
+\end{figure}
+
+Unfortunately the \MFCL\ regions split the MHI between regions 2 and 4. 
+Both regions were evaluated as abundance indices.
+
+\begin{figure}
+\begin{center}
+\begin{tabular}{lr}
+\includegraphics[width=0.50\textwidth]{./graphics/annual_region_2_biomass.pdf} &
+\includegraphics[width=0.50\textwidth]{./graphics/annual_region_4_biomass.pdf} \\
+\end{tabular}
+\end{center}
+\caption{Estimated biomass trends in \MFCL\ regions 1 and 2 (Davies, et al. 2014).
+\label{fig:mfclbiomass}
+}
+\end{figure}
+
+
  
 \end{document}
 
-Regulation of catches of tunas by fisheries in the waters surrounding
-the Hawaiian Islands is the responsibility of the Western and Central
-Pacific Fisheries Commission (WCPFC).
-The WCPFC conducts stock assessments for the region over which it has
-jurisdiction. These assessments provides estimates of stock size and
-productivity which with Commission uses to set fishery management
-policy, but offers little guidance applicable to small scale
-fisheries.
-%This international legal arrangement is intended to regulate large
-%scale fisheries for tunas, 

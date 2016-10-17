@@ -417,6 +417,12 @@ read.rep.files=function(path.list)# read.rep.files(dir(path=".",pattern="CV*"))
 
 }
 
+
+#  tnames=c("$-\log L$", "$n$", "$|G|_{max}$", "$\log\MSY$", "$\log\Fmsy$",
+#           "$\log Q$", "$\log\sigma_P$", "$\log\sigma_Y$", "$\MSY$",
+#           "$\Fmsy$", "$Q$", "$\sigma_P$", "$\sigma_Y$", "$r$", "$K$",
+#           "$p_0$", "$\tilde{r}$", "$\sigma_r$")
+
 nice.xrange=function(x,nchar=3)
 {
    xr = c(min(x,na.rm=TRUE),max(x,na.rm=TRUE))
