@@ -326,12 +326,15 @@ extract.value=function(text,text.list)
 #  print(paste("offset",offset))
 #  print(text.list[ndx])
 #  print(text.list[ndx+offset])
-#  x = as.numeric(text.list[ndx+offset])
-   x = text.list[ndx+offset]
+
+   x = as.numeric(text.list[ndx+offset])
+   x = signif(x,3)
+
+#  x = text.list[ndx+offset]
+
 #  print(paste(text,x))
    return(x)
 }
-
 
 read.rep=function(file="issams.rep",ntime=61,dt=1,ngear=4)
 
@@ -342,25 +345,26 @@ read.rep=function(file="issams.rep",ntime=61,dt=1,ngear=4)
    ret$nll = extract.value("nll",rep)
    ret$nvar = extract.value("nvar",rep)
    ret$Gmax = extract.value("Gmax",rep)
+
    ret$logMSY = extract.value("logMSY",rep)
-   ret$MSY = extract.value("MSY",rep)
    ret$logFmsy = extract.value("logFmsy",rep)
-   ret$Fmsy = extract.value("Fmsy",rep)
-   ret$r = extract.value("r",rep)
-   ret$rprior = extract.value("r_prior",rep)
-   ret$sdrprior = extract.value("sdr_prior",rep)
-   ret$K = extract.value("K",rep)
+   ret$logQ = extract.value("logQ:",rep)
    ret$logsdlogProc = extract.value("logsdlogProc:",rep)
+   ret$logsdlogYield = extract.value("logsdlogYield:",rep)
+
+   ret$MSY = extract.value("MSY",rep)
+   ret$Fmsy = extract.value("Fmsy",rep)
+   ret$Q = extract.value("Q:",rep)
    ret$sdlogProc = extract.value("sdlogProc:",rep)
    ret$logsdlogF = extract.value("logsdlogF:",rep)
-   ret$sdlogF = extract.value("sdlogF:",rep)
-   ret$logsdlogPop = extract.value("logsdlogPop:",rep)
-   ret$sdlogPop = extract.value("sdlogPop:",rep)
-   ret$logsdlogYield = extract.value("logsdlogYield:",rep)
-   ret$sdlogYield = extract.value("sdlogYield:",rep)
-   ret$Q = extract.value("Q:",rep)
+
+   ret$r = extract.value("r",rep)
+   ret$K = extract.value("K",rep)
+
    ret$pcon = extract.value("pcon",rep)
-   ret$KF = extract.value("klingon_multiplier",rep)
+   ret$rprior = extract.value("r_prior",rep)
+   ret$sdrprior = extract.value("sdr_prior",rep)
+#  ret$KF = extract.value("klingon_multiplier",rep)
    return(ret)
 }
 
@@ -408,20 +412,27 @@ read.rep.files=function(path.list)# read.rep.files(dir(path=".",pattern="CV*"))
       cat("\n",file=csv,append=TRUE)
    }
    
+   tnames=c("$-\\log L$", "$n$", "$|G|_{max}$", "$\\log\\MSY$", "$\\log\\Fmsy$",
+            "$\\log Q$", "$\\log\\sigma_P$", "$\\log\\sigma_Y$", "$\\MSY$",
+            "$\\Fmsy$", "$Q$", "$\\sigma_P$", "$\\sigma_Y$", "$r$", "$K$",
+            "$p_0$", "$\\tilde{r}$", "$\\sigma_r$")
+   print(length(tnames))
 #  rep.matrix = matrix(unlist(rep.list),nrow=length(path.list),byrow=TRUE)
 #  colnames(rep.matrix)=names(rep)
    rep.matrix = matrix(unlist(rep.list),ncol=length(path.list),byrow=FALSE)
-   rownames(rep.matrix)=names(rep)
+   print(dim(rep.matrix))
+   rownames(rep.matrix)=tnames #names(rep)
    colnames(rep.matrix)=path.list
-   return(as.data.frame(rep.matrix))
+   write.table(rep.matrix,file="rep_summary.tex",sep=" & ",quote=FALSE,eol="\\\\\n") 
+#  return(as.data.frame(rep.matrix))
 
 }
+#  write.table(x, file = "", append = FALSE, quote = TRUE, sep = " ",
+#                eol = "\n", na = "NA", dec = ".", row.names = TRUE,
+#                col.names = TRUE, qmethod = c("escape", "double"),
+#                fileEncoding = "")
 
 
-#  tnames=c("$-\log L$", "$n$", "$|G|_{max}$", "$\log\MSY$", "$\log\Fmsy$",
-#           "$\log Q$", "$\log\sigma_P$", "$\log\sigma_Y$", "$\MSY$",
-#           "$\Fmsy$", "$Q$", "$\sigma_P$", "$\sigma_Y$", "$r$", "$K$",
-#           "$p_0$", "$\tilde{r}$", "$\sigma_r$")
 
 nice.xrange=function(x,nchar=3)
 {

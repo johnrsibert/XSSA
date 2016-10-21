@@ -9,7 +9,7 @@ do_issams()
    pwd
 }
 
-DIRS="r2 r4 r0 r0-sdrprior"
+DIRS="r2 r4 r0 r2-sdrprior r4-sdrprior r0-sdrprior"
 echo $DIRS
 
 for d in $DIRS

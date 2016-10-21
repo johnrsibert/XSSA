@@ -46,6 +46,8 @@ nice.ts.plot<-function(x,y,label=NULL,legend=NULL,bcol="blue",fcol="lightblue",
 
    old.par <- par(no.readonly = TRUE) 
  # par(mar=c(3,4,2,1)+0.1)
+ # par("cex.axis"=1.6,"cex.main"=1.6,"cex.lab"=1.6)
+
    plot(xrange,yrange,type='n',axes=FALSE,ann=FALSE,yaxs='i')
    for (i in 2:length(ytic))
    {

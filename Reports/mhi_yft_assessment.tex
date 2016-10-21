@@ -9,13 +9,14 @@
 \usepackage{longtable}
 \usepackage{rotating}
 %\usepackage{verbatim}
-\usepackage[pdftex,bookmarksopen=false]{hyperref}
-%\usepackage[pdftex]{hyperref}
-\hypersetup{pdfauthor={John Sibert}}
-\hypersetup{pdfsubject={Yellowfin stock assessment}}
-\hypersetup{pdftitle={Assessment of the yellowfin tuna Thunnus albacares 
-stock in the Main Hawaiian Islands Yellowfin Tuna Fishery}}
-\hypersetup{pdfkeywords={yellowfin tuna,state space model,stock assessment,Hawaii}}
+%\usepackage[pdftex,bookmarksopen=false]{hyperref}
+\usepackage[pdftex]{hyperref}
+\hypersetup{pdfauthor={John Sibert}
+            pdfsubject={Yellowfin stock assessment}
+            pdftitle={Assessment of the yellowfin tuna Thunnus albacares 
+stock in the Main Hawaiian Islands Yellowfin Tuna Fishery}
+            pdfkeywords={yellowfin tuna,state space model,stock assessment,Hawaii}
+            }%
 
 \newcommand\doublespacing{\baselineskip=1.6\normalbaselineskip}
 \newcommand\singlespacing{\baselineskip=1.0\normalbaselineskip}
@@ -86,11 +87,14 @@ The WCPFC conducts stock assessments for several species of tunas and
 implements fishery management and conservation measures based on
 these stock assessments. The WCPFC stock assessments provide estimates
 of stock size and indicators of productivity of the WCPFC area of
-responsibility, but offer little advice to local fishery managers about
-the extent that local small-scale fisheries are effecting local
-populations.
+responsibility, but offer little advice to local fishery managers.
 
-Yellowfin tuna ({\it Thunnus albacares}) is an important food resource
+Recent studies (Rooker et al 2016) have shown that
+Hawaii-based fishery for yellowfin tuna ({\it Thunnus albacares}) 
+is  supported by local production with
+little or no subsidies from equatorial production zones
+or nurseries.
+Yellowfin tuna is an important food resource
 of many Pacific Island communities and the people of the Hawaiian
 islands of been fishing for yellowfin for many generations. 
 The Main Hawaiian Islands (MHI), Figure~\ref{fig:mhimap},
@@ -118,14 +122,16 @@ full explanation.
 
 This paper presents an assessment of the stock of yellowfin tuna
 residing in the MHI that may be of use to fishery managers in Hawaii
-in addressing questions about the effects of the fishery on the
-stock. The general approach is to adopt a state-space variant of
-the surplus production model  (Schaefer, 1954). 
+in addressing questions about the effects of the local fishery on the
+local stock. The general approach is to adopt a state-space variant of
+the surplus production model  (Schaefer, 1954) to analyze the 65 year
+catch time series collected by the State of Hawaii. 
 The model has several novel features.
 Fishing mortality, the proportion of the population harvested each
 year, is represented as a random walk (Nielsen and Berg, 2014).
-Biomass estimates from the 2014 WCPFC yellowfin stock assessment
-(Davies, et al. 2014) can be used as indices of abundance.
+Off line coupling is used to link the local biomass to 
+regional biomass estimates from the 2014 WCPFC yellowfin stock assessment
+(Davies, et al. 2014).
 The logistic parameters of the surplus production model are
 reparameterized to estimate parameters of direct relevance to fishery
 management. State transitions are represented as random effects.
@@ -275,7 +281,7 @@ This proportion may be estimated or fixed at a constant value.
 \caption{Complete list of estimated and computed parameters and model
 constraints for 
 the state-space surplus production model. There are 5 estimated parameters. 
-For a model with 61 time steps and 4 gear types there are 305 random effects.
+For a model with 61 time steps and 4 gear types, there are 305 random effects.
 Values of non-estimated model variables, e.g.,  $r$ and $K$, are computed by
 parameter substitution formulas.
 There are three constraints.
@@ -290,18 +296,23 @@ Parameter & Definition\\
 $\MSY$ & Maximum sustainable yield\\
 $\Fmsy$& Fishing mortality at maximum sustainable yield\\
 $Q$    & Abundance index proportionality constant\\
-$\sigma_P$ & Global process error SD; $\sigma_P=\sigma_N=\sigma_F=\sigma_I$\\
-$\sigma_Y$ & Observation error SD \\
+$\sigma_P$ & Global process error standard deviation;\\
+           & $\sigma_P=\sigma_N=\sigma_F=\sigma_I$\\
+$\sigma_Y$ & Observation error standard deviation \\
 \hline
+       & Computed parameters:\\
 $r$    & Instantaneous growth rate; $r=2F_{\MSY}$\\
 $K$    & Asymptotic population size; $K=\frac{4\MSY}{r}$\\
+$\bar{F}_5$ & Average of total fishing mortality for the most recent
+five years.\\
 \hline
+       & Constraints:\\
 $p_0$  & Proportion of zero catch observations;\\
        & fixed at 0.04918\\
 $\tilde{r}$ & An {\it a priori} assumed value for $r$\\
             & fixed at $\tilde{r}=0.486$ (Carruthers and McAllister, 2011)\\
 $\sigma_r$  & Assumed standard deviation of $r$ around its prior;\\
-            & fixed at $\sigma_r=0.8$.\\
+            & fixed at $\sigma_r=0.8$ or $\sigma_r=0.2$.\\
 \hline
 \end{tabular}
 \end{center}
@@ -324,55 +335,215 @@ L(\theta,\alpha,x)=
 Here, $m=61$, the number of time steps in the catch time series and
 $\theta$ is a vector of model parameters (Table~\ref{tab:allvars1}).
 The model is implemented in ADMB-RE (Fournier et al, 2012).
-The actual number of
-parameters to be estimated depends on the model configuration,
-specified by phase flags in the input file. 
 All computer code, data files, and draft reports in support of this
 analysis can be found at Github:
 \url{https://github.com/johnrsibert/XSSA.git}.
 
-\section*{Results}
+\doublespacing
 
+\section*{Results}
+Table~\ref{tab:ests1} compares 6 different models
+using three index of abundance assumptions and two 
+assumed values of the standard deviation of the $r$ prior, $\sigma_r$. 
+$|G|_{max}<10^{-4}$ indicate that the solution is likely a true
+All models converged to a solution with the exception of the model
+without an index of abundance and using the loose constraint on $r$,
+$\sigma_r=0.8$.
+Decreasing the constraint on $r$ from $\sigma_r=0.8$ to
+$\sigma_r=0.2$ has the effect of forcing the value or $r$ to be closer
+to the prior providing additional information and enabling the model
+to converge to a solution.
+Decreasing the value of $\sigma_r$ produces solutions for all three
+abundance index assumptions that are similar to one another with
+$K\approx 8000$ and $r\approx 0.5$.
+For convenience, I will refer to models with 
+region 2 indexing and $\sigma_r=0.8$,
+region 4 indexing and $\sigma_r=0.8$, and 
+no indexing and $\sigma_r=0.2$
+as models A, B, and C respectively (Table~\ref{tab:ests1}).
+Models A and B are
+quite different from one another. Model A, indexed to region 2, 
+predicts a large, slowly growing population ($K=23900; r=0.232$)
+whereas model B, indexed to region 4, predict a smaller, more rapidly growing
+population ($K = 2130; r=1.84$).
+Model C, not indexed, predicts an intermediate situation 
+($K=8140; r=0.497$). In models A and B, the prediction is dominated by
+the abundance index, and in model C the prediction is dominated by the
+prior assumption about $r$.
 
 \begin{table}
-\caption{Yada yada
+{\small
+\caption{Results for 6 different models using three
+abundance indices and two constraints on $r$. The first section of the
+table shows model diagnostics. $-\log L$ is the negative logarithm of
+equation~\ref{eqn:likelihood}; lower values indicate better fits to
+the data.
+$|G|_{max}$ is the gradient of the likelihood with respect to the
+parameters; Values of $|G|_{max}>1e^{-4}$ indicate lack of model
+convergence.
+$n$ is the number of parameters estimated.
+Model Name is the identifier used to discuss the models in the
+text.
 }
 \label{tab:ests1}
 \begin{center}
-\begin{tabular}{lrrrr}
+\begin{tabular}{|l|rrr|rrr|}
 \hline
- &\multicolumn{4}{c}{Index Region}\\
-\cline{2-5}
-Estimate &               2&              4&            None& None\\
+ &\multicolumn{6}{c|}{Index Region}\\
+\cline{2-7}
+Parameter &               2&              4&            None& 
+                         2&              4&            None\\
+\hline
+Model Name & A    & B   &     &     &     & C\\
 \hline
 \hline
-$\MSY$       & 1384.7700000000& 979.9600000000& 5533.8000000&1011.840000000\\
-$\Fmsy$      &    0.1159930000&   0.9199500000&    0.4359210& 0.248501000\\
-$Q$            &    0.0720595000&   0.0007741100&    0.0500016& 0.050001600\\
-$\sigma_P$    &    0.2330650000&   0.2337410000&    0.3208980& 0.318883000\\
-$\sigma_Y$    &    0.3974540000&   0.3946970000&    0.3495700& 0.351795000\\
+$-\log L$ & 199 & 193 & 271 & 199 & 195 & 195\\
+$n$ & 5 & 5 & 4 & 5 & 5 & 4\\
+$|G|_{max}$ & 9.2e-05 & 4.79e-05 & 0.138 & 2.17e-05 & 5.87e-05 & 1.32e-05\\
 \hline
-$-\log L$ &  199.0340000000& 192.6540000000&  270.8720000& 195.105000000\\
-$n$       &    5.0000000000&   5.0000000000&    4.0000000& 4.000000000\\
-$|G|_{max}$ &    0.0000919767&   0.0000478966&    0.1377480& 0.000013202\\
+$\MSY$ & 1380 & 980 & 5530 & 1110 & 940 & 1010\\
+$\Fmsy$ & 0.116 & 0.92 & 0.436 & 0.205 & 0.294 & 0.249\\
+$Q$ & 0.0721 & 0.000774 & 0.05 & 0.0285 & 0.00235 & 0.05\\
+$\sigma_P$ & 0.233 & 0.234 & 0.321 & 0.245 & 0.231 & 0.319\\
+$\sigma_Y$ & -1.46 & -1.45 & -1.14 & -1.41 & -1.46 & -1.14\\
 \hline
-$r$          &    0.2319860000&   1.8399000000&    0.8718420& 0.497003000\\
-$K$          &23876.7000000000&2130.4600000000&25389.0000000&8143.520000000\\
+$r$ & 0.232 & 1.84 & 0.872 & 0.409 & 0.588 & 0.497\\
+$K$ & 23900 & 2130 & 25400 & 10900 & 6400 & 8140\\
+$\bar{F}_5$ & 0.0632 & 1.52  & 0.749 & 0.163 & 0.513 & 0.149\\
 \hline
-$p_0$         &    0.0491800000&   0.0491800000&    0.0491800& 0.049180000\\
-$\tilde{r}$  &    0.4860000000&   0.4860000000&    0.4860000& 0.486000000\\
-$\sigma_r$   &    0.8000000000&   0.8000000000&    0.8000000& 0.200000000\\
-\hline
-$\log\sigma_P$ &   -1.4564400000&  -1.4535400000&   -1.1366300& -1.142930000\\
-$\log\sigma_Y$&   -0.9226750000&  -0.9296360000&   -1.0510500& -1.044710000\\
-$\log\MSY$  &    7.2332900000&   6.8875100000&    8.6186300& 6.919520000\\
-$\log\Fmsy$  &   -2.1542200000&  -0.0834354000&   -0.8302940& -1.392310000\\
+$p_0$ & 0.0492 & 0.0492 & 0.0492 & 0.0492 & 0.0492 & 0.0492\\
+$\tilde{r}$ & 0.486 & 0.486 & 0.486 & 0.486 & 0.486 & 0.486\\
+$\sigma_r$ & 0.8 & 0.8 & 0.8 & 0.2 & 0.2 & 0.2\\
 \hline
 \end{tabular}
 \end{center}
+}
 \end{table}
 
 
+All models are equally capable of predicting catch,
+Figure~\ref{fig:mopcatch}. Low catches seem to be predicted
+accurately, but some high catches are underestimated, as is
+expected with log-normal errors. 
+See Figure~\ref{fig:estcatch} for more detail.
+
+
+\begin{figure}
+\begin{center}
+\includegraphics[width=0.95\textwidth]{../4-gear-runs/multiOPcatch.pdf}
+\caption{Plot of predicted catch on observed catch for models A, B,
+and C. Colors indicated different models.
+\label{fig:mopcatch}
+}
+\end{center}
+\end{figure}
+
+Estimated biomass tracks the abundance indices for models A and B,
+Figure~\ref{fig:estbiomass}. 
+The estimated biomass and abundance index for model A (region 2)
+both reach maxima in the 1980s. 
+The estimated biomass trend in model C shows a similar peak in the
+1980s, but the process error, $\sigma_P$, is larger.
+The abundance index for model B (region 4) 
+declines monotonically in a classic ``one way trip'', and the estimated
+biomass trends reflects this decline. 
+The peaks of the estimated biomass trends in all models exceed the estimated
+equilibrium biomass ($K$). However $K$ lies generally within the
+process error of all three models.
+
+
+\begin{sidewaysfigure}
+\begin{center}
+{\scriptsize \sffamily
+\begin{tabular}{ccc}
+A. Region 2 index; $\sigma_r=0.8$ &
+B. Region 4 index; $\sigma_r=0.8$ &
+C. No index; $\sigma_r=0.2$ \\
+\\
+\includegraphics[width=0.33\textwidth]{../4-gear-runs/r2/est_popB1.pdf} &
+\includegraphics[width=0.33\textwidth]{../4-gear-runs/r4/est_popB1.pdf} &
+\includegraphics[width=0.33\textwidth]{../4-gear-runs/r0-sdrprior/est_popB1.pdf}\\
+\end{tabular}
+}
+\caption{Predicted biomass trends with different indices of abundance
+and values of $\sigma_r$.
+Blue lines indicate the estimated biomass in metric tons (mt).
+The purple line indicates the index of abundance.
+The light blue shaded areas represent the process error as 
+$\pm 2\sigma_P$.
+The equilibrium biomass $K$ is indicated by the blue dot-dash line.
+Note that the scale of the ordinate is different in each panel.
+\label{fig:estbiomass}}
+\end{center}
+\end{sidewaysfigure}
+
+
+Figure~\ref{fig:estprod} places the model results in a fishery
+management context. The parabolic dashed red lines indicate the theoretical
+yield from a population with logistic growth. The maximum yield if the
+population were at equilibrium, occurs at the  peak of the parabola.
+There are many possible equilibria, but the` maximum equilibrium yield
+has been labeled ``Maximum Sustainable Yield" in the fisheries
+literature.% $\MSY$\ in these models.
+The parameter $\Fmsy$\ is the fishing mortality that would produce $\MSY$\
+at equilibrium. Models A and C predict situations where exploitation
+is well below $\Fmsy$. Model B is ambiguous. 
+
+The long term average YFT catch in the MHI is 690 mt, and the average
+catch for the most recent 5 years 818 mt.  Both averages are below
+$\MSY$. 
+The average estimated fishing mortality for the most recent 5 years 
+is 0.0632, 1.52 and 0.149 for models A, B and C respectively
+%\label{tab:ests1}.
+Only model B (region 4 indexing) estimates the current fishing
+mortality to be greater than $\Fmsy$. Models A and C estimate the
+current fishing mortality to be about half of $\Fmsy$. 
+
+\begin{sidewaysfigure}
+\begin{center}
+{\scriptsize \sffamily
+\begin{tabular}{ccc}
+A. Region 2 index; $\sigma_r=0.8$ &
+B. Region 4 index; $\sigma_r=0.8$ &
+C. No index; $\sigma_r=0.2$ \\
+\\
+\includegraphics[width=0.30\textwidth]{../4-gear-runs/r2/prodB1.pdf} &
+\includegraphics[width=0.30\textwidth]{../4-gear-runs/r4/prodB1.pdf} &
+\includegraphics[width=0.30\textwidth]{../4-gear-runs/r0-sdrprior/prodB1.pdf}\\
+\end{tabular}
+}
+\caption{Estimated production curves showing catch plotted against
+estimated fishing mortality with different indices of abundance
+and values of $\sigma_r$.
+The green line and dark green dots are estimated catch.
+The green $+$ symbols are the observed catch annotated with the year.
+The dashed red line is the theoretical equilibrium yield.
+Note that the scale of the abscissa is different in each panel, and
+the ordinate has been scaled to the observed catch.
+\label{fig:estprod}}
+\end{center}
+\end{sidewaysfigure}
+
+
+
+\section*{Discussion}
+Davies et al.
+\begin{quote}
+p 6
+
+4. Latest catches marginally exceed the maximum sustainable yield (MSY).
+
+5. Recent levels of fishing mortality are most likely below the level that will support the MSY.
+
+p 38
+
+11. The estimates of MSY for the principal model options (526,400744,800 mt) are comparable to the
+recent level of (estimated) catch from the fishery (597,000 mt), and for most of the plausible model
+runs the recent catch exceeds MSY (0.81.13). Further, while estimates of current fishing mortality
+are generally below FMSY , any increase in fishing mortality would most likely increase the depletion
+levels within regions 4 and 8.
+\end{quote}
+ 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 %\vspace{4ex}
@@ -384,7 +555,8 @@ Managment Council. I thank the Council for its generous support and
 Council Staff Paul Dalzell and Eric Kingma for encouraging me to
 actually take on this challenging project and for their on-going
 collaboration. Special thanks
-to David Itano for sharing insights into the small-boat fisheries in Hawaii,
+to David Itano for sharing insights into the biology of yellowfin tuna
+around Hawaii and about small-boat fisheries in Hawaii,
 to Reginald Kokubun State of Hawaii, Division of Aquatic Resources,
 Departmemnt of Land and Natural Resources for supplying catch report
 data from the Commercial Marine Landings data base,
@@ -428,7 +600,10 @@ in stock assessments using state-space models. Fisheries Research
 Quinn, T, R. Deriso. 1999. Quantitative fish dynamics. Oxford
 University Press, New York.
 
-Rooker, J. 2016.
+Rooker, J.R., R. J. D. Wells, D. G. Itano, S. R. Thorrold, J. M. Lee. 2016.
+Natal origin and population connectivity of bigeye and
+yellowfin tuna in the Pacific Ocean
+Fish. Oceanogr. 25:3, 277–291.
 
 Schaefer, M. B. 1954. Some aspects of the dynamics of populations
 important to the management of the commercial marine fisheries. IATTC
@@ -448,16 +623,19 @@ Skaug, H., Fournier, D., 2006. Automatic approximation of the marginal
 likelihood in non-Gaussian hierarchical models. Computational
 Statistics \& Data Analysis 51, 699–709.
 
-Wells, D., J. Rooker, D. Itano. 2012.  Nursery origin of yellowfin
-tuna in the Hawaiian Islands. Mar. Ecol. Prog. Ser. 461:187-196. 
+%Wells, D., J. Rooker, D. Itano. 2012.  Nursery origin of yellowfin
+%tuna in the Hawaiian Islands. Mar. Ecol. Prog. Ser. 461:187-196. 
+
+Wilson, P. T. 2011. {\it AKU!}. Xlibris, USA. 368pp.ISBN
+978-1-4568-5904-6.
 \par}
 
 \clearpage
 
 
-%\numberwithin{figure}{section}
+\numberwithin{figure}{section}
 \appendix
-\section*{Data preparation}
+\section{Data preparation}
 \label{sec:data}
 
 \subsection*{Catch data}
@@ -498,9 +676,8 @@ The ``Bottom/inshore HL'' and ``Tuna HL'' are both handline gears and
 the data for these two gear types were combined at the suggestion of
 the CML database administrator.
 The ``Aku Boat'' gear type refers to storied Japanese-style pole and
-line fishery that operated in Hawaii through th 1980s. This fishery
-collapsed because of lack of access to bait and the closure of the only
-cannery in Honolulu. The Aku Boats target skipjack tuna 
+line fishery that operated in Hawaii through th 1980s (Wilson 2011). 
+The Aku Boats target skipjack tuna 
 ({\it Katsuwonus pelamis}), but yellowfin were occasionally landed as
 incidental catch.
 Some time series contain sustained periods of zero catch which
@@ -568,17 +745,20 @@ Four gear type catch time series used in the assessment model.
 
 \clearpage
 \subsection*{Off line coupling}
-The MHI assessment model could be 1coupled to two different models of
+The MHI assessment model could be coupled to two different models of
 the WCPO yellowfin stocks, \MFCL\ and \SD. Both models are age
-structure and spatially resolved and have been applied to YFT.
+structured and spatially resolved and have been applied to YFT.
 The spatial resolution of the \SD\ YFT model is 1\deg{} whereas the
 \MFCL\ yellowfin assessment divides the WCPO into 9 regions to facilitate
 incorporation of tagging data and to improve mortality estimates
 Figure~\ref{fig:mfclregions}.
 The spatial resolution of the \SD\ model would make it an ideal
-candiate for computing an index of abundance, but the model is still
+candidate for computing an index of abundance, but the model and its
+application to yellowfin are still
 under active development. In contrast the 2014 \MFCL\ assessment has
 been officially adopted as the best available assessment.
+The \MFCL\ regions split the MHI between regions 2 and 4. 
+Both regions were evaluated as abundance indices.
 
 \begin{figure}
 \begin{center}
@@ -589,8 +769,6 @@ Regional structure used in the 2014 WCPFC YFT stocks assessment.
 \end{center}
 \end{figure}
 
-Unfortunately the \MFCL\ regions split the MHI between regions 2 and 4. 
-Both regions were evaluated as abundance indices.
 
 \begin{figure}
 \begin{center}
@@ -604,7 +782,29 @@ Both regions were evaluated as abundance indices.
 }
 \end{figure}
 
+\begin{sidewaysfigure}
+\begin{center}
+{\scriptsize \sffamily
+\begin{tabular}{ccc}
+A. Region 2 index; $\sigma_r=0.8$ &
+B. Region 4 index; $\sigma_r=0.8$ &
+C. No index; $\sigma_r=0.2$ \\
+\\
+\includegraphics[width=0.30\textwidth]{../4-gear-runs/r2/est_catchB1.pdf} &
+\includegraphics[width=0.30\textwidth]{../4-gear-runs/r4/est_catchB1.pdf} &
+\includegraphics[width=0.30\textwidth]{../4-gear-runs/r0-sdrprior/est_catchB1.pdf}\\
+\end{tabular}
+}
+\caption{Predicted and observed catch trends with different indices of abundance
+and values of $\sigma_r$.
+Solid green line indicates predicted catch; $+$ indicate observed
+catch. 
+The light green shaded areas represent the observation error as 
+$\pm 2\sigma_Y$.
+Catch ordinates scaled to for each gear type.
+\label{fig:estcatch}}
+\end{center}
+\end{sidewaysfigure}
 
- 
 \end{document}
 
