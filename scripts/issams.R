@@ -307,7 +307,7 @@ show.block.number=function(block.number,x,line=3)
           at=c(x,0),cex=0.8)
 }
 
-extract.value=function(text,text.list)
+extract.value=function(text,text.list,sig.fig=3)
 {
    name = paste("^",text,sep="")
 #  print(paste(text,name))
@@ -328,7 +328,7 @@ extract.value=function(text,text.list)
 #  print(text.list[ndx+offset])
 
    x = as.numeric(text.list[ndx+offset])
-   x = signif(x,3)
+   x = signif(x,sig.fig)
 
 #  x = text.list[ndx+offset]
 
@@ -342,7 +342,7 @@ read.rep=function(file="issams.rep",ntime=61,dt=1,ngear=4)
 #  print(paste("Scanning file",file))
    rep = scan(file,what="character",quiet=TRUE)
    ret = list()
-   ret$nll = extract.value("nll",rep)
+   ret$nll = extract.value("nll",rep,sig=5)
    ret$nvar = extract.value("nvar",rep)
    ret$Gmax = extract.value("Gmax",rep)
 
@@ -367,6 +367,9 @@ read.rep=function(file="issams.rep",ntime=61,dt=1,ngear=4)
 #  ret$KF = extract.value("klingon_multiplier",rep)
    return(ret)
 }
+
+
+# read.rep.files(c("r2","r4","r0","r2-sdrprior","r4-sdrprior","r0-sdrprior"))->junk
 
 read.rep.files=function(path.list)# read.rep.files(dir(path=".",pattern="CV*"))
 {
