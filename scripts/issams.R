@@ -1,7 +1,5 @@
 #require("mvtnorm")
-#gear.names = c("Tuna HL","Troll","Longline","Bottom/inshore HL","Aku Boat",
-#                "Klingon")
-gear.names = c("Handline","Troll","Longline","Aku Boat", "Klingon")
+gear.names = c("Handline","Troll","Longline","Aku Boat", "Recreational")
 sgn = c("HL","Troll","LL","Aku","K")
 have.xssams.R = FALSE
 have.issams.R = TRUE

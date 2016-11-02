@@ -156,7 +156,7 @@ plot.biomass=function(x,y,K=NULL,sd=NULL,block=NULL,propL=NULL,
       text(x[1],forcing[1],"I ",adj=c(1.5,0.5),col="purple",cex=1.2)
       axis(4,lwd=1,at=ftic[2:length(ftic)],col="purple",col.axis="purple")
       abline(v=par("usr")[2],lwd=2,col="purple")
-      mtext("Forcing (I)",side=4,col="purple",line=3)
+      mtext("Abundance Index",side=4,col="purple",line=3)
     }
     if (!is.null(B1))
     {
