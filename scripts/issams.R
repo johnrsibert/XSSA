@@ -305,34 +305,34 @@ show.block.number=function(block.number,x,line=3)
           at=c(x,0),cex=0.8)
 }
 
-extract.value=function(text,text.list,sig.fig=3)
-{
-   name = paste("^",text,sep="")
-#  print(paste(text,name))
-   ndx = grep(name,text.list)[1]
-#  print(paste("ndx",ndx))
-#  print(paste("nchar",nchar(name)))
-   colon = grep(":",name)
-#  if (text=="K")
-#  {
-#     print(paste("ndx",ndx))
-#     print(paste("colon",colon,length(colon),is.numeric(colon),as.numeric(colon),sep="|"))
-#  }
-   offset = 2
-   if(length(colon)>0)
-      offset = 1
-#  print(paste("offset",offset))
-#  print(text.list[ndx])
-#  print(text.list[ndx+offset])
-
-   x = as.numeric(text.list[ndx+offset])
-   x = signif(x,sig.fig)
-
-#  x = text.list[ndx+offset]
-
-#  print(paste(text,x))
-   return(x)
-}
+# extract.value=function(text,text.list,sig.fig=3)
+# {
+#    name = paste("^",text,sep="")
+# #  print(paste(text,name))
+#    ndx = grep(name,text.list)[1]
+# #  print(paste("ndx",ndx))
+# #  print(paste("nchar",nchar(name)))
+#    colon = grep(":",name)
+# #  if (text=="K")
+# #  {
+# #     print(paste("ndx",ndx))
+# #     print(paste("colon",colon,length(colon),is.numeric(colon),as.numeric(colon),sep="|"))
+# #  }
+#    offset = 2
+#    if(length(colon)>0)
+#       offset = 1
+# #  print(paste("offset",offset))
+# #  print(text.list[ndx])
+# #  print(text.list[ndx+offset])
+# 
+#    x = as.numeric(text.list[ndx+offset])
+#    x = signif(x,sig.fig)
+# 
+# #  x = text.list[ndx+offset]
+# 
+# #  print(paste(text,x))
+#    return(x)
+# }
 
 read.rep=function(file="issams.rep",ntime=61,dt=1,ngear=4)
 
@@ -369,31 +369,30 @@ read.rep=function(file="issams.rep",ntime=61,dt=1,ngear=4)
 
 # read.rep.files(c("r2","r4","r0","r2-sdrprior","r4-sdrprior","r0-sdrprior"))->junk
 
-read.rep.files=function(path.list)# read.rep.files(dir(path=".",pattern="CV*"))
+read.rep.files=function(path.list,ngear)
 {
    print(path.list)
    have.names=FALSE
    csv = "rep_summary.csv"
-   nvar = 0
    rep.list=list() 
-   r = 0
    for (p in path.list)
    {
       path = paste(".",p,"issams.rep",sep="/")
-   #  print(path)
-      rep = read.rep(file=path)
-      if (nvar <= 0)
-         nvar = length(rep)
-   #  print(rep)
-      r = r+1
-      rep.list = c(rep.list,rep)
+      rep = read.rep.diagnostics(path,ntime=61,dt=1,ngear=ngear,
+                                block=NULL, mtype='i')
+   #  print("names(rep):")
+   #  print(names(rep))
+
+      # omit resid member of rep
+      nvar = length(rep) - 1
+      print(nvar)
+      rep.list = c(rep.list,rep[1:nvar])
       if (!have.names)
       {
          cat(paste(names(rep)[1],", ",sep=""),file=csv,append=FALSE)
          for (i in 2:nvar)
          {
             print(paste(i,names(rep)[i]))
-         #  cat(names(rep)[i],sep=",",file=csv,append=TRUE)
             cat(names(rep)[i],file=csv,append=TRUE)
             if (i < nvar)
                cat(", ",file=csv,append=TRUE)
@@ -404,8 +403,6 @@ read.rep.files=function(path.list)# read.rep.files(dir(path=".",pattern="CV*"))
 
       for (i in 1:nvar)
       {
-      #  print(paste(i,rep[i]))
-      #  cat(paste(rep[i],", ",sep=""),file=csv,append=TRUE)
          cat(rep[[i]],file=csv,append=TRUE)
          if (i < nvar)
             cat(", ",file=csv,append=TRUE)
@@ -416,22 +413,17 @@ read.rep.files=function(path.list)# read.rep.files(dir(path=".",pattern="CV*"))
    tnames=c("$-\\log L$", "$n$", "$|G|_{max}$", "$\\log\\MSY$", "$\\log\\Fmsy$",
             "$\\log Q$", "$\\log\\sigma_P$", "$\\log\\sigma_Y$", "$\\MSY$",
             "$\\Fmsy$", "$Q$", "$\\sigma_P$", "$\\sigma_Y$", "$r$", "$K$",
-            "$p_0$", "$\\tilde{r}$", "$\\sigma_r$")
-   print(length(tnames))
-#  rep.matrix = matrix(unlist(rep.list),nrow=length(path.list),byrow=TRUE)
-#  colnames(rep.matrix)=names(rep)
+            "$p_0$", "$\\tilde{r}$", "$\\sigma_r$","$\\bar{F}_5$",
+            "$\\bar{Y}_5$", "$\\bar{C}$")
+#  print(paste("length(tnames)",length(tnames)))
+
    rep.matrix = matrix(unlist(rep.list),ncol=length(path.list),byrow=FALSE)
    print(dim(rep.matrix))
-   rownames(rep.matrix)=tnames #names(rep)
+   rownames(rep.matrix)=tnames
    colnames(rep.matrix)=path.list
    write.table(rep.matrix,file="rep_summary.tex",sep=" & ",quote=FALSE,eol="\\\\\n") 
 #  return(as.data.frame(rep.matrix))
-
 }
-#  write.table(x, file = "", append = FALSE, quote = TRUE, sep = " ",
-#                eol = "\n", na = "NA", dec = ".", row.names = TRUE,
-#                col.names = TRUE, qmethod = c("escape", "double"),
-#                fileEncoding = "")
 
 
 

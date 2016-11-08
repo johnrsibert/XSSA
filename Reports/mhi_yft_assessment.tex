@@ -48,10 +48,8 @@ stock in the Main Hawaiian Islands Yellowfin Tuna Fishery}
 \newcommand\MSYFmsy{\MSY\;\Fmsy}
 \newcommand\Bd{B_1\; d}
 
-%\title{Assessment of the yellowfin tuna ({\it Thunnus albacares}) 
-%stock in the Main Hawaiian Islands Yellowfin Tuna Fishery}
-\title{Assessment of a fragment of the yellowfin tuna 
-({\it Thunnus albacares}) stock in the Pacific~Ocean:\\[0.125in]
+\title{Assessing of a portion of the Pacific yellowfin tuna 
+({\it Thunnus albacares}) stock:\\[0.125in]
 {\it Ahi} in the Main Hawaiian Islands}
 
 
@@ -63,12 +61,8 @@ Honolulu, HI  96822 U.S.A.\\[0.125in]
 \date{\today}
 }
 
-%\pagestyle{myheadings}
-%\markboth{John Sibert\hfil MHI Yellowfin Assessment}
-%{MHI Yellowfin Assessment Model\hfil John Sibert}
-
 \pagestyle{headings}
-\markright{Status of the {\rm Ahi} stock in Hawai`i \hfil John Sibert}
+\markright{John Sibert \hfil Status of the {\rm Ahi} stock in Hawai`i}
 
 \begin{document}
 %\numberwithin{equation}{section}
@@ -78,7 +72,18 @@ Honolulu, HI  96822 U.S.A.\\[0.125in]
 %\doublespacing
 
 \begin{abstract}
-\begin{center}\help{Write me!}\end{center}
+Regional tuna fishery management organizations do not provide useful
+advice to local fishery managers in small island jurisdictions. The
+State of Hawaii maintains time series of yellowfin tuna catches dating
+back to 1949, but these data have never been formally applied to
+evaluating the effects of the yellowfin fishery in the Main Hawaiian
+Islands on the local stock. I develop a new approach utilizing these
+data that links the local stock dynamics to the dynamics of the larger
+Pacific stock. This approach uses a state-space logistic production
+model linked the larger Pacific stock using an index of abundance. The
+conclusion is that such a model is feasible, that the local stock
+is not overfished and that local fisheries are fishing at acceptable
+levels.
 \end{abstract}
 
 
@@ -95,24 +100,21 @@ these stock assessments. These
 WCPFC stock assessments and conservation and management measures
 inform the WCPFC, but offer little useful advice to local fishery managers.
 
-Yellowfin ({\it Thunnus albacares}, YFT) tuna is an important food resource
+Yellowfin tuna ({\it Thunnus albacares}, YFT) is an important food resource
 of many Pacific Island communities and the people of the Hawaiian
 islands of been fishing for yellowfin for many generations. 
-Recent studies (Rooker et al 2016) have shown that the Hawaii-based
+Recent studies (Rooker et al. 2016) have shown that the Hawaii-based
 fishery for YFT is  supported by
 local production with little or no subsidies from equatorial
 production zones or nurseries.
 The Main Hawaiian Islands (MHI), Figure~\ref{fig:mhimap},
-comprising, the 8 largest islands in the Hawaiian Archipelago
+comprising the 8 largest islands in the Hawaiian Archipelago,
 has been an important fishing ground throughout this history.
 Since the recent creation of the Papah\={a}naumoku\={a}kea Marine National
 Monument in 2016, the MHI is the only legally accessible tuna fishing ground
 in the State of Hawaii.
 This change emphasizes the importance of careful management of yellowfin
 fisheries in the MHI.
-The State of Hawaii has collected yellowfin catch data from the MHI
-since 1949, but these data have seldom been used to advise fisheries
-management.
 
 \begin{figure}
 \begin{center}
@@ -127,23 +129,28 @@ full explanation.
 \end{center}
 \end{figure}
 
-This paper presents a new approach to providing advice to fisheries
-managers about the effects of local fisheries on the local fragment of
+The primary purpose of this paper is to explore a means to apply the 65
+year time series of
+data collected from local fisheries to the problem of
+providing advice to fisheries
+managers about the effects of local fisheries on the local portion of
 the larger stock of yellowfin tuna in the Pacific.
-The general approach is to adopt a state-space variant of
+The general approach is to develop a relatively simple population
+dynamics model, estimate the model parameters from existing
+data, and apply the estimated parameters to answer the question of the
+effects of the fishery.
+I adopt a state-space variant of
 the logistic surplus production model with several novel features.
 Fishing mortality, the proportion of the population harvested each
 year, is represented as a random walk of multiple gear types.
-Offine coupling is used to link the local biomass to regional
+Offline coupling is used to link the local biomass to regional
 biomass estimates from large scale yellowfin stock assessment models
 developed for the WCPFC.
 The logistic parameters of the surplus production model are
 reparameterized to estimate parameters of direct relevance to fishery
 management. All state transitions are represented as random effects.
-The model is applied to the 65 year catch time series collected by the
-State of Hawaii.
 
-\section*{Model development}
+\section*{Methods}
 \label{sec:models}
 State-space models separate variability in the biological
 processes in the system (transition model)
@@ -159,7 +166,7 @@ the function $T$ embodies the dynamics mediating the
 development of the state at time $t$ from the state at the previous
 time with random process error, $\eta_t$.
 
-Stock dynamics follow the classic Schaefer differential equation:
+Stock dynamics follow the classic Schaefer (1954) differential equation:
 \begin{equation}
 \label{eqn:ischaefer}
 \frac{dN}{dt} = rN(1-\frac{N}{K}) - FN
@@ -185,8 +192,8 @@ $$
 \bar{F}_t =\sum_{g=1}^n F_{g,t}.
 $$
 The logarithm of fishing mortality for each gear is assumed to
-follow a random walk with normal increments, as suggested by Berg and
-Nielsen (2014).
+follow a random walk with normal increments, as suggested by Nielsen
+and Berg (2014).
 \begin{equation}
 \label{eqn:Fwalk}
 \log F_{g,t} = \log F_{g,t-1} + \xi_t;\quad \xi_t\sim
@@ -219,7 +226,7 @@ Biomass estimates from both regions were evaluated as abundance indices.
 
 The logistic parameters $r$ and $K$ are notoriously difficult to estimate
 in surplus production models, 
-so a parameter substitutions were used. 
+so parameter substitutions were used. 
 Maximum sustainable yeld
 (MSY, $\MSY$) and fishing mortality at MSY ($\Fmsy$) are commonly used
 fishery reference points and are simple functions of $r$ and $K$.
@@ -232,16 +239,14 @@ logistic growth parameter, $r$, in equation~(\ref{eqn:ischaefer}). They
 suggest $\tilde{r} = 0.486$ with a standard deviation of $\sigma_r = 0.046$
 (a coefficient of variation ${\rm cv}=\frac{\sigma_r}{r}=0.094$)
 for Atlantic YFT.
-A lognormal prior on $r$ was implemented with 
-$\tilde{r} = 0.486$ and $\sigma_r = 0.8$.
+A lognormal prior on $r$ was implemented as 
 \begin{equation}
 \log r - \log \tilde{r} = \rho ;\quad \rho\sim N(0,\sigma^2_r)
 \end{equation}
-which is a somewhat ``looser'' constraint on the estimate of $r$.
 $\rho$ becomes a component of the likelihood
 (equation~\ref{eqn:likelihood}).
 
-All process errors are assumed to have the same distribution
+All process errors are assumed to have the same distribution,
 $N(0,\sigma^2_P)$; $\sigma_N$,$\sigma_F$, and $\sigma_I$ are assumed
 to be equal and estimated as a global process error with variance
 $\sigma^2_P$.
@@ -254,7 +259,7 @@ where the function $O$ describes the measurement process with
 error $\varepsilon$ in observing the state.
 
 Predicted catch, $\widehat{C}_{g,t}$, for each gear is the product of
-estimated fishing mortality and the biomass.
+estimated fishing mortality and the biomass,
 \begin{equation}
 \widehat{C}_{g,t} = F_{g,t}\cdot\Bigl(\frac{N_{t-\Delta
 t}+N_t}{2}\Bigr) \cdot e^{\varepsilon_t}
@@ -281,12 +286,11 @@ $p_0$ is the proportion of observed catch observations equal to zero.
 
 \begin{table}
 \caption{Complete list of estimated and computed parameters and model
-constraints for 
-the state-space surplus production model. There are 5 estimated parameters. 
+constraints for the state-space surplus production model. 
+There are 5 estimated parameters. 
+Computed variables are functions of estimated parameters.
+There are four constraints and constants.
 For a model with 61 time steps and 4 gear types, there are 305 random effects.
-Values of non-estimated model variables, e.g.,  $r$ and $K$, are computed by
-parameter substitution formulas.
-There are three constraints.
 }
 \label{tab:allvars1}
 \begin{center}
@@ -299,24 +303,26 @@ Parameter & Definition\\
 $\MSY$ & Maximum sustainable yield\\
 $\Fmsy$& Fishing mortality at maximum sustainable yield\\
 $Q$    & Abundance index proportionality constant\\
-$\sigma_P$ & Global process error standard deviation;\\
+$\sigma_P$ & Global process error standard deviation,\\
            & $\sigma_P=\sigma_N=\sigma_F=\sigma_I$\\
 $\sigma_Y$ & Observation error standard deviation \\
 \hline
-       & {\it Computed parameters:}\\
-$r$    & Instantaneous growth rate; $r=2F_{\MSY}$\\
-$K$    & Asymptotic population size; $K=\frac{4\MSY}{r}$\\
-$\bar{F}_5$ & Average of total fishing mortality for the most recent
+       & {\it Computed variables:}\\
+$r$    & Instantaneous growth rate, $r=2F_{\MSY}$\\
+$K$    & Asymptotic population size, $K=\frac{4\MSY}{r}$\\
+$\bar{F}_5$ & Average of total estimated fishing mortality for the most recent
 five years.\\
 \hline
-       & {\it Constraints:}\\
-$p_0$  & Proportion of zero catch observations;\\
+       & {\it Constraints and constants:}\\
+$p_0$  & Proportion of zero catch observations,\\
        & fixed at 0.04918\\
 $\tilde{r}$ & An {\it a priori} assumed value for $r$\\
             & fixed at $\tilde{r}=0.486$ (Carruthers and McAllister, 2011)\\
-$\sigma_r$  & Assumed standard deviation of $r$ around its prior;\\
+$\sigma_r$  & Assumed standard deviation of $r$ around its prior,\\
             & fixed at $\sigma_r=0.8$ or $\sigma_r=0.2$;
             ${\rm cv}=1.64$ or ${\rm cv}=0.411$\\
+$\bar{Y}_5$ & Average of total observed catch for the most recent
+five years.\\
 \hline
 \end{tabular}
 \end{center}
@@ -325,7 +331,7 @@ $\sigma_r$  & Assumed standard deviation of $r$ around its prior;\\
 
 
 %{\bf Estimation.} 
-The model states, $N_t$ and $F_{gt}$ are assumed to be random
+The model states, $N_t$ and $F_{gt}$, are assumed to be random
 effects (Skaug and Fournier, 2006). Model parameters are estimated by
 maximizing the joint likelihood of the random
 effects, observations, and prior likelihood.
@@ -339,16 +345,18 @@ L(\theta,\alpha,x)=
 where $m$ is the number of time steps in the catch time series and
 $\theta=\left\{\MSY,\Fmsy,Q,\sigma_P,\sigma_y\right\}$ 
 is a vector of model parameters (Table~\ref{tab:allvars1}).
-The model is implemented in ADMB-RE (Fournier et al, 2012) and
+The model is implemented in ADMB-RE (Fournier et al. 2012) and
 applied to a 61 year ($m=61$) time series of observed
-catch by 4 fishing gears from 1952 through 2012
+catch by four fishing gears from 1952 through 2012
 (Figure~\ref{fig:data}).
 Data preparation is described in Appendix~\ref{sec:data}.
-All computer code, data files, and draft reports presented in this
+Noncommercial fishers may land substantial quantities of YFT, but
+reliable data from this sector of the fishery are not currently
+available. The effects of omitting the noncommercial catch is
+discussed briefly in Appendix~\ref{sec:klingon}.
+All computer code and data files discussed in this
 paper can be found at Github:
 \url{https://github.com/johnrsibert/XSSA.git}.
-
-\doublespacing
 
 \section*{Results}
 Table~\ref{tab:ests1} compares 6 different models
@@ -409,7 +417,7 @@ $\sigma_Y$ & -1.46 & -1.45 & -1.14 & -1.41 & -1.46 & -1.14\\
 \hline
 $r$ & 0.232 & 1.84 & 0.872 & 0.409 & 0.588 & 0.497\\
 $K$ & 23900 & 2130 & 25400 & 10900 & 6400 & 8140\\
-$\bar{F}_5$ & 0.0632 & 1.52  & 0.749 & 0.163 & 0.513 & 0.149\\
+$\bar{F}_5$ & 0.0632 & 1.52 & 0.749 & 0.163 & 0.513 & 0.149\\
 \hline
 $p_0$ & 0.0492 & 0.0492 & 0.0492 & 0.0492 & 0.0492 & 0.0492\\
 $\tilde{r}$ & 0.486 & 0.486 & 0.486 & 0.486 & 0.486 & 0.486\\
@@ -433,7 +441,7 @@ See Figure~\ref{fig:estFC} for more detail.
 %\includegraphics[width=0.95\textwidth]{../4-gear-runs/multiOPcatch.pdf}
 \includegraphics[height=0.45\textheight]{../4-gear-runs/multiOPcatch.pdf}
 \caption{Plot of predicted catch on observed catch for models A, B,
-and C. Colors indicated different models.
+and C.
 \label{fig:mopcatch}
 }
 \end{center}
@@ -443,9 +451,9 @@ Estimated biomass tracks abundance indices for both models A and B,
 Figure~\ref{fig:estbiomass}, and the abundance indices lie within the
 process error of the biomass trend.
 The estimated biomass and abundance index for model A (region 2)
-reach maxima in the 1980s and subsequently decreases. 
-The estimated biomass and abundance index for for model B (region 4) 
-decrease monotonically in a classic ``one way trip''.
+reach maxima in the 1980s and subsequently decrease. 
+The estimated biomass and abundance index for model B (region 4) 
+decrease monotonically.
 The estimated biomass trend in model C is roughly similar to
 that of model A with a peak in the 1980s and subsequent decrease.  
 The maxima of the biomass trends in all models exceed the
@@ -477,8 +485,6 @@ Note that the scale of the ordinate is different in each panel.
 \end{center}
 \end{sidewaysfigure}
 
-
-
 The average total YFT catch in the MHI for the most recent 5 years
 is 818 mt, easily below the estimated $\MSY$ for all three models. 
 The average estimated fishing mortality for the most recent 5 years 
@@ -492,10 +498,11 @@ mortality to be greater than $\Fmsy$.
 Failure of the model to converge to a solution without an index of
 abundance and using the loose prior on $r$ (Table~ \ref{tab:ests1})
 indicates that the data lack sufficient information for this model.
-An index of abundance or a prior constraint on a parameter are
+An index of abundance or an informative prior
+constraint on a parameter are
 alternative assumptions that provide additional information to a model
-to further constrain model behavior.
-Interpretations of these assumptions are quite different. 
+to constrain model behavior.
+Interpretations of these two assumptions are quite different. 
 Assuming a prior value for $r$ implies {\it a priori} knowledge of stock
 productivity, and imposing a low standard deviation around the
 prior implies a high level of certainty. On the other hand,
@@ -508,28 +515,56 @@ The biomass trajectories predicted by both model C (no index of abundance)
 and by model A (region 2 index of abundance) are
 qualitatively similar to the region 2 biomass trajectory.
 These similarities suggest that the data are not completely
-uninformative; there is sufficient information in the
+uninformative. There is sufficient information in the
 data to estimate a biomass trend similar to region 2 with or without
-recourse to an index of abundance.
+recourse to an index of abundance, but additional information is
+required to scale the trend.
 
-MFCL Regions 2 and 4 differ from on another in their oceanography,
+MFCL Regions 2 and 4 differ from one another in their oceanography,
 ecology and fisheries (Appendix~\ref{sec:index}). 
-Region 2 is outside of the center of abundance for yellowfin in the
-WCPO, appears to have a smaller stock, and Davies et al (2014)
-estimate that region 2 has experienced relatively a minor
-impact of the fishery.
-In contrast, region 4 hosts some of the largest fisheries in the WCPO and
-produces a large proportion of the total WCPO yellowfin catch.
-Davies et al (2014) estimate that region 2 has experienced
-the largest impact of the fishery of any of the MFCL.
+Region 2 is outside the center of abundance for yellowfin in the
+WCPO, appears to have a smaller stock, and Davies et al. (2014)
+estimate that region 2 has experienced relatively minor fishery impact.
+In contrast, region 4 hosts some of the largest fisheries in the WCPO,
+produces a large proportion of the total WCPO yellowfin catch, and
+Davies et al. (2014) estimate that region 4 has experienced
+the largest impact of the fishery of any of the MFCL regions.
+On the basis of low levels of exploitation and the location of the
+Hawaiian archipelago in the North Pacific Tropical Gyre province, MFCL
+region 2 would seem {\it a priori} to be the best choice of a for
+computing an index of abundance.
 
 The random walk representation of fishing mortality enables
-to model to compute accurate values of $F_{g,t}$. The zero-inflated
+the model to compute accurate values of $F_{g,t}$. The zero-inflated
 log normal observation error and the separation of fishing fleets
 enable the model to interpret low (or zero) catches as changes in
 $F_{g,t}$ rather than as episodes of low stock size.
-These to features enable the model to estimate catch, i.e. removals
+These features enable the model to estimate catch
 from the estimated stock, extremely accurately.
+
+Current catches ($\bar{Y}_5$) are less than model estimates of maximum
+sustainable yield ($\MSY$) for all model variants. 
+Estimates of current fishing mortality ($\bar{F}_5$) are less than
+estimates of fishing mortality at maximum sustainable yield ($\Fmsy$)
+for all models except model B (region 4 index of abundance).
+If fishery managers were to adopt $\MSY$ and $\Fmsy$ as management
+reference points, the conclusion would be that the local stock is not
+overfished and that overfishing is not occurring.
+
+The model presented here is a promising approach to assessing a local
+portion of a larger fish stock in a way that provides useful advice to
+local fisheries managers. The current model is clearly in need of
+further development. Estimates of noncommercial catch (and possibly
+their observation error) should be included in the data. 
+The issue of selecting an appropriate index of abundance should be
+resolved. One hopes that the
+next round of  WCPFC stock assessments will realign
+the MFCL regions to be more consistent
+with the Longhurst (1998) ecological provinces so that the entire
+Hawaiian Archipelago lies within a single region. 
+A region that aligns approximately with  the North Pacific Tropical
+Gyre Province would be the best choice for an index of abundance for
+the MHI.
 
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -542,12 +577,12 @@ This work was initiated under a contract from the Western Pacific
 Regional Fisheries Managment Council. 
 I thank the Council for its generous support and
 Council Staff Paul Dalzell and Eric Kingma for encouraging me to
-actually take on this challenging project.
+take on this challenging project.
 Special thanks are due 
 to David Itano for sharing insights into the biology of yellowfin tuna
 and into small-boat fisheries in Hawaii,
-to Reginald Kokubun State of Hawaii, Division of Aquatic Resources,
-Departmemnt of Land and Natural Resources for supplying catch report
+to Reginald Kokubun of the State of Hawaii, Division of Aquatic Resources,
+Department of Land and Natural Resources, for supplying catch report
 data from the Commercial Marine Landings data base,
 to Keith Bigelow and Karen Sender of NOAA Pacific
 Island Fisheries Science Center for supplying logbook reporting data and
@@ -589,30 +624,22 @@ Nielsen, A., C. Berg. 2014. Estimation of time-varying selectivity
 in stock assessments using state-space models. Fisheries Research
 158:96-101.
 
-%Murray, J. D. 1993. Mathematical biology. Second Edition.
-%Springer-Verlag. 767pp.
-
 Quinn, T, R. Deriso. 1999. Quantitative fish dynamics. Oxford
 University Press, New York.
 
 Rooker, J.R., R. J. D. Wells, D. G. Itano, S. R. Thorrold, J. M. Lee. 2016.
 Natal origin and population connectivity of bigeye and
-yellowfin tuna in the Pacific Ocean
-Fish. Oceanogr. 25:3, 277–291.
+yellowfin tuna in the Pacific Ocean.
+Fish. Oceanogr. 25, 277-291.
 
 Schaefer, M. B. 1954. Some aspects of the dynamics of populations
 important to the management of the commercial marine fisheries. IATTC
-Bull. 1(2):27-56.
-
-Senina, I., J. Sibert, P. Lehodey  2008. Parameter estimation for
-basin-scale ecosystem linked population models of large pelagic
-predators: Application to skipjack tuna.  Prog. Oceanogr. 78:319-335.
+Bull. 1:27-56.
 
 Senina, I.,  P. Lehodey, B. Calmettes, S. Nicol, S. Caillot,
 J. Hampton and P. Williams. 2015.
 SEAPODYM application for yellow tuna in the Pacific Ocean.
 WCPFC-SC11-2015/EB-IP-01.
-
 
 Skaug, H., Fournier, D., 2006. Automatic approximation of the marginal
 likelihood in non-Gaussian hierarchical models. Computational
@@ -650,7 +677,8 @@ catches were zero.
 %Commercial Marine Landings, Division of Aquatic Resources, Dept. of Land and Natural Resources, State of Hawaii
 The State of Hawaii Department of Land and Natural Resources
 Commercial Marine Landings data base (CML) from 1949 through 2014 is
-the primary source of data used in this analysis. These document the
+the primary source of data used in this analysis. This database
+documents the
 continuous 65 year history of commercial fishing in Hawaii.
 
 
@@ -661,7 +689,7 @@ HL'', ``Casting'', ``Hybrid'',  ``Shortline'', ``Other'', and
 For this analysis catches by ``Casting'', ``Hybrid'',
 ``Shortline'', ``Other'', and ``Vertical line'' are combined into a new
 category, ``Misc''. Landing in the ``Misc'' category are highest after
-year 2000 and less than 20 mt, i.e. 2\% of the total landings.
+year 2000 and less than  2\% of the total landings.
 The catch time series for the CML data are shown in
 Figure~\ref{fig:CMLdata}.
 The ``Bottom/inshore HL'' and ``Tuna HL'' are both handline gears and
@@ -737,8 +765,6 @@ Four gear type catch time series used in the assessment model.
 \label{sec:index}
 Using the output of one model to constrain a second model is sometimes
 referred to as ``offline'' coupling. 
-%It is a fairly common practice, but does usually not propagate the
-%estimation errors between the two models.
 The output from two quite different models of WCPO yellowfin,
 \SD\ and \MFCL, could potentially be used as indices of abundance.
 Both models are age structured, spatially structured, and have been
@@ -751,16 +777,17 @@ The spatial resolution of the \SD\ model would make it an ideal
 candidate for computing an index of abundance, but the model and its
 application to yellowfin are still under active development (Senina et
 al, 2015). 
-The 2014 \MFCL\ assessment (Davies et al 2014) has been officially
+The 2014 \MFCL\ assessment (Davies et al. 2014) has been officially
 adopted by the WCPFC as the assessment on which regional conservation
 and management measures are based.
 
 \begin{figure}
 \begin{center}
-%\includegraphics[width=0.8\textwidth]{./graphics/MFCLregions.png}
-\includegraphics[height=0.45\textheight]{./graphics/MFCLregions.png}
+\includegraphics[width=0.9\textwidth]{./graphics/MFCLregions.png}
+%\includegraphics[height=0.45\textheight]{./graphics/MFCLregions.png}
 \caption{\label{fig:mfclregions}
-Regional structure used in the 2014 WCPFC YFT stocks assessment.
+Regional structure used in the 2014 WCPFC YFT stocks assessment from
+Davies et al. (2014).
 }
 \end{center}
 \end{figure}
@@ -771,16 +798,18 @@ Figure~\ref{fig:paczones}.
 The boundary between MFCL regions 2 and 4 splits both MHI and the NPTG.
 Region 2 includes the northern extent of the range of YFT, and the MFCL
 assessment concludes that the YFT biomass is relatively low and that
-the impact of the WCPO fisheries has been relatively minor`.
+the impact of the WCPO fisheries has been relatively minor.
 In contrast, region 4 lies in primarily in the Western Pacific Warm
 Pool Province, includes the core of the YFT range in the Pacific,
 and supports some of the most intense tuna fisheries in the world.
 MFCL estimates that the impact of the fisheries on the YFT stock in
 region 4 to be one among the highest of all MFCL regions, and it is
 likely that overfishing is occuring.
-An implicit assumption of selection a specific biomass time series for an
-index of abundance for the MHI stock 
-is that the ecology and productivity of the index population 
+The estimated biomass trends in these two regions are quite different,
+Figure~\ref{fig:mfclbiomass}.
+Selecting a specific biomass time series for an
+index of abundance for the MHI stock implicitly assumes
+that the ecology and productivity of the index population 
 is comparable to the MHI.
 On the basis of low levels of exploitation and the location of the
 Hawaiian archipelago in the NPTG, MFCL region 2 would seem {\it a
@@ -822,12 +851,52 @@ MFCL Region 2 & MFCL Region 4\\
 \clearpage
 \section{Additional Diagnostics}
 \label{sec:diagnostics}
+
+Figure~\ref{fig:estFC} shows the trends in fishing mortality and
+catch with different indices of abundance and values of the $r$
+prior, $\sigma_r$.
+The solid brown lines in the upper panel show the estimated fishing
+mortality by fleet. The orange shaded areas represent the process
+error as $\pm 2\sigma_P$.
+The solid green lines in the lower panel show the predicted catch; $+$
+symbols indicate observed catch. 
+The light green shaded areas represent the observation error as 
+$\pm 2\sigma_Y$.
+The ordinate in each panel is scaled to the specific gear type.
+
+\begin{sidewaysfigure}
+\begin{center}
+{\scriptsize \sffamily
+\begin{tabular}{ccc}
+A. Region 2 index; $\sigma_r=0.8$ &
+B. Region 4 index; $\sigma_r=0.8$ &
+C. No index; $\sigma_r=0.2$ \\
+\\
+& Fishing Mortality\\
+\hline
+\includegraphics[width=0.30\textwidth]{../4-gear-runs/r2/est_FB1.pdf} &
+\includegraphics[width=0.30\textwidth]{../4-gear-runs/r4/est_FB1.pdf} &
+\includegraphics[width=0.30\textwidth]{../4-gear-runs/r0-sdrprior/est_FB1.pdf}\\
+\\
+& Observed and Predicted Catch\\
+\hline
+\includegraphics[width=0.30\textwidth]{../4-gear-runs/r2/est_catchB1.pdf} &
+\includegraphics[width=0.30\textwidth]{../4-gear-runs/r4/est_catchB1.pdf} &
+\includegraphics[width=0.30\textwidth]{../4-gear-runs/r0-sdrprior/est_catchB1.pdf}\\
+\end{tabular}
+}
+\caption{Trends in estimated fishing mortality (top, orange) and 
+catch (bottom, green).
+\label{fig:estFC}}
+\end{center}
+\end{sidewaysfigure}
+
 Figure~\ref{fig:estprod} places the model results in a fishery
 management context. The parabolic dashed red lines indicate the theoretical
 yield from a population with logistic growth. The maximum yield if the
-population were at equilibrium, would occur at the  peak of the parabola.
+population were at equilibrium would occur at the  peak of the parabola.
 There are many possible equilibria, but the  maximum equilibrium yield
-has been labeled ``Maximum Sustainable Yield" in the fisheries
+has been labeled ``Maximum Sustainable Yield", $\MSY$, in the fisheries
 literature.
 The parameter $\Fmsy$\ is the fishing mortality that would produce $\MSY$\
 at equilibrium. 
@@ -858,87 +927,58 @@ the ordinate has been scaled to the observed catch.
 \end{center}
 \end{sidewaysfigure}
 
-
-Figure~\ref{fig:estFC} shows the trends in fishing mortality and
-catch with different indices of abundance and values of the $r$
-perior, $\sigma_r$.
-The solid brown lines in the upper panel show the estimated fishing
-mortality by fleet. The orange shaded areas represent the process
-error as $\pm 2\sigma_P$.
-The solid green lines in the lower panel show the predicted catch; $+$
-symbols indicate observed catch. 
-The light green shaded areas represent the observation error as 
-$\pm 2\sigma_Y$.
-Ordinates scaled to for each gear type.
-
-\begin{sidewaysfigure}
-\begin{center}
-{\scriptsize \sffamily
-\begin{tabular}{ccc}
-A. Region 2 index; $\sigma_r=0.8$ &
-B. Region 4 index; $\sigma_r=0.8$ &
-C. No index; $\sigma_r=0.2$ \\
-\\
-& Fishing Mortality\\
-\hline
-\includegraphics[width=0.30\textwidth]{../4-gear-runs/r2/est_FB1.pdf} &
-\includegraphics[width=0.30\textwidth]{../4-gear-runs/r4/est_FB1.pdf} &
-\includegraphics[width=0.30\textwidth]{../4-gear-runs/r0-sdrprior/est_FB1.pdf}\\
-\\
-& Observed and Predicted Catch\\
-\hline
-\includegraphics[width=0.30\textwidth]{../4-gear-runs/r2/est_catchB1.pdf} &
-\includegraphics[width=0.30\textwidth]{../4-gear-runs/r4/est_catchB1.pdf} &
-\includegraphics[width=0.30\textwidth]{../4-gear-runs/r0-sdrprior/est_catchB1.pdf}\\
-\end{tabular}
-}
-\caption{Trends in estimated fishing mortality (top, orange) and 
-catch (bottom, green).
-\label{fig:estFC}}
-\end{center}
-\end{sidewaysfigure}
-
 \clearpage
 \section{Noncommercial Catch}
 \label{sec:klingon}
-The Main Hawaiian Islands supports a large number of non-commercial
-fishers. There is no catch reporting and no mandatory marine fishing
-license. In consequence it is difficult to accurately estimate the
-noncommercial catch. 
+The Main Hawaiian Islands support a large number of noncommercial
+fishers. There is no catch reporting system and no mandatory marine fishing
+license. 
+Accurately estimating the noncommercial catch is therefore difficult. 
 The State of Hawaii Department of Land and Natural Resources and the
 United States National Oceanic and Atmospheric Administration are  
 collaborating to improve survey methods for the Hawai`i Marine
 Recreational Fishing Survey (HMRFS). The HMRFS Newsletter (DLNR, 2011)
 reports that non-commercial catches of YFT range between 2300 and 6900
-mt from 2003 through 2010 considerably in excess of the most recent
+mt from 2003 through 2010, considerably in excess of the most recent
 commercial catch. The assessment model developed here has the capability to
 augment the reported catch with catch by an additional fleet in
 proportion to the total reported catch and use the augmented catch in
 the assessment as if it were reported.
-Tables~\ref{tab:k2} and Tables~\ref{tab:k0} summarize the results of
-attempting to fit the catch data with non-commercial catch included as
+
+Tables~\ref{tab:k2} and \ref{tab:k0} summarize the results of
+attempting to fit the observed catch data augmented by 
 different multiples of the total catch. Four different multipliers
 were tested, 1, 2, 5, and 10 times total catch.
-
-All 8 augmented catch models converged to a solution. The negative
+All 8 augmented catch models converge to solutions. The negative
 log likelihood values are higher than the non-augmented fits as would
-be expected because there are more data points.
+be expected with more data points.
 {\it A priori} one would expect that a fish population capable
 of producing a higher than reported yield over a 60 year history
 would have a higher productivity and a higher biomass. The results of
 the augmented catch parameter estimates are generally consistent with
-this conclusion.
+this conclusion. 
+The model compensates for the higher catch by
+increasing $\MSY$ in all models. $\Fmsy$\ increases slightly, but the
+prior on $r$ constrains the increases. $Q$ increases in
+the abundance index models. $\bar{F}_5$ decreases substantially in the
+models without an abundance index.
+
+This simple catch augmentation simulation indicates that the unreported
+noncommercial catch causes this model to underestimate maximum
+sustainable yield and the fishing mortality at maximum sustainable
+yield when applied to the available reported catch data.
+More realistic simulations should be developed to evaluate this
+problem.
 
 
-The details of the results of augmenting the catch depned strongly on
-the model constraints, i.e., the index of abundance and the prior on
-$r$.
 
 \begin{table}
 {\small
-\caption{Results of fitting the model to different multiples of the
+\caption{Results of fitting the model to 4 different multiples of the
 total catch using MFCL Region 2 as an index of abundance and a loose
-prior on $r, \sigma_r = 0.8$, model A in Table~\ref{tab:ests1}.
+prior on $r, \sigma_r = 0.8$, comparable to model A in
+Table~\ref{tab:ests1}. 
+See Table~\ref{tab:allvars1} for definitions of all variables.
 \label{tab:k2}}
 \begin{center}
 \begin{tabular}{|l|r|rrrr|}
@@ -963,7 +1003,7 @@ $\bar{F}_5$ & 0.0632 & 0.0745 & 0.0739 & 0.0733 & 0.0729\\
 $p_0$ & 0.0492 & 0.0492 & 0.0492 & 0.0492 & 0.0492\\
 $\tilde{r}$ & 0.486 & 0.486 & 0.486 & 0.486 & 0.486\\
 $\sigma_r$ & 0.8 & 0.8 & 0.8 & 0.8 & 0.8\\
-$\bar{Y}_5$ & 818 & 1620 & 2420 & 4820 & 8810\\
+$\bar{Y}_5$ & 818 & 1630 & 2450 & 4890 & 8960\\
 \hline
 \end{tabular}
 \end{center}
@@ -977,12 +1017,13 @@ $\bar{Y}_5$ & 818 & 1620 & 2420 & 4820 & 8810\\
 {\small
 \caption{Results of fitting the model to different multiples of the
 total catch with no index of abundance and a tighter
-prior on $r, \sigma_r = 0.2$, model C in Table~\ref{tab:ests1}.
+prior on $r, \sigma_r = 0.2$, comparable to model C in Table~\ref{tab:ests1}.
+See Table~\ref{tab:allvars1} for definitions of all variables.
 \label{tab:k0}}
 \begin{center}
 \begin{tabular}{|l|r|rrrr|}
 \hline
-Multiplier & C & 1 & 2 & 5 & k10\\
+Multiplier & C & 1 & 2 & 5 & 10\\
 \hline
 \hline
 $-\log L$ & 195.1 & 217.51 & 217.53 & 217.54 & 217.54\\
@@ -991,7 +1032,6 @@ $|G|_{max}$ & 1.32e-05 & 1.62e-05 & 6.35e-05 & 4.14e-05 & 5.7e-05\\
 \hline
 $\MSY$ & 1010 & 62100000 & 1.16e+11 & 4.41e+10 & 6.14e+10\\
 $\Fmsy$ & 0.249 & 0.244 & 0.244 & 0.244 & 0.244\\
-$Q$ & ~---~ & & & &\\
 $\sigma_P$ & 0.319 & 0.295 & 0.295 & 0.295 & 0.295\\
 $\sigma_Y$ & -1.14 & -1.22 & -1.22 & -1.22 & -1.22\\
 \hline
@@ -1002,7 +1042,7 @@ $\bar{F}_5$ & 0.149 & 3.17e-06 & 2.50e-09 & 1.24e-08 & 1.77e-08\\
 $p_0$ & 0.0492 & 0.0492 & 0.0492 & 0.0492 & 0.0492\\
 $\tilde{r}$ & 0.486 & 0.486 & 0.486 & 0.486 & 0.486\\
 $\sigma_r$ & 0.2 & 0.2 & 0.2 & 0.2 & 0.2\\
-$\bar{Y}_5$ & 818 & 1630 & 2050 & 4850 & 7490\\
+$\bar{Y}_5$ & 818 & 1630 & 2450 & 4890 & 8960\\
 \hline
 \end{tabular}
 \end{center}
@@ -1013,21 +1053,3 @@ $\bar{Y}_5$ & 818 & 1630 & 2050 & 4850 & 7490\\
 \end{document}
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-
-Davies et al.
-\begin{quote}
-p 6
-
-4. Latest catches marginally exceed the maximum sustainable yield (MSY).
-
-5. Recent levels of fishing mortality are most likely below the level that will support the MSY.
-
-p 38
-
-11. The estimates of MSY for the principal model options (526,400;744,800 mt) are comparable to the
-recent level of (estimated) catch from the fishery (597,000 mt), and for most of the plausible model
-runs the recent catch exceeds MSY (0.81.13). Further, while estimates of current fishing mortality
-are generally below FMSY , any increase in fishing mortality would most likely increase the depletion
-levels within regions 4 and 8.
-\end{quote}
- 

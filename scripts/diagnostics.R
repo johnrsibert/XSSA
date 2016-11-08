@@ -202,41 +202,45 @@ read.rep.diagnostics=function(file="issams.rep", ntime=61,dt=1,ngear=4,
 
    print(paste("Scanning file",file))
    rep = scan(file,what="character")
+   print("head(rep):")
+   print(head(rep))
 
    ests=get.diagnostics(rep,ntime=ntime,dt=dt,ngear=ngear,block=NULL)
    return(ests)
 }
 
+extract.value=function(text,text.list,sig.fig=3)
+{
+   name = paste("^",text,sep="")
+#  print(paste(text,name))
+   ndx = grep(name,text.list)[1]
+#  print(paste("ndx",ndx))
+#  print(paste("nchar",nchar(name)))
+   colon = grep(":",name)
+#  if (text=="K")
+#  {
+#     print(paste("ndx",ndx))
+#     print(paste("colon",colon,length(colon),is.numeric(colon),as.numeric(colon),sep="|"))
+#  }
+   offset = 2
+   if(length(colon)>0)
+      offset = 1
+#  print(paste("offset",offset))
+#  print(text.list[ndx])
+#  print(text.list[ndx+offset])
+
+   x = as.numeric(text.list[ndx+offset])
+   x = signif(x,sig.fig)
+
+#  x = text.list[ndx+offset]
+
+#  print(paste(text,x))
+   return(x)
+}
+
+
 get.diagnostics=function(log,ntime=61,dt=1,ngear=4,block=NULL,mtype='i')
 {
-   get.numeric.field = function(what, text)
-   {
-   #  print(what)
-      old.opt=getOption("warn")
-      options("warn"=-1)
-      ndx = grep(what,text)
-      lwhat = nchar(what)
-      value = 0.0
-      if (substr(what,lwhat,lwhat) == ":")
-         ndx = ndx + 1
-      else
-         ndx = ndx + 2
-
-      value = as.numeric(text[ndx])
-      wv = which(!is.na(value))
-      options("warn"=old.opt)
-      return(value[wv])   
-   } 
-
-   get.active.field = function(what, text)
-   {
-      old.opt=getOption("warn")
-      ndx = grep(what,text)
-      active = text[ndx+2]
-      options("warn"=old.opt)
-      return(active=="(1)")
-   }
-
 
 #  print(paste("Scanning file",file))
 #  log = scan(file,what="character")
@@ -245,52 +249,33 @@ get.diagnostics=function(log,ntime=61,dt=1,ngear=4,block=NULL,mtype='i')
    nblock = length(res)
    print(paste(nblock,"residual blocks found"))
 
-   logsdlogF = get.numeric.field("logsdlogF:",log)   
-   sdlogF = exp(logsdlogF)
-
    if (is.null(block))
       block = nblock
 
-   ests = list(logT12=NULL, T12=NULL, logT21=NULL, T21=NULL, logr=NULL,
-               r=NULL, r_prior=NULL, sdr_prior=NULL, logB1=NULL, logdB1K=NULL,
-               B1=NULL, K=NULL, MSY=NULL, Fmsy=NULL, logsdlogProc=NULL,
-               sdlogPop=NULL, logsdlogYield=NULL, sdlogYield=NULL, pcon=NULL,
-               qProp=NULL, logsdlogF=NULL, sdlogF=NULL, logsdlogPop=NULL,
-               resid=NULL, indexed=NULL, nll=NULL, nvar=NULL,
-               lastC=NULL, lastF=NULL, averageC=NULL)
+   ests = list()
+   ests$nll = extract.value("nll",log,sig=5)
+   ests$nvar = extract.value("nvar",log)
+   ests$Gmax = extract.value("Gmax",log)
 
-#  print(ests)
+   ests$logMSY = extract.value("logMSY",log)
+   ests$logFmsy = extract.value("logFmsy",log)
+   ests$logQ = extract.value("logQ:",log)
+   ests$logsdlogProc = extract.value("logsdlogProc:",log)
+   ests$logsdlogYield = extract.value("logsdlogYield:",log)
 
-   ests$indexed=get.active.field("^Q",log)[block]
-#  print(paste("ests$indexed",ests$indexed))
+   ests$MSY = extract.value("MSY",log)
+   ests$Fmsy = extract.value("Fmsy",log)
+   ests$Q = extract.value("Q:",log)
+   ests$sdlogProc = extract.value("sdlogProc:",log)
+   ests$sdlogYield = extract.value("logsdlogYield:",log)
 
-   ests$logT12=get.numeric.field("^logT12",log)[block]
-   ests$T12=get.numeric.field("^T12",log)[block]
-   ests$logT21=get.numeric.field("^logT21",log)[block]
-   ests$T21=get.numeric.field("^T21",log)[block]
-   ests$logr=get.numeric.field("^logr",log)[block]
-   ests$r=get.numeric.field("^r",log)[block]
-   ests$r_prior=get.numeric.field("^r_prior",log)[block]
-   ests$sdr_prior=get.numeric.field("^sdr_prior",log)[block]
-   ests$logB1=get.numeric.field("^logB1",log)[block]
-   ests$logdB1K=get.numeric.field("^logdB1K",log)[block]
-   ests$B1=get.numeric.field("^B1",log)[block]
-   ests$K=get.numeric.field("^K",log)[block]
-   ests$MSY=get.numeric.field("^MSY",log)[block]
-   ests$Fmsy=get.numeric.field("^Fmsy",log)[block]
-   ests$logsdlogProc=get.numeric.field("^logsdlogProc:",log)[block]
-   ests$sdlogPop=get.numeric.field("^sdlogPop:",log)[block]
-   ests$logsdlogYield=get.numeric.field("^logsdlogYield:",log)[block]
-   ests$sdlogYield=get.numeric.field("^sdlogYield:",log)[block]
-   ests$pcon=get.numeric.field("^pcon",log)[block]
-   ests$qProp=get.numeric.field("^qProp",log)[block]
-   ests$logsdlogF=get.numeric.field("^logsdlogF:",log)[block]
-   ests$sdlogF=get.numeric.field("^sdlogF:",log)[block]
-   ests$logsdlogPop=get.numeric.field("^logsdlogPop:",log)[block]
-   ests$nll=get.numeric.field("^nll",log)[block]
-   ests$nvar=get.numeric.field("^nvar",log)[block]
+   ests$r = extract.value("r",log)
+   ests$K = extract.value("K",log)
 
-   # npop?
+   ests$pcon = extract.value("pcon",log)
+   ests$rprior = extract.value("r_prior",log)
+   ests$sdrprior = extract.value("sdr_prior",log)
+
    if (mtype == "x")
       ncol = (3*ngear+6)
    else if (mtype == "i")
@@ -319,14 +304,20 @@ get.diagnostics=function(log,ntime=61,dt=1,ngear=4,block=NULL,mtype='i')
          resid[t,c] = as.numeric(log[fc],ngear)
       }
    }
-   totalF = rowSums(exp(resid[,seq(5,(4+ngear))]))
-   ests$lastF = mean(totalF[seq(ntime-4,ntime)])
-   print(paste("Last 5 year total average F:",ests$lastF))
 
-   totalC = rowSums(exp(resid[,seq(13,(12+ngear))]))
-   ests$lastC = mean(totalC[seq(ntime-4,ntime)])
+   # correct indexing for ngear
+   Fndx=c(seq(5,(4+ngear)))
+   predCndx=c(seq((5+ngear),(4+2*ngear)))
+   obsCndx=c(seq((5+2*ngear),(4+3*ngear)))
+
+   totalF = rowSums(exp(resid[,Fndx]))
+   ests$lastF = signif(mean(totalF[seq(ntime-4,ntime)]),3)
+   print(paste("Last 5 year total average F:",ests$lastF))
+   totalC = rowSums(exp(resid[,obsCndx]))
+   ests$lastC = signif(mean(totalC[seq(ntime-4,ntime)]),3)
    print(paste("Last 5 year average total catch:",ests$lastC))
-   ests$averageC = mean(totalC)
+
+   ests$averageC = signif(mean(totalC),3)
    print(paste("Average total catch:",ests$averageC))
 
 #  print(paste("Block",block,":"))
@@ -660,7 +651,7 @@ plot.multi.obs.pred.catch=function(path.list=c("r2","r4","r0-sdrprior"),
       file = paste(p,"/issams.rep",sep="")
       rep = read.rep.diagnostics(file=file, ntime=ntime, dt=dt,
                               ngear=ngear, block=blocak, mtype=mtype)
-
+      # hard coded indices; only valid for ngear=4
       pred = exp(rep$resid[9:12])
       obs = exp(rep$resid[13:16])
       print(max(obs,pred))
