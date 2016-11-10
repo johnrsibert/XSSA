@@ -652,9 +652,19 @@ awkread = function(file,name)
 }  
 
 
-#  fit = read.fit(file)
 hst.plot=function(model="issams",model.type="")
 {
+#alogMSY
+#aMSY
+#alogFmsy
+#aFmsy
+#ar
+#aK
+#asdlogProc
+#asdlogYield
+#aQ
+#alogQ
+
    hst.names=list()
    ncol = 1
    nrow = 2
@@ -793,13 +803,135 @@ hst.plot=function(model="issams",model.type="")
       }
    }
    
-   tname = c("par_posteriors","fpar_posteriors")
-   for (d in 1:2)
+#  tname = c("par_posteriors","fpar_posteriors")
+#  for (d in 1:2)
+#  {
+#     dev.set(dev.list[d])
+#     din = par("din")
+#     save.png.plot(tname[d],width=din[1],height=din[2])
+#  }
+}
+
+hst.row.plot=function(model="issams")
+{
+#alogMSY
+#aMSY
+#alogFmsy
+#aFmsy
+#ar
+#aK
+#asdlogProc
+#asdlogYield
+#aQ
+#alogQ
+
+   hst.names=c("sdlogProc","sdlogYield","MSY","Fmsy","K","r","Q") 
+   ncol = length(hst.names)
+   nrow = 1
+   print(ncol)
+   print(hst.names)
+   dat = scan(paste(model,".dat",sep=""),what="character")
+#  print(dat)
+   wp = which(dat == "r_prior")
+   r.prior.use = as.numeric(dat[wp+4])
+   r.prior = as.numeric(dat[wp+5])
+   sd.r.prior = as.numeric(dat[wp+6])
+   print(paste(wp,r.prior.use,r.prior,sd.r.prior))
+
+   nvar = length(hst.names)
+   dev.list = vector(mode="numeric",length=2)
+   width= 12.0
+   height = 2.0
+   xpos = 0
+   old.par = par(no.readonly = TRUE) 
+   x11(width=width,height=height)
+   par(mar=c(2.5,2.5,0,0)+0.5)#,las=1)
+   lm = layout(matrix(c(1:(nrow*ncol)),ncol=ncol,nrow=nrow,byrow=TRUE))
+   layout.show(lm)
+   
+#  if (1) 
+#     return("---------- quitting")
+
+
+   lwd = 2
+   hst.file = paste(model,".hst",sep="")
+   fit = read.fit(model)
+   for (v in 1:nvar)
    {
-      dev.set(dev.list[d])
-      din = par("din")
-      save.png.plot(tname[d],width=din[1],height=din[2])
+      w = which(fit$names==paste("a",hst.names[v],sep=""))
+      dist = awkread(hst.file,hst.names[v])
+      x1 = min(dist$x,na.rm=TRUE)
+      x2 = max(dist$x,na.rm=TRUE)
+      x1 = fit$est[w]-5*fit$std[w]
+      x2 = fit$est[w]+5*fit$std[w]
+      print(paste(v,hst.names[v],length(w),w,fit$names[w],fit$est[w],fit$std[w],x1,x2))
+      xx = seq(x1,x2,(x2-x1)/100.0)
+      yy = dnorm(xx,mean=fit$est[w],sd=fit$std[w])
+      pp = dist$p
+      if (nrow(dist) > 4)
+      {
+         print(paste(v,hst.names[v]))
+         xrange = c(max(min(xx),min(dist$x)),min(max(xx),max(dist$x))) #range(xx,dist$x)
+         xrange = c(x1,x2) #range(dist$x)
+         yrange = range(pp,yy) #range(yy,dist$p)
+         ylab=paste("p(",hst.names[v],")",sep="") 
+         plot(xrange,yrange,type='n', axes=FALSE,ann=FALSE)
+         axis(side=1,line=0)
+         mtext(side=1,line=2,text=hst.names[v],cex=0.75)
+         axis(side=2,line=0)
+         mtext(side=2,line=2,text=ylab,cex=0.75)
+         box()
+         lines(dist$x,pp,type='b',lwd=lwd)
+         abline(v=fit$est[w],lty="dotdash",col="blue",lwd=lwd)
+         abline(v=fit$est[w]-2.0*fit$std[w],lty="dotted",col="blue",lwd=lwd)
+         abline(v=fit$est[w]+2.0*fit$std[w],lty="dotted",col="blue",lwd=lwd)
+         lines(xx,yy,col="blue",lwd=lwd)
+         if ((hst.names[v] == "r" ) && r.prior.use > 0)
+         {
+            pyy = dnorm(xx,mean=r.prior,sd=sd.r.prior)
+            lines(xx,pyy,col="red",lwd=lwd)
+            abline(v=r.prior,lty="dotdash",col="red",lwd=lwd)
+         }
+         if ((hst.names[v] == "logr" ) && r.prior.use > 0)
+         {
+            pyy = dnorm(xx,mean=log(r.prior),sd=sd.r.prior)
+            lines(xx,pyy,col="red",lwd=lwd)
+            abline(v=log(r.prior),lty="dotdash",col="red",lwd=lwd)
+         }
+
+         #   ar = 2.0*mfexp(logFmsy);
+         if ((hst.names[v] == "logFmsy" ) && r.prior.use > 0)
+         {
+            logFmsy.prior = log(r.prior)-log(2)
+            pyy = dnorm(xx,mean=logFmsy.prior,sd=sd.r.prior)
+            lines(xx,pyy,col="red",lwd=lwd)
+            abline(v=logFmsy.prior,lty="dotdash",col="red")
+         }
+         if ((hst.names[v] == "Fmsy" ) && r.prior.use > 0)
+         {
+            Fmsy.prior = r.prior/2.0
+            sd.Fmsy.prior = sd.r.prior/2.0
+            pyy = dnorm(xx,mean=Fmsy.prior,sd=sd.Fmsy.prior)
+            lines(xx,pyy,col="red",lwd=lwd)
+            abline(v=Fmsy.prior,lty="dotdash",col="red")
+         }
+         #   aK = 4.0*mfexp(logMSY)/(1.0e-20+ar);
+         if ((hst.names[v] == "K" ) && r.prior.use > 0)
+         {
+            wMSY = which(fit$names=="aMSY")
+            MSY = fit$est[wMSY]
+            K.prior = 4.0*MSY/r.prior
+            sd.K.prior = 4.0*MSY/r.prior
+            pyy = dnorm(xx,mean=K.prior,sd=sd.K.prior)
+            lines(xx,pyy,col="red",lwd=lwd)
+            abline(v=K.prior,lty="dotdash",col="red")
+         }
+      } # if (nrow(dist) > 4)
    }
+   
+   tname = "posterior_row"
+   save.png.plot(tname,width=width,height=height)
+   par(old.par)
 }
 
 # logit(N1/(N1+N2)) = log(N1)-log(N2)
