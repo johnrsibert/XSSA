@@ -439,7 +439,7 @@ PROCEDURE_SECTION
        write_status(clogf);
     }
   }
-  write_nll_vector();
+  //write_nll_vector();
 
 
 SEPARABLE_FUNCTION void step0(const dvariable& p11, const dvariable& lsdlogProc, const dvariable& lFmsy, const dvariable& lMSY, const dvariable& tlogQ)

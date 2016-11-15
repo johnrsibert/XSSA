@@ -871,9 +871,10 @@ hst.row.plot=function(model="issams")
       if (nrow(dist) > 4)
       {
          print(paste(v,hst.names[v]))
-         xrange = c(max(min(xx),min(dist$x)),min(max(xx),max(dist$x))) #range(xx,dist$x)
+      #  xrange = c(max(min(xx),min(dist$x)),min(max(xx),max(dist$x))) #range(xx,dist$x)
          xrange = c(x1,x2) #range(dist$x)
-         yrange = range(pp,yy) #range(yy,dist$p)
+         yrange = c(0,max(pp,yy))
+      #  yrange = c(0,max(pp[2:(length(pp)-1)],yy))
          ylab=paste("p(",hst.names[v],")",sep="") 
          plot(xrange,yrange,type='n', axes=FALSE,ann=FALSE)
          axis(side=1,line=0)
@@ -907,6 +908,18 @@ hst.row.plot=function(model="issams")
             lines(xx,pyy,col="red",lwd=lwd)
             abline(v=logFmsy.prior,lty="dotdash",col="red")
          }
+
+         if ((hst.names[v] == "MSY" ) && r.prior.use > 0)
+         {
+            wK = which(fit$names=="aK")
+            K = fit$est[wK]
+            MSY.prior = r.prior*K/4.0
+            sd.MSY.prior = r.prior*K/4.0
+            pyy = dnorm(xx,mean=MSY.prior,sd=sd.MSY.prior)
+            lines(xx,pyy,col="red",lwd=lwd)
+            abline(v=MSY.prior,lty="dotdash",col="red")
+         }
+
          if ((hst.names[v] == "Fmsy" ) && r.prior.use > 0)
          {
             Fmsy.prior = r.prior/2.0
@@ -915,6 +928,7 @@ hst.row.plot=function(model="issams")
             lines(xx,pyy,col="red",lwd=lwd)
             abline(v=Fmsy.prior,lty="dotdash",col="red")
          }
+
          #   aK = 4.0*mfexp(logMSY)/(1.0e-20+ar);
          if ((hst.names[v] == "K" ) && r.prior.use > 0)
          {

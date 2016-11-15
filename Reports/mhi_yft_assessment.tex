@@ -110,7 +110,7 @@ production zones or nurseries.
 The Main Hawaiian Islands (MHI), Figure~\ref{fig:mhimap},
 comprising the 8 largest islands in the Hawaiian Archipelago,
 has been an important fishing ground throughout this history.
-Since the recent creation of the Papah\={a}naumoku\={a}kea Marine National
+Since the recent expansion of the Papah\={a}naumoku\={a}kea Marine National
 Monument in 2016, the MHI is the only legally accessible tuna fishing ground
 in the State of Hawaii.
 This change emphasizes the importance of careful management of yellowfin
@@ -924,6 +924,50 @@ the ordinate has been scaled to the observed catch.
 \label{fig:estprod}}
 \end{center}
 \end{sidewaysfigure}
+
+
+%nice issams -noinit -mcmc2 1000000 -mcsave 20 -shess &> issams-mcmc.out&
+Figure~\ref{fig:posteriors} shows the frequency distributions of the
+parameter estimates obtained by sampling the output of $10^6$ Markov
+Chain Monte Carlo simulations. Some parameters are clearly estimated
+more accurately than others. The process and observation error
+estimates have well defined modes and appear to be normally
+distributed around their point estimates. The distributions of other
+parameters depends on the model. For model B, indexed to a
+biomass trajectory with a well defined trend, estimates of $\MSY$,
+$\Fmsy$, and $Q$ also seem well defined.
+The corresponding estimates are more ambiguous for model A.
+Figure~\ref{fig:posteriors} also demonstrates the pervasive (some
+might say pernicious) effects of using an informative prior on $r$. Estimates
+of all parameters that depend on $r$ appear to be normally
+distributed around the prior value.
+
+\begin{sidewaysfigure}
+\begin{center}
+{\sffamily
+Model A\\
+\includegraphics[width=1.00\textwidth]{../4-gear-runs/r2/mcmc/posterior_row.pdf}\\
+~\\
+Model B\\
+\includegraphics[width=1.00\textwidth]{../4-gear-runs/r4/mcmc/posterior_row.pdf}\\
+~\\
+Model C\\
+\includegraphics[width=1.00\textwidth]{../4-gear-runs/r0-sdrprior/mcmc/posterior_row.pdf}\\
+}
+\end{center}
+\caption{Posterior distributions of parameter estimates from $10^6$
+MCMC samples. 
+Black circles and connecting lines are frequencies of the estimates.
+Blue curves are the theoretical normal distribution of the maximum
+likelihood estimates computed from the standard deviations estimated
+from the inverse Hessian matrix at the minimum. 
+Vertical blue dotted lines indicate $\pm 2\sigma$.
+The solid red curves indicate the effect of the prior on $r$; the
+vertical red line is the prior.
+\label{fig:posteriors}}
+\end{sidewaysfigure}
+
+
 
 \clearpage
 \section{Noncommercial Catch}
