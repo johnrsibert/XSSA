@@ -98,7 +98,7 @@ plot.biomass=function(x,y,K=NULL,sd=NULL,block=NULL,propL=NULL,
 #  if ( (ncol(y) > 2) && (!is.null(sd)) )
 #     plot.error(x,y[,3],sdlogNN, bcol="blue",fcol="lightblue")
 
-   print("N error")
+   print(paste("N error,sd =",sd))
    if (!is.null(sd))
    {
       print("N1 error")
@@ -196,7 +196,7 @@ plot.production=function(Fmort, obsC, predC, t, r, K, block=NULL)
 }
 
 
-read.rep.diagnostics=function(file="issams.rep", ntime=61,dt=1,ngear=4,
+read.rep.diagnostics=function(file="issams6.rep", ntime=61,dt=1,ngear=4,
                               block=NULL, mtype='i')
 {
 
@@ -267,7 +267,14 @@ get.diagnostics=function(log,ntime=61,dt=1,ngear=4,block=NULL,mtype='i')
    ests$Fmsy = extract.value("Fmsy",log)
    ests$Q = extract.value("Q:",log)
    ests$sdlogProc = extract.value("sdlogProc:",log)
-   ests$sdlogYield = extract.value("logsdlogYield:",log)
+   ests$sdlogBProc = extract.value("sdlogBProc:",log)
+#  if ( is.null(ests$sdlogProc) )
+   {
+      ests$sdlogProc = ests$sdlogBProc 
+      ests$logsdlogProc = log(ests$sdlogBProc)
+   }
+   ests$sdlogFmort = extract.value("sdlogFmort:",log)
+   ests$sdlogYield = extract.value("sdlogYield:",log)
 
    ests$r = extract.value("r",log)
    ests$K = extract.value("K",log)
@@ -276,7 +283,7 @@ get.diagnostics=function(log,ntime=61,dt=1,ngear=4,block=NULL,mtype='i')
    ests$rprior = extract.value("r_prior",log)
    ests$sdrprior = extract.value("sdr_prior",log)
 
-   if (mtype == "x")
+   if (mtype == "x") 
       ncol = (3*ngear+6)
    else if (mtype == "i")
       ncol = (3*ngear+4)
@@ -633,7 +640,8 @@ plot.obs.pred.catch=function(file="issams.rep", ntime=61,dt=1,ngear=4,
    save.png.plot("OPcatch",width=6.5,height=6.5)
 }
 
-plot.multi.obs.pred.catch=function(path.list=c("r2","r4","r0-sdrprior"), 
+#plot.multi.obs.pred.catch=function(path.list=c("r2","r4","r0-sdrprior"), 
+plot.multi.obs.pred.catch=function(path.list=c("r2","r2-sdrprior"), 
                                    ntime=61,dt=1,ngear=4, block=NULL, mtype='i')
 
 {
@@ -645,10 +653,11 @@ plot.multi.obs.pred.catch=function(path.list=c("r2","r4","r0-sdrprior"),
    axis(2,lwd=0)
    abline(v=par("usr")[1],lwd=3)
    pcol = 1
+   ppch = 1
    for(p in path.list)
    {
       pcol = pcol + 1
-      file = paste(p,"/issams.rep",sep="")
+      file = paste(p,"/issams6.rep",sep="")
       rep = read.rep.diagnostics(file=file, ntime=ntime, dt=dt,
                               ngear=ngear, block=blocak, mtype=mtype)
       # hard coded indices; only valid for ngear=4
@@ -658,8 +667,9 @@ plot.multi.obs.pred.catch=function(path.list=c("r2","r4","r0-sdrprior"),
 
       for (g in 1:ngear)
       {
-         points(obs[,g],pred[,g],col = pcol)#,pch=16,col=g+1)
+         points(obs[,g],pred[,g],pch=ppch)#,col = pcol)#,pch=16,col=g+1)
       }
+      ppch = 3
       
    }
    save.png.plot("multiOPcatch",width=6.5,height=6.5)

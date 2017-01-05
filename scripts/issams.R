@@ -230,7 +230,7 @@ plot.diagnostics=function(dat=NULL,file="diagnostics.dat",dt,ngear,
    return(new.devices)
 }
 
-log.diagnostics=function(file="issams_program.log",ntime=61,dt=1,ngear=4,
+log.diagnostics=function(file="issams6_program.log",ntime=61,dt=1,ngear=4,
                          plot.Fmort=FALSE,plot.prod=FALSE,plot.impact=FALSE)
 {
       
@@ -249,13 +249,15 @@ log.diagnostics=function(file="issams_program.log",ntime=61,dt=1,ngear=4,
    while ( (c != 'q') && (c != 'x') )
    {
       tmp=get.diagnostics(log,ntime=ntime,dt=dt,ngear=ngear,block=counter,mtype="i")
+      print(names(tmp))
+    # print(tmp)
 
       new.devices = plot.diagnostics(tmp$resid,dt=dt,ngear=ngear,
-                    sdlogPop=tmp$sdlogPop,
+                    sdlogPop=tmp$sdlogBProc,
                     sdlogYield=tmp$sdlogYield,
                     sdlogF=tmp$sdlogF,
                     sdlogQ=tmp$sdlogQ,
-                    K=tmp$K, r=tmp$r, B1=tmp$B1, indexed=tmp$indexed,
+                    K=tmp$K, r=tmp$r, B1=tmp$B1, indexed=TRUE,#tmp$indexed,
                     plot.Fmort=plot.Fmort,
                     plot.prod=plot.prod,
                     plot.impact=plot.impact,
@@ -368,8 +370,7 @@ read.rep=function(file="issams.rep",ntime=61,dt=1,ngear=4)
 
 
 # read.rep.files(c("r2","r4","r0","r2-sdrprior","r4-sdrprior","r0-sdrprior"))->junk
-
-read.rep.files=function(path.list,ngear)
+read.rep.files=function(path.list,ngear=4)
 {
    print(path.list)
    have.names=FALSE
@@ -377,7 +378,7 @@ read.rep.files=function(path.list,ngear)
    rep.list=list() 
    for (p in path.list)
    {
-      path = paste(".",p,"issams.rep",sep="/")
+      path = paste(".",p,"issams6.rep",sep="/")
       rep = read.rep.diagnostics(path,ntime=61,dt=1,ngear=ngear,
                                 block=NULL, mtype='i')
    #  print("names(rep):")
@@ -412,10 +413,10 @@ read.rep.files=function(path.list,ngear)
    
    tnames=c("$-\\log L$", "$n$", "$|G|_{max}$", "$\\log\\MSY$", "$\\log\\Fmsy$",
             "$\\log Q$", "$\\log\\sigma_P$", "$\\log\\sigma_Y$", "$\\MSY$",
-            "$\\Fmsy$", "$Q$", "$\\sigma_P$", "$\\sigma_Y$", "$r$", "$K$",
+            "$\\Fmsy$", "$Q$", "$\\sigma_P$", "$\\sigma_P$", "$\\sigma_F$", "$\\sigma_Y$", "$r$", "$K$",
             "$p_0$", "$\\tilde{r}$", "$\\sigma_r$","$\\bar{F}_5$",
             "$\\bar{Y}_5$", "$\\bar{C}$")
-#  print(paste("length(tnames)",length(tnames)))
+   print(paste("length(tnames)",length(tnames)))
 
    rep.matrix = matrix(unlist(rep.list),ncol=length(path.list),byrow=FALSE)
    print(dim(rep.matrix))

@@ -13,8 +13,8 @@ GLOBALS_SECTION;
   const double TWO_M_PI = 2.0*M_PI;
   const double LOG_M_PI = log(M_PI);
 
-   //  issams2sd -noinit -iprint 1 -shess &> issams2sd.out&
-   //  issams2sd -noinit -mcmc2 500000 -mcsave 20 -shess &> issams2sd.out
+   //  issams6 -noinit -iprint 1 -shess &> issams6.out&
+   //  issams6 -noinit -mcmc2 500000 -mcsave 20 -shess &> issams6.out
 
 
   int fexists(const adstring& filename)
