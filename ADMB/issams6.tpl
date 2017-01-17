@@ -26,6 +26,22 @@ GLOBALS_SECTION;
        return 1;
   }
 
+  template <typename SCALAR> SCALAR logit(const SCALAR& p)
+  {
+     SCALAR a = log(p/(1.0-p));
+     return a;
+  }
+  template double logit<double>(const double& p);
+  template dvariable logit<dvariable>(const dvariable& p);
+
+  template <typename SCALAR> SCALAR alogit(const SCALAR& a)
+  {
+     SCALAR p = 1.0/(1.0+(mfexp(-a))+1e-20);
+     return p;
+  }
+  template double alogit<double>(const double& a);
+  template dvariable alogit<dvariable>(const dvariable& a);
+
 TOP_OF_MAIN_SECTION
   arrmblsize = 50000000;
   gradient_structure::set_CMPDIF_BUFFER_SIZE(  150000000L);
@@ -266,7 +282,7 @@ PARAMETER_SECTION
   init_number logsdlogYield(phase_sdlogYield);
 
   // abundance index proportionality constant
-  init_number logQ(phase_Q);
+  init_number logitQ(phase_Q);
 
   random_effects_vector U(1,lengthU);
   //vector U(1,lengthU);
@@ -281,7 +297,7 @@ PARAMETER_SECTION
   sdreport_number asdlogFmort;
   sdreport_number asdlogYield;
   sdreport_number aQ;
-  sdreport_number alogQ;
+  sdreport_number alogitQ;
 
   objective_function_value nll;
 
@@ -305,8 +321,8 @@ PRELIMINARY_CALCS_SECTION
        logsdlogYield = log(init_sdlogYield);
        logsdlogBProc = log(init_sdlogBProc);
        logsdlogFmort = log(init_sdlogFmort);
-       logQ = log(init_Q);
-       TTRACE(logQ,init_Q);
+       logitQ = logit((double)init_Q);
+       TTRACE(logitQ,init_Q);
 
        double r = 2.0*mfexp(value(logFmsy));
        double K = 4.0*mfexp(value(logMSY))/(1.0e-20+r);
@@ -338,7 +354,7 @@ PRELIMINARY_CALCS_SECTION
        PINOUT(logsdlogBProc)
        PINOUT(logsdlogFmort)
        PINOUT(logsdlogYield)
-       PINOUT(logQ)
+       PINOUT(logitQ)
        //PINOUT(U)
        pin << "# U:" << endl;
        pin << "#   F(t,g):" << endl;
@@ -374,7 +390,7 @@ PRELIMINARY_CALCS_SECTION
     TRACE(logsdlogBProc)
     TRACE(logsdlogFmort)
     TRACE(logsdlogYield)
-    TRACE(logQ)
+    TRACE(logitQ)
     TRACE(U)
     TRACE(U(utPop+1))
     TRACE (trace_init_pars)
@@ -405,13 +421,13 @@ PROCEDURE_SECTION
   nll = 0.0;
   nll_count = 0;
 
-  step0(U(utPop+1), logsdlogBProc, logFmsy, logMSY, logQ);
+  step0(U(utPop+1), logsdlogBProc, logFmsy, logMSY, logitQ);
  
   for (int t = 2; t <= ntime; t++)
   {
      step(t, U(Fndxl(t-1),Fndxu(t-1)), U(Fndxl(t),Fndxu(t)),
              U(utPop+t-1), U(utPop+t), logsdlogBProc, logsdlogFmort,
-             logFmsy, logMSY, logQ);
+             logFmsy, logMSY, logitQ);
   }
   
   for (int t = 1; t <= ntime; t++)
@@ -438,8 +454,8 @@ PROCEDURE_SECTION
   asdlogBProc = mfexp(logsdlogBProc);
   asdlogFmort = mfexp(logsdlogFmort);
   asdlogYield = mfexp(logsdlogYield);
-  aQ = mfexp(logQ);
-  alogQ = logQ;
+  aQ = alogit((dvariable)logitQ);
+  alogitQ = logitQ;
 
   ++userfun_entries;
   if (!mc_phase())
@@ -455,7 +471,7 @@ PROCEDURE_SECTION
   //write_nll_vector();
 
 
-SEPARABLE_FUNCTION void step0(const dvariable& p11, const dvariable& lsdlogBProc, const dvariable& lFmsy, const dvariable& lMSY, const dvariable& tlogQ)
+SEPARABLE_FUNCTION void step0(const dvariable& p11, const dvariable& lsdlogBProc, const dvariable& lFmsy, const dvariable& lMSY, const dvariable& lgtQ)
   // p11 U(utPop+t-1) log N at start of time step
 
   // ensure that starting population size is near K
@@ -474,7 +490,7 @@ SEPARABLE_FUNCTION void step0(const dvariable& p11, const dvariable& lsdlogBProc
   if (use_Q)
   {
      dvariable varlogQ = square(mfexp(lsdlogBProc));
-     dvariable lnQ=tlogQ;
+     dvariable lnQ=log(alogit((dvariable)lgtQ));
      dvariable logib = lnQ + log(immigrant_biomass(1));
      Qnll += 0.5*(log(TWO_M_PI*varlogQ) + square(logib-p11)/varlogQ);
      nll += Qnll;
@@ -484,7 +500,7 @@ SEPARABLE_FUNCTION void step0(const dvariable& p11, const dvariable& lsdlogBProc
 
 
 
-SEPARABLE_FUNCTION void step(const int t, const dvar_vector& f1, const dvar_vector& f2, const dvariable& p11, const dvariable p12, const dvariable& lsdlogBProc, const dvariable& lsdlogFmort, const dvariable& lFmsy, const dvariable& lMSY, const dvariable lnQ)
+SEPARABLE_FUNCTION void step(const int t, const dvar_vector& f1, const dvar_vector& f2, const dvariable& p11, const dvariable p12, const dvariable& lsdlogBProc, const dvariable& lsdlogFmort, const dvariable& lFmsy, const dvariable& lMSY, const dvariable lgtQ)
   // f1  U(Fndxl(t-1),Fndxu(t-1)) log F at start of time step
   // f2  U(Fndxl(t),Fndxu(t)      log F at end   of time step)
   // p11 U(utPop+t-1) log N at start of time step
@@ -552,6 +568,7 @@ SEPARABLE_FUNCTION void step(const int t, const dvar_vector& f1, const dvar_vect
   if (use_Q)
   {
      dvariable varlogQ = square(mfexp(lsdlogBProc));
+     dvariable lnQ=log(alogit((dvariable)lgtQ));
      dvariable logib = lnQ + log(immigrant_biomass(t));
      Qnll += 0.5*(log(TWO_M_PI*varlogQ) + square(logib-nextLogN)/varlogQ);
      nll += Qnll;
@@ -665,7 +682,7 @@ SEPARABLE_FUNCTION void obs(const int t, const dvar_vector& f,const dvariable& p
   double K = 4.0*mfexp(value(logMSY))/(1.0e-20+r);
   residuals(t,++rc) = value(pop21);
   residuals(t,++rc) = K;
-  residuals(t,++rc) = mfexp(value(logQ))*immigrant_biomass(t);
+  residuals(t,++rc) = alogit(value(logitQ))*immigrant_biomass(t);
 
   for (int g = 1; g <= ngear; g++)
     residuals(t, ++rc) = value(ft(g));
@@ -705,8 +722,8 @@ FUNCTION void write_status(ofstream& s)
     s << "# logsdlogYield: " << logsdlogYield
              <<  " (" << active(logsdlogYield) <<")" << endl;
     s << "#    sdlogYield: " << mfexp(logsdlogYield) << endl;
-    s << "#          logQ: " << logQ <<  " (" << active(logQ) <<")" << endl;
-    s << "#             Q: " << mfexp(logQ) << " (" << use_Q <<")" << endl;
+    s << "#        logitQ: " << logitQ <<  " (" << active(logitQ) <<")" << endl;
+    s << "#             Q: " << alogit((dvariable)logitQ) << " (" << use_Q <<")" << endl;
     s << "# pcon = " << pcon << endl;
     s << "# klingon_multiplier = " << klingon_multiplier << endl;
     // to keep the diagnostics R script happy

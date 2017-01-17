@@ -80,10 +80,10 @@ evaluating the effects of the yellowfin fishery in the Main Hawaiian
 Islands on the local stock. I develop a new approach utilizing these
 data that links the local stock dynamics to the dynamics of the larger
 Pacific stock. This approach uses a state-space logistic production
-model linked the larger Pacific stock using an index of abundance. The
+model linked to the larger Pacific stock using an index of abundance. The
 conclusion is that such a model is feasible, that the local stock
 is not overfished and that local fisheries are fishing at acceptable
-levels.
+levels. \help{and data and indices}
 \end{abstract}
 
 
@@ -102,7 +102,7 @@ these stock assessments.
 These WCPFC stock assessments and conservation and management measures
 may assist the WCPFC in regulating large scale fisheries in the stock
 habitat, but offer little useful advice to managers of small scale
-fisheries operating outside of the core areas.
+fisheries operating outside of the primary equatorial fishing grounds.
 
 Yellowfin tuna ({\it Thunnus albacares}, YFT) is an important food resource
 of many Pacific Island communities and the people of the Hawaiian
@@ -148,7 +148,7 @@ the logistic surplus production model with several novel features.
 Fishing mortality, the proportion of the population harvested each
 year, is represented as a random walk of multiple gear types.
 Offline coupling is used to link the local biomass to regional
-biomass estimates from large scale yellowfin stock assessment models
+biomass estimates by large scale yellowfin stock assessment models
 developed for the WCPFC.
 The logistic parameters of the surplus production model are
 reparameterized to estimate parameters of direct relevance to fishery
@@ -161,7 +161,7 @@ processes in the system (transition model)
 from errors in observing features of interest
 in the system (observation model).
 
-The general form of the transition model is
+The general form of the {\bf transition model} is
 \begin{equation}
 \alpha_t=T(\alpha_{t-1}) + \eta_t
 \end{equation}
@@ -175,7 +175,7 @@ Stock dynamics follow the classic Schaefer (1954) differential equation:
 \label{eqn:ischaefer}
 \frac{dN}{dt} = rN(1-\frac{N}{K}) - FN
 \end{equation}
-where $N$ is the biomass of YFT in the MHI (mt), 
+where $N$ is the biomass of YFT in the MHI (metric tonnes, mt), 
 $r$ is the logistic growth rate (\peryr),
 $K$ is the asymptotic biomass (mt), and
 $F$ is the total fishing mortality (\peryr) in the MHI.
@@ -192,9 +192,9 @@ t(r-\bar{F}_t)}-re^{-\Delta t(r-\bar{F}_t)} -r} \cdot e^{\eta_t};
 where $\eta_t \sim N(0,\sigma_N)$ is a process error expressing
 variability in population dynamics
 and $\bar{F}_t$ is the total fishing mortality exerted by all gears, i. e.,
-$$
+\begin{equation}
 \bar{F}_t =\sum_{g=1}^n F_{g,t}.
-$$
+\end{equation}
 The logarithm of fishing mortality for each gear is assumed to
 follow a random walk with normal increments, as suggested by Nielsen
 and Berg (2014).
@@ -206,7 +206,7 @@ N(0,\sigma^2_F)
 where  $\xi_t$ is a process error expressing the year to year
 variability in fishing mortality.
 
-An index abundance assumes that the biomass of YFT in the MHI
+An index of abundance assumes that the biomass of YFT in the MHI
 is approximately proportional to some index which is independent of
 the data analyzed in the model,
 \begin{equation}
@@ -214,7 +214,7 @@ the data analyzed in the model,
 \label{eqn:index}
 \end{equation}
 where
-$I_t$ is the index at time $t$,
+$I_t$ is the index (mt) at time $t$,
 $Q$ is the estimated ratio of the MHI population size to the index,
 and $\omega_t$ is a process error representing the difference
 between the MHI biomass and the abundance index. 
@@ -231,7 +231,7 @@ Biomass estimates from both regions were evaluated as abundance indices.
 The logistic parameters $r$ and $K$ are notoriously difficult to estimate
 in surplus production models, 
 so parameter substitutions were used. 
-Maximum sustainable yeld
+Maximum sustainable yield
 (MSY, $\MSY$) and fishing mortality at MSY ($\Fmsy$) are commonly used
 fishery reference points and are simple functions of $r$ and $K$.
 Therefore $\MSY$ and $\Fmsy$ were
@@ -245,17 +245,19 @@ suggest $\tilde{r} = 0.486$ with a standard deviation of $\sigma_r = 0.046$
 for Atlantic YFT.
 A lognormal prior on $r$ was implemented as 
 \begin{equation}
-\log r - \log \tilde{r} = \rho ;\quad \rho\sim N(0,\sigma^2_r)
+\log r - \log \tilde{r} = \rho ;\quad \rho\sim N(0,\sigma^2_r);
 \end{equation}
 $\rho$ becomes a component of the likelihood
 (equation~\ref{eqn:likelihood}).
 
-All process errors are assumed to have the same distribution,
-$N(0,\sigma^2_P)$; $\sigma_N$,$\sigma_F$, and $\sigma_I$ are assumed
-to be equal and estimated as a global process error with variance
-$\sigma^2_P$.
-
-The general form of the state space observation model is
+This model assumes three Normal $N(0,\sigma^2)$ process errors with
+standard deviations, $\sigma_N$, $\sigma_I$, and $\sigma_F$. The first
+two, $\sigma_N$ and $\sigma_I$, pertain to the evolution of biomass over
+time. It is assumed that these two standard deviations can be
+represented by a single parameter, $\sigma_P$. The third standard
+deviation, $\sigma_F$, pertains to the fishing mortality.
+\goodbreak
+The general form of the state space {\bf observation model} is
 \begin{equation}
 x_t = O(\alpha_t) + \varepsilon_t
 \end{equation}
@@ -291,7 +293,7 @@ $p_0$ is the proportion of observed catch observations equal to zero.
 \begin{table}
 \caption{Complete list of estimated and computed parameters and model
 constraints for the state-space surplus production model. 
-There are 5 estimated parameters. 
+There are 6 estimated parameters. 
 Computed variables are functions of estimated parameters.
 There are four constraints and constants.
 For a model with 61 time steps and 4 gear types, there are 305 random effects.
@@ -304,18 +306,18 @@ Parameter & Definition\\
 \hline
 \hline
        & {\it Estimated parameters:}\\
-$\MSY$ & Maximum sustainable yield\\
-$\Fmsy$& Fishing mortality at maximum sustainable yield\\
+$\MSY$ & Maximum sustainable yield (mt).\\
+$\Fmsy$& Fishing mortality at maximum sustainable yield (\peryr).\\
 $Q$    & Abundance index proportionality constant\\
-$\sigma_P$ & Global process error standard deviation,\\
-           & $\sigma_P=\sigma_N=\sigma_F=\sigma_I$\\
-$\sigma_Y$ & Observation error standard deviation \\
+$\sigma_P$ & Biomass random walk process error standard deviation,\\
+           & $\sigma_P=\sigma_N=\sigma_I$ (mt).\\
+$\sigma_F$ & Fishing mortality random walk process error standard deviation (\peryr).\\
+$\sigma_Y$ & Observation error standard deviation (mt).\\
 \hline
        & {\it Computed variables:}\\
-$r$    & Instantaneous growth rate, $r=2F_{\MSY}$\\
-$K$    & Asymptotic population size, $K=\frac{4\MSY}{r}$\\
-$\bar{F}_5$ & Average of total estimated fishing mortality for the most recent
-five years.\\
+$r$    & Instantaneous growth rate, $r=2F_{\MSY}$ (\peryr).\\
+$K$    & Asymptotic population size, $K=\frac{4\MSY}{r}$ (mt).\\
+$\bar{F}_5$ & Average of total estimated fishing mortality for the most recent five years (mt).\\
 \hline
        & {\it Constraints and constants:}\\
 $p_0$  & Proportion of zero catch observations,\\
@@ -323,8 +325,7 @@ $p_0$  & Proportion of zero catch observations,\\
 $\tilde{r}$ & An {\it a priori} assumed value for $r$\\
             & fixed at $\tilde{r}=0.486$ (Carruthers and McAllister, 2011)\\
 $\sigma_r$  & Assumed standard deviation of $r$ around its prior,\\
-            & fixed at $\sigma_r=0.8$ or $\sigma_r=0.2$;
-            ${\rm cv}=1.64$ or ${\rm cv}=0.411$\\
+            & fixed at $\sigma_r=0.8$ or $\sigma_r=0.1$.\\
 $\bar{Y}_5$ & Average of total observed catch for the most recent
 five years.\\
 \hline
@@ -347,7 +348,7 @@ L(\theta,\alpha,x)=
 \Sigma_\varepsilon\big)\big]\cdot\rho
 \end{equation}
 where $m$ is the number of time steps in the catch time series and
-$\theta=\left\{\MSY,\Fmsy,Q,\sigma_P,\sigma_y\right\}$ 
+$\theta=\left\{\MSY,\Fmsy,Q,\sigma_P,\sigma_F, \sigma_Y\right\}$ 
 is a vector of model parameters (Table~\ref{tab:allvars1}).
 The model is implemented in ADMB-RE (Fournier et al. 2012) and
 applied to a 61 year ($m=61$) time series of observed
@@ -366,25 +367,33 @@ paper can be found at Github:
 Table~\ref{tab:ests1} compares 6 different models
 using three index of abundance assumptions and two 
 assumed values of the standard deviation of the $r$ prior, $\sigma_r$. 
+Models without an index of abundance do not fit the data well, do
+not converge to solutions as indicated by the values of $-\log L$
+and $|G|_{max}$, and biomass estimates crash early in the time series.
 Models with the loose constraint on $r$, $\sigma_r=0.8$, and either
-region 2 or region 4 abundance indices converged to solution, but the
-model without an index of abundance did not converge.
-All models with a tighter constraint on $r$, $\sigma_r=0.2$ converged
-to solutions with similar likelihood values and similar
-parameter estimates, $K\approx 8000$ and $r\approx 0.5$.
-For convenience, I will refer to models with 
-region 2 indexing and $\sigma_r=0.8$,
-region 4 indexing and $\sigma_r=0.8$, and 
-no indexing and $\sigma_r=0.2$
-as models A, B, and C respectively (Table~\ref{tab:ests1}).
-Model A, indexed to region 2, 
-predicts a large, slowly growing population ($K=23900; r=0.232$)
-whereas model B, indexed to region 4, predicts a small, rapidly growing
-population ($K = 2130; r=1.84$).
-Model C, not indexed, predicts an intermediate situation ($K=8140; r=0.497$). 
-In models A and B, the prediction is dominated by
-the abundance index, and in model C the prediction is dominated by the
-prior assumption about $r$.
+index of abundance appear to be
+more consistent with the catch data than those with $\sigma_r=0.1$ on
+the basis of the values of $-\log L$. 
+
+%Models with the loose constraint on $r$, $\sigma_r=0.8$, and either
+%region 2 or region 4 abundance indices converged to solution, but the
+%model without an index of abundance did not converge.
+%All models with a tighter constraint on $r$, $\sigma_r=0.2$ converged
+%to solutions with similar likelihood values and similar
+%parameter estimates, $K\approx 8000$ and $r\approx 0.5$.
+%For convenience, I will refer to models with 
+%region 2 indexing and $\sigma_r=0.8$,
+%region 4 indexing and $\sigma_r=0.8$, and 
+%no indexing and $\sigma_r=0.2$
+%as models A, B, and C respectively (Table~\ref{tab:ests1}).
+%Model A, indexed to region 2, 
+%predicts a large, slowly growing population ($K=23900; r=0.232$)
+%whereas model B, indexed to region 4, predicts a small, rapidly growing
+%population ($K = 2130; r=1.84$).
+%Model C, not indexed, predicts an intermediate situation ($K=8140; r=0.497$). 
+%In models A and B, the prediction is dominated by
+%the abundance index, and in model C the prediction is dominated by the
+%prior assumption about $r$.
 
 \begin{table}
 {\small
@@ -394,11 +403,11 @@ table shows model diagnostics. $-\log L$ is the negative logarithm of
 equation~\ref{eqn:likelihood}; lower values indicate better fits to
 the data.
 $|G|_{max}$ is the gradient of the likelihood with respect to the
-parameters; values of $|G|_{max}>1e^{-4}$ indicate lack of model
+parameters; values of $|G|_{max}>10^{-4}$ (1e-04) indicate lack of model
 convergence.
 $n$ is the number of parameters estimated.
-Model Name is the identifier used to discuss the models in the
-text.
+%Model Name is the identifier used to discuss the models in the text. 
+All values are reported to three significant figures.
 }
 \label{tab:ests1}
 \begin{center}
@@ -409,6 +418,26 @@ Index Region  &  2& 4& None& 2& 4& None\\
 Model Name & A    & B   &     &     &     & C\\
 \hline
 \hline
+$-\log L$ & 157.54 & 128.73 & 523.74 & 170.78 & 130.36 & 317.43\\
+$n$ & 6 & 6 & 5 & 6 & 6 & 5\\
+$|G|_{max}$ & 9.04e-06 & 2.1e-05 & 0.266 & 6.86e-05 & 3.43e-05 & 0.454\\
+\hline
+$\MSY$ & 1180 & 765 & 3040 & 1030 & 928 & 1490\\
+$\Fmsy$ & 0.0235 & 0.0815 & 0.248 & 0.207 & 0.225 & 0.239\\
+$Q$ & 0.438 & 0.00699 & 0.286 & 0.025 & 0.00288 & 0.286\\
+$\sigma_P$ & 0.111 & 0.0703 & 0.00204 & 0.167 & 0.0787 & 0.00366\\
+$\sigma_F$ & 0.323 & 0.346 & 0.328 & 0.321 & 0.345 & 0.336\\
+$\sigma_Y$ & 0.393 & 0.382 & 0.389 & 0.394 & 0.382 & 0.393\\
+\hline
+$r$ & 0.047 & 0.163 & 0.495 & 0.415 & 0.45 & 0.478\\
+$K$ & 1e+05 & 18800 & 24500 & 9970 & 8240 & 12500\\
+$\bar{F}_5$ & 0.0104 & 0.181 & 0.388 & 0.19 & 0.429 & 0.334\\
+\hline
+$p_0$ & 0.197 & 0.197 & 0.197 & 0.197 & 0.197 & 0.197\\
+$\tilde{r}$ & 0.486 & 0.486 & 0.486 & 0.486 & 0.486 & 0.486\\
+$\sigma_r$ & 0.8 & 0.8 & 0.8 & 0.1 & 0.1 & 0.1\\
+\hline
+\hline
 $-\log L$ & 199.03 & 192.65 & 270.87 & 198.95 & 195.04 & 195.1\\
 $n$ & 5 & 5 & 4 & 5 & 5 & 4\\
 $|G|_{max}$ & 9.2e-05 & 4.79e-05 & 0.138 & 2.17e-05 & 5.87e-05 & 1.32e-05\\
@@ -417,7 +446,8 @@ $\MSY$ & 1380 & 980 & 5530 & 1110 & 940 & 1010\\
 $\Fmsy$ & 0.116 & 0.92 & 0.436 & 0.205 & 0.294 & 0.249\\
 $Q$ & 0.0721 & 0.000774 & ~---~ & 0.0285 & 0.00235 & ~---~\\
 $\sigma_P$ & 0.233 & 0.234 & 0.321 & 0.245 & 0.231 & 0.319\\
-$\sigma_Y$ & -1.46 & -1.45 & -1.14 & -1.41 & -1.46 & -1.14\\
+%$\sigma_Y$ & -1.46 & -1.45 & -1.14 & -1.41 & -1.46 & -1.14\\
+$\sigma_Y$ & 0.23 & 0.23 & 0.32 & 0.24 & 0.23 & 0.24\\
 \hline
 $r$ & 0.232 & 1.84 & 0.872 & 0.409 & 0.588 & 0.497\\
 $K$ & 23900 & 2130 & 25400 & 10900 & 6400 & 8140\\
@@ -427,30 +457,14 @@ $p_0$ & 0.0492 & 0.0492 & 0.0492 & 0.0492 & 0.0492 & 0.0492\\
 $\tilde{r}$ & 0.486 & 0.486 & 0.486 & 0.486 & 0.486 & 0.486\\
 $\sigma_r$ & 0.8 & 0.8 & 0.8 & 0.2 & 0.2 & 0.2\\
 \hline
-\hline
-&r2 & r4 & r0 & r2-sdrprior & r4-sdrprior & r0-sdrprior\\
-$-\log L$ & 158.42 & 87549000 & 175.24 & 171.87 & 83034000 & 541.64\\
-$n$ & 6 & 6 & 5 & 6 & 6 & 5\\
-$|G|_{max}$ & 1.51e-05 & 895 & 0.0133 & 1.1e-05 & 794 & 0.0225\\
-$\MSY$ & 1040 & 15500 & 4010 & 982 & 17000 & 3690\\
-$\Fmsy$ & 0.0235 & 0.0557 & 0.244 & 0.207 & 0.0615 & 0.243\\
-$Q$ & 0.387 & 0.323 & 0.5 & 0.0237 & 0.294 & 0.5\\
-$\sigma_P$ & 0.111 & 0.0297 & 0.00017 & 0.167 & 0.0291 & 0.000722\\
-$\sigma_F$ & 0.321 & 0.323 & 0.329 & 0.318 & 0.325 & 0.329\\
-$\sigma_Y$ & 0.398 & 0.337 & 0.394 & 0.399 & 0.34 & 0.393\\
-$r$ & 0.0469 & 0.111 & 0.488 & 0.414 & 0.123 & 0.487\\
-$K$ & 88600 & 555000 & 32800 & 9490 & 554000 & 30300\\
-$p_0$ & 0.197 & 0.197 & 0.197 & 0.197 & 0.197 & 0.197\\
-$\sigma_r$ & 0.8 & 0.8 & 0.8 & 0.1 & 0.1 & 0.1\\
-$\bar{F}_5$ & 0.0105 & 1.74e+20 & 0.0427 & 0.181 & 1.18e+21 & 0.398\\
-\hline
 \end{tabular}
 \end{center}
 }
 \end{table}
 
 
-All models are equally capable of predicting catch,
+Models with region 2 indexing and region 4 indexing appear to be
+capable of accurately predicting catch,
 Figure~\ref{fig:mopcatch}. Low catches seem to be predicted
 accurately, but some high catches are estimated with larger errors, as is
 expected with log-normal errors. 
@@ -461,24 +475,21 @@ See Figure~\ref{fig:estFC} for more detail.
 \begin{center}
 %\includegraphics[width=0.95\textwidth]{../4-gear-runs/multiOPcatch.pdf}
 \includegraphics[height=0.45\textheight]{./4-gear-runs_multiOPcatch.pdf}
-\caption{Plot of predicted catch on observed catch for models A, B,
-and C.
+\caption{Plot of predicted catch on observed catch for two different
+models.
+Open circles (o) indicate region 2 index; plus (+) symbols indicate
+region 4 index.
 \label{fig:mopcatch}
 }
 \end{center}
 \end{figure}
 
-Estimated biomass tracks abundance indices for both models A and B,
+Estimated biomass tracks abundance indices for both indexed models
 Figure~\ref{fig:estbiomass}, and the abundance indices lie within the
 process error of the biomass trend.
-The estimated biomass and abundance index for model A (region 2)
-reach maxima in the 1980s and subsequently decrease. 
-The estimated biomass and abundance index for model B (region 4) 
-decrease monotonically.
-The estimated biomass trend in model C is roughly similar to
-that of model A with a peak in the 1980s and subsequent decrease.  
-The maxima of the biomass trends in all models exceed the
-estimated equilibrium biomass ($K$).
+The maxima of the estimated biomass trends exceed the
+estimated equilibrium biomass ($K$) for substantial period of time for
+both indexed models.
 
 
 \begin{sidewaysfigure}
@@ -507,7 +518,8 @@ Note that the scale of the ordinate is different in each panel.
 \end{sidewaysfigure}
 
 The average total YFT catch in the MHI for the most recent 5 years
-is 818 mt, easily below the estimated $\MSY$ for all three models. 
+is 818 mt, well below the estimated $\MSY$ for region 2 model, but
+slightly above the estimate $\MSY$ fir the region 4 model.
 The average estimated fishing mortality for the most recent 5 years 
 is 0.0632, 1.52 and 0.149 for models A, B and C respectively
 (Table \ref{tab:ests1}).
@@ -876,7 +888,7 @@ catch with different indices of abundance and values of the $r$
 prior, $\sigma_r$.
 The solid brown lines in the upper panel show the estimated fishing
 mortality by fleet. The orange shaded areas represent the process
-error as $\pm 2\sigma_P$.
+error as $\pm 2\sigma_F$.
 The solid green lines in the lower panel show the predicted catch; $+$
 symbols indicate observed catch. 
 The light green shaded areas represent the observation error as 
@@ -889,19 +901,16 @@ The ordinate in each panel is scaled to the specific gear type.
 \begin{tabular}{ccc}
 A. Region 2 index; $\sigma_r=0.8$ &
 B. Region 4 index; $\sigma_r=0.8$ &
-C. No index; $\sigma_r=0.2$ \\
 \\
-& Fishing Mortality\\
+\multicolumn{2}{c}{Fishing Mortality}\\
 \hline
 \includegraphics[width=0.30\textwidth]{./4-gear-runs_r2_est_FB1.pdf} &
 \includegraphics[width=0.30\textwidth]{./4-gear-runs_r4_est_FB1.pdf} &
-\includegraphics[width=0.30\textwidth]{./4-gear-runs_r0-sdrprior_est_FB1.pdf}\\
 \\
-& Observed and Predicted Catch\\
+\multicolumn{2}{c}{Observed and Predicted Catch}\\
 \hline
 \includegraphics[width=0.30\textwidth]{./4-gear-runs_r2_est_catchB1.pdf} &
 \includegraphics[width=0.30\textwidth]{./4-gear-runs_r4_est_catchB1.pdf} &
-\includegraphics[width=0.30\textwidth]{./4-gear-runs_r0-sdrprior_est_catchB1.pdf}\\
 \end{tabular}
 }
 \caption{Trends in estimated fishing mortality (top, orange) and 

@@ -18,9 +18,10 @@ plot.error=function(x,y,sd,bcol,fcol,mult=2)
 
 show.block.number=function(block.number,x,line=3,col="black")
 {
+#  print(paste("block number =",block.number))
    if (block.number > 1)
-   mtext(text=paste("(",block.number,")",sep=""),side=1,line=line,
-          at=c(x,0),cex=0.8,col=col)
+      mtext(text=paste("(",block.number,")",sep=""),side=1,line=line,
+            at=c(x,0),cex=0.8,col=col)
 }
 
 plot.catches=function(t,obs,pred,sd=NULL,block=NULL)
@@ -147,9 +148,9 @@ plot.biomass=function(x,y,K=NULL,sd=NULL,block=NULL,propL=NULL,
    {
       print("forcing")
       par("new"=TRUE)
-      frange = c(0,1.2*max(forcing,na.rm=TRUE))
+      frange = yrange #c(0,1.2*max(forcing,na.rm=TRUE))
       ftic <- pretty(c(frange[1],frange[2]),5)
-      plot(xrange,frange,type='n',axes=FALSE,ann=FALSE,yaxs='i')
+      plot(xrange,yrange,type='n',axes=FALSE,ann=FALSE,yaxs='i')
       lines(x,forcing,lwd=3,col="purple")
    #  plot(x,forcing,lwd=3,type='l',col="purple",
    #       ylim=frange,ann=FALSE,axes=FALSE,xlim=xrange)

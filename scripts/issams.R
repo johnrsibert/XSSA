@@ -348,7 +348,7 @@ read.rep=function(file="issams.rep",ntime=61,dt=1,ngear=4)
 
    ret$logMSY = extract.value("logMSY",rep)
    ret$logFmsy = extract.value("logFmsy",rep)
-   ret$logQ = extract.value("logQ:",rep)
+   ret$logitQ = extract.value("logitQ:",rep)
    ret$logsdlogProc = extract.value("logsdlogProc:",rep)
    ret$logsdlogYield = extract.value("logsdlogYield:",rep)
 
@@ -412,7 +412,7 @@ read.rep.files=function(path.list,ngear=4)
    }
    
    tnames=c("$-\\log L$", "$n$", "$|G|_{max}$", "$\\log\\MSY$", "$\\log\\Fmsy$",
-            "$\\log Q$", "$\\log\\sigma_P$", "$\\log\\sigma_Y$", "$\\MSY$",
+            "$\\logit Q$", "$\\log\\sigma_P$", "$\\log\\sigma_Y$", "$\\MSY$",
             "$\\Fmsy$", "$Q$", "$\\sigma_P$", "$\\sigma_P$", "$\\sigma_F$", "$\\sigma_Y$", "$r$", "$K$",
             "$p_0$", "$\\tilde{r}$", "$\\sigma_r$","$\\bar{F}_5$",
             "$\\bar{Y}_5$", "$\\bar{C}$")
@@ -653,7 +653,7 @@ awkread = function(file,name)
 }  
 
 
-hst.plot=function(model="issams",model.type="")
+hst.plot=function(model="issams6",model.type="")
 {
 #alogMSY
 #aMSY
@@ -661,7 +661,8 @@ hst.plot=function(model="issams",model.type="")
 #aFmsy
 #ar
 #aK
-#asdlogProc
+#asdlogBProc
+#asdlogFmort
 #asdlogYield
 #aQ
 #alogQ
@@ -671,8 +672,8 @@ hst.plot=function(model="issams",model.type="")
    nrow = 2
    if (model.type == "")
    {
-      hst.names=c("logFmsy","logMSY","sdlogProc","sdlogYield","logQ",
-                  "Fmsy","MSY","K","r","Q")
+      hst.names=c("logFmsy","logMSY","sdlogBProc","sdlogFmort","sdlogYield",
+                  "logQ","Fmsy","MSY","K","r","Q")
       ncol = 3
    }
    else
@@ -813,7 +814,7 @@ hst.plot=function(model="issams",model.type="")
 #  }
 }
 
-hst.row.plot=function(model="issams")
+hst.row.plot=function(model="issams6")
 {
 #alogMSY
 #aMSY
@@ -821,12 +822,17 @@ hst.row.plot=function(model="issams")
 #aFmsy
 #ar
 #aK
-#asdlogProc
+#asdlogBProc
+#asdlogFmort
 #asdlogYield
 #aQ
 #alogQ
-
-   hst.names=c("sdlogProc","sdlogYield","MSY","Fmsy","K","r","Q") 
+   require("latex2exp")
+   hst.names=c("sdlogBProc","sdlogFmort","sdlogYield","MSY","Fmsy","K","r","Q") 
+#  tex.names=c("sigma[P]","sigma[F]","sigma[Y]","widetilde{Y}","F[widetilde(Y)]",
+#             "K","r","Q") 
+   tex.names=c("$\\sigma_P$","$\\sigma_F$","$\\sigma_Y$","$\\widetilde{Y}$",
+               "$F_\\widetilde{Y}$","$K$","$r$","$Q$") 
    ncol = length(hst.names)
    nrow = 1
    print(ncol)
@@ -841,12 +847,12 @@ hst.row.plot=function(model="issams")
 
    nvar = length(hst.names)
    dev.list = vector(mode="numeric",length=2)
-   width= 12.0
+   width= 14.0
    height = 2.0
    xpos = 0
-   old.par = par(no.readonly = TRUE) 
    x11(width=width,height=height)
-   par(mar=c(2.5,2.5,0,0)+0.5)#,las=1)
+   old.par = par(no.readonly = TRUE) 
+   par(mar=c(2.5,3.0,0,0)+0.5)#,las=1)
    lm = layout(matrix(c(1:(nrow*ncol)),ncol=ncol,nrow=nrow,byrow=TRUE))
    layout.show(lm)
    
@@ -859,10 +865,9 @@ hst.row.plot=function(model="issams")
    fit = read.fit(model)
    for (v in 1:nvar)
    {
+      print(paste("--- ",v,hst.names[v]," ---"))
       w = which(fit$names==paste("a",hst.names[v],sep=""))
       dist = awkread(hst.file,hst.names[v])
-      x1 = min(dist$x,na.rm=TRUE)
-      x2 = max(dist$x,na.rm=TRUE)
       x1 = fit$est[w]-5*fit$std[w]
       x2 = fit$est[w]+5*fit$std[w]
       print(paste(v,hst.names[v],length(w),w,fit$names[w],fit$est[w],fit$std[w],x1,x2))
@@ -873,15 +878,20 @@ hst.row.plot=function(model="issams")
       {
          print(paste(v,hst.names[v]))
       #  xrange = c(max(min(xx),min(dist$x)),min(max(xx),max(dist$x))) #range(xx,dist$x)
-         xrange = c(x1,x2) #range(dist$x)
+      #  xrange = c(x1,x2) #range(dist$x)
+         xrange = c(fit$est[w]-3*fit$std[w],fit$est[w]+3*fit$std[w])
          yrange = c(0,max(pp,yy))
       #  yrange = c(0,max(pp[2:(length(pp)-1)],yy))
-         ylab=paste("p(",hst.names[v],")",sep="") 
+
          plot(xrange,yrange,type='n', axes=FALSE,ann=FALSE)
+
+         xlab=paste("\\textit{",tex.names[v],"}",sep="")
          axis(side=1,line=0)
-         mtext(side=1,line=2,text=hst.names[v],cex=0.75)
+         mtext(side=1,line=2,text=TeX(xlab),cex=0.75)
+
+         ylab=paste("\\textit{p(",tex.names[v],")}",sep="") 
          axis(side=2,line=0)
-         mtext(side=2,line=2,text=ylab,cex=0.75)
+         mtext(side=2,line=2,text=TeX(ylab),cex=0.75)
          box()
          lines(dist$x,pp,type='b',lwd=lwd)
          abline(v=fit$est[w],lty="dotdash",col="blue",lwd=lwd)

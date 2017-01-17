@@ -88,6 +88,10 @@ nice.ts.plot<-function(x,y,label=NULL,legend=NULL,bcol="blue",fcol="lightblue",
    abline(v=par("usr")[1],lwd=3)
    mtext(ylab,side=2,line=3)
 
+   ranges=list()
+   ranges$xrange=xrange
+   ranges$yrange=yrange
+   
    return(xrange)
 #  par(old.par)
 }
