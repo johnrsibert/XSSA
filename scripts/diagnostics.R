@@ -260,7 +260,7 @@ get.diagnostics=function(log,ntime=61,dt=1,ngear=4,block=NULL,mtype='i')
 
    ests$logMSY = extract.value("logMSY",log)
    ests$logFmsy = extract.value("logFmsy",log)
-   ests$logQ = extract.value("logQ:",log)
+   ests$logitQ = extract.value("logitQ:",log)
    ests$logsdlogProc = extract.value("logsdlogProc:",log)
    ests$logsdlogYield = extract.value("logsdlogYield:",log)
 

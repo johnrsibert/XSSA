@@ -336,37 +336,42 @@ show.block.number=function(block.number,x,line=3)
 #    return(x)
 # }
 
-read.rep=function(file="issams.rep",ntime=61,dt=1,ngear=4)
 
-{
-#  print(paste("Scanning file",file))
-   rep = scan(file,what="character",quiet=TRUE)
-   ret = list()
-   ret$nll = extract.value("nll",rep,sig=5)
-   ret$nvar = extract.value("nvar",rep)
-   ret$Gmax = extract.value("Gmax",rep)
-
-   ret$logMSY = extract.value("logMSY",rep)
-   ret$logFmsy = extract.value("logFmsy",rep)
-   ret$logitQ = extract.value("logitQ:",rep)
-   ret$logsdlogProc = extract.value("logsdlogProc:",rep)
-   ret$logsdlogYield = extract.value("logsdlogYield:",rep)
-
-   ret$MSY = extract.value("MSY",rep)
-   ret$Fmsy = extract.value("Fmsy",rep)
-   ret$Q = extract.value("Q:",rep)
-   ret$sdlogProc = extract.value("sdlogProc:",rep)
-   ret$logsdlogF = extract.value("logsdlogF:",rep)
-
-   ret$r = extract.value("r",rep)
-   ret$K = extract.value("K",rep)
-
-   ret$pcon = extract.value("pcon",rep)
-   ret$rprior = extract.value("r_prior",rep)
-   ret$sdrprior = extract.value("sdr_prior",rep)
-#  ret$KF = extract.value("klingon_multiplier",rep)
-   return(ret)
-}
+## unused?
+## replaced by
+## get.diagnostics=function(log,ntime=61,dt=1,ngear=4,block=NULL,mtype='i')
+## in diagnostics.R
+##
+## read.rep=function(file="issams.rep",ntime=61,dt=1,ngear=4)
+## {
+## #  print(paste("Scanning file",file))
+##    rep = scan(file,what="character",quiet=TRUE)
+##    ret = list()
+##    ret$nll = extract.value("nll",rep,sig=5)
+##    ret$nvar = extract.value("nvar",rep)
+##    ret$Gmax = extract.value("Gmax",rep)
+## 
+##    ret$logMSY = extract.value("logMSY",rep)
+##    ret$logFmsy = extract.value("logFmsy",rep)
+##    ret$logitQ = extract.value("logitQ:",rep)
+##    ret$logsdlogProc = extract.value("logsdlogProc:",rep)
+##    ret$logsdlogYield = extract.value("logsdlogYield:",rep)
+## 
+##    ret$MSY = extract.value("MSY",rep)
+##    ret$Fmsy = extract.value("Fmsy",rep)
+##    ret$Q = extract.value("Q:",rep)
+##    ret$sdlogProc = extract.value("sdlogProc:",rep)
+##    ret$logsdlogF = extract.value("logsdlogF:",rep)
+## 
+##    ret$r = extract.value("r",rep)
+##    ret$K = extract.value("K",rep)
+## 
+##    ret$pcon = extract.value("pcon",rep)
+##    ret$rprior = extract.value("r_prior",rep)
+##    ret$sdrprior = extract.value("sdr_prior",rep)
+## #  ret$KF = extract.value("klingon_multiplier",rep)
+##    return(ret)
+## }
 
 
 # read.rep.files(c("r2","r4","r0","r2-sdrprior","r4-sdrprior","r0-sdrprior"))->junk
@@ -412,7 +417,7 @@ read.rep.files=function(path.list,ngear=4)
    }
    
    tnames=c("$-\\log L$", "$n$", "$|G|_{max}$", "$\\log\\MSY$", "$\\log\\Fmsy$",
-            "$\\logit Q$", "$\\log\\sigma_P$", "$\\log\\sigma_Y$", "$\\MSY$",
+            "$\\logitQ$", "$\\log\\sigma_P$", "$\\log\\sigma_Y$", "$\\MSY$",
             "$\\Fmsy$", "$Q$", "$\\sigma_P$", "$\\sigma_P$", "$\\sigma_F$", "$\\sigma_Y$", "$r$", "$K$",
             "$p_0$", "$\\tilde{r}$", "$\\sigma_r$","$\\bar{F}_5$",
             "$\\bar{Y}_5$", "$\\bar{C}$")
