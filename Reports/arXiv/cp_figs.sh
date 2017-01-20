@@ -9,7 +9,9 @@
 
 #  cp -fv ../../run-issams6/multiOPcatch.pdf 4-gear-runs_multiOPcatch.pdf
 cp -fv ../../run-issams6/r2/est_popB1.pdf 4-gear-runs_r2_est_popB1.pdf
+cp -fv ../../run-issams6/r2-sdrprior/est_popB1.pdf 4-gear-runs_r2-sdrprior_est_popB1.pdf
 cp -fv ../../run-issams6/r4/est_popB1.pdf 4-gear-runs_r4_est_popB1.pdf
+cp -fv ../../run-issams6/r4-sdrprior/est_popB1.pdf 4-gear-runs_r4-sdrprior_est_popB1.pdf
 cp -fv ../../run-issams6/r0-sdrprior/est_popB1.pdf 4-gear-runs_r0-sdrprior_est_popB1.pdf
 cp -fv ../../run-issams6/r2/est_FB1.pdf 4-gear-runs_r2_est_FB1.pdf
 cp -fv ../../run-issams6/r4/est_FB1.pdf 4-gear-runs_r4_est_FB1.pdf

@@ -7,8 +7,8 @@ start.year = 1952
 
 
 plot.diagnostics=function(dat=NULL,file="diagnostics.dat",dt,ngear,
-                 sdlogPop, sdlogYield, sdlogF, sdlogQ, K, r, B1, indexed,
-                 plot.Fmort,plot.prod, plot.impact,
+                 sdlogPop, sdlogI, sdlogYield, sdlogF, sdlogQ, K, r, B1, 
+                 indexed, plot.Fmort,plot.prod, plot.impact,
                  devices,block)
 {
    print("plot.diagnostics, issams.R")
@@ -72,7 +72,7 @@ plot.diagnostics=function(dat=NULL,file="diagnostics.dat",dt,ngear,
    y[,1]=dat$pop
 #  y[,2]=dat$forcing
    print(paste("sdlogPop",sdlogPop))
-   plot.biomass(dat$t,y,sd=sdlogPop,block=block,K=dat$K,B1=B1,
+   plot.biomass(dat$t,y,sd=sdlogPop,sdI=sdlogI,block=block,K=dat$K,B1=B1,
                 forcing=dat$forcing,indexed=indexed)
 
 #  options(scipen=6)
@@ -254,6 +254,7 @@ log.diagnostics=function(file="issams6_program.log",ntime=61,dt=1,ngear=4,
 
       new.devices = plot.diagnostics(tmp$resid,dt=dt,ngear=ngear,
                     sdlogPop=tmp$sdlogBProc,
+                    sdlogI=tmp$sdlogI,
                     sdlogYield=tmp$sdlogYield,
                     sdlogF=tmp$sdlogF,
                     sdlogQ=tmp$sdlogQ,
@@ -301,11 +302,11 @@ log.diagnostics=function(file="issams6_program.log",ntime=61,dt=1,ngear=4,
 #  return(counter)
 }
 
-show.block.number=function(block.number,x,line=3)
-{
-   mtext(text=paste("(",block.number,")",sep=""),side=1,line=line,
-          at=c(x,0),cex=0.8)
-}
+#show.block.number=function(block.number,x,line=3)
+#{
+#   mtext(text=paste("(",block.number,")",sep=""),side=1,line=line,
+#          at=c(x,0),cex=0.8)
+#}
 
 # extract.value=function(text,text.list,sig.fig=3)
 # {
@@ -375,7 +376,7 @@ show.block.number=function(block.number,x,line=3)
 
 
 # read.rep.files(c("r2","r4","r0","r2-sdrprior","r4-sdrprior","r0-sdrprior"))->junk
-read.rep.files=function(path.list,ngear=4)
+read.rep.files=function(path.list,ngear=4,npar=6)
 {
    print(path.list)
    have.names=FALSE
@@ -383,11 +384,11 @@ read.rep.files=function(path.list,ngear=4)
    rep.list=list() 
    for (p in path.list)
    {
-      path = paste(".",p,"issams6.rep",sep="/")
+      path = paste("./",p,"/issams",npar,".rep",sep="")
       rep = read.rep.diagnostics(path,ntime=61,dt=1,ngear=ngear,
                                 block=NULL, mtype='i')
-   #  print("names(rep):")
-   #  print(names(rep))
+      print("names(rep):")
+      print(names(rep))
 
       # omit resid member of rep
       nvar = length(rep) - 1
@@ -417,8 +418,9 @@ read.rep.files=function(path.list,ngear=4)
    }
    
    tnames=c("$-\\log L$", "$n$", "$|G|_{max}$", "$\\log\\MSY$", "$\\log\\Fmsy$",
-            "$\\logitQ$", "$\\log\\sigma_P$", "$\\log\\sigma_Y$", "$\\MSY$",
-            "$\\Fmsy$", "$Q$", "$\\sigma_P$", "$\\sigma_P$", "$\\sigma_F$", "$\\sigma_Y$", "$r$", "$K$",
+            "$\\logitQ$", "$\\log\\sigma_P$", "$\\log\\sigma_P$", "$\\log\\sigma_P$", 
+            "$\\log\\sigma_Y$", "$\\MSY$", "$\\Fmsy$", "$Q$", "$\\sigma_P$", "$\\sigma_F$", "$\\sigma_Y$",
+            "$\\sigma_I$", "$r$", "$K$",
             "$p_0$", "$\\tilde{r}$", "$\\sigma_r$","$\\bar{F}_5$",
             "$\\bar{Y}_5$", "$\\bar{C}$")
    print(paste("length(tnames)",length(tnames)))

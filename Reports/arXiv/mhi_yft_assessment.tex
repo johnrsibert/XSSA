@@ -311,23 +311,25 @@ $\Fmsy$& Fishing mortality at maximum sustainable yield (\peryr).\\
 $Q$    & Abundance index proportionality constant\\
 $\sigma_P$ & Biomass random walk process error standard deviation,\\
            & $\sigma_P=\sigma_N=\sigma_I$ (mt).\\
-$\sigma_F$ & Fishing mortality random walk process error standard deviation (\peryr).\\
+$\sigma_F$ & Fishing mortality random walk process error\\
+           & standard deviation (\peryr).\\
 $\sigma_Y$ & Observation error standard deviation (mt).\\
 \hline
        & {\it Computed variables:}\\
 $r$    & Instantaneous growth rate, $r=2F_{\MSY}$ (\peryr).\\
 $K$    & Asymptotic population size, $K=\frac{4\MSY}{r}$ (mt).\\
-$\bar{F}_5$ & Average of total estimated fishing mortality for the most recent five years (mt).\\
+$\bar{F}_5$ & Average of total estimated fishing mortality\\
+            & for the most recent five years (\peryr).\\
 \hline
        & {\it Constraints and constants:}\\
 $p_0$  & Proportion of zero catch observations,\\
        & fixed at 0.04918\\
-$\tilde{r}$ & An {\it a priori} assumed value for $r$\\
+$\tilde{r}$ & An {\it a priori} assumed value for $r$ (\peryr)\\
             & fixed at $\tilde{r}=0.486$ (Carruthers and McAllister, 2011)\\
 $\sigma_r$  & Assumed standard deviation of $r$ around its prior,\\
-            & fixed at $\sigma_r=0.8$ or $\sigma_r=0.1$.\\
-$\bar{Y}_5$ & Average of total observed catch for the most recent
-five years.\\
+            & fixed at $\sigma_r=0.8$ or $\sigma_r=0.1$ (\peryr).\\
+$\bar{Y}_5$ & Average of total observed catch\\
+            & for the most recent five years (mt).\\
 \hline
 \end{tabular}
 \end{center}
@@ -367,10 +369,12 @@ paper can be found at Github:
 Table~\ref{tab:ests1} compares 6 different models
 using three index of abundance assumptions and two 
 assumed values of the standard deviation of the $r$ prior, $\sigma_r$. 
-Models without an index of abundance do not fit the data well, do
-not converge to solutions as indicated by the values of $-\log L$
-and $|G|_{max}$, and biomass estimates crash early in the time series.
-Models with the loose constraint on $r$, $\sigma_r=0.8$, and either
+Models without no index of abundance do not converge to solutions as
+indicated by the values of $|G|_{max}$.
+Both the values of $-\log L$ and the estimated values of $\Fmsy$ are
+lower for the loose constraint on $r$, $\sigma_r=0.8$ than for the
+tighter constraint, $\sigma_r=0.1$.
+lower values of $r$, and either
 index of abundance appear to be
 more consistent with the catch data than those with $\sigma_r=0.1$ on
 the basis of the values of $-\log L$. 
@@ -418,20 +422,21 @@ Index Region  &  2& 4& None& 2& 4& None\\
 Model Name & A    & B   &     &     &     & C\\
 \hline
 \hline
-$-\log L$ & 157.54 & 128.73 & 523.74 & 170.78 & 130.36 & 317.43\\
+&r2 & r4 & r0 & r2-sdrprior & r4-sdrprior & r0-sdrprior\\
+$-\log L$ & 157.54 & 128.73 & 523.74 & 170.78 & 130.36 & 170.57\\
 $n$ & 6 & 6 & 5 & 6 & 6 & 5\\
-$|G|_{max}$ & 9.04e-06 & 2.1e-05 & 0.266 & 6.86e-05 & 3.43e-05 & 0.454\\
+$|G|_{max}$ & 9.04e-06 & 2.1e-05 & 0.266 & 6.86e-05 & 3.43e-05 & 0.0158\\
 \hline
-$\MSY$ & 1180 & 765 & 3040 & 1030 & 928 & 1490\\
-$\Fmsy$ & 0.0235 & 0.0815 & 0.248 & 0.207 & 0.225 & 0.239\\
-$Q$ & 0.438 & 0.00699 & 0.286 & 0.025 & 0.00288 & 0.286\\
-$\sigma_P$ & 0.111 & 0.0703 & 0.00204 & 0.167 & 0.0787 & 0.00366\\
-$\sigma_F$ & 0.323 & 0.346 & 0.328 & 0.321 & 0.345 & 0.336\\
-$\sigma_Y$ & 0.393 & 0.382 & 0.389 & 0.394 & 0.382 & 0.393\\
+$\MSY$ & 1180 & 765 & 3040 & 1030 & 928 & 929\\
+$\Fmsy$ & 0.0235 & 0.0815 & 0.248 & 0.207 & 0.225 & 0.248\\
+$Q$ & 0.438 & 0.00699 & --- & 0.025 & 0.00288 & ---\\
+$\sigma_P$ & 0.111 & 0.0703 & 0.00204 & 0.167 & 0.0787 & 0.00168\\
+$\sigma_F$ & 0.323 & 0.346 & 0.328 & 0.321 & 0.345 & 0.329\\
+$\sigma_Y$ & 0.393 & 0.382 & 0.389 & 0.394 & 0.382 & 0.39\\
 \hline
-$r$ & 0.047 & 0.163 & 0.495 & 0.415 & 0.45 & 0.478\\
-$K$ & 1e+05 & 18800 & 24500 & 9970 & 8240 & 12500\\
-$\bar{F}_5$ & 0.0104 & 0.181 & 0.388 & 0.19 & 0.429 & 0.334\\
+$r$ & 0.047 & 0.163 & 0.495 & 0.415 & 0.45 & 0.497\\
+$K$ & 100000 & 18800 & 24500 & 9970 & 8240 & 7480\\
+$\bar{F}_5$ & 0.0104 & 0.181 & 0.388 & 0.19 & 0.429 & 0.214\\
 \hline
 $p_0$ & 0.197 & 0.197 & 0.197 & 0.197 & 0.197 & 0.197\\
 $\tilde{r}$ & 0.486 & 0.486 & 0.486 & 0.486 & 0.486 & 0.486\\
@@ -475,8 +480,8 @@ See Figure~\ref{fig:estFC} for more detail.
 \begin{center}
 %\includegraphics[width=0.95\textwidth]{../4-gear-runs/multiOPcatch.pdf}
 \includegraphics[height=0.45\textheight]{./4-gear-runs_multiOPcatch.pdf}
-\caption{Plot of predicted catch on observed catch for two different
-models.
+\caption{Plot of predicted catch on observed catch for two indices of
+abundance.
 Open circles (o) indicate region 2 index; plus (+) symbols indicate
 region 4 index.
 \label{fig:mopcatch}
@@ -492,17 +497,18 @@ estimated equilibrium biomass ($K$) for substantial period of time for
 both indexed models.
 
 
-\begin{sidewaysfigure}
+\begin{figure}
 \begin{center}
 {\scriptsize \sffamily
-\begin{tabular}{ccc}
+\begin{tabular}{cc}
 A. Region 2 index; $\sigma_r=0.8$ &
-B. Region 4 index; $\sigma_r=0.8$ &
-C. No index; $\sigma_r=0.2$ \\
-\\
-\includegraphics[width=0.33\textwidth]{./4-gear-runs_r2_est_popB1.pdf} &
-\includegraphics[width=0.33\textwidth]{./4-gear-runs_r4_est_popB1.pdf} &
-\includegraphics[width=0.33\textwidth]{./4-gear-runs_r0-sdrprior_est_popB1.pdf}\\
+B. Region 4 index; $\sigma_r=0.8$ \\
+\includegraphics[height=0.35\textheight]{./4-gear-runs_r2_est_popB1.pdf} &
+\includegraphics[height=0.35\textheight]{./4-gear-runs_r4_est_popB1.pdf} \\
+C. Region 2 index; $\sigma_r=0.1$ &
+D. Region 4 index; $\sigma_r=0.1$ \\
+\includegraphics[height=0.35\textheight]{./4-gear-runs_r2-sdrprior_est_popB1.pdf} &
+\includegraphics[height=0.35\textheight]{./4-gear-runs_r4-sdrprior_est_popB1.pdf} \\
 \end{tabular}
 }
 \caption{Predicted biomass trends with different indices of abundance
@@ -515,7 +521,7 @@ The equilibrium biomass $K$ is indicated by the blue dot-dash line.
 Note that the scale of the ordinate is different in each panel.
 \label{fig:estbiomass}}
 \end{center}
-\end{sidewaysfigure}
+\end{figure}
 
 The average total YFT catch in the MHI for the most recent 5 years
 is 818 mt, well below the estimated $\MSY$ for region 2 model, but

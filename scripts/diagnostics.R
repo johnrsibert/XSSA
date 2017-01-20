@@ -26,7 +26,7 @@ show.block.number=function(block.number,x,line=3,col="black")
 
 plot.catches=function(t,obs,pred,sd=NULL,block=NULL)
 {
-#  print(head(t))
+   print(head(t))
 #  print(head(obs))
 #  print(head(pred))
    ntime = length(t)
@@ -67,7 +67,7 @@ plot.catches=function(t,obs,pred,sd=NULL,block=NULL)
    par(old.par)
 }
 
-plot.biomass=function(x,y,K=NULL,sd=NULL,block=NULL,propL=NULL,
+plot.biomass=function(x,y,K=NULL,sd=NULL, sdI=NULL, block=NULL,propL=NULL,
                       forcing=NULL,yrange=NULL,B1=NULL,indexed=NULL)
 {
    print("plot.biomass, diagnostics.R")
@@ -98,11 +98,17 @@ plot.biomass=function(x,y,K=NULL,sd=NULL,block=NULL,propL=NULL,
 #  print("N3 error")
 #  if ( (ncol(y) > 2) && (!is.null(sd)) )
 #     plot.error(x,y[,3],sdlogNN, bcol="blue",fcol="lightblue")
+   print(paste("Index error sd =",sdI))
+   if (!is.null(sdI))
+   {
+   #  print("Index error")
+      plot.error(x,y[,1],sdI, bcol="purple4",fcol="purple")
+   }
 
    print(paste("N error,sd =",sd))
    if (!is.null(sd))
    {
-      print("N1 error")
+   #  print("N1 error")
       plot.error(x,y[,1],sd, bcol="blue",fcol="lightblue")
    }
    if ( (ncol(y) > 1) && (!is.null(sd)) )
@@ -111,9 +117,7 @@ plot.biomass=function(x,y,K=NULL,sd=NULL,block=NULL,propL=NULL,
       plot.error(x,y[,2],sd, bcol="blue",fcol="lightblue")
       lines(x,y[,1],col="blue",lwd=5)
    }
-   print("N1")
    lines(x,y[,1],col="blue",lwd=5)
-   print("N1 label")
    text(x[ntime],y[ntime,1],parse(text=paste("N","[1]")),adj=c(-0.5,0.5),
         col="blue",cex=1.2)
 
@@ -148,16 +152,16 @@ plot.biomass=function(x,y,K=NULL,sd=NULL,block=NULL,propL=NULL,
    {
       print("forcing")
       par("new"=TRUE)
-      frange = yrange #c(0,1.2*max(forcing,na.rm=TRUE))
-      ftic <- pretty(c(frange[1],frange[2]),5)
-      plot(xrange,yrange,type='n',axes=FALSE,ann=FALSE,yaxs='i')
+   #  frange = yrange #c(0,1.2*max(forcing,na.rm=TRUE))
+   #  ftic <- pretty(c(frange[1],frange[2]),5)
+   #  plot(xrange,yrange,type='n',axes=FALSE,ann=FALSE,yaxs='i')
       lines(x,forcing,lwd=3,col="purple")
    #  plot(x,forcing,lwd=3,type='l',col="purple",
    #       ylim=frange,ann=FALSE,axes=FALSE,xlim=xrange)
       text(x[1],forcing[1],"I ",adj=c(1.5,0.5),col="purple",cex=1.2)
-      axis(4,lwd=1,at=ftic[2:length(ftic)],col="purple",col.axis="purple")
-      abline(v=par("usr")[2],lwd=2,col="purple")
-      mtext("Abundance Index",side=4,col="purple",line=3)
+   #  axis(4,lwd=1,at=ftic[2:length(ftic)],col="purple",col.axis="purple")
+   #  abline(v=par("usr")[2],lwd=2,col="purple")
+   #  mtext("Abundance Index",side=4,col="purple",line=3)
     }
     if (!is.null(B1))
     {
@@ -262,20 +266,22 @@ get.diagnostics=function(log,ntime=61,dt=1,ngear=4,block=NULL,mtype='i')
    ests$logFmsy = extract.value("logFmsy",log)
    ests$logitQ = extract.value("logitQ:",log)
    ests$logsdlogProc = extract.value("logsdlogProc:",log)
+   ests$logsdlogBProc = extract.value("logsdlogBProc:",log)
+   ests$logsdlogN = extract.value("logsdlogN:",log)
    ests$logsdlogYield = extract.value("logsdlogYield:",log)
 
    ests$MSY = extract.value("MSY",log)
    ests$Fmsy = extract.value("Fmsy",log)
    ests$Q = extract.value("Q:",log)
-   ests$sdlogProc = extract.value("sdlogProc:",log)
-   ests$sdlogBProc = extract.value("sdlogBProc:",log)
-#  if ( is.null(ests$sdlogProc) )
-   {
-      ests$sdlogProc = ests$sdlogBProc 
-      ests$logsdlogProc = log(ests$sdlogBProc)
-   }
+   if (is.na(ests$logsdlogBProc))
+      ests$logsdlogBProc = ests$logsdlogN
+   if (is.na(ests$logsdlogProc))
+      ests$logsdlogProc = ests$logsdlogBProc
+
+   ests$sdlogBProc = exp(ests$logsdlogBProc)
    ests$sdlogFmort = extract.value("sdlogFmort:",log)
    ests$sdlogYield = extract.value("sdlogYield:",log)
+   ests$sdlogI     = extract.value("sdlogI:",log)
 
    ests$r = extract.value("r",log)
    ests$K = extract.value("K",log)
@@ -283,6 +289,7 @@ get.diagnostics=function(log,ntime=61,dt=1,ngear=4,block=NULL,mtype='i')
    ests$pcon = extract.value("pcon",log)
    ests$rprior = extract.value("r_prior",log)
    ests$sdrprior = extract.value("sdr_prior",log)
+#  print(ests)
 
    if (mtype == "x") 
       ncol = (3*ngear+6)
