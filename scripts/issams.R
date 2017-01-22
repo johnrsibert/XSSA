@@ -1502,3 +1502,24 @@ read.dat.file=function(dat.file="issams.dat")
 
    return(data)
 }
+
+write.cor.table=function(model="issams6")
+{
+   fit = read.fit(model)
+   #[1] "alogMSY"     "aMSY"        "alogFmsy"    "aFmsy"       "ar"         
+   #[6] "aK"          "asdlogBProc" "asdlogFmort" "asdlogYield" "aQ"      
+   txtnames=c("aMSY","aFmsy","asdlogBProc","asdlogFmort","asdlogYield","aQ","ar","aK")
+   texnames=c("$\\MSY$", "$\\Fmsy$","$\\sigma_P$", "$\\sigma_F$", "$\\sigma_Y$","$Q$",
+              "$r$", "$K$")
+             
+   andx = match(txtnames,fit$names)
+#  print(andx)
+#  print(fit$names[andx])
+   acor = round(fit$cor[andx,andx],2)
+   colnames(acor) = texnames #fit$names[andx]
+   rownames(acor) = texnames #=fit$names[andx]
+   print(acor)
+   write.table(acor,file="cor_summary.tex",sep=" & ",quote=FALSE,eol="\\\\\n") 
+
+}
+
