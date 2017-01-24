@@ -1503,7 +1503,7 @@ read.dat.file=function(dat.file="issams.dat")
    return(data)
 }
 
-write.cor.table=function(model="issams6")
+write.cor.table=function(model="issams6",panel="X",region="Y",sigr="Z")
 {
    fit = read.fit(model)
    #[1] "alogMSY"     "aMSY"        "alogFmsy"    "aFmsy"       "ar"         
@@ -1511,15 +1511,48 @@ write.cor.table=function(model="issams6")
    txtnames=c("aMSY","aFmsy","asdlogBProc","asdlogFmort","asdlogYield","aQ","ar","aK")
    texnames=c("$\\MSY$", "$\\Fmsy$","$\\sigma_P$", "$\\sigma_F$", "$\\sigma_Y$","$Q$",
               "$r$", "$K$")
-             
+   nvar = length(texnames)           
    andx = match(txtnames,fit$names)
-#  print(andx)
-#  print(fit$names[andx])
-   acor = round(fit$cor[andx,andx],2)
-   colnames(acor) = texnames #fit$names[andx]
-   rownames(acor) = texnames #=fit$names[andx]
-   print(acor)
-   write.table(acor,file="cor_summary.tex",sep=" & ",quote=FALSE,eol="\\\\\n") 
+#  acor = round(signif(fit$cor[andx,andx],2),2)
+#  acor = round(fit$cor[andx,andx],2)
+   acor = fit$cor[andx,andx]
+   colnames(acor) = texnames
+   rownames(acor) = texnames
+#  write.table(acor,file="cor_summary.tex",sep=" & ",quote=FALSE,eol="\\\\\n") 
+   heading = paste(panel,". Region ",region,"; $\\sigma_r = ",sigr,sep="")
+   print(heading)
+   texfile="cor_summary.tex"
+   cat("\\begin{center}\n",file=texfile,append=FALSE)
+   cat("\\begin{tabular}{|lrrrrrrrr|}\n",file=texfile,append=TRUE)
+#  cat("\\multicolumn{9}{c}{{\\Large X. Region Y; $\\sigma_r = Z$}}\\\\\n",
+   cat(paste("\\multicolumn{9}{c}{{\\Large ",heading,"$}}\\\\\n",sep=""),
+       file=texfile,append=TRUE)
+   cat("\\hline\n",file=texfile,append=TRUE)
+   cat("&",file=texfile,append=TRUE)
+   for (i in 1:nvar)
+   {
+      cat(paste(texnames[i],sep=""),file=texfile,append=TRUE)
+      if (i < nvar)
+         cat("&",file=texfile,append=TRUE)
+   }
+   cat("\\\\\n", file=texfile, append=TRUE)
+   cat("\\hline\n",file=texfile,append=TRUE)
+   for (i in 1:nvar)
+   {
+      cat(paste(texnames[i],"&",sep=""),file=texfile,append=TRUE)
+      for(j in 1:nvar)
+      {
+         if (j <= i)
+            cat(sprintf("%.2f",acor[i,j]),file=texfile,append=TRUE)
+         #  cat(acor[i,j],file=texfile,append=TRUE)
+         if (j < nvar)
+            cat("&",file=texfile,append=TRUE)
+      }
+      cat("\\\\\n", file=texfile, append=TRUE)
+   }
+   cat("\\hline\n",file=texfile,append=TRUE)
+   cat("\\end{tabular}\n",file=texfile,append=TRUE)
+   cat("\\end{center}\n",file=texfile,append=TRUE)
 
 }
 

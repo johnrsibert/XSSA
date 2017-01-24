@@ -1004,6 +1004,138 @@ vertical red line is the prior.
 \end{sidewaysfigure}
 
 
+%\documentclass[12pt,letterpaper]{article}
+%\usepackage{amsmath}
+%\usepackage{amsfonts}
+%\usepackage{rotating}
+%
+%\newcommand\MSY{\widetilde{Y}}
+%\newcommand\Fmsy{F_{\MSY}}
+
+%\begin{document}
+%\small
+
+
+
+\begin{sidewaystable}
+   \begin{tabular}[h]{cc}
+      \begin{minipage}[t]{0.5\textwidth}
+         \scriptsize
+      %  \input r2/cor_summary
+
+\begin{center}
+{\Large A. Region 2; $\sigma_r = 0.8$}\\
+~\\
+\begin{tabular}{|lrrrrrrrr|}
+%\multicolumn{9}{c}{{\Large A. Region 2; $\sigma_r = 0.8$}}\\
+\hline
+&$\MSY$&$\Fmsy$&$\sigma_P$&$\sigma_F$&$\sigma_Y$&$Q$&$r$&$K$\\
+\hline
+$\MSY$&1.00&&&&&&&\\
+$\Fmsy$&0.23&1.00&&&&&&\\
+$\sigma_P$&0.13&0.39&1.00&&&&&\\
+$\sigma_F$&0.01&-0.00&-0.00&1.00&&&&\\
+$\sigma_Y$&-0.00&0.00&0.00&-0.31&1.00&&&\\
+$Q$&0.98&0.04&0.06&0.01&-0.00&1.00&&\\
+$r$&0.23&1.00&0.39&-0.00&0.00&0.04&1.00&\\
+$K$&0.99&0.07&0.07&0.01&-0.00&1.00&0.07&1.00\\
+\hline
+\end{tabular}
+\end{center}
+
+      \end{minipage} &
+      \begin{minipage}[t]{0.5\textwidth}
+         \scriptsize
+      %  \input r4/cor_summary
+
+\begin{center}
+{\Large B. Region 4; $\sigma_r = 0.8$}\\
+~\\
+\begin{tabular}{|lrrrrrrrr|}
+%\multicolumn{9}{c}{{\Large B. Region 4; $\sigma_r = 0.8$}}\\
+\hline
+&$\MSY$&$\Fmsy$&$\sigma_P$&$\sigma_F$&$\sigma_Y$&$Q$&$r$&$K$\\
+\hline
+$\MSY$&1.00&&&&&&&\\
+$\Fmsy$&0.76&1.00&&&&&&\\
+$\sigma_P$&0.23&0.28&1.00&&&&&\\
+$\sigma_F$&0.04&0.01&-0.02&1.00&&&&\\
+$\sigma_Y$&-0.02&-0.01&-0.00&-0.26&1.00&&&\\
+$Q$&-0.53&-0.95&-0.25&0.01&0.01&1.00&&\\
+$r$&0.76&1.00&0.28&0.01&-0.01&-0.95&1.00&\\
+$K$&-0.50&-0.94&-0.26&0.01&0.01&0.99&-0.94&1.00\\
+\hline
+\end{tabular}
+\end{center}
+
+      \end{minipage}\\
+      & \\
+      & \\
+      \begin{minipage}[t]{0.5\textwidth}
+         \scriptsize
+      %  \input r2-sdrprior/cor_summary
+
+\begin{center}
+{\Large C. Region 2; $\sigma_r = 0.1$}\\
+~\\
+\begin{tabular}{|lrrrrrrrr|}
+%\multicolumn{9}{c}{{\Large C. Region 2; $\sigma_r = 0.1$}}\\
+\hline
+&$\MSY$&$\Fmsy$&$\sigma_P$&$\sigma_F$&$\sigma_Y$&$Q$&$r$&$K$\\
+\hline
+$\MSY$&1.00&&&&&&&\\
+$\Fmsy$&-0.01&1.00&&&&&&\\
+$\sigma_P$&0.08&0.33&1.00&&&&&\\
+$\sigma_F$&0.05&-0.01&-0.02&1.00&&&&\\
+$\sigma_Y$&-0.02&0.01&-0.01&-0.30&1.00&&&\\
+$Q$&0.90&-0.38&-0.03&0.05&-0.02&1.00&&\\
+$r$&-0.01&1.00&0.33&-0.01&0.01&-0.38&1.00&\\
+$K$&0.93&-0.39&-0.05&0.05&-0.02&0.98&-0.39&1.00\\
+\hline
+\end{tabular}
+\end{center}
+
+      \end{minipage} &
+      \begin{minipage}[t]{0.5\textwidth}
+         \scriptsize
+      %  \input r4-sdrprior/cor_summary
+
+
+\begin{center}
+{\Large D. Region 4; $\sigma_r = 0.1$}\\
+~\\
+\begin{tabular}{|lrrrrrrrr|}
+%\multicolumn{9}{c}{{\Large D. Region 4; $\sigma_r = 0.1$}}\\
+\hline
+&$\MSY$&$\Fmsy$&$\sigma_P$&$\sigma_F$&$\sigma_Y$&$Q$&$r$&$K$\\
+\hline
+$\MSY$&1.00&&&&&&&\\
+$\Fmsy$&0.13&1.00&&&&&&\\
+$\sigma_P$&0.07&0.17&1.00&&&&&\\
+$\sigma_F$&0.08&-0.01&-0.04&1.00&&&&\\
+$\sigma_Y$&-0.04&0.00&-0.01&-0.26&1.00&&&\\
+$Q$&0.49&-0.76&-0.08&0.06&-0.03&1.00&&\\
+$r$&0.13&1.00&0.17&-0.01&0.00&-0.76&1.00&\\
+$K$&0.53&-0.78&-0.10&0.06&-0.03&0.96&-0.78&1.00\\
+\hline
+\end{tabular}
+\end{center}
+      \end{minipage}\\
+   \end{tabular}%[h]{cc}
+\end{sidewaystable}
+
+%\input cor_summary
+
+
+%\end{document}
+
+%\begin{center}
+%\begin{tabular}{lrrrrrrrr}
+%\end{tabular}
+%\end{center}
+
+
+
 
 \clearpage
 \section{Noncommercial Catch}
