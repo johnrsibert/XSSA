@@ -294,7 +294,7 @@ $p_0$ is the proportion of observed catch observations equal to zero.
 \caption{Complete list of estimated and computed parameters and model
 constraints for the state-space surplus production model. 
 There are 6 estimated parameters. 
-Computed variables are functions of estimated parameters.
+The three computed variables are functions of estimated parameters.
 There are four constraints and constants.
 For a model with 61 time steps and 4 gear types, there are 305 random effects.
 }
@@ -350,7 +350,7 @@ L(\theta,\alpha,x)=
 \Sigma_\varepsilon\big)\big]\cdot\rho
 \end{equation}
 where $m$ is the number of time steps in the catch time series and
-$\theta=\left\{\MSY,\Fmsy,Q,\sigma_P,\sigma_F, \sigma_Y\right\}$ 
+$\theta=\left\{\MSY,\Fmsy,Q,\sigma_P,\sigma_F,\sigma_Y\right\}$ 
 is a vector of model parameters (Table~\ref{tab:allvars1}).
 The model is implemented in ADMB-RE (Fournier et al. 2012) and
 applied to a 61 year ($m=61$) time series of observed
@@ -369,35 +369,13 @@ paper can be found at Github:
 Table~\ref{tab:ests1} compares 6 different models
 using three index of abundance assumptions and two 
 assumed values of the standard deviation of the $r$ prior, $\sigma_r$. 
-Models without no index of abundance do not converge to solutions as
+Models without an index of abundance do not converge to solutions as
 indicated by the values of $|G|_{max}$.
-Both the values of $-\log L$ and the estimated values of $\Fmsy$ are
-lower for the loose constraint on $r$, $\sigma_r=0.8$ than for the
-tighter constraint, $\sigma_r=0.1$.
-lower values of $r$, and either
-index of abundance appear to be
-more consistent with the catch data than those with $\sigma_r=0.1$ on
-the basis of the values of $-\log L$. 
-
-%Models with the loose constraint on $r$, $\sigma_r=0.8$, and either
-%region 2 or region 4 abundance indices converged to solution, but the
-%model without an index of abundance did not converge.
-%All models with a tighter constraint on $r$, $\sigma_r=0.2$ converged
-%to solutions with similar likelihood values and similar
-%parameter estimates, $K\approx 8000$ and $r\approx 0.5$.
-%For convenience, I will refer to models with 
-%region 2 indexing and $\sigma_r=0.8$,
-%region 4 indexing and $\sigma_r=0.8$, and 
-%no indexing and $\sigma_r=0.2$
-%as models A, B, and C respectively (Table~\ref{tab:ests1}).
-%Model A, indexed to region 2, 
-%predicts a large, slowly growing population ($K=23900; r=0.232$)
-%whereas model B, indexed to region 4, predicts a small, rapidly growing
-%population ($K = 2130; r=1.84$).
-%Model C, not indexed, predicts an intermediate situation ($K=8140; r=0.497$). 
-%In models A and B, the prediction is dominated by
-%the abundance index, and in model C the prediction is dominated by the
-%prior assumption about $r$.
+Values of $-\log L$ are lower for models with the loose constraint on $r$
+($\sigma_r=0.8$) than for equivalent models with the tight constraint on $r$
+($\sigma_r=0.1$).
+Models with $\sigma_r=0.1$ estimate higher values of $\Fmsy$ and the
+calculated values of $r$ are, of course, closer to the prior.
 
 \begin{table}
 {\small
@@ -406,9 +384,9 @@ abundance indices and two constraints on $r$. The first section of the
 table shows model diagnostics. $-\log L$ is the negative logarithm of
 equation~\ref{eqn:likelihood}; lower values indicate better fits to
 the data.
-$|G|_{max}$ is the gradient of the likelihood with respect to the
-parameters; values of $|G|_{max}>10^{-4}$ (1e-04) indicate lack of model
-convergence.
+$|G|_{max}$ is the maximum gradient of the likelihood with respect to
+the parameters; values of $|G|_{max}>10^{-4}$ (1e-04) indicate lack of
+model convergence.
 $n$ is the number of parameters estimated.
 %Model Name is the identifier used to discuss the models in the text. 
 All values are reported to three significant figures.
@@ -418,49 +396,29 @@ All values are reported to three significant figures.
 \begin{tabular}{|l|rrr|rrr|}
 \hline
 Index Region  &  2& 4& None& 2& 4& None\\
+%\hline
+%Model Name & A    & B   &     &     &     & C\\
+%\hline
 \hline
-Model Name & A    & B   &     &     &     & C\\
-\hline
-\hline
-&r2 & r4 & r0 & r2-sdrprior & r4-sdrprior & r0-sdrprior\\
-$-\log L$ & 157.54 & 128.73 & 523.74 & 170.78 & 130.36 & 170.57\\
+%&r2 & r4 & r0 & r2-sdrprior & r4-sdrprior & r0-sdrprior\\
+$-\log L$ & 157.54 & 128.73 & 789.98 & 170.78 & 130.36 & 317.17\\
 $n$ & 6 & 6 & 5 & 6 & 6 & 5\\
-$|G|_{max}$ & 9.04e-06 & 2.1e-05 & 0.266 & 6.86e-05 & 3.43e-05 & 0.0158\\
+$|G|_{max}$ & 9.72e-06 & 8.65e-06 & 0.266 & 3.5e-05 & 5.44e-06 & 0.455\\
 \hline
-$\MSY$ & 1180 & 765 & 3040 & 1030 & 928 & 929\\
-$\Fmsy$ & 0.0235 & 0.0815 & 0.248 & 0.207 & 0.225 & 0.248\\
+$\MSY$ & 1180 & 765 & 3040 & 1030 & 928 & 1490\\
+$\Fmsy$ & 0.0235 & 0.0815 & 0.248 & 0.207 & 0.225 & 0.239\\
 $Q$ & 0.438 & 0.00699 & --- & 0.025 & 0.00288 & ---\\
-$\sigma_P$ & 0.111 & 0.0703 & 0.00204 & 0.167 & 0.0787 & 0.00168\\
-$\sigma_F$ & 0.323 & 0.346 & 0.328 & 0.321 & 0.345 & 0.329\\
-$\sigma_Y$ & 0.393 & 0.382 & 0.389 & 0.394 & 0.382 & 0.39\\
+$\sigma_P$ & 0.112 & 0.0699 & 0.00203 & 0.167 & 0.0789 & 0.00366\\
+$\sigma_F$ & 0.323 & 0.346 & 0.328 & 0.321 & 0.345 & 0.336\\
+$\sigma_Y$ & 0.393 & 0.382 & 0.389 & 0.394 & 0.382 & 0.393\\
 \hline
-$r$ & 0.047 & 0.163 & 0.495 & 0.415 & 0.45 & 0.497\\
-$K$ & 100000 & 18800 & 24500 & 9970 & 8240 & 7480\\
-$\bar{F}_5$ & 0.0104 & 0.181 & 0.388 & 0.19 & 0.429 & 0.214\\
+$r$ & 0.047 & 0.163 & 0.495 & 0.415 & 0.45 & 0.478\\
+$K$ & 100000 & 18800 & 24500 & 9970 & 8240 & 12500\\
+$\bar{F}_5$ & 0.0104 & 0.181 & 0.388 & 0.19 & 0.429 & 0.334\\
 \hline
 $p_0$ & 0.197 & 0.197 & 0.197 & 0.197 & 0.197 & 0.197\\
 $\tilde{r}$ & 0.486 & 0.486 & 0.486 & 0.486 & 0.486 & 0.486\\
 $\sigma_r$ & 0.8 & 0.8 & 0.8 & 0.1 & 0.1 & 0.1\\
-\hline
-\hline
-$-\log L$ & 199.03 & 192.65 & 270.87 & 198.95 & 195.04 & 195.1\\
-$n$ & 5 & 5 & 4 & 5 & 5 & 4\\
-$|G|_{max}$ & 9.2e-05 & 4.79e-05 & 0.138 & 2.17e-05 & 5.87e-05 & 1.32e-05\\
-\hline
-$\MSY$ & 1380 & 980 & 5530 & 1110 & 940 & 1010\\
-$\Fmsy$ & 0.116 & 0.92 & 0.436 & 0.205 & 0.294 & 0.249\\
-$Q$ & 0.0721 & 0.000774 & ~---~ & 0.0285 & 0.00235 & ~---~\\
-$\sigma_P$ & 0.233 & 0.234 & 0.321 & 0.245 & 0.231 & 0.319\\
-%$\sigma_Y$ & -1.46 & -1.45 & -1.14 & -1.41 & -1.46 & -1.14\\
-$\sigma_Y$ & 0.23 & 0.23 & 0.32 & 0.24 & 0.23 & 0.24\\
-\hline
-$r$ & 0.232 & 1.84 & 0.872 & 0.409 & 0.588 & 0.497\\
-$K$ & 23900 & 2130 & 25400 & 10900 & 6400 & 8140\\
-$\bar{F}_5$ & 0.0632 & 1.52 & 0.749 & 0.163 & 0.513 & 0.149\\
-\hline
-$p_0$ & 0.0492 & 0.0492 & 0.0492 & 0.0492 & 0.0492 & 0.0492\\
-$\tilde{r}$ & 0.486 & 0.486 & 0.486 & 0.486 & 0.486 & 0.486\\
-$\sigma_r$ & 0.8 & 0.8 & 0.8 & 0.2 & 0.2 & 0.2\\
 \hline
 \end{tabular}
 \end{center}
@@ -469,21 +427,21 @@ $\sigma_r$ & 0.8 & 0.8 & 0.8 & 0.2 & 0.2 & 0.2\\
 
 
 Models with region 2 indexing and region 4 indexing appear to be
-capable of accurately predicting catch,
-Figure~\ref{fig:mopcatch}. Low catches seem to be predicted
+equally capable of accurately predicting catch,
+Figure~\ref{fig:mopcatch}. Low catches ae predicted
 accurately, but some high catches are estimated with larger errors, as is
 expected with log-normal errors. 
-See Figure~\ref{fig:estFC} for more detail.
+See Figure~\ref{fig:estC} for more detail.
 
 
 \begin{figure}
 \begin{center}
-%\includegraphics[width=0.95\textwidth]{../4-gear-runs/multiOPcatch.pdf}
-\includegraphics[height=0.45\textheight]{./4-gear-runs_multiOPcatch.pdf}
+\includegraphics[height=0.45\textheight]{./multiOPcatch.pdf}
 \caption{Plot of predicted catch on observed catch for two indices of
 abundance.
 Open circles (o) indicate region 2 index; plus (+) symbols indicate
 region 4 index.
+Blue indicates $\sigma_r=0.8$; red indicates $\sigma_r=0.1$
 \label{fig:mopcatch}
 }
 \end{center}
@@ -503,12 +461,12 @@ both indexed models.
 \begin{tabular}{cc}
 A. Region 2 index; $\sigma_r=0.8$ &
 B. Region 4 index; $\sigma_r=0.8$ \\
-\includegraphics[height=0.35\textheight]{./4-gear-runs_r2_est_popB1.pdf} &
-\includegraphics[height=0.35\textheight]{./4-gear-runs_r4_est_popB1.pdf} \\
+\includegraphics[height=0.35\textheight]{./r2_est_popB1.pdf} &
+\includegraphics[height=0.35\textheight]{./r4_est_popB1.pdf} \\
 C. Region 2 index; $\sigma_r=0.1$ &
 D. Region 4 index; $\sigma_r=0.1$ \\
-\includegraphics[height=0.35\textheight]{./4-gear-runs_r2-sdrprior_est_popB1.pdf} &
-\includegraphics[height=0.35\textheight]{./4-gear-runs_r4-sdrprior_est_popB1.pdf} \\
+\includegraphics[height=0.35\textheight]{./r2-sdrprior_est_popB1.pdf} &
+\includegraphics[height=0.35\textheight]{./r4-sdrprior_est_popB1.pdf} \\
 \end{tabular}
 }
 \caption{Predicted biomass trends with different indices of abundance
@@ -889,41 +847,72 @@ MFCL Region 2 & MFCL Region 4\\
 \section{Additional Diagnostics}
 \label{sec:diagnostics}
 
-Figure~\ref{fig:estFC} shows the trends in fishing mortality and
-catch with different indices of abundance and values of the $r$
+Figures~\ref{fig:estC}~and~\ref{fig:estF} show 
+the trends in estimated catch add fishing mortality 
+with different indices of abundance and values of the $r$
 prior, $\sigma_r$.
-The solid brown lines in the upper panel show the estimated fishing
-mortality by fleet. The orange shaded areas represent the process
-error as $\pm 2\sigma_F$.
-The solid green lines in the lower panel show the predicted catch; $+$
-symbols indicate observed catch. 
-The light green shaded areas represent the observation error as 
-$\pm 2\sigma_Y$.
+%The solid brown lines in the upper panel show the estimated fishing
+%mortality by fleet. The orange shaded areas represent the process
+%error as $\pm 2\sigma_F$.
+%The solid green lines in the lower panel show the predicted catch; $+$
+%symbols indicate observed catch. 
+%The light green shaded areas represent the observation error as 
+%$\pm 2\sigma_Y$.
 The ordinate in each panel is scaled to the specific gear type.
 
 \begin{sidewaysfigure}
 \begin{center}
 {\scriptsize \sffamily
 \begin{tabular}{ccc}
-A. Region 2 index; $\sigma_r=0.8$ &
-B. Region 4 index; $\sigma_r=0.8$ &
-\\
-\multicolumn{2}{c}{Fishing Mortality}\\
+\multicolumn{2}{c}{{\small $\sigma_r=0.8$}}\\
+Region 2 Index & Region 4 Index\\
 \hline
-\includegraphics[width=0.30\textwidth]{./4-gear-runs_r2_est_FB1.pdf} &
-\includegraphics[width=0.30\textwidth]{./4-gear-runs_r4_est_FB1.pdf} &
+\includegraphics[width=0.30\textwidth]{./r2_est_catchB1.pdf} &
+\includegraphics[width=0.30\textwidth]{./r4_est_catchB1.pdf} &
 \\
-\multicolumn{2}{c}{Observed and Predicted Catch}\\
+\\
+\multicolumn{2}{c}{{\small $\sigma_r=0.1$}}\\
+Region 2 Index & Region 4 Index\\
+\\
 \hline
-\includegraphics[width=0.30\textwidth]{./4-gear-runs_r2_est_catchB1.pdf} &
-\includegraphics[width=0.30\textwidth]{./4-gear-runs_r4_est_catchB1.pdf} &
+\includegraphics[width=0.30\textwidth]{./r2-sdrprior_est_catchB1.pdf} &
+\includegraphics[width=0.30\textwidth]{./r4-sdrprior_est_catchB1.pdf} &
 \end{tabular}
 }
-\caption{Trends in estimated fishing mortality (top, orange) and 
-catch (bottom, green).
-\label{fig:estFC}}
+\caption{Trends in observed (+) and estimated catch (solid green
+line). The light green shaded areas represent the process error as 
+$\pm 2\sigma_Y$.
+\label{fig:estC}}
 \end{center}
 \end{sidewaysfigure}
+
+\begin{sidewaysfigure}
+\begin{center}
+{\scriptsize \sffamily
+\begin{tabular}{ccc}
+\multicolumn{2}{c}{{\small $\sigma_r=0.8$}}\\
+Region 2 Index & Region 4 Index\\
+\hline
+\includegraphics[width=0.30\textwidth]{./r2_est_FB1.pdf} &
+\includegraphics[width=0.30\textwidth]{./r4_est_FB1.pdf} &
+\\
+\\
+\multicolumn{2}{c}{{\small $\sigma_r=0.1$}}\\
+Region 2 Index & Region 4 Index\\
+\\
+\hline
+\includegraphics[width=0.30\textwidth]{./r2-sdrprior_est_FB1.pdf} &
+\includegraphics[width=0.30\textwidth]{./r4-sdrprior_est_FB1.pdf} &
+\end{tabular}
+}
+\caption{Trends in estimated fishing mortality (solid brown
+line). The orange shaded areas represent the process error as 
+$\pm 2\sigma_F$.
+\label{fig:estF}}
+\end{center}
+\end{sidewaysfigure}
+
+
 
 Figure~\ref{fig:estprod} places the model results in a fishery
 management context. The parabolic dashed red lines indicate the theoretical
@@ -935,7 +924,6 @@ literature.
 The parameter $\Fmsy$\ is the fishing mortality that would produce $\MSY$\
 at equilibrium. 
 
-
 \begin{sidewaysfigure}
 \begin{center}
 {\scriptsize \sffamily
@@ -944,9 +932,9 @@ A. Region 2 index; $\sigma_r=0.8$ &
 B. Region 4 index; $\sigma_r=0.8$ &
 C. No index; $\sigma_r=0.2$ \\
 \\
-\includegraphics[width=0.30\textwidth]{./4-gear-runs_r2_prodB1.pdf} &
-\includegraphics[width=0.30\textwidth]{./4-gear-runs_r4_prodB1.pdf} &
-\includegraphics[width=0.30\textwidth]{./4-gear-runs_r0-sdrprior_prodB1.pdf}\\
+\includegraphics[width=0.30\textwidth]{./r2_prodB1.pdf} &
+\includegraphics[width=0.30\textwidth]{./r4_prodB1.pdf} &
+\includegraphics[width=0.30\textwidth]{./r0-sdrprior_prodB1.pdf}\\
 \end{tabular}
 }
 \caption{Estimated production curves showing catch plotted against
@@ -982,13 +970,13 @@ distributed around the prior value.
 \begin{center}
 {\sffamily
 Model A\\
-\includegraphics[width=1.00\textwidth]{./4-gear-runs_r2_mcmc_posterior_row.pdf}\\
+\includegraphics[width=1.00\textwidth]{./r2_mcmc_posterior_row.pdf}\\
 ~\\
 Model B\\
-\includegraphics[width=1.00\textwidth]{./4-gear-runs_r4_mcmc_posterior_row.pdf}\\
+\includegraphics[width=1.00\textwidth]{./r4_mcmc_posterior_row.pdf}\\
 ~\\
 Model C\\
-\includegraphics[width=1.00\textwidth]{./4-gear-runs_r0-sdrprior_mcmc_posterior_row.pdf}\\
+%\includegraphics[width=1.00\textwidth]{./r0-sdrprior_mcmc_posterior_row.pdf}\\
 }
 \end{center}
 \caption{Posterior distributions of parameter estimates from $10^6$
@@ -1004,21 +992,12 @@ vertical red line is the prior.
 \end{sidewaysfigure}
 
 
-%\documentclass[12pt,letterpaper]{article}
-%\usepackage{amsmath}
-%\usepackage{amsfonts}
-%\usepackage{rotating}
-%
-%\newcommand\MSY{\widetilde{Y}}
-%\newcommand\Fmsy{F_{\MSY}}
-
-%\begin{document}
-%\small
-
-
-
 \begin{sidewaystable}
+\caption{Correlation coefficients between parameter estimates for four
+models.
+\label{tab:correl}}
    \begin{tabular}[h]{cc}
+
       \begin{minipage}[t]{0.5\textwidth}
          \scriptsize
       %  \input r2/cor_summary
@@ -1123,18 +1102,6 @@ $K$&0.53&-0.78&-0.10&0.06&-0.03&0.96&-0.78&1.00\\
       \end{minipage}\\
    \end{tabular}%[h]{cc}
 \end{sidewaystable}
-
-%\input cor_summary
-
-
-%\end{document}
-
-%\begin{center}
-%\begin{tabular}{lrrrrrrrr}
-%\end{tabular}
-%\end{center}
-
-
 
 
 \clearpage

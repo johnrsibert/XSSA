@@ -278,7 +278,7 @@ get.diagnostics=function(log,ntime=61,dt=1,ngear=4,block=NULL,mtype='i')
    if (is.na(ests$logsdlogProc))
       ests$logsdlogProc = ests$logsdlogBProc
 
-   ests$sdlogBProc = exp(ests$logsdlogBProc)
+   ests$sdlogBProc = signif(exp(ests$logsdlogBProc),3)
    ests$sdlogFmort = extract.value("sdlogFmort:",log)
    ests$sdlogYield = extract.value("sdlogYield:",log)
    ests$sdlogI     = extract.value("sdlogI:",log)
@@ -662,9 +662,19 @@ plot.multi.obs.pred.catch=function(path.list=c("r2","r2-sdrprior"),
    abline(v=par("usr")[1],lwd=3)
    pcol = 1
    ppch = 1
+   clist = c("blue","red") 
    for(p in path.list)
    {
-      pcol = pcol + 1
+      if (length(grep("2",p)) > 0)
+         ppch = 1 # o
+      else
+         ppch = 3 # +
+
+      if (nchar(p) > 2)
+         pcol = 2 # red
+      else
+         pcol = 1 # blue
+         
       file = paste(p,"/issams6.rep",sep="")
       rep = read.rep.diagnostics(file=file, ntime=ntime, dt=dt,
                               ngear=ngear, block=blocak, mtype=mtype)
@@ -675,9 +685,10 @@ plot.multi.obs.pred.catch=function(path.list=c("r2","r2-sdrprior"),
 
       for (g in 1:ngear)
       {
-         points(obs[,g],pred[,g],pch=ppch)#,col = pcol)#,pch=16,col=g+1)
+      #  points(obs[,g],pred[,g],pch=ppch)
+         points(obs[,g],pred[,g],col = clist[pcol],pch=ppch) #,col=g+1)
       }
-      ppch = 3
+   #  ppch = 3
       
    }
    save.png.plot("multiOPcatch",width=6.5,height=6.5)
