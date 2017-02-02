@@ -224,8 +224,8 @@ Biomass estimates from the most recent WCPFC stock
 assessment (Davies, et al. 2014) are convenient potential abundance
 indices. The assessment method used by the
 WCPFC is spatially structured and estimates biomass in several regions
-in the Pacific Ocean. The boundary between two of these
-regions passes directly through the MHI (Figure~\ref{fig:mhimap}).
+in the Pacific Ocean. The boundary between regions 2 and 4 passes
+directly through the MHI (Figure~\ref{fig:mhimap}).
 Biomass estimates from both regions were evaluated as abundance indices.
 
 The logistic parameters $r$ and $K$ are notoriously difficult to estimate
@@ -256,7 +256,7 @@ two, $\sigma_N$ and $\sigma_I$, pertain to the evolution of biomass over
 time. It is assumed that these two standard deviations can be
 represented by a single parameter, $\sigma_P$. The third standard
 deviation, $\sigma_F$, pertains to the fishing mortality.
-\goodbreak
+\pagebreak[2]
 The general form of the state space {\bf observation model} is
 \begin{equation}
 x_t = O(\alpha_t) + \varepsilon_t
@@ -353,11 +353,11 @@ where $m$ is the number of time steps in the catch time series and
 $\theta=\left\{\MSY,\Fmsy,Q,\sigma_P,\sigma_F,\sigma_Y\right\}$ 
 is a vector of model parameters (Table~\ref{tab:allvars1}).
 The model is implemented in ADMB-RE (Fournier et al. 2012) and
-applied to a 61 year ($m=61$) time series of observed
+applied to a 61 year ($m=61$) time series of reported commercial
 catch by four fishing gears from 1952 through 2012
 (Figure~\ref{fig:data}).
 Data preparation is described in Appendix~\ref{sec:data}.
-Noncommercial fishers may land substantial quantities of YFT, but
+Noncommercial fishers land substantial quantities of YFT, but
 reliable data from this sector of the fishery are not currently
 available. The effects of omitting the noncommercial catch is
 discussed briefly in Appendix~\ref{sec:klingon}.
@@ -425,14 +425,13 @@ $\sigma_r$ & 0.8 & 0.8 & 0.8 & 0.1 & 0.1 & 0.1\\
 }
 \end{table}
 
-
 Models with region 2 indexing and region 4 indexing appear to be
 equally capable of accurately predicting catch,
-Figure~\ref{fig:mopcatch}. Low catches ae predicted
+Figure~\ref{fig:mopcatch}. Low catches are predicted
 accurately, but some high catches are estimated with larger errors, as is
 expected with log-normal errors. 
 See Figure~\ref{fig:estC} for more detail.
-
+\pagebreak[4]
 
 \begin{figure}
 \begin{center}
@@ -441,18 +440,22 @@ See Figure~\ref{fig:estC} for more detail.
 abundance.
 Open circles (o) indicate region 2 index; plus (+) symbols indicate
 region 4 index.
-Blue indicates $\sigma_r=0.8$; red indicates $\sigma_r=0.1$
+Blue indicates $\sigma_r=0.8$; red indicates $\sigma_r=0.1$.
+The black line has a slope of 1 and passes through the origin.
 \label{fig:mopcatch}
 }
 \end{center}
 \end{figure}
 
-Estimated biomass tracks abundance indices for both indexed models
+Estimated biomass tracks abundance indices for all models,
 Figure~\ref{fig:estbiomass}, and the abundance indices lie within the
 process error of the biomass trend.
-The maxima of the estimated biomass trends exceed the
-estimated equilibrium biomass ($K$) for substantial period of time for
-both indexed models.
+The maxima of the estimated biomass trends may exceed the
+estimated equilibrium biomass ($K$) for varying periods of time for
+all models.
+In the case of the region 2, $\sigma_r=0.8$, model,
+the estimated biomass and exceeds $K$
+for most of the time series.
 
 
 \begin{figure}
@@ -471,8 +474,8 @@ D. Region 4 index; $\sigma_r=0.1$ \\
 }
 \caption{Predicted biomass trends with different indices of abundance
 and values of $\sigma_r$.
-Blue lines indicate the estimated biomass in metric tons (mt).
-The purple line indicates the index of abundance.
+Blue lines indicate the estimated biomass in metric tons (mt);
+purple lines indicates the index of abundance.
 The light blue shaded areas represent the process error as 
 $\pm 2\sigma_P$.
 The equilibrium biomass $K$ is indicated by the blue dot-dash line.
@@ -482,33 +485,24 @@ Note that the scale of the ordinate is different in each panel.
 \end{figure}
 
 The average total YFT catch in the MHI for the most recent 5 years
-is 818 mt, well below the estimated $\MSY$ for region 2 model, but
-slightly above the estimate $\MSY$ fir the region 4 model.
-The average estimated fishing mortality for the most recent 5 years 
-is 0.0632, 1.52 and 0.149 for models A, B and C respectively
-(Table \ref{tab:ests1}).
-Models A and C estimate the current fishing mortality to be about half
-of $\Fmsy$.  Model B (region 4 indexing) estimates the current fishing
-mortality to be greater than $\Fmsy$.
+is 818 mt. The estimated $\MSY$ is higher than this average for all
+models except the region 4 index with $\sigma_r=0.1$.
+The estimated average fishing mortality for the last 5 years is below
+the estimated $\Fmsy$ for both region 2 models, but above estimated
+$\Fmsy$ for the region 4 models; see Table~\ref{tab:ests1}.
 
 \section*{Discussion}
 Failure of the model to converge to a solution without an index of
-abundance and using the loose prior on $r$ (Table~ \ref{tab:ests1})
+abundance (Table~ \ref{tab:ests1})
 indicates that the data lack sufficient information for this model.
-The qualitative similarity between the biomass trajectories predicted
-by models A and C suggests that
-there is sufficient information in the
-data to estimate a biomass trend similar to region 2 without
-an index of abundance, but that additional information is
-required to scale the trend.
-An index of abundance or an informative prior
-constraint on a parameter are
-alternative assumptions that provide additional information to a model
-to constrain model behavior.
+An informative prior constraint on a parameter or an index of abundance are 
+additional assumptions that provide information to a model
+to constrain its behavior.
 Interpretations of these two assumptions are quite different. 
 Assuming a prior value for $r$ implies {\it a priori} knowledge of stock
 productivity, and imposing a low standard deviation around the
-prior implies a high level of certainty. On the other hand,
+prior implies a high level of certainty about its value.
+On the other hand,
 assuming that local stock size is proportional to stock size in
 a larger geographic range
 implies that factors mediating the abundance
@@ -516,17 +510,16 @@ of the local stock are similar to those mediating the
 abundance in the larger area.
 
 MFCL Regions 2 and 4 differ from one another in their oceanography,
-ecology and fisheries (Appendix~\ref{sec:index}). 
+ecology and fisheries (Appendix~\ref{sec:index}).
 Region 2 is outside the center of abundance for yellowfin in the
-WCPO, appears to have a smaller stock, and Davies et al. (2014)
+WCPO, appears to have a relatively small YFT stock, and Davies et al. (2014)
 estimate that region 2 has experienced relatively minor fishery impact.
-In contrast, region 4 hosts some of the largest fisheries in the WCPO,
+In contrast, region 4 straddles the equatorial center of YFT abundance,
+appears to have a larger stock, hosts some of the largest fisheries in the WCPO,
 produces a large proportion of the total WCPO yellowfin catch, and
 Davies et al. (2014) estimate that region 4 has experienced
 the largest impact of the fishery of any of the MFCL regions.
-On the basis of low levels of exploitation and the location of the
-Hawaiian archipelago in the North Pacific Tropical Gyre province, MFCL
-region 2 would seem {\it a priori} to be the best choice for
+Region 2, therefore, is the best {\it a priori} choice for
 an index of abundance.
 
 The random walk representation of fishing mortality enables
@@ -541,12 +534,13 @@ Current catches ($\bar{Y}_5$) are less than model estimates of maximum
 sustainable yield ($\MSY$) for all model variants. 
 Estimates of current fishing mortality ($\bar{F}_5$) are less than
 estimates of fishing mortality at maximum sustainable yield ($\Fmsy$)
-for all models except model B (region 4 index of abundance).
+for all models with region 2 index of abundance.
 If fishery managers were to adopt $\MSY$ and $\Fmsy$ as management
 reference points, the conclusion would be that the local stock is not
 overfished and that overfishing is not occurring.
 
-The model presented here is a promising approach to assessing a local
+The model presented here is a promising, if preliminary,
+approach to assessing a local
 portion of a larger fish stock in a way that provides useful advice to
 local fisheries managers. The current model is clearly in need of
 further development. Estimates of noncommercial catch (and possibly
@@ -556,7 +550,7 @@ resolved. One hopes that the
 next round of  WCPFC stock assessments will realign
 the MFCL regions to be more consistent
 with the Longhurst (1998) ecological provinces so that the entire
-Hawaiian Archipelago lies within a single region. 
+Hawaiian Archipelago lies within a single stock assessmemt region. 
 A region that aligns approximately with  the North Pacific Tropical
 Gyre Province would be the best choice for an index of abundance for
 the MHI.
@@ -814,7 +808,7 @@ abundance.
 \begin{figure}
 \begin{center}
 %\includegraphics[width=\textwidth]{./paczones.pdf}
-\includegraphics[height=0.45\textheight]{./paczones.pdf}
+\includegraphics[width=1.10\textwidth]{./paczones.pdf}
 \caption{Map of the central north Pacific Ocean showing selected \MFCL\
 stock assessment regions (blue lines and numbers) and 
 Longhurst (1998) ecological provinces (dashed green lines and labels);
@@ -927,14 +921,14 @@ at equilibrium.
 \begin{sidewaysfigure}
 \begin{center}
 {\scriptsize \sffamily
-\begin{tabular}{ccc}
-A. Region 2 index; $\sigma_r=0.8$ &
-B. Region 4 index; $\sigma_r=0.8$ &
-C. No index; $\sigma_r=0.2$ \\
-\\
+\begin{tabular}{cc}
+Region 2; $\sigma_r = 0.8$ & Region 4; $\sigma_r = 0.8$ \\
 \includegraphics[width=0.30\textwidth]{./r2_prodB1.pdf} &
-\includegraphics[width=0.30\textwidth]{./r4_prodB1.pdf} &
-\includegraphics[width=0.30\textwidth]{./r0-sdrprior_prodB1.pdf}\\
+\includegraphics[width=0.30\textwidth]{./r4_prodB1.pdf} \\
+\\
+Region 4; $\sigma_r = 0.1$ & Region 4; $\sigma_r = 0.1$ \\
+\includegraphics[width=0.30\textwidth]{./r2-sdrprior_prodB1.pdf} &
+\includegraphics[width=0.30\textwidth]{./r4-sdrprior_prodB1.pdf} \\
 \end{tabular}
 }
 \caption{Estimated production curves showing catch plotted against
@@ -957,26 +951,26 @@ Chain Monte Carlo simulations. Some parameters are clearly estimated
 more accurately than others. The process and observation error
 estimates have well defined modes and appear to be normally
 distributed around their point estimates. The distributions of other
-parameters depends on the model. For model B, indexed to a
-biomass trajectory with a well defined trend, estimates of $\MSY$,
-$\Fmsy$, and $Q$ also seem well defined.
-The corresponding estimates are more ambiguous for model A.
+parameters depends on the abundance index and value of $\sigma_r$.
 Figure~\ref{fig:posteriors} also demonstrates the pervasive (some
-might say pernicious) effects of using an informative prior on $r$. Estimates
-of all parameters that depend on $r$ appear to be normally
-distributed around the prior value.
+might say pernicious) effects of using an informative prior on $r$.
+
 
 \begin{sidewaysfigure}
 \begin{center}
 {\sffamily
-Model A\\
+A. Region 2; $\sigma_r=0.8$\\
 \includegraphics[width=1.00\textwidth]{./r2_mcmc_posterior_row.pdf}\\
 ~\\
-Model B\\
+B. Region 4; $\sigma_r=0.8$\\
 \includegraphics[width=1.00\textwidth]{./r4_mcmc_posterior_row.pdf}\\
 ~\\
-Model C\\
-%\includegraphics[width=1.00\textwidth]{./r0-sdrprior_mcmc_posterior_row.pdf}\\
+C. Region 2; $\sigma_r=0.1$\\
+\includegraphics[width=1.00\textwidth]{./r2-sdrprior_mcmc_posterior_row.pdf}\\
+~\\
+D. Region 4; $\sigma_r=0.1$\\
+\includegraphics[width=1.00\textwidth]{./r4-sdrprior_mcmc_posterior_row.pdf}\\
+~\\
 }
 \end{center}
 \caption{Posterior distributions of parameter estimates from $10^6$
@@ -1003,7 +997,7 @@ models.
       %  \input r2/cor_summary
 
 \begin{center}
-{\Large A. Region 2; $\sigma_r = 0.8$}\\
+{\normalsize A. Region 2; $\sigma_r = 0.8$}\\
 ~\\
 \begin{tabular}{|lrrrrrrrr|}
 %\multicolumn{9}{c}{{\Large A. Region 2; $\sigma_r = 0.8$}}\\
@@ -1028,7 +1022,7 @@ $K$&0.99&0.07&0.07&0.01&-0.00&1.00&0.07&1.00\\
       %  \input r4/cor_summary
 
 \begin{center}
-{\Large B. Region 4; $\sigma_r = 0.8$}\\
+{\normalsize B. Region 4; $\sigma_r = 0.8$}\\
 ~\\
 \begin{tabular}{|lrrrrrrrr|}
 %\multicolumn{9}{c}{{\Large B. Region 4; $\sigma_r = 0.8$}}\\
@@ -1055,7 +1049,7 @@ $K$&-0.50&-0.94&-0.26&0.01&0.01&0.99&-0.94&1.00\\
       %  \input r2-sdrprior/cor_summary
 
 \begin{center}
-{\Large C. Region 2; $\sigma_r = 0.1$}\\
+{\normalsize C. Region 2; $\sigma_r = 0.1$}\\
 ~\\
 \begin{tabular}{|lrrrrrrrr|}
 %\multicolumn{9}{c}{{\Large C. Region 2; $\sigma_r = 0.1$}}\\
@@ -1081,7 +1075,7 @@ $K$&0.93&-0.39&-0.05&0.05&-0.02&0.98&-0.39&1.00\\
 
 
 \begin{center}
-{\Large D. Region 4; $\sigma_r = 0.1$}\\
+{\normalsize D. Region 4; $\sigma_r = 0.1$}\\
 ~\\
 \begin{tabular}{|lrrrrrrrr|}
 %\multicolumn{9}{c}{{\Large D. Region 4; $\sigma_r = 0.1$}}\\
