@@ -231,7 +231,8 @@ plot.diagnostics=function(dat=NULL,file="diagnostics.dat",dt,ngear,
 }
 
 log.diagnostics=function(file="issams6_program.log",ntime=61,dt=1,ngear=4,
-                         plot.Fmort=FALSE,plot.prod=FALSE,plot.impact=FALSE)
+                         plot.Fmort=FALSE,plot.prod=FALSE,plot.impact=FALSE,
+                         klingon=FALSE)
 {
       
    print(paste("Scanning file",file))
@@ -248,7 +249,7 @@ log.diagnostics=function(file="issams6_program.log",ntime=61,dt=1,ngear=4,
 #  while (c != 'q')
    while ( (c != 'q') && (c != 'x') )
    {
-      tmp=get.diagnostics(log,ntime=ntime,dt=dt,ngear=ngear,block=counter,mtype="i")
+      tmp=get.diagnostics(log,ntime=ntime,dt=dt,ngear=ngear,block=counter,mtype="i",klingon)
       print(names(tmp))
     # print(tmp)
 
@@ -376,7 +377,7 @@ log.diagnostics=function(file="issams6_program.log",ntime=61,dt=1,ngear=4,
 
 
 # read.rep.files(c("r2","r4","r0","r2-sdrprior","r4-sdrprior","r0-sdrprior"))->junk
-read.rep.files=function(path.list,ngear=4,npar=6)
+read.rep.files=function(path.list,ngear=4,npar=6,klingon=FALSE)
 {
    print(path.list)
    have.names=FALSE
@@ -386,7 +387,7 @@ read.rep.files=function(path.list,ngear=4,npar=6)
    {
       path = paste("./",p,"/issams",npar,".rep",sep="")
       rep = read.rep.diagnostics(path,ntime=61,dt=1,ngear=ngear,
-                                block=NULL, mtype='i')
+                                block=NULL, mtype='i',klingon)
       print("names(rep):")
       print(names(rep))
 

@@ -202,7 +202,7 @@ plot.production=function(Fmort, obsC, predC, t, r, K, block=NULL)
 
 
 read.rep.diagnostics=function(file="issams6.rep", ntime=61,dt=1,ngear=4,
-                              block=NULL, mtype='i')
+                              block=NULL, mtype='i',klingon=FALSE)
 {
 
    print(paste("Scanning file",file))
@@ -210,7 +210,7 @@ read.rep.diagnostics=function(file="issams6.rep", ntime=61,dt=1,ngear=4,
    print("head(rep):")
    print(head(rep))
 
-   ests=get.diagnostics(rep,ntime=ntime,dt=dt,ngear=ngear,block=NULL)
+   ests=get.diagnostics(rep,ntime=ntime,dt=dt,ngear=ngear,block=NULL,klingon=klingon)
    return(ests)
 }
 
@@ -244,12 +244,14 @@ extract.value=function(text,text.list,sig.fig=3)
 }
 
 
-get.diagnostics=function(log,ntime=61,dt=1,ngear=4,block=NULL,mtype='i')
+get.diagnostics=function(log,ntime=61,dt=1,ngear=4,block=NULL,mtype='i',klingon=FALSE)
 {
 
 #  print(paste("Scanning file",file))
 #  log = scan(file,what="character")
 ## print(length(log))
+   if (klingon)
+      ngear = ngear + 1
    res = grep("Residuals:",log)
    nblock = length(res)
    print(paste(nblock,"residual blocks found"))
@@ -322,10 +324,13 @@ get.diagnostics=function(log,ntime=61,dt=1,ngear=4,block=NULL,mtype='i')
 
    # correct indexing for ngear
    Fndx=c(seq(5,(4+ngear)))
+   print(Fndx)
    predCndx=c(seq((5+ngear),(4+2*ngear)))
    obsCndx=c(seq((5+2*ngear),(4+3*ngear)))
+   print(predCndx)
 
    totalF = rowSums(exp(resid[,Fndx]))
+   print(paste("ntime:",ntime))
    ests$lastF = signif(mean(totalF[seq(ntime-4,ntime)]),3)
    print(paste("Last 5 year total average F:",ests$lastF))
    totalC = rowSums(exp(resid[,obsCndx]))

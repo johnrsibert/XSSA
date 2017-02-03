@@ -256,7 +256,8 @@ two, $\sigma_N$ and $\sigma_I$, pertain to the evolution of biomass over
 time. It is assumed that these two standard deviations can be
 represented by a single parameter, $\sigma_P$. The third standard
 deviation, $\sigma_F$, pertains to the fishing mortality.
-\pagebreak[2]
+\pagebreak[4]
+
 The general form of the state space {\bf observation model} is
 \begin{equation}
 x_t = O(\alpha_t) + \varepsilon_t
@@ -329,7 +330,7 @@ $\tilde{r}$ & An {\it a priori} assumed value for $r$ (\peryr)\\
 $\sigma_r$  & Assumed standard deviation of $r$ around its prior,\\
             & fixed at $\sigma_r=0.8$ or $\sigma_r=0.1$ (\peryr).\\
 $\bar{Y}_5$ & Average of total observed catch\\
-            & for the most recent five years (mt).\\
+            & for the most recent five years (818 mt).\\
 \hline
 \end{tabular}
 \end{center}
@@ -425,13 +426,13 @@ $\sigma_r$ & 0.8 & 0.8 & 0.8 & 0.1 & 0.1 & 0.1\\
 }
 \end{table}
 
+\pagebreak[4]
 Models with region 2 indexing and region 4 indexing appear to be
 equally capable of accurately predicting catch,
 Figure~\ref{fig:mopcatch}. Low catches are predicted
 accurately, but some high catches are estimated with larger errors, as is
 expected with log-normal errors. 
 See Figure~\ref{fig:estC} for more detail.
-\pagebreak[4]
 
 \begin{figure}
 \begin{center}
@@ -495,7 +496,7 @@ $\Fmsy$ for the region 4 models; see Table~\ref{tab:ests1}.
 Failure of the model to converge to a solution without an index of
 abundance (Table~ \ref{tab:ests1})
 indicates that the data lack sufficient information for this model.
-An informative prior constraint on a parameter or an index of abundance are 
+An informative prior constraint on a parameter and an index of abundance are 
 additional assumptions that provide information to a model
 to constrain its behavior.
 Interpretations of these two assumptions are quite different. 
@@ -511,7 +512,7 @@ abundance in the larger area.
 
 MFCL Regions 2 and 4 differ from one another in their oceanography,
 ecology and fisheries (Appendix~\ref{sec:index}).
-Region 2 is outside the center of abundance for yellowfin in the
+Region 2 is outside the center of abundance for YFT in the
 WCPO, appears to have a relatively small YFT stock, and Davies et al. (2014)
 estimate that region 2 has experienced relatively minor fishery impact.
 In contrast, region 4 straddles the equatorial center of YFT abundance,
@@ -530,7 +531,7 @@ $F_{g,t}$ rather than as episodes of low stock size.
 These features enable the model to estimate catch
 from the estimated stock extremely accurately.
 
-Current catches ($\bar{Y}_5$) are less than model estimates of maximum
+Current catches ($\bar{Y}_5=818$) are less than model estimates of maximum
 sustainable yield ($\MSY$) for all model variants. 
 Estimates of current fishing mortality ($\bar{F}_5$) are less than
 estimates of fishing mortality at maximum sustainable yield ($\Fmsy$)
@@ -760,7 +761,7 @@ Both models are age structured, spatially structured, and have been
 applied to YFT.
 \SD\ is an ocean basin scale model with 1\deg{} spatial resolution,
 whereas the \MFCL\ yellowfin assessment model is constrained to the
-western Pacific and partitions the model domain into 9 regions.
+western Pacific and partitions the model domain into 9 regions,
 Figure~\ref{fig:mfclregions}.
 The spatial resolution of the \SD\ model would make it an ideal
 candidate for computing an index of abundance, but the model and its
@@ -785,7 +786,7 @@ The Hawaiian archipelago lies in the eastern extension of Longhurst's
 (1998) North Pacific Tropical Gyre Province (NPTG), 
 Figure~\ref{fig:paczones}.
 The boundary between MFCL regions 2 and 4 splits both MHI and the NPTG.
-Region 2 includes the northern extent of the range of YFT, and the MFCL
+Region 2 includes the northern extent of the range of YFT. The MFCL
 assessment concludes that the YFT biomass is relatively low and that
 the impact of the WCPO fisheries has been relatively minor.
 In contrast, region 4 lies in primarily in the Western Pacific Warm
@@ -1110,71 +1111,74 @@ United States National Oceanic and Atmospheric Administration are
 collaborating to improve survey methods for the Hawai`i Marine
 Recreational Fishing Survey (HMRFS). The HMRFS Newsletter (DLNR, 2011)
 reports that non-commercial catches of YFT range between 2300 and 6900
-mt from 2003 through 2010, considerably in excess of the most recent
+mt from 2003 through 2010,  roughly 3 to 10 times greater than the most recent
 commercial catch. The assessment model developed here has the capability to
 augment the reported catch with catch by an additional fleet in
 proportion to the total reported catch and use the augmented catch in
-the assessment as if it were reported.
+the assessment as if it were reported. Region 2 indexing was used with
+both loose and tight priors on $r$.  Four different multipliers
+were tested so that the augmented catch was 1, 2, 5, and 10 times total catch.
 
-Tables~\ref{tab:k2} and \ref{tab:k0} summarize the results of
-attempting to fit the observed catch data augmented by 
-different multiples of the total catch. Four different multipliers
-were tested, 1, 2, 5, and 10 times total catch.
+Tables~\ref{tab:k2} and \ref{tab:k2-rprior} summarize the results of
+fiting the augmented catch.
 All 8 augmented catch models converge to solutions. The negative
-log likelihood values are higher than the non-augmented fits as would
-be expected with more data points.
+log likelihood values are higher than comparable non-augmented fits.
 {\it A priori} one would expect that a fish population capable
 of producing a higher than reported yield over a 60 year history
-would have a higher productivity and a higher biomass. The results of
-the augmented catch parameter estimates are generally consistent with
-this conclusion. 
-The model compensates for the higher catch by
-increasing $\MSY$ in all models. $\Fmsy$\ increases slightly, but the
-prior on $r$ constrains the increases. $Q$ increases in
-the abundance index models. $\bar{F}_5$ decreases substantially in the
-models without an abundance index.
+would have a higher productivity and a higher biomass. These results
+are generally consistent with this conclusion. 
+The model compensates for the higher catch by estimating higher
+$\MSY$ and higher $K$ in all models, 
+whereas estimates $\Fmsy$\ and $r$ are relatively unchanged by the
+augmented catch.
+Estimates of $\bar{F}_5$ increase in models with $\sigma_r=0.8$ but
+change very little in models with $\sigma_r=0.1$.
+The $\sigma_r=0.8$ model estimates that the fishery is sustainable
+with a total yield about 5 times the current reported yield.
+The $\sigma_r=0.1$ model forces a much higher $\Fmsy$. In consequence,
+this form of the model estimates a sustainable fishery with yields at
+least 10 times current reported yield. 
 
-This simple catch augmentation simulation indicates that the unreported
+This simple catch augmentation simulation indicates that unreported
 noncommercial catch causes this model to underestimate maximum
 sustainable yield and the fishing mortality at maximum sustainable
-yield when applied to the available reported catch data.
-More realistic simulations should be developed to evaluate this
-problem.
-
-
+yield when applied to the available reported catch data. To put this
+conclusion in a different context, fishers should report their catch
+if they want a higher yield from a managed fishery.
 
 \begin{table}
 {\small
 \caption{Results of fitting the model to 4 different multiples of the
 total catch using MFCL Region 2 as an index of abundance and a loose
-prior on $r, \sigma_r = 0.8$, comparable to model A in
-Table~\ref{tab:ests1}. 
+prior on $r, \sigma_r = 0.8$, comparable to Table~\ref{tab:ests1}. 
 See Table~\ref{tab:allvars1} for definitions of all variables.
 \label{tab:k2}}
 \begin{center}
-\begin{tabular}{|l|r|rrrr|}
+%\begin{tabular}{|l|r|rrrr|}
+\begin{tabular}{|l|rrrr|}
 \hline
-Multiplier & A & 1 & 2 & 5 & 10\\
+Multiplier & 1 & 2 & 5 & 10\\
 \hline
+&k1 & k2 & k5 & k10\\
+$-\log L$ & 181.75 & 181.77 & 181.97 & 182.84\\
+$n$ & 6 & 6 & 6 & 6\\
+$|G|_{max}$ & 8.32e-05 & 6.87e-05 & 6.24e-05 & 5.6e-05\\
 \hline
-$-\log L$ & 199.03 & 220.1 & 220.12 & 220.14 & 220.14\\
-$n$ & 5 & 5 & 5 & 5 & 5\\
-$|G|_{max}$ & 9.2e-05 & 2.56e-05 & 4.44e-05 & 2.96e-05 & 5.97e-06\\
+$\MSY$ & 2240 & 2740 & 2810 & 3070\\
+$\Fmsy$ & 0.0237 & 0.0237 & 0.0237 & 0.0248\\
+$Q$ & 0.819 & 1 & 1 & 1\\
+$\sigma_P$ & 0.112 & 0.112 & 0.112 & 0.113\\
+$\sigma_F$ & 0.295 & 0.295 & 0.295 & 0.294\\
+$\sigma_Y$ & 0.358 & 0.358 & 0.358 & 0.358\\
 \hline
-$\MSY$ & 1380 & 2560 & 3880 & 7820 & 14400\\
-$\Fmsy$ & 0.116 & 0.123 & 0.123 & 0.123 & 0.123\\
-$Q$ & 0.0721 & 0.122 & 0.185 & 0.375 & 0.691\\
-$\sigma_P$ & 0.233 & 0.234 & 0.234 & 0.234 & 0.234\\
-$\sigma_Y$ & -1.46 & -1.45 & -1.45 & -1.45 & -1.45\\
+$r$ & 0.0474 & 0.0474 & 0.0475 & 0.0495\\
+$K$ & 189000 & 232000 & 237000 & 248000\\
+$\bar{F}_5$ & 0.0111 & 0.0136 & 0.0270 & 0.0485\\
 \hline
-$r$ & 0.232 & 0.246 & 0.246 & 0.245 & 0.245\\
-$K$ & 23900 & 41700 & 63100 & 128000 & 235000\\
-$\bar{F}_5$ & 0.0632 & 0.0745 & 0.0739 & 0.0733 & 0.0729\\
-\hline
-$p_0$ & 0.0492 & 0.0492 & 0.0492 & 0.0492 & 0.0492\\
-$\tilde{r}$ & 0.486 & 0.486 & 0.486 & 0.486 & 0.486\\
-$\sigma_r$ & 0.8 & 0.8 & 0.8 & 0.8 & 0.8\\
-$\bar{Y}_5$ & 818 & 1630 & 2450 & 4890 & 8960\\
+$p_0$ & 0.197 & 0.197 & 0.197 & 0.197\\
+$\tilde{r}$ & 0.486 & 0.486 & 0.486 & 0.486\\
+$\sigma_r$ & 0.8 & 0.8 & 0.8 & 0.8\\
+$\bar{Y}_5$ & 1630 & 2450 & 4890 & 8960\\
 \hline
 \end{tabular}
 \end{center}
@@ -1186,34 +1190,38 @@ $\bar{Y}_5$ & 818 & 1630 & 2450 & 4890 & 8960\\
 
 \begin{table}
 {\small
-\caption{Results of fitting the model to different multiples of the
-total catch with no index of abundance and a tighter
-prior on $r, \sigma_r = 0.2$, comparable to model C in Table~\ref{tab:ests1}.
+\caption{Results of fitting the model to 4 different multiples of the
+total catch using MFCL Region 2 as an index of abundance and a tighter
+prior on $r, \sigma_r = 0.1$, comparable to Table~\ref{tab:ests1}. 
 See Table~\ref{tab:allvars1} for definitions of all variables.
-\label{tab:k0}}
+\label{tab:k2-rprior}}
 \begin{center}
-\begin{tabular}{|l|r|rrrr|}
+%\begin{tabular}{|l|r|rrrr|}
+\begin{tabular}{|l|rrrr|}
 \hline
-Multiplier & C & 1 & 2 & 5 & 10\\
+Multiplier  & 1 & 2 & 5 & 10\\
 \hline
+&k1 & k2 & k5 & k10\\
+$-\log L$ & 194.64 & 194.63 & 194.58 & 194.56\\
+$n$ & 6 & 6 & 6 & 6\\
+$|G|_{max}$ & 9.36e-05 & 4.46e-05 & 2.7e-05 & 7.46e-05\\
 \hline
-$-\log L$ & 195.1 & 217.51 & 217.53 & 217.54 & 217.54\\
-$n$ & 4 & 4 & 4 & 4 & 4\\
-$|G|_{max}$ & 1.32e-05 & 1.62e-05 & 6.35e-05 & 4.14e-05 & 5.7e-05\\
+$\MSY$ & 2060 & 3110 & 6260 & 11500\\
+$\Fmsy$ & 0.208 & 0.208 & 0.208 & 0.208\\
+$Q$ & 0.0495 & 0.0747 & 0.15 & 0.277\\
+$\sigma_P$ & 0.169 & 0.169 & 0.167 & 0.167\\
+$\sigma_F$ & 0.291 & 0.291 & 0.291 & 0.291\\
+$\sigma_Y$ & 0.357 & 0.357 & 0.357 & 0.358\\
 \hline
-$\MSY$ & 1010 & 62100000 & 1.16e+11 & 4.41e+10 & 6.14e+10\\
-$\Fmsy$ & 0.249 & 0.244 & 0.244 & 0.244 & 0.244\\
-$\sigma_P$ & 0.319 & 0.295 & 0.295 & 0.295 & 0.295\\
-$\sigma_Y$ & -1.14 & -1.22 & -1.22 & -1.22 & -1.22\\
+$r$ & 0.415 & 0.415 & 0.416 & 0.416\\
+$K$ & 19800 & 29900 & 60200 & 111000\\
+$\bar{F}_5$ & 0.191 & 0.191 & 0.191 & 0.191\\
 \hline
-$r$ & 0.497 & 0.488 & 0.488 & 0.488 & 0.488\\
-$K$ & 8140 & 5.1e+08 & 9.56e+11 & 3.62e+11 & 5.04e+11\\
-$\bar{F}_5$ & 0.149 & 3.17e-06 & 2.50e-09 & 1.24e-08 & 1.77e-08\\
-\hline
-$p_0$ & 0.0492 & 0.0492 & 0.0492 & 0.0492 & 0.0492\\
-$\tilde{r}$ & 0.486 & 0.486 & 0.486 & 0.486 & 0.486\\
-$\sigma_r$ & 0.2 & 0.2 & 0.2 & 0.2 & 0.2\\
-$\bar{Y}_5$ & 818 & 1630 & 2450 & 4890 & 8960\\
+$p_0$ & 0.197 & 0.197 & 0.197 & 0.197\\
+$\tilde{r}$ & 0.486 & 0.486 & 0.486 & 0.486\\
+$\sigma_r$ & 0.1 & 0.1 & 0.1 & 0.1\\
+$\bar{Y}_5$ & 1630 & 2450 & 4890 & 8960\\
+$\bar{C}$ & 1380 & 2070 & 4130 & 7560\\
 \hline
 \end{tabular}
 \end{center}
