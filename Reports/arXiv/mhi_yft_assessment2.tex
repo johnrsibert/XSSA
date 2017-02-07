@@ -1,17 +1,12 @@
-%\documentclass[12pt,letterpaper,twoside]{article}
 \documentclass[12pt,letterpaper]{article}
 \usepackage{amsmath}
 \usepackage{amsfonts}
-%\usepackage{appendix}
 \usepackage[figurewithin=section,tablewithin=section]{caption}
 \usepackage[usenames,dvipsnames]{color}
 \usepackage{graphicx}
 \usepackage{longtable}
 \usepackage{rotating}
-%\usepackage{verbatim}
-%\usepackage[pdftex,bookmarksopen=false]{hyperref}
 \usepackage[pdftex,bookmarks=false]{hyperref}
-%\usepackage[pdftex]{hyperref}
 \hypersetup{pdfauthor={John Sibert}
             pdfsubject={Yellowfin stock assessment}
             pdftitle={Assessment of the yellowfin tuna Thunnus albacares 
@@ -48,8 +43,8 @@ stock in the Main Hawaiian Islands Yellowfin Tuna Fishery}
 \newcommand\MSYFmsy{\MSY\;\Fmsy}
 \newcommand\Bd{B_1\; d}
 
-\title{Assessing of a portion of the Pacific yellowfin tuna 
-({\it Thunnus albacares}) stock:\\[0.125in]
+\title{Assessing of a portion of the Pacific 
+{\it Thunnus albacares} stock:\\[0.125in]
 {\it Ahi} in the Main Hawaiian Islands}
 
 
@@ -72,7 +67,7 @@ Honolulu, HI  96822 U.S.A.\\[0.125in]
 %\doublespacing
 
 \begin{abstract}
-Regional tuna fishery management organizations do not provide useful
+Regional tuna fishery management organizations cannot provide specific
 advice to local fishery managers in small island jurisdictions. The
 State of Hawaii maintains time series of yellowfin tuna catches dating
 back to 1949, but these data have never been formally applied to
@@ -83,7 +78,7 @@ Pacific stock. This approach uses a state-space logistic production
 model linked to the larger Pacific stock using an index of abundance. The
 conclusion is that such a model is feasible, that the local stock
 is not overfished and that local fisheries are fishing at acceptable
-levels. \help{and data and indices}
+levels.
 \end{abstract}
 
 
@@ -113,7 +108,7 @@ local production with little or no subsidies from equatorial
 production zones or nurseries.
 The Main Hawaiian Islands (MHI), Figure~\ref{fig:mhimap},
 comprising the 8 largest islands in the Hawaiian Archipelago,
-has been an important fishing ground throughout this history.
+have been important fishing grounds throughout this history.
 Since the recent expansion of the Papah\={a}naumoku\={a}kea Marine National
 Monument in 2016, the MHI is the only legally accessible tuna fishing ground
 in the State of Hawaii.
@@ -175,7 +170,7 @@ Stock dynamics follow the classic Schaefer (1954) differential equation:
 \label{eqn:ischaefer}
 \frac{dN}{dt} = rN(1-\frac{N}{K}) - FN
 \end{equation}
-where $N$ is the biomass of YFT in the MHI (metric tonnes, mt), 
+where $N$ is the biomass of YFT in the MHI (measured in metric tonnes, mt), 
 $r$ is the logistic growth rate (\peryr),
 $K$ is the asymptotic biomass (mt), and
 $F$ is the total fishing mortality (\peryr) in the MHI.
@@ -454,10 +449,9 @@ process error of the biomass trend.
 The maxima of the estimated biomass trends may exceed the
 estimated equilibrium biomass ($K$) for varying periods of time for
 all models.
-In the case of the region 2, $\sigma_r=0.8$, model,
-the estimated biomass and exceeds $K$
+In the case of the model with region 2 index $\sigma_r=0.8$,
+the estimated biomass exceeds $K$
 for most of the time series.
-
 
 \begin{figure}
 \begin{center}
@@ -1120,7 +1114,7 @@ both loose and tight priors on $r$.  Four different multipliers
 were tested so that the augmented catch was 1, 2, 5, and 10 times total catch.
 
 Tables~\ref{tab:k2} and \ref{tab:k2-rprior} summarize the results of
-fiting the augmented catch.
+fitting the augmented catch.
 All 8 augmented catch models converge to solutions. The negative
 log likelihood values are higher than comparable non-augmented fits.
 {\it A priori} one would expect that a fish population capable

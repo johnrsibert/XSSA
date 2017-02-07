@@ -726,13 +726,6 @@ FUNCTION void write_status(ofstream& s)
     s << "#             Q: " << alogit((dvariable)logitQ) << " (" << use_Q <<")" << endl;
     s << "# pcon = " << pcon << endl;
     s << "# klingon_multiplier = " << klingon_multiplier << endl;
-    // to keep the diagnostics R script happy
-    //s << "#     logsdlogF: " << logsdlogProc 
-    //         <<  " (" << active(logsdlogProc) <<")" << endl;
-    //s << "#        sdlogF: " << mfexp(logsdlogProc) << endl;
-    //s << "#   logsdlogPop: " << logsdlogProc
-    //         <<  " (" << active(logsdlogProc) <<")" << endl;
-    //s << "#      sdlogPop: " << mfexp(logsdlogProc) << endl;
 
     s << "# Residuals:" << endl;
     s << "  t    pop   K  forcing";
