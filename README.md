@@ -13,7 +13,7 @@ Development of state-space stock assessment models for application to open syste
 
 ###Directories
 
-* ADMB - source (.tpl files) for ADMB implementation including several __deprecated__ version
+* ADMB - source (.tpl files) for ADMB implementation including several __deprecated__ versions
 *	TMB - source (.R, .cpp and .dat files) for TMB port of ADMB implmentation
 *	scripts - R and bash scripts for plotting and data manipulation
 *	Reports - LaTeX and pdf documentaiton of models and results
@@ -21,9 +21,9 @@ Development of state-space stock assessment models for application to open syste
 *	YPR - yield per recruite of Main Hawaiian Islands yellowfing tuna fishery
 
 ### To Do
-* Modify estimatio of Q to allow estimate to exceed 1.0 for augmented catch models
-* Rationalize TMB code with isam6.tpl
-* Compute Widely Applicable Information Criterion
+* Modify estimation of Q to allow estimate to exceed 1.0 for augmented catch models
+* Rationalize TMB code with issam6.tpl
+* Compute Widely Applicable Information Criterion (WAIC)
 * Update analysis in the event that WCPFC uptades regional yellowfin assessment
 
 
