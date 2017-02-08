@@ -18,7 +18,7 @@ Development of state-space stock assessment models for application to open syste
 *	scripts - R and bash scripts for plotting and data manipulation
 *	Reports - LaTeX and pdf documentaiton of models and results
 * dat - data file to run isams6
-*	YPR - yield per recruite of Main Hawaiian Islands yellowfing tuna fishery
+*	YPR - yield per recruit analysis of Main Hawaiian Islands yellowfing tuna fishery
 
 ### To Do
 * Modify estimation of Q to allow estimate to exceed 1.0 for augmented catch models
