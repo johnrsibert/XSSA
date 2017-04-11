@@ -37,6 +37,12 @@ endif
 #BIN_DIR = ../run
 BIN_DIR = ~/bin
 
+issams-tad: issams-tad.tpl
+	@echo ------- Translate $<
+	$(ADMB_HOME)/bin/admb ${FLAGS} -r $<
+	@echo -------- move $@
+	mv -f $@ $(BIN_DIR)/$@$(VER)
+
 issams7: issams7.tpl
 	@echo ------- Translate $<
 	$(ADMB_HOME)/bin/admb ${FLAGS} -r $<
